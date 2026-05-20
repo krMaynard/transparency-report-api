@@ -31,56 +31,100 @@ client                          server
   │◀── rows (json or csv)         │
 ```
 
-## Quick start
+## Authentication
+
+Every endpoint except `/`, `/docs`, and `/openapi.json` requires a key in the
+`X-API-Key` header. To keep the demo obviously-not-production, the keys are
+just the two researcher names: `alice` and `bob`.
+
+Jobs are scoped per key — `bob` cannot list, view, fetch, or cancel jobs
+submitted with `alice`'s key (foreign job ids return `404`, not `403`, so the
+existence of other researchers' jobs isn't leaked).
+
+In a real deployment these keys would come from a secret store, not be
+hard-coded in `main.py`.
+
+## Try the demo from your terminal
 
 ```bash
+# 1. Install and seed
+git clone https://github.com/krMaynard/api-demo.git
+cd api-demo
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-python seed.py                     # builds demo.db from the JSON dataset
-uvicorn main:app --reload          # http://127.0.0.1:8000
+python seed.py
+
+# 2. Run the server in one terminal (leave it running)
+uvicorn main:app --port 8000
+
+# --- in a second terminal: ---
+
+# 3. Set your key once so you don't have to repeat it
+export KEY='alice'
+
+# 4. Look around
+curl -H "X-API-Key: $KEY" http://127.0.0.1:8000/tables
+curl -H "X-API-Key: $KEY" http://127.0.0.1:8000/schema/removals
+
+# 5. Submit a query — note the 202 + job_id
+curl -i -X POST http://127.0.0.1:8000/query \
+  -H "X-API-Key: $KEY" -H 'Content-Type: application/json' \
+  -d '{"sql": "SELECT c.name, SUM(r.items_requested) AS items FROM removals r JOIN countries c ON c.id = r.country_id GROUP BY c.name ORDER BY items DESC LIMIT 5"}'
+
+# Capture the id from the response, then:
+export JOB='<paste-job_id-here>'
+
+# 6. Poll until done
+curl -H "X-API-Key: $KEY" "http://127.0.0.1:8000/jobs/$JOB"
+
+# 7. Fetch the result as JSON or CSV
+curl -H "X-API-Key: $KEY" "http://127.0.0.1:8000/jobs/$JOB/result?format=json"
+curl -H "X-API-Key: $KEY" "http://127.0.0.1:8000/jobs/$JOB/result?format=csv" -o result.csv
 ```
 
-Open <http://127.0.0.1:8000/docs> for the interactive Swagger UI.
+### One-liner (capture id, poll, fetch)
+
+```bash
+KEY='alice'
+JOB=$(curl -s -X POST http://127.0.0.1:8000/query \
+  -H "X-API-Key: $KEY" -H 'Content-Type: application/json' \
+  -d '{"sql":"SELECT c.name, SUM(r.items_requested) AS items FROM removals r JOIN countries c ON c.id=r.country_id GROUP BY c.name ORDER BY items DESC LIMIT 5"}' \
+  | python3 -c "import sys,json;print(json.load(sys.stdin)['job_id'])")
+until [ "$(curl -s -H "X-API-Key: $KEY" "http://127.0.0.1:8000/jobs/$JOB" | python3 -c "import sys,json;print(json.load(sys.stdin)['status'])")" = "done" ]; do sleep 0.2; done
+curl -s -H "X-API-Key: $KEY" "http://127.0.0.1:8000/jobs/$JOB/result?format=json"
+```
+
+### Things to try that demonstrate the design
+
+```bash
+# No key -> 401
+curl -i http://127.0.0.1:8000/tables
+
+# Write attempt -> job lands in status=failed (read-only DB rejects it)
+curl -s -X POST http://127.0.0.1:8000/query \
+  -H "X-API-Key: $KEY" -H 'Content-Type: application/json' \
+  -d '{"sql":"DELETE FROM countries"}'
+# (then GET /jobs/<id> -> {"status":"failed","error":"SQL error: attempt to write a readonly database"})
+
+# Bob cannot see Alice's job
+curl -i -H 'X-API-Key: bob' "http://127.0.0.1:8000/jobs/$JOB"   # -> 404
+
+# Or just open the Swagger UI in a browser:  http://127.0.0.1:8000/docs
+# (click "Authorize" and paste a key)
+```
 
 ## Endpoints
 
-| Method | Path                                | Description                                    |
-|--------|-------------------------------------|------------------------------------------------|
-| GET    | `/`                                 | Service info                                   |
-| GET    | `/tables`                           | List tables                                    |
-| GET    | `/schema/{table}`                   | Show a table's columns                         |
-| POST   | `/query`                            | Submit a SQL query — returns `202 + job_id`    |
-| GET    | `/jobs`                             | List recent jobs                               |
-| GET    | `/jobs/{job_id}`                    | Job status                                     |
-| GET    | `/jobs/{job_id}/result?format=…`    | Result rows (only when `status=done`)          |
-| DELETE | `/jobs/{job_id}`                    | Cancel a running job, or remove a finished one |
-
-## Example
-
-Submit a query:
-
-```bash
-curl -i -X POST 'http://127.0.0.1:8000/query' \
-  -H 'Content-Type: application/json' \
-  -d '{"sql": "SELECT c.name, SUM(r.items_requested) AS items FROM removals r JOIN countries c ON c.id = r.country_id GROUP BY c.name ORDER BY items DESC LIMIT 5"}'
-# HTTP/1.1 202 Accepted
-# Location: /jobs/c7be1dc4894c4f4e84688847c5d829de
-# {"job_id":"c7be1dc4894c4f4e84688847c5d829de","status":"running",...}
-```
-
-Poll until done:
-
-```bash
-curl http://127.0.0.1:8000/jobs/c7be1dc4894c4f4e84688847c5d829de
-# {"status":"done","row_count":5,"result_url":"/jobs/.../result", ...}
-```
-
-Fetch the result:
-
-```bash
-curl 'http://127.0.0.1:8000/jobs/c7be1dc4894c4f4e84688847c5d829de/result?format=json'
-curl 'http://127.0.0.1:8000/jobs/c7be1dc4894c4f4e84688847c5d829de/result?format=csv' -o russia.csv
-```
+| Method | Path                                | Auth | Description                                    |
+|--------|-------------------------------------|------|------------------------------------------------|
+| GET    | `/`                                 | —    | Service info                                   |
+| GET    | `/tables`                           | key  | List tables                                    |
+| GET    | `/schema/{table}`                   | key  | Show a table's columns                         |
+| POST   | `/query`                            | key  | Submit a SQL query — returns `202 + job_id`    |
+| GET    | `/jobs`                             | key  | List **your** jobs                             |
+| GET    | `/jobs/{job_id}`                    | key  | Job status (your jobs only)                    |
+| GET    | `/jobs/{job_id}/result?format=…`    | key  | Result rows (only when `status=done`)          |
+| DELETE | `/jobs/{job_id}`                    | key  | Cancel a running job, or remove a finished one |
 
 ## Job statuses
 
@@ -137,6 +181,7 @@ GROUP BY pr.label ORDER BY pr.id;
 - Per-job results are capped at 100,000 rows; over that the job fails and the
   client is asked to add a `LIMIT`.
 - Jobs and their result rows live in process memory. Restart = clear.
-- This is a **demo**. Production would need: persistent job storage, auth,
-  per-user quotas, query allow-listing or row-level filtering, and result
-  pagination/streaming for large outputs.
+- This is a **demo**. Production would need: persistent job storage, real
+  auth (OAuth/OIDC + rotating keys from a secret store), per-user quotas,
+  query allow-listing or row-level filtering, and result pagination/streaming
+  for large outputs.

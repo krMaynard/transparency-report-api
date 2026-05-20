@@ -17,14 +17,36 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Response
 from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "demo.db")
 ROW_LIMIT = 100_000
 WORKER_THREADS = 4
 QUERY_TIMEOUT_SECONDS = 300
+
+# Demo-only API keys. In production these would live in a secret store
+# (Vault, AWS SM, etc.) and be loaded at startup, not committed to git.
+# We deliberately use the researcher's name as the key so it's obvious
+# this is a demo placeholder, not a credential.
+API_KEYS: dict[str, dict[str, str]] = {
+    "alice": {"name": "alice"},
+    "bob": {"name": "bob"},
+}
+
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
+
+
+def require_api_key(key: str | None = Depends(api_key_header)) -> dict[str, str]:
+    if not key or key not in API_KEYS:
+        raise HTTPException(
+            status_code=401,
+            detail="Missing or invalid API key. Set header `X-API-Key: <key>`.",
+        )
+    return {"key": key, **API_KEYS[key]}
+
 
 JobStatus = Literal["queued", "running", "done", "failed", "cancelled"]
 
@@ -33,6 +55,8 @@ JobStatus = Literal["queued", "running", "done", "failed", "cancelled"]
 class Job:
     id: str
     sql: str
+    owner_key: str
+    submitted_by: str
     status: JobStatus = "queued"
     submitted_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     started_at: str | None = None
@@ -46,6 +70,7 @@ class Job:
         return {
             "job_id": self.id,
             "status": self.status,
+            "submitted_by": self.submitted_by,
             "submitted_at": self.submitted_at,
             "started_at": self.started_at,
             "finished_at": self.finished_at,
@@ -134,15 +159,28 @@ def _execute_job(job_id: str) -> None:
             job.finished_at = _now()
 
 
+def _job_for_owner(job_id: str, owner_key: str) -> Job:
+    """Look up a job and 404 if it isn't owned by this caller.
+
+    We return 404 (not 403) for foreign jobs so the API doesn't leak the
+    existence of other researchers' job ids.
+    """
+    job = _jobs.get(job_id)
+    if job is None or job.owner_key != owner_key:
+        raise HTTPException(status_code=404, detail="Job not found.")
+    return job
+
+
 @app.get("/")
 def root() -> dict[str, Any]:
     return {
         "name": "SQL Query Demo API",
         "pattern": "async-job",
+        "auth": "X-API-Key header required for all endpoints except `/`, `/docs`, `/openapi.json`",
         "endpoints": {
             "POST /query": "Submit a SQL query, returns 202 + job_id",
-            "GET /jobs": "List recent jobs",
-            "GET /jobs/{job_id}": "Job status",
+            "GET /jobs": "List your jobs",
+            "GET /jobs/{job_id}": "Job status (your jobs only)",
             "GET /jobs/{job_id}/result?format=json|csv": "Result (only when status=done)",
             "DELETE /jobs/{job_id}": "Cancel a queued/running job, or remove a finished one",
             "GET /tables": "List tables in the demo database",
@@ -155,7 +193,7 @@ def root() -> dict[str, Any]:
 
 
 @app.get("/tables")
-def list_tables() -> dict[str, list[str]]:
+def list_tables(_: dict = Depends(require_api_key)) -> dict[str, list[str]]:
     with _connect_ro() as conn:
         rows = conn.execute(
             "SELECT name FROM sqlite_master WHERE type='table' "
@@ -165,7 +203,9 @@ def list_tables() -> dict[str, list[str]]:
 
 
 @app.get("/schema/{table}")
-def table_schema(table: str) -> dict[str, Any]:
+def table_schema(
+    table: str, _: dict = Depends(require_api_key)
+) -> dict[str, Any]:
     if not table.replace("_", "").isalnum():
         raise HTTPException(status_code=400, detail="Invalid table name.")
     with _connect_ro() as conn:
@@ -182,8 +222,17 @@ def table_schema(table: str) -> dict[str, Any]:
 
 
 @app.post("/query", status_code=202)
-def submit_query(body: QueryRequest, response: Response) -> dict[str, Any]:
-    job = Job(id=uuid.uuid4().hex, sql=body.sql)
+def submit_query(
+    body: QueryRequest,
+    response: Response,
+    principal: dict = Depends(require_api_key),
+) -> dict[str, Any]:
+    job = Job(
+        id=uuid.uuid4().hex,
+        sql=body.sql,
+        owner_key=principal["key"],
+        submitted_by=principal["name"],
+    )
     with _jobs_lock:
         _jobs[job.id] = job
     _executor.submit(_execute_job, job.id)
@@ -192,29 +241,31 @@ def submit_query(body: QueryRequest, response: Response) -> dict[str, Any]:
 
 
 @app.get("/jobs")
-def list_jobs(limit: int = 50) -> dict[str, Any]:
+def list_jobs(
+    limit: int = 50, principal: dict = Depends(require_api_key)
+) -> dict[str, Any]:
     with _jobs_lock:
-        items = sorted(_jobs.values(), key=lambda j: j.submitted_at, reverse=True)[:limit]
+        mine = [j for j in _jobs.values() if j.owner_key == principal["key"]]
+        items = sorted(mine, key=lambda j: j.submitted_at, reverse=True)[:limit]
         return {"jobs": [j.to_public() for j in items]}
 
 
 @app.get("/jobs/{job_id}")
-def get_job(job_id: str) -> dict[str, Any]:
+def get_job(
+    job_id: str, principal: dict = Depends(require_api_key)
+) -> dict[str, Any]:
     with _jobs_lock:
-        job = _jobs.get(job_id)
-        if job is None:
-            raise HTTPException(status_code=404, detail="Job not found.")
-        return job.to_public()
+        return _job_for_owner(job_id, principal["key"]).to_public()
 
 
 @app.get("/jobs/{job_id}/result", response_model=None)
 def get_job_result(
-    job_id: str, format: Literal["json", "csv"] = "json"
+    job_id: str,
+    format: Literal["json", "csv"] = "json",
+    principal: dict = Depends(require_api_key),
 ) -> JSONResponse | PlainTextResponse:
     with _jobs_lock:
-        job = _jobs.get(job_id)
-        if job is None:
-            raise HTTPException(status_code=404, detail="Job not found.")
+        job = _job_for_owner(job_id, principal["key"])
         if job.status != "done":
             raise HTTPException(
                 status_code=409,
@@ -237,11 +288,11 @@ def get_job_result(
 
 
 @app.delete("/jobs/{job_id}")
-def cancel_job(job_id: str) -> dict[str, Any]:
+def cancel_job(
+    job_id: str, principal: dict = Depends(require_api_key)
+) -> dict[str, Any]:
     with _jobs_lock:
-        job = _jobs.get(job_id)
-        if job is None:
-            raise HTTPException(status_code=404, detail="Job not found.")
+        job = _job_for_owner(job_id, principal["key"])
         prior = job.status
         if job.status in ("queued", "running"):
             job.status = "cancelled"
@@ -253,6 +304,5 @@ def cancel_job(job_id: str) -> dict[str, Any]:
                     job._conn.interrupt()
                 except sqlite3.Error:
                     pass
-        # Either way, drop the job from the table.
         del _jobs[job_id]
     return {"job_id": job_id, "previous_status": prior, "deleted": True}
