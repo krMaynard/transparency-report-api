@@ -79,7 +79,7 @@ def _request(method: str, path: str, *, payload=None, key: str | None = None):
     except urllib.error.HTTPError as e:
         try:
             body = json.loads(e.read())
-        except Exception:
+        except (ValueError, json.JSONDecodeError):
             body = {"detail": str(e)}
         _show_response(e.code, body)
         return e.code, body
@@ -102,7 +102,9 @@ def _poll(job_id: str, key: str) -> dict:
     _note("polling until done …")
     for attempt in range(60):
         time.sleep(0.25)
-        _, body = get(f"/jobs/{job_id}", key=key)
+        status, body = get(f"/jobs/{job_id}", key=key)
+        if status != 200:
+            raise RuntimeError(f"Polling failed with status {status}: {body}")
         if body.get("status") in ("done", "failed", "cancelled"):
             return body
     raise RuntimeError("Timed out waiting for job to finish.")
@@ -113,7 +115,8 @@ def _poll(job_id: str, key: str) -> dict:
 def _check_server() -> None:
     print(f"\n{BOLD}Checking that the server is up …{RESET}")
     try:
-        urllib.request.urlopen(f"{BASE}/", timeout=3)
+        with urllib.request.urlopen(f"{BASE}/", timeout=3):
+            pass
         print(f"  {GREEN}Server is running at {BASE}{RESET}\n")
     except Exception:
         print(f"  {RED}Cannot reach {BASE}{RESET}")
