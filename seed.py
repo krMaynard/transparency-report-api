@@ -1,6 +1,8 @@
 """Build demo.db from the Google Government Content Removals dataset.
 
-Source JSON: ../krMaynard.github.io/data/google-government-removals.json
+Default source: ../krMaynard.github.io/data/google-government-removals.json
+Override with --source <path> or the SEED_SOURCE_JSON env var.
+Override output with --db <path> or the DB_PATH env var.
 
 The source is a column-store-ish format: lookup arrays (periods, countries,
 requestors, products, reasons) and a `rows` array where the first five
@@ -8,25 +10,38 @@ columns are indices into those lookups and the rest are integer counts.
 We expand it into a small star schema: dimension tables + a `removals`
 fact table with foreign keys.
 """
+import argparse
 import json
 import os
 import sqlite3
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(HERE, "demo.db")
-SOURCE_JSON = os.path.normpath(
-    os.path.join(HERE, "..", "krMaynard.github.io", "data", "google-government-removals.json")
+
+_DEFAULT_SOURCE = os.getenv(
+    "SEED_SOURCE_JSON",
+    os.path.normpath(
+        os.path.join(HERE, "..", "krMaynard.github.io", "data", "google-government-removals.json")
+    ),
 )
+_DEFAULT_DB = os.getenv("DB_PATH", os.path.join(HERE, "demo.db"))
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Seed demo.db from the Google removals dataset.")
+    parser.add_argument("--source", default=_DEFAULT_SOURCE, help="Path to google-government-removals.json")
+    parser.add_argument("--db", default=_DEFAULT_DB, help="Output SQLite database path")
+    args = parser.parse_args()
+
+    SOURCE_JSON = args.source
+    DB_PATH = args.db
+
     with open(SOURCE_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
 
     if os.path.exists(DB_PATH):
         os.remove(DB_PATH)
 
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(args.db)
     cur = conn.cursor()
 
     cur.executescript(
@@ -113,7 +128,7 @@ def main() -> None:
     conn.close()
 
     print(
-        f"Seeded {DB_PATH}: {n_rows} removal rows across "
+        f"Seeded {args.db}: {n_rows} removal rows across "
         f"{len(data['periods'])} periods, {len(data['countries'])} countries, "
         f"{len(data['products'])} products, {len(data['reasons'])} reasons."
     )
