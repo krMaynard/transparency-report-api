@@ -172,6 +172,15 @@ class RedisJobStore:
     def __init__(self, client: Any, ttl: int = JOB_TTL) -> None:
         self._r = client
         self._ttl = ttl
+        # upstash-redis uses zadd(key, score, member); redis-py uses zadd(key, {member: score})
+        self._is_upstash = client.__class__.__module__.startswith("upstash_redis")
+
+    def _zadd(self, key: str, score: float, member: str) -> None:
+        """Normalise zadd signature across redis-py and upstash-redis."""
+        if self._is_upstash:
+            self._r.zadd(key, score, member)
+        else:
+            self._r.zadd(key, {member: score})
 
     # key helpers
     def _jk(self, job_id: str) -> str:
@@ -216,7 +225,7 @@ class RedisJobStore:
         self._r.hset(key, mapping=self._to_hash(job))
         self._r.expire(key, self._ttl)
         ts = datetime.fromisoformat(job.submitted_at).timestamp()
-        self._r.zadd(self._ok(job.owner_key), {job.id: ts})
+        self._zadd(self._ok(job.owner_key), ts, job.id)
 
     def get(self, job_id: str) -> Job | None:
         h = self._r.hgetall(self._jk(job_id))
