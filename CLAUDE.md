@@ -126,6 +126,10 @@ bind with `?`).
 
 ## Code Review Workflow
 
+**After opening or updating a pull request, always self-review the diff** and
+post a comment summarising what you checked and any issues found + fixed (run
+the tests/linters and note the result). Never leave a PR without a self-review.
+
 Whenever a pull request is created or updated, **always check for Gemini
 code-review comments** (`gemini-code-assist[bot]`) using the GitHub MCP tools:
 
@@ -133,6 +137,9 @@ code-review comments** (`gemini-code-assist[bot]`) using the GitHub MCP tools:
 2. Call `pull_request_read` with `method=get_review_comments` to get inline thread details.
 3. Verify each finding against the actual source files before acting.
 4. Apply confirmed fixes, commit, and push on the same branch.
+5. **Always reply to every Gemini (GCA) comment** with `add_reply_to_pull_request_comment` —
+   either describing the fix applied, or explaining why the suggestion isn't
+   being taken. Never leave a GCA review comment unacknowledged.
 
 ## Endpoints
 
