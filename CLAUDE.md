@@ -101,9 +101,12 @@ bind with `?`).
 - **Structured params, not SQL**: the only way to query is the validated
   parameter model, compiled to one parameterised SELECT — no caller SQL runs.
 - **Researcher portal** (`/portal` + `POST /portal/register`): a demo onboarding
-  UI. Registration issues an ephemeral key into an in-memory `_issued_keys` map;
-  `require_api_key` accepts configured keys *or* issued ones (`_lookup_principal`).
-  Per-process, like the job store — production would persist keys + add real auth.
+  UI. Registration mints a key into the **issued-key store** (`_key_store`:
+  Redis-backed when configured, else in-memory — shares `_redis` with the job
+  store), with an expiry (`ISSUED_KEY_TTL`) and per-IP/email rate limiting
+  (`_key_store.incr`). `require_api_key` accepts configured keys *or* issued ones
+  (`_lookup_principal`); `DELETE /portal/key` self-revokes. Still no real auth —
+  production would front it with SSO.
 - **202 + polling** instead of blocking HTTP: lets long queries run without
   tying up connections or timing out at proxies.
 - **Signed download URLs**: a done job exposes `download_urls` (json/csv) —
@@ -137,7 +140,8 @@ code-review comments** (`gemini-code-assist[bot]`) using the GitHub MCP tools:
 |--------|------|------|-------|
 | GET | `/` | — | Service info |
 | GET | `/portal` | — | Researcher portal web UI (sign in → key → schema) |
-| POST | `/portal/register` | — | Issue a demo API key (`{name, email}`) |
+| POST | `/portal/register` | — | Issue a demo API key (`{name, email}`) — rate-limited, expiring |
+| DELETE | `/portal/key` | key | Revoke your own portal-issued key |
 | GET | `/fields` | key | Queryable fields + operations |
 | GET | `/tables` | key | List tables |
 | GET | `/schema/{table}` | key | Column info |
