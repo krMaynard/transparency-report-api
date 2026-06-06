@@ -101,21 +101,21 @@ def require_api_key(key: str | None = Depends(api_key_header)) -> dict[str, str]
 DOWNLOAD_FORMATS = ("json", "csv")
 
 
-def _download_signature(job_id: str, owner_key: str, fmt: str, expires: int) -> str:
-    msg = f"{job_id}:{owner_key}:{fmt}:{expires}".encode()
+def _download_signature(job_id: str, fmt: str, expires: int) -> str:
+    # The job_id is an unguessable UUID, so it alone scopes the link; no need to
+    # mix in owner_key (which would force a store lookup before we could verify).
+    msg = f"{job_id}:{fmt}:{expires}".encode()
     return hmac.new(DOWNLOAD_URL_SECRET.encode(), msg, hashlib.sha256).hexdigest()
 
 
-def _make_download_url(job_id: str, owner_key: str, fmt: str) -> str:
+def _make_download_url(job_id: str, fmt: str) -> str:
     expires = int(time.time()) + DOWNLOAD_URL_TTL
-    sig = _download_signature(job_id, owner_key, fmt, expires)
+    sig = _download_signature(job_id, fmt, expires)
     return f"/jobs/{job_id}/download?format={fmt}&expires={expires}&sig={sig}"
 
 
-def _verify_download_signature(
-    job_id: str, owner_key: str, fmt: str, expires: int, sig: str
-) -> bool:
-    expected = _download_signature(job_id, owner_key, fmt, expires)
+def _verify_download_signature(job_id: str, fmt: str, expires: int, sig: str) -> bool:
+    expected = _download_signature(job_id, fmt, expires)
     return hmac.compare_digest(expected, sig)
 
 
@@ -157,7 +157,7 @@ class Job:
             "result_url": f"/jobs/{self.id}/result" if self.status == "done" else None,
             # Signed, expiring links that download the result without an API key.
             "download_urls": (
-                {fmt: _make_download_url(self.id, self.owner_key, fmt) for fmt in DOWNLOAD_FORMATS}
+                {fmt: _make_download_url(self.id, fmt) for fmt in DOWNLOAD_FORMATS}
                 if self.status == "done"
                 else None
             ),
@@ -870,17 +870,17 @@ def download_job_result(
     The link is a capability: the HMAC signature authorises this exact job +
     format + expiry, so possession of a valid, unexpired URL is sufficient.
     """
-    job = _store.get(job_id)
-    # Bind the signature to the job's owner; if the job is gone, there's nothing
-    # to verify against, so treat it as a 404 either way.
-    if job is None:
-        raise HTTPException(status_code=404, detail="Job not found.")
-
-    if not _verify_download_signature(job_id, job.owner_key, format, expires, sig):
+    # Verify the signature *before* touching the store, so a caller without a
+    # valid signature always gets 403 — whether or not the job id exists. This
+    # avoids leaking which job ids are real (404 vs 403 probing).
+    if not _verify_download_signature(job_id, format, expires, sig):
         raise HTTPException(status_code=403, detail="Invalid download signature.")
     if expires < int(time.time()):
         raise HTTPException(status_code=410, detail="Download link has expired.")
 
+    job = _store.get(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Result not found (may have expired).")
     if job.status != "done":
         raise HTTPException(
             status_code=409,

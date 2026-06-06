@@ -99,10 +99,11 @@ bind with `?`).
 - **202 + polling** instead of blocking HTTP: lets long queries run without
   tying up connections or timing out at proxies.
 - **Signed download URLs**: a done job exposes `download_urls` (json/csv) —
-  capability links carrying an HMAC-SHA256 of `job_id:owner_key:format:expires`.
-  `GET /jobs/{id}/download` verifies the signature instead of an API key, so the
-  URL alone authorises the download (presigned-URL style). Set
-  `DOWNLOAD_URL_SECRET` in production so links survive restarts and span workers.
+  capability links carrying an HMAC-SHA256 of `job_id:format:expires`.
+  `GET /jobs/{id}/download` verifies the signature (before any store lookup, so
+  job existence isn't leaked) instead of an API key, so the URL alone authorises
+  the download (presigned-URL style). Set `DOWNLOAD_URL_SECRET` in production so
+  links survive restarts and span workers.
 - **In-memory job registry** (`_jobs` dict + `threading.Lock`): simple for a
   demo; restart clears all jobs. Production would need persistent storage.
 - **`sqlite3.interrupt()`** on `DELETE /jobs/{id}` while running: aborts the

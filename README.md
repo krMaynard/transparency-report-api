@@ -246,11 +246,13 @@ map with a signed, expiring link for each format:
 ```
 
 These are **capability URLs** (like an S3 presigned link): the `sig` is an
-HMAC-SHA256 over the job id, owner, format, and expiry, so the link
-authorises that exact download and nothing else. `GET /jobs/{id}/download`
-therefore needs **no `X-API-Key`** — possession of a valid, unexpired URL is
-sufficient — and serves the result as a file attachment. You can hand the URL
-to a browser, a `curl` without headers, or a download manager.
+HMAC-SHA256 over the job id, format, and expiry, so the link authorises that
+exact download and nothing else. `GET /jobs/{id}/download` therefore needs
+**no `X-API-Key`** — possession of a valid, unexpired URL is sufficient — and
+serves the result as a file attachment. You can hand the URL to a browser, a
+`curl` without headers, or a download manager. The signature is checked before
+any job lookup, so an invalid signature always returns `403` whether or not the
+job id exists (no existence probing).
 
 ```bash
 # Fetch the signed CSV link from the job status, then download with no key:
@@ -380,9 +382,11 @@ No running server or Redis needed — the test suite uses FastAPI's in-process
   compiler couldn't write to it.
 - Per-job results are capped at `ROW_LIMIT` rows (default 100k); over that the
   job fails and the client is asked to lower `max_count`.
-- Download URLs are signed capabilities: the HMAC binds job id, owner, format,
-  and expiry, so a link can't be tampered with or repointed and stops working
-  after `DOWNLOAD_URL_TTL_SECONDS`. Set `DOWNLOAD_URL_SECRET` in production.
+- Download URLs are signed capabilities: the HMAC binds job id, format, and
+  expiry, so a link can't be tampered with or repointed and stops working after
+  `DOWNLOAD_URL_TTL_SECONDS`. The signature is verified before any store lookup,
+  so invalid signatures get a uniform `403` and can't probe which job ids exist.
+  Set `DOWNLOAD_URL_SECRET` in production.
 - When `REDIS_URL` is set, jobs and results persist across restarts and are
   shared across multiple processes. Without it, everything lives in memory
   and a restart clears all jobs.

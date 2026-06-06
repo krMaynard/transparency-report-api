@@ -228,16 +228,13 @@ class TestSecureDownload:
         assert client.get(bumped).status_code == 403
 
     def test_expired_link_is_410(self):
-        from main import _make_download_url, _store
+        from main import _download_signature
 
         job = _submit_and_wait(COUNT_ALL)
         job_id = job["job_id"]
-        owner_key = _store.get(job_id).owner_key
         # Forge a correctly-signed but already-expired link.
         expires = 1
-        from main import _download_signature
-
-        sig = _download_signature(job_id, owner_key, "json", expires)
+        sig = _download_signature(job_id, "json", expires)
         r = client.get(f"/jobs/{job_id}/download?format=json&expires={expires}&sig={sig}")
         assert r.status_code == 410
 
@@ -247,9 +244,11 @@ class TestSecureDownload:
         url = job["download_urls"]["json"].replace("format=json", "format=csv")
         assert client.get(url).status_code == 403
 
-    def test_unknown_job_download_is_404(self):
+    def test_unknown_job_download_is_403(self):
+        # Signature is verified before any store lookup, so an unknown job id with
+        # an invalid signature returns 403 (not 404) — existence isn't leaked.
         r = client.get("/jobs/doesnotexist/download?format=json&expires=99999999999&sig=abc")
-        assert r.status_code == 404
+        assert r.status_code == 403
 
 
 # ── Job isolation ─────────────────────────────────────────────────────────────
