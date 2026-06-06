@@ -250,6 +250,46 @@ class TestSafety:
         # Table still intact afterwards.
         assert client.get("/tables", headers=ALICE).json()["tables"].count("countries") == 1
 
+    def test_dimension_requires_string(self):
+        # A numeric value on a TEXT dimension would silently match nothing under
+        # SQLite affinity rules, so it is rejected up front.
+        r = client.post(
+            "/query",
+            json={"query": {"and": [{"operation": "EQ", "field_name": "country_code", "field_values": [123]}]}},
+            headers=ALICE,
+        )
+        assert r.status_code == 400
+
+    def test_duplicate_group_by_is_400(self):
+        r = client.post(
+            "/query",
+            json={
+                "group_by": ["country_name", "country_name"],
+                "aggregates": [{"function": "COUNT", "alias": "n"}],
+            },
+            headers=ALICE,
+        )
+        assert r.status_code == 400
+
+    def test_alias_clashing_with_group_by_is_400(self):
+        r = client.post(
+            "/query",
+            json={
+                "group_by": ["country_name"],
+                "aggregates": [{"function": "SUM", "field_name": "num_requests", "alias": "country_name"}],
+            },
+            headers=ALICE,
+        )
+        assert r.status_code == 400
+
+    def test_duplicate_field_is_400(self):
+        r = client.post(
+            "/query",
+            json={"fields": ["country_name", "country_name"]},
+            headers=ALICE,
+        )
+        assert r.status_code == 400
+
     def test_no_sql_field_accepted(self):
         # The old free-form `sql` field is gone; sending it yields an empty
         # (default) query rather than executing arbitrary SQL.

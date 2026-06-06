@@ -402,6 +402,13 @@ def _require_number(value: Any, field_name: str) -> None:
         raise QueryCompileError(f"Field '{field_name}' requires numeric values.")
 
 
+def _require_string(value: Any, field_name: str) -> None:
+    # Dimensions are TEXT columns; a numeric value would silently match nothing
+    # under SQLite type affinity rules, so reject it up front.
+    if not isinstance(value, str):
+        raise QueryCompileError(f"Field '{field_name}' requires string values.")
+
+
 def _compile_condition(cond: Condition) -> tuple[str, list[Any]]:
     field = cond.field_name
     if field not in _ALL_FIELDS:
@@ -424,12 +431,16 @@ def _compile_condition(cond: Condition) -> tuple[str, list[Any]]:
             raise QueryCompileError("Operation EQ takes exactly one value; use IN for multiple.")
         if is_measure:
             _require_number(values[0], field)
+        else:
+            _require_string(values[0], field)
         return f"{col} = ?", [values[0]]
 
     if op == "IN":
-        if is_measure:
-            for v in values:
+        for v in values:
+            if is_measure:
                 _require_number(v, field)
+            else:
+                _require_string(v, field)
         placeholders = ", ".join(["?"] * len(values))
         return f"{col} IN ({placeholders})", list(values)
 
@@ -490,12 +501,16 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
         for gb in req.group_by:
             if gb not in _DIMENSIONS:
                 raise QueryCompileError(f"group_by field '{gb}' must be a dimension. See GET /fields.")
+            if gb in col_expr:
+                raise QueryCompileError(f"Duplicate group_by field '{gb}'.")
             expr = _DIMENSIONS[gb]
             select_parts.append(f"{expr} AS {gb}")
             columns.append(gb)
             col_expr[gb] = expr
         for agg in req.aggregates:
             alias = _safe_alias(agg.alias)
+            if alias in col_expr:
+                raise QueryCompileError(f"Duplicate or clashing output column '{alias}'.")
             if agg.function == "COUNT" and agg.field_name in ("*", ""):
                 expr = "COUNT(*)"
             elif agg.field_name not in _MEASURES:
@@ -514,6 +529,8 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
         for f in fields:
             if f not in _ALL_FIELDS:
                 raise QueryCompileError(f"Unknown field '{f}'. See GET /fields.")
+            if f in col_expr:
+                raise QueryCompileError(f"Duplicate field '{f}' in fields list.")
             expr = _ALL_FIELDS[f]
             select_parts.append(f"{expr} AS {f}")
             columns.append(f)
