@@ -203,7 +203,10 @@ def _lookup_principal(key: str) -> dict[str, str] | None:
     if rec is None:
         return None
     if rec.get("auth") == "google":
-        reg = _registrations.get(rec.get("email", ""))
+        email = rec.get("email")
+        if not email:
+            return None
+        reg = _registrations.get(email)
         if reg is None or reg.get("status") != "approved":
             return None
     return rec
@@ -608,16 +611,19 @@ class MemoryRegistrationStore:
         self._lock = threading.Lock()
 
     def upsert(self, email: str, record: dict[str, Any]) -> None:
+        # Copy on the way in/out so callers can't alias and mutate stored state
+        # (the Redis backend serialises, giving the same isolation for free).
         with self._lock:
-            self._recs[email] = record
+            self._recs[email] = record.copy()
 
     def get(self, email: str) -> dict[str, Any] | None:
         with self._lock:
-            return self._recs.get(email)
+            rec = self._recs.get(email)
+            return rec.copy() if rec is not None else None
 
     def list(self) -> list[dict[str, Any]]:
         with self._lock:
-            return list(self._recs.values())
+            return [rec.copy() for rec in self._recs.values()]
 
     def delete(self, email: str) -> bool:
         with self._lock:
@@ -639,13 +645,12 @@ class RedisRegistrationStore:
         return json.loads(raw) if raw else None
 
     def list(self) -> list[dict[str, Any]]:
-        out: list[dict[str, Any]] = []
-        for e in self._r.smembers("reg:index"):
-            email = e.decode() if isinstance(e, bytes) else e
-            rec = self.get(email)
-            if rec:
-                out.append(rec)
-        return out
+        emails = [e.decode() if isinstance(e, bytes) else e for e in self._r.smembers("reg:index")]
+        if not emails:
+            return []
+        # Single round-trip rather than one GET per registration.
+        raw_recs = self._r.mget([f"reg:{email}" for email in emails])
+        return [json.loads(raw) for raw in raw_recs if raw]
 
     def delete(self, email: str) -> bool:
         self._r.srem("reg:index", email)
