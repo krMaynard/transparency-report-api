@@ -34,6 +34,7 @@ Configuration (environment variables):
     PUBLIC_BASE_URL       base URL used to make callback payload links absolute (default: relative)
     CALLBACK_TIMEOUT_SECONDS  per-attempt webhook timeout (default: 10)
     CALLBACK_MAX_ATTEMPTS     webhook delivery attempts before giving up (default: 3)
+    CALLBACK_WORKERS          size of the bounded webhook delivery pool (default: 8)
     CALLBACK_ALLOW_PRIVATE    allow callbacks to private/loopback hosts — dev only (default: off)
 """
 import csv
@@ -102,6 +103,7 @@ LOG_FORMAT = os.getenv("LOG_FORMAT", "json").lower()
 PUBLIC_BASE_URL = os.getenv("PUBLIC_BASE_URL", "").rstrip("/")
 CALLBACK_TIMEOUT = int(os.getenv("CALLBACK_TIMEOUT_SECONDS", "10"))
 CALLBACK_MAX_ATTEMPTS = int(os.getenv("CALLBACK_MAX_ATTEMPTS", "3"))
+CALLBACK_WORKERS = int(os.getenv("CALLBACK_WORKERS", "8"))
 CALLBACK_ALLOW_PRIVATE = os.getenv("CALLBACK_ALLOW_PRIVATE", "").lower() in ("1", "true", "yes")
 
 
@@ -255,6 +257,11 @@ def _validate_callback_url(url: str) -> None:
         raise CallbackUrlError(f"callback_url host did not resolve: {exc}")
     for info in infos:
         ip = ipaddress.ip_address(info[4][0])
+        # IPv4-mapped (::ffff:127.0.0.1) and 6to4 IPv6 addresses report
+        # is_private/is_loopback=False even when they embed a private IPv4 — unwrap
+        # to the embedded v4 so the guard can't be bypassed through them.
+        if isinstance(ip, ipaddress.IPv6Address):
+            ip = ip.ipv4_mapped or ip.sixtofour or ip
         if (
             ip.is_private or ip.is_loopback or ip.is_link_local
             or ip.is_reserved or ip.is_multicast or ip.is_unspecified
@@ -569,6 +576,9 @@ _redis = _make_redis_client()
 _store: MemoryJobStore | RedisJobStore = _make_store()
 _key_store: MemoryKeyStore | RedisKeyStore = _make_key_store()
 _executor = ThreadPoolExecutor(max_workers=WORKER_THREADS, thread_name_prefix="sql-worker")
+# Webhook delivery runs on its own bounded pool so a flood of callbacks (or slow
+# receivers during retry backoff) can't exhaust threads or starve query workers.
+_callback_executor = ThreadPoolExecutor(max_workers=CALLBACK_WORKERS, thread_name_prefix="callback-worker")
 
 app = FastAPI(
     title="Structured Query Demo API (async jobs)",
@@ -927,21 +937,21 @@ def _send_callback(job_id: str, callback_url: str, payload: dict[str, Any]) -> N
     }
     for attempt in range(1, CALLBACK_MAX_ATTEMPTS + 1):
         try:
-            _validate_callback_url(callback_url)  # re-check (DNS rebinding) before each send
+            _validate_callback_url(callback_url)  # re-check (narrows DNS rebinding) before each send
             req = urllib.request.Request(callback_url, data=body, headers=headers, method="POST")
             with _callback_opener.open(req, timeout=CALLBACK_TIMEOUT) as resp:
-                status = resp.status
-            if 200 <= status < 300:
-                CALLBACKS_TOTAL.labels("delivered").inc()
-                logger.info("callback_delivered", extra={"data": {
-                    "job_id": job_id, "status": status, "attempt": attempt}})
-                return
-            reason = f"HTTP {status}"
+                status = resp.status  # the opener only returns for 2xx; 3xx/4xx/5xx raise HTTPError
+            CALLBACKS_TOTAL.labels("delivered").inc()
+            logger.info("callback_delivered", extra={"data": {
+                "job_id": job_id, "status": status, "attempt": attempt}})
+            return
         except CallbackUrlError as exc:
             CALLBACKS_TOTAL.labels("blocked").inc()
             logger.warning("callback_blocked", extra={"data": {"job_id": job_id, "error": str(exc)}})
             return  # don't retry a blocked target
-        except Exception as exc:  # network error, timeout, non-2xx HTTPError, …
+        except urllib.error.HTTPError as exc:
+            reason = f"HTTP {exc.code}"
+        except Exception as exc:  # network error, timeout, …
             reason = f"{type(exc).__name__}: {exc}"
         if attempt < CALLBACK_MAX_ATTEMPTS:
             time.sleep(2 ** (attempt - 1))  # 1s, 2s, 4s, …
@@ -951,16 +961,11 @@ def _send_callback(job_id: str, callback_url: str, payload: dict[str, Any]) -> N
 
 
 def _dispatch_callback(job: Job) -> None:
-    """Fire-and-forget callback delivery on its own thread (off the query workers)."""
+    """Fire-and-forget callback delivery on the bounded callback pool (off query workers)."""
     if not job.callback_url or job.status not in ("done", "failed"):
         return
     payload = {"event": f"job.{job.status}", "job": _absolutise(job.to_public())}
-    threading.Thread(
-        target=_send_callback,
-        args=(job.id, job.callback_url, payload),
-        name=f"callback-{job.id[:8]}",
-        daemon=True,
-    ).start()
+    _callback_executor.submit(_send_callback, job.id, job.callback_url, payload)
 
 
 def _connect_ro() -> sqlite3.Connection:

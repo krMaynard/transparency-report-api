@@ -676,10 +676,11 @@ class TestCallbacks:
         main.CALLBACK_ALLOW_PRIVATE = False  # exercise the guard regardless of env
         try:
             for bad in (
-                "http://127.0.0.1/x",        # loopback
-                "http://169.254.169.254/x",  # cloud metadata (link-local)
-                "http://10.1.2.3/x",         # private
-                "http://[::1]/x",            # ipv6 loopback
+                "http://127.0.0.1/x",           # loopback
+                "http://169.254.169.254/x",     # cloud metadata (link-local)
+                "http://10.1.2.3/x",            # private
+                "http://[::1]/x",               # ipv6 loopback
+                "http://[::ffff:127.0.0.1]/x",  # ipv4-mapped ipv6 loopback (bypass attempt)
             ):
                 with pytest.raises(main.CallbackUrlError):
                     main._validate_callback_url(bad)

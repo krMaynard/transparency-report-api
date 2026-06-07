@@ -133,12 +133,14 @@ bind with `?`).
   `job_done`/`job_failed`. Pass fields via `extra={"data": {...}}`; never log keys.
 - **Webhook callbacks**: an optional `callback_url` on `POST /query`. When the
   job reaches `done`/`failed`, `_dispatch_callback` POSTs the job object (with
-  absolute links if `PUBLIC_BASE_URL` is set) to that URL on a daemon thread —
-  off the query workers — HMAC-signed (`X-Webhook-Signature`, same secret as
-  download URLs), retried with backoff. SSRF-guarded: `_validate_callback_url`
-  blocks non-http(s) and private/loopback/link-local/metadata targets (at submit
-  *and* before each send, defeating DNS rebinding); redirects aren't followed.
-  `CALLBACK_ALLOW_PRIVATE=1` bypasses the guard for local dev only.
+  absolute links if `PUBLIC_BASE_URL` is set) to that URL on a **bounded callback
+  thread pool** (`_callback_executor`, `CALLBACK_WORKERS`) — off the query
+  workers — HMAC-signed (`X-Webhook-Signature`, same secret as download URLs),
+  retried with backoff. SSRF-guarded: `_validate_callback_url` blocks non-http(s)
+  and private/loopback/link-local/metadata targets, **unwrapping IPv4-mapped/6to4
+  IPv6** so they can't smuggle a private v4; enforced at submit *and* before each
+  send (narrows DNS rebinding — full closure needs network egress filtering);
+  redirects aren't followed. `CALLBACK_ALLOW_PRIVATE=1` bypasses for local dev.
 - **Prometheus metrics** at `GET /metrics` (no auth): the same request middleware
   records `api_demo_http_requests_total` + `_http_request_duration_seconds`,
   labelled by the **route template** (`/jobs/{job_id}`) to bound cardinality; the

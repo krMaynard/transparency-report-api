@@ -457,6 +457,7 @@ All tuneable values are read from environment variables at startup:
 | `PUBLIC_BASE_URL` | _(unset — relative links)_ | Base URL to make callback payload links absolute |
 | `CALLBACK_TIMEOUT_SECONDS` | `10` | Per-attempt webhook delivery timeout |
 | `CALLBACK_MAX_ATTEMPTS` | `3` | Webhook delivery attempts before giving up |
+| `CALLBACK_WORKERS` | `8` | Size of the bounded webhook delivery thread pool |
 | `CALLBACK_ALLOW_PRIVATE` | `0` | Allow callbacks to private/loopback hosts (dev only) |
 
 Copy `.env.example` to `.env` and edit before running Docker Compose.
