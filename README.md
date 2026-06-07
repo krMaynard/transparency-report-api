@@ -575,9 +575,11 @@ gcloud iam workload-identity-pools providers create-oidc github \
   --location=global --workload-identity-pool=github \
   --issuer-uri="https://token.actions.githubusercontent.com" \
   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository" \
-  --attribute-condition="assertion.repository=='${REPO}'"
-POOL=$(gcloud iam workload-identity-pools describe github --location=global --format='value(name)')
+  --attribute-condition="assertion.repository=='${REPO}'" \
+  --project "$PROJECT_ID"
+POOL=$(gcloud iam workload-identity-pools describe github --location=global --project "$PROJECT_ID" --format='value(name)')
 gcloud iam service-accounts add-iam-policy-binding "$SA" \
+  --project "$PROJECT_ID" \
   --role=roles/iam.workloadIdentityUser \
   --member="principalSet://iam.googleapis.com/${POOL}/attribute.repository/${REPO}"
 ```
@@ -603,8 +605,8 @@ Map a domain to the service (or use Cloud Run's built-in domain mapping / a
 load balancer):
 
 ```bash
-gcloud beta run domain-mappings create --service "$SERVICE" \
-  --domain api.example.com --region "$REGION"
+gcloud beta run domain-mappings create --service api-demo \
+  --domain api.example.com --region "$REGION" --project "$PROJECT_ID"
 # Then add the shown DNS records at your registrar.
 ```
 
