@@ -1583,14 +1583,20 @@ def _ask_system_prompt() -> str:
     return "\n".join(lines)
 
 
+_anthropic_client = None
+
+
 def _translate_question(question: str) -> dict[str, Any]:
     """Call Claude to turn a question into an AskQuery dict (constrained JSON).
     `anthropic` is imported lazily (only needed when the feature is enabled);
-    monkeypatched in tests so the suite never makes a network call."""
+    monkeypatched in tests so the suite never makes a network call. The client is
+    cached so its HTTP connection pool is reused across requests."""
+    global _anthropic_client
     import anthropic
 
-    client = anthropic.Anthropic()
-    resp = client.messages.create(
+    if _anthropic_client is None:
+        _anthropic_client = anthropic.Anthropic()
+    resp = _anthropic_client.messages.create(
         model=ANTHROPIC_MODEL,
         max_tokens=1024,
         system=_ask_system_prompt(),
@@ -1692,7 +1698,7 @@ def ask(body: AskRequest, request: Request) -> dict[str, Any]:
     try:
         req = _askquery_to_request(ask_query)
         result = _run_query_bounded(req)
-    except (QueryCompileError, ValidationError, ValueError) as exc:
+    except (QueryCompileError, ValidationError, ValueError, KeyError, TypeError, AttributeError) as exc:
         # Surface the model's attempt so the user sees what it produced.
         raise HTTPException(
             status_code=422,
