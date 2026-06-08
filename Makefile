@@ -1,4 +1,4 @@
-.PHONY: install seed serve test lint gifs portal-gifs
+.PHONY: install seed serve test lint typecheck gifs portal-gifs
 
 install:
 	pip install -r requirements.txt -r requirements-dev.txt
@@ -15,6 +15,10 @@ test:
 # Same lint CI runs on every PR/push.
 lint:
 	python -m pyflakes main.py seed.py demo.py conftest.py test_api.py
+
+# Static type check (config in mypy.ini); also runs in CI.
+typecheck:
+	python -m mypy
 
 # Regenerate the terminal-demo GIFs in docs/gifs/ (starts a temp server itself).
 gifs:

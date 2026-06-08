@@ -46,10 +46,11 @@ Built to demonstrate two things:
 
 ## CI
 
-GitHub Actions runs `pyflakes main.py seed.py demo.py conftest.py test_api.py`
-and `pytest test_api.py` on every pull request and push to `main` (`ci.yml`).
-Keep both green — the suite is hermetic (no Redis/server/`demo.db` needed;
-`conftest.py` builds a temp DB). Run them locally before pushing.
+GitHub Actions runs `pyflakes`, `mypy` (config in `mypy.ini`, over
+`main.py`/`seed.py`/`demo.py`/`conftest.py`), and `pytest test_api.py` on every
+pull request and push to `main` (`ci.yml`). Keep all three green — the suite is
+hermetic (no Redis/server/`demo.db` needed; `conftest.py` builds a temp DB). Run
+them locally before pushing (`make lint typecheck test`).
 
 `deploy.yml` builds + pushes the image and rolls a Cloud Run revision on push to
 `main` via Workload Identity Federation, stamping the commit SHA as `APP_VERSION`.
