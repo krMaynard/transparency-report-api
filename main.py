@@ -247,7 +247,7 @@ api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
 def require_api_key(key: str | None = Depends(api_key_header)) -> dict[str, str]:
     principal = _lookup_principal(key) if key else None
-    if principal is None:
+    if principal is None or key is None:
         raise HTTPException(
             status_code=401,
             detail="Missing or invalid API key. Set header `X-API-Key: <key>`.",
@@ -1696,14 +1696,16 @@ def _askquery_to_request(aq: dict[str, Any]) -> QueryRequest:
             "field_name": "*" if is_count_star else a["field"],
             "alias": a["alias"],
         })
-    return QueryRequest(
-        table=aq.get("table"),
-        query={"and": conditions},
-        group_by=aq.get("group_by", []),
-        aggregates=aggregates,
-        sort=[{"field_name": s["field"], "order": s["order"]} for s in aq.get("sort", [])],
-        max_count=aq.get("max_count") or 10,
-    )
+    payload = {
+        "table": aq.get("table"),
+        "query": {"and": conditions},
+        "group_by": aq.get("group_by", []),
+        "aggregates": aggregates,
+        "sort": [{"field_name": s["field"], "order": s["order"]} for s in aq.get("sort", [])],
+        "max_count": aq.get("max_count") or 10,
+    }
+    # model_validate runs the same field validation as a request body would.
+    return QueryRequest.model_validate(payload)
 
 
 def _run_query_bounded(body: QueryRequest) -> dict[str, Any]:
@@ -1774,6 +1776,7 @@ def ask(body: AskRequest, request: Request) -> dict[str, Any]:
             logger.exception("nl_translate_failed")
             raise HTTPException(status_code=502, detail="The language model could not translate that question.")
         _ask_cache_put(question, ask_query)
+    assert ask_query is not None  # set from cache or translate above
     try:
         req = _askquery_to_request(ask_query)
         result = _run_query_bounded(req)

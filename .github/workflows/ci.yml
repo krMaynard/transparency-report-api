@@ -31,10 +31,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx pyflakes
+          pip install pytest httpx pyflakes mypy
 
       - name: Lint (pyflakes)
         run: python -m pyflakes main.py seed.py demo.py conftest.py test_api.py
+
+      - name: Type check (mypy)
+        run: python -m mypy
 
       - name: Run tests
         run: python -m pytest test_api.py -q
