@@ -4,20 +4,57 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Research Data Portal · EU DSA VLOP Transparency</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+  // Match the main site: set the theme before first paint to avoid a flash.
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
 <style>
   :root {
-    --bg: #0d1117; --panel: #161b22; --panel2: #1c2230; --border: #30363d;
-    --fg: #e6edf3; --muted: #9aa7b4; --accent: #58a6ff; --accent2: #3fb950;
+    --bg: #f2f2f2; --panel: #fff; --panel2: #f5f5f5; --border: #e8e8e8;
+    --fg: #333; --muted: #666; --accent: #2a9d8f; --accent-dark: #1e7268; --accent2: #1e7268;
+    --on-accent: #fff; --shadow: rgba(0,0,0,.07);
     --mono: ui-monospace, SFMono-Regular, "DejaVu Sans Mono", Menlo, monospace;
+  }
+  [data-theme="dark"] {
+    --bg: #15181c; --panel: #1d2025; --panel2: #2a2f35; --border: #2c3138;
+    --fg: #e8e8e8; --muted: #b0b0b0; --accent: #4ec1b1; --accent-dark: #6ed3c4; --accent2: #6ed3c4;
+    --on-accent: #08110f; --shadow: rgba(0,0,0,.45);
   }
   * { box-sizing: border-box; }
   body {
-    margin: 0; background: radial-gradient(1200px 600px at 50% -10%, #16203a 0%, var(--bg) 55%);
-    color: var(--fg); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    min-height: 100vh; padding: 32px 16px;
+    margin: 0; background: var(--bg);
+    color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
   }
-  .wrap { max-width: 880px; margin: 0 auto; }
+  /* Top site bar — mirrors kieranmaynard.com */
+  .site-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.9rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .site-nav .nav-name { font-weight: 700; font-size: 1rem; color: var(--fg); text-decoration: none; }
+  .site-nav .nav-links { display: flex; gap: 1.4rem; align-items: center; }
+  .site-nav .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .site-nav .nav-links a:hover { color: var(--accent); }
+  .theme-toggle {
+    background: none; border: 0; color: var(--muted); cursor: pointer; padding: 4px;
+    display: inline-flex; width: auto; margin: 0;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle svg { width: 20px; height: 20px; }
+  .theme-icon-light { display: none; }
+  [data-theme="dark"] .theme-toggle .theme-icon-light { display: block; }
+  [data-theme="dark"] .theme-toggle .theme-icon-dark { display: none; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 1.5rem; }
   header { text-align: center; margin-bottom: 28px; }
   header .badge {
     display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
@@ -37,18 +74,19 @@
     width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
     background: var(--panel2); color: var(--fg); font-size: 15px;
   }
-  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(88,166,255,.2); }
+  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(42,157,143,.2); }
   button {
     margin-top: 20px; width: 100%; padding: 12px 16px; border: 0; border-radius: 9px;
-    background: var(--accent); color: #04101f; font-size: 15px; font-weight: 650; cursor: pointer;
+    background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 650; cursor: pointer;
   }
-  button:hover { filter: brightness(1.07); }
+  button:hover { background: var(--accent-dark); }
   button:disabled { opacity: .6; cursor: default; }
   .hidden { display: none !important; }
-  .error { color: #ff7b72; font-size: 14px; margin-top: 12px; min-height: 18px; }
+  .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
+  [data-theme="dark"] .error { color: #ff7b72; }
   .keyrow { display: flex; gap: 10px; align-items: stretch; }
   .keybox {
-    flex: 1; font-family: var(--mono); font-size: 14px; background: #0b1020; color: var(--accent2);
+    flex: 1; font-family: var(--mono); font-size: 14px; background: var(--panel2); color: var(--accent2);
     border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; overflow-x: auto;
     white-space: nowrap;
   }
@@ -77,7 +115,7 @@
   [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
   .skip-link {
     position: absolute; left: 8px; top: -48px; z-index: 10;
-    background: var(--accent); color: #04101f; padding: 8px 14px;
+    background: var(--accent); color: var(--on-accent); padding: 8px 14px;
     border-radius: 8px; font-weight: 700; transition: top .15s;
   }
   .skip-link:focus { top: 8px; }
@@ -86,9 +124,21 @@
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
+<nav class="site-nav" aria-label="Site">
+  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <div class="nav-links">
+    <a href="https://kieranmaynard.com/work.html">Work</a>
+    <a href="https://kieranmaynard.com/transparency.html">Products</a>
+    <a href="https://kieranmaynard.com/blog.html">Blog</a>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
+      <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
+      <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
+    </button>
+  </div>
+</nav>
 <div class="wrap">
   <header>
-    <span class="badge">Demo portal</span>
+    <span class="badge">Researcher portal</span>
     <h1>Research Data Portal</h1>
     <p>EU DSA VLOP content-moderation transparency — request access and explore the schema.</p>
   </header>
@@ -105,10 +155,10 @@
       <p class="hint">New accounts are reviewed by an administrator before access is granted.</p>
     </div>
 
-    <!-- Divider, shown only when both Google and demo sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>or use a demo identity</span></div>
+    <!-- Divider, shown only when both Google and key-based sign-in are available -->
+    <div class="divider hidden" id="auth-divider"><span>or sign in with your details</span></div>
 
-    <!-- Demo registration (shown when ALLOW_DEMO_KEYS is on) -->
+    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
     <form id="login-form" autocomplete="off" class="hidden">
       <label for="name">Full name</label>
       <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
@@ -187,10 +237,12 @@ async function loadSchema() {
   show($("#schema-card"));
 }
 
-// Common success path for both Google sign-in and demo registration: an issued
+// Common success path for both Google sign-in and detail-based registration: an issued
 // key/session that unlocks the schema view.
 async function onAuthSuccess(data) {
   apiKey = data.api_key;
+  // Share the key with the dashboard's Ask box (same origin, picked up on focus).
+  try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
   $("#who").textContent = data.name;
   $("#apikey").textContent = apiKey;
   if (data.expires_at) {
@@ -287,7 +339,7 @@ async function init() {
 
   $("#login-sub").textContent = googleOn
     ? "Sign in with your Google account to request access."
-    : "Sign in with your details to be issued an API key. (Demo — no real authentication.)";
+    : "Sign in with your details to be issued an API key.";
   if (!googleOn && !demoOn) {
     $("#login-sub").textContent = "No sign-in method is enabled on this server.";
   }
@@ -299,6 +351,22 @@ $("#copy").addEventListener("click", async () => {
   const b = $("#copy"); const t = b.textContent; b.textContent = "Copied!";
   setTimeout(() => (b.textContent = t), 1200);
 });
+</script>
+<script>
+  // Dark-mode toggle — persists to localStorage, shared with the main site.
+  (function () {
+    const btn = document.querySelector('[data-theme-toggle]');
+    if (!btn) return;
+    const sync = () => btn.setAttribute('aria-pressed',
+      String(document.documentElement.getAttribute('data-theme') === 'dark'));
+    sync();
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      sync();
+    });
+  })();
 </script>
 </body>
 </html>

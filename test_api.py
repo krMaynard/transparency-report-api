@@ -1061,7 +1061,7 @@ class TestAsk:
         yield
 
     def test_ask_runs_generated_query(self):
-        r = client.post("/api/ask", json={"question": "top platforms by notices?"})
+        r = client.post("/api/ask", json={"question": "top platforms by notices?"}, headers=ALICE)
         assert r.status_code == 200
         d = r.json()
         assert d["question"] == "top platforms by notices?"
@@ -1076,7 +1076,7 @@ class TestAsk:
             "table": "t4_notices", "filters": [], "group_by": [],
             "aggregates": [], "sort": [], "max_count": 100000,
         })
-        r = client.post("/api/ask", json={"question": "everything"})
+        r = client.post("/api/ask", json={"question": "everything"}, headers=ALICE)
         # raw (non-aggregated) query, capped at EXPLORE_MAX_ROWS
         assert r.status_code == 200 and r.json()["row_count"] <= 500
 
@@ -1085,7 +1085,7 @@ class TestAsk:
         bad = {"table": "t4_notices", "filters": [], "group_by": ["not_a_field"],
                "aggregates": [], "sort": [], "max_count": 10}
         monkeypatch.setattr(main, "_translate_question", lambda q: bad)
-        r = client.post("/api/ask", json={"question": "huh"})
+        r = client.post("/api/ask", json={"question": "huh"}, headers=ALICE)
         assert r.status_code == 422
         assert r.json()["detail"]["generated"] == bad  # surfaces the model's attempt
 
@@ -1094,12 +1094,12 @@ class TestAsk:
         def boom(q):
             raise RuntimeError("model unavailable")
         monkeypatch.setattr(main, "_translate_question", boom)
-        assert client.post("/api/ask", json={"question": "x"}).status_code == 502
+        assert client.post("/api/ask", json={"question": "x"}, headers=ALICE).status_code == 502
 
     def test_ask_disabled_is_503(self, monkeypatch):
         import main
         monkeypatch.setattr(main, "NL_QUERY_ENABLED", False)
-        assert client.post("/api/ask", json={"question": "x"}).status_code == 503
+        assert client.post("/api/ask", json={"question": "x"}, headers=ALICE).status_code == 503
 
     def test_ask_caches_translation(self, monkeypatch):
         import main
@@ -1110,15 +1110,19 @@ class TestAsk:
                     "aggregates": [{"function": "SUM", "field": "notices", "alias": "v"}],
                     "sort": [{"field": "v", "order": "desc"}], "max_count": 3}
         monkeypatch.setattr(main, "_translate_question", counting)
-        r1 = client.post("/api/ask", json={"question": "Top platforms?"})
-        r2 = client.post("/api/ask", json={"question": "  top   PLATFORMS? "})  # same, normalized
+        r1 = client.post("/api/ask", json={"question": "Top platforms?"}, headers=ALICE)
+        r2 = client.post("/api/ask", json={"question": "  top   PLATFORMS? "}, headers=ALICE)  # same, normalized
         assert r1.status_code == 200 and r2.status_code == 200
         assert calls["n"] == 1  # second served from cache
         assert r1.json()["cached"] is False and r2.json()["cached"] is True
 
     def test_ask_reports_truncated(self):
-        r = client.post("/api/ask", json={"question": "top platforms by notices?"})
+        r = client.post("/api/ask", json={"question": "top platforms by notices?"}, headers=ALICE)
         assert "truncated" in r.json()  # cap indicator present
+
+    def test_ask_requires_key(self):
+        # No key → 401 from require_api_key, before any LLM work (gated like /api/query).
+        assert client.post("/api/ask", json={"question": "x"}).status_code == 401
 
 
 def test_askquery_to_request_maps_count_star():

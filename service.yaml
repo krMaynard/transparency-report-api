@@ -27,14 +27,19 @@ spec:
             - name: ALLOW_DEMO_KEYS          # production: Google sign-in only
               value: "0"
             - name: GOOGLE_CLIENT_ID         # OAuth 2.0 Web client ID
-              value: "PASTE_CLIENT_ID.apps.googleusercontent.com"
-            - name: ADMIN_EMAILS             # comma-separated admin allowlist
-              value: "REPLACE_ADMIN_EMAIL"
+              value: "694282548149-5ro3pokkjgp8d4ht5n8jmm8o9gqug961.apps.googleusercontent.com"
+            # ADMIN_EMAILS is PII, so it is NOT committed here (public repo).
+            # It is set out-of-band on the live service:
+            #   gcloud run services update research-api --region us-central1 \
+            #     --project transparency-site --update-env-vars ADMIN_EMAILS=you@example.com
+            # NOTE: a full `gcloud run services replace service.yaml` will DROP
+            # ADMIN_EMAILS (it's absent here) — re-apply it with the command above
+            # afterwards, or prefer `services update` for env changes.
             # ── Runtime ─────────────────────────────────────────────────────
             - name: LOG_FORMAT
               value: "json"
             - name: PUBLIC_BASE_URL          # absolute links in callbacks/downloads
-              value: "https://REPLACE_WITH_SERVICE_URL.run.app"
+              value: "https://transparency.kieranmaynard.com"
             # Lock browser CORS to your frontend origin(s); omit if same-origin only.
             # - name: ALLOWED_ORIGINS
             #   value: "https://app.example.com"
@@ -50,6 +55,13 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: research-api-redis-url
+                  key: latest
+            # Enables the natural-language "Ask" box (POST /api/ask). Off (503)
+            # until this secret exists; IP-rate-limited. Model = claude-opus-4-8.
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: research-api-anthropic-key
                   key: latest
           resources:
             limits:
