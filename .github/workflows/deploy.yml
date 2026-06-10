@@ -71,10 +71,12 @@ jobs:
         # an identity-token Authorization header.
         if: ${{ vars.DEPLOY != 'false' }}
         run: |
+          # `describe` doesn't take --filter; filter the traffic list in the
+          # format projection instead, then normalize gcloud's list rendering.
           URL=$(gcloud run services describe "${SERVICE}" \
             --region "${REGION}" --project "${PROJECT_ID}" \
-            --flatten="status.traffic[]" --filter="status.traffic.tag=candidate" \
-            --format="value(status.traffic.url)")
+            --format='value(status.traffic.filter("tag:candidate").extract(url))')
+          URL="${URL//[\[\]\' ]/}"
           echo "Probing ${URL}/readyz"
           curl --fail --silent --show-error --retry 10 --retry-all-errors --retry-delay 3 "${URL}/readyz"
 
