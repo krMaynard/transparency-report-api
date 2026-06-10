@@ -1335,10 +1335,10 @@ def root() -> dict[str, Any]:
             "GET /api/overview": "Public headline aggregates powering the dashboard (no auth)",
             "GET /api/explore/options": "Public: tables + their dimensions/measures for the query builder",
             "POST /api/explore": "Public: run a bounded structured query inline (no auth, row-capped, rate-limited)",
-            "POST /api/ask": "Public: ask in natural language — an LLM writes the structured query (if enabled)",
+            "POST /api/ask": "Ask in natural language (requires an API key) — an LLM writes the structured query (if enabled)",
             "GET /portal": "Researcher portal (web UI: sign in, get a key, browse the schema)",
             "POST /api/auth/google": "Sign in with a Google ID token (FedCM/GIS) → session key, or pending approval",
-            "POST /api/portal/register": "Demo: issue an API key without auth (disabled when ALLOW_DEMO_KEYS=0)",
+            "POST /api/portal/register": "Issue an API key without sign-in (disabled when ALLOW_DEMO_KEYS=0)",
             "DELETE /api/portal/key": "Revoke your session / portal-issued key",
             "GET /api/admin/registrations": "Admin: list researcher registrations",
             "POST /api/admin/registrations/{email}/approve": "Admin: approve an account",
@@ -1448,7 +1448,8 @@ def _page_csp(html: str, *, script_hosts=(), connect_hosts=(), frame_hosts=(), i
     directives = [
         "default-src 'self'",
         " ".join(["script-src", "'self'", *hashes, *script_hosts]),
-        "style-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
         " ".join(["img-src", "'self'", "data:", *img_hosts]),
         " ".join(["connect-src", "'self'", *connect_hosts]),
         " ".join(["frame-src", *(frame_hosts or ["'none'"])]),
@@ -1792,20 +1793,20 @@ def explore(body: QueryRequest, request: Request) -> dict[str, Any]:
 
 
 @api_router.post("/ask")
-def ask(body: AskRequest, request: Request) -> dict[str, Any]:
-    """Public natural-language query: an LLM translates the question into the
+def ask(body: AskRequest, principal: dict = Depends(require_api_key)) -> dict[str, Any]:
+    """Authenticated natural-language query: an LLM translates the question into the
     *structured* QueryRequest (never SQL), which is then run through the exact same
     compile_query trust boundary as /api/explore. The model only proposes — a bad
     field is a 400, and no model-authored SQL can reach the database.
 
-    Disabled (503) unless ANTHROPIC_API_KEY is set; IP-rate-limited (LLM calls
-    cost money) on the same limiter as /api/explore."""
+    Requires an API key (sign in to get one) — LLM calls cost money, so this is
+    gated and rate-limited per key. Disabled (503) unless ANTHROPIC_API_KEY is set."""
     if not NL_QUERY_ENABLED:
         raise HTTPException(
             status_code=503,
             detail="Natural-language queries aren't enabled on this server (set ANTHROPIC_API_KEY).",
         )
-    if _key_store.incr(f"ask:{_client_ip(request)}", ASK_RATE_WINDOW) > ASK_RATE_MAX:
+    if _key_store.incr(f"ask:{principal['key']}", ASK_RATE_WINDOW) > ASK_RATE_MAX:
         raise HTTPException(
             status_code=429,
             detail="Too many questions from here. Please slow down.",
@@ -1843,7 +1844,7 @@ def portal_register(body: RegisterRequest, request: Request) -> dict[str, Any]:
     if not ALLOW_DEMO_KEYS:
         raise HTTPException(
             status_code=404,
-            detail="Demo registration is disabled. Sign in with Google at POST /auth/google.",
+            detail="Open registration is disabled. Sign in with Google at POST /api/auth/google.",
         )
     name = body.name.strip()
     email = body.email.strip()
@@ -1874,7 +1875,7 @@ def portal_register(body: RegisterRequest, request: Request) -> dict[str, Any]:
         "name": name,
         "expires_at": expires_at,
         "header": "X-API-Key",
-        "note": "Pass this key in the X-API-Key header on every request. Demo key — not for production.",
+        "note": "Pass this key in the X-API-Key header on every request.",
     }
 
 
