@@ -157,7 +157,9 @@
   <div class="nav-links">
     <a href="https://kieranmaynard.com/work.html">Work</a>
     <a href="https://kieranmaynard.com/transparency.html">Products</a>
+    <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
     <a href="https://kieranmaynard.com/blog.html">Blog</a>
+    <a href="mailto:kieranmaynard@gmail.com">Contact</a>
     <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
@@ -588,8 +590,10 @@ async function setupAsk() {
   // Gate the LLM Ask box behind a portal key (Google login). Re-check when the
   // user returns from the portal (focus) or signs in in another tab (storage).
   const refreshGate = () => askGate(!localStorage.getItem("vlop_api_key"));
-  window.addEventListener("storage", refreshGate);
-  window.addEventListener("focus", refreshGate);
+  window.addEventListener("storage", refreshGate);        // signed in in another tab
+  window.addEventListener("focus", refreshGate);          // returned to this tab
+  window.addEventListener("pageshow", refreshGate);       // back-nav / bfcache restore
+  document.addEventListener("visibilitychange", refreshGate);
   refreshGate();
 }
 
