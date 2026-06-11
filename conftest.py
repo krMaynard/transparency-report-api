@@ -43,8 +43,10 @@ _FIXTURE = {
     "t9": [[0, 0, 0, 0, 12]],
     # t10: [svc, scope, value]
     "t10": [[0, 0, 64767887], [1, 0, 50000000]],
-    # t11: [svc, indicator, value_text]
-    "t11": [[0, 1, "YouTube qualitative summary text."]],
+    # t11: [svc, indicator, value_text] — the second row's leading "=" exercises
+    # the CSV formula-injection escaping (test_csv_download_escapes_formula_cells).
+    "t11": [[0, 1, "YouTube qualitative summary text."],
+            [1, 1, '=HYPERLINK("http://evil.example/x")']],
 }
 
 seed.build_db(_FIXTURE, _DB)

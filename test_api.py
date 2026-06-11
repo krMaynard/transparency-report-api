@@ -522,6 +522,76 @@ class TestSafety:
         assert client.get("/api/jobs/doesnotexist", headers=ALICE).status_code == 404
 
 
+# ── Abuse hardening: complexity caps, body cap, CSV escaping ─────────────────────
+
+class TestAbuseHardening:
+    def test_oversized_in_list_is_422(self):
+        cond = {"operation": "IN", "field_name": "service_name", "field_values": ["x"] * 101}
+        r = client.post("/api/explore", json={"table": "t4_notices", "query": {"and": [cond]}})
+        assert r.status_code == 422
+
+    def test_too_many_conditions_is_422(self):
+        cond = {"operation": "EQ", "field_name": "service_name", "field_values": ["x"]}
+        r = client.post("/api/explore", json={"table": "t4_notices", "query": {"and": [cond] * 51}})
+        assert r.status_code == 422
+
+    def test_too_many_aggregates_is_422(self):
+        aggs = [{"function": "SUM", "field_name": "notices", "alias": f"a{i}"} for i in range(51)]
+        r = client.post("/api/explore", json={"table": "t4_notices", "aggregates": aggs})
+        assert r.status_code == 422
+
+    def test_oversized_body_is_413(self):
+        body = b'{"table": "' + b"x" * (2 * 1024 * 1024) + b'"}'
+        r = client.post(
+            "/api/explore", content=body, headers={"Content-Type": "application/json"}
+        )
+        assert r.status_code == 413
+
+    def test_huge_content_length_header_is_413_not_500(self):
+        # A digit string longer than CPython's int-parse limit (~4300 digits) must
+        # short-circuit on length, not blow up in int() and surface as a 500.
+        r = client.post(
+            "/api/explore", content=b"{}",
+            headers={"Content-Type": "application/json", "Content-Length": "9" * 5000},
+        )
+        assert r.status_code == 413
+
+    def test_jobs_limit_bounds_enforced(self):
+        assert client.get("/api/jobs?limit=0", headers=ALICE).status_code == 422
+        assert client.get("/api/jobs?limit=501", headers=ALICE).status_code == 422
+
+    def test_csv_safe_neutralises_formula_sigils(self):
+        import main
+
+        assert main._csv_safe("=HYPERLINK(1)") == "'=HYPERLINK(1)"
+        assert main._csv_safe("+1+2") == "'+1+2"
+        assert main._csv_safe("-2+3") == "'-2+3"
+        assert main._csv_safe("@cmd") == "'@cmd"
+        assert main._csv_safe("plain text") == "plain text"
+        assert main._csv_safe(-5) == -5  # numbers are never mangled
+        assert main._csv_safe(None) is None
+
+    def test_csv_download_escapes_formula_cells(self):
+        # The conftest fixture seeds a t11 row whose free text starts with "=" —
+        # the rendered CSV must neutralise it so Excel/Sheets won't execute it.
+        job = _submit_and_wait({
+            "table": "t11_qualitative",
+            "query": {"and": [{"operation": "EQ", "field_name": "service_name",
+                               "field_values": ["Facebook"]}]},
+            "fields": ["qualitative_text"],
+        })
+        assert job["status"] == "done"
+        r = client.get(f"/api/jobs/{job['job_id']}/result?format=csv", headers=ALICE)
+        assert r.status_code == 200
+        import csv as csv_mod
+        import io
+
+        data_rows = list(csv_mod.reader(io.StringIO(r.text)))[1:]
+        cells = [cell for row in data_rows for cell in row]
+        assert any(cell.startswith("'=") for cell in cells)
+        assert not any(cell.startswith("=") for cell in cells)
+
+
 # ── Cancel / delete ───────────────────────────────────────────────────────────
 
 class TestDelete:
@@ -723,6 +793,9 @@ class TestCallbacks:
                 "http://10.1.2.3/x",            # private
                 "http://[::1]/x",               # ipv6 loopback
                 "http://[::ffff:127.0.0.1]/x",  # ipv4-mapped ipv6 loopback (bypass attempt)
+                "http://100.64.0.1/x",          # CGNAT (not is_private, but not global)
+                "http://192.0.0.192/x",         # IETF protocol assignments
+                "http://198.18.0.1/x",          # benchmarking range
             ):
                 with pytest.raises(main.CallbackUrlError):
                     main._validate_callback_url(bad)
