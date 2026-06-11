@@ -547,6 +547,15 @@ class TestAbuseHardening:
         )
         assert r.status_code == 413
 
+    def test_huge_content_length_header_is_413_not_500(self):
+        # A digit string longer than CPython's int-parse limit (~4300 digits) must
+        # short-circuit on length, not blow up in int() and surface as a 500.
+        r = client.post(
+            "/api/explore", content=b"{}",
+            headers={"Content-Type": "application/json", "Content-Length": "9" * 5000},
+        )
+        assert r.status_code == 413
+
     def test_jobs_limit_bounds_enforced(self):
         assert client.get("/api/jobs?limit=0", headers=ALICE).status_code == 422
         assert client.get("/api/jobs?limit=501", headers=ALICE).status_code == 422

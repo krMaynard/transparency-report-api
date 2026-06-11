@@ -231,8 +231,9 @@ def _configured_principal(key: str) -> dict[str, str] | None:
     the first differing character, which leaks key prefixes through response
     timing; compare_digest checks every byte regardless."""
     found = None
+    key_bytes = key.encode()
     for k, principal in API_KEYS.items():
-        if hmac.compare_digest(k.encode(), key.encode()):
+        if hmac.compare_digest(k.encode(), key_bytes):
             found = principal
     return found
 
@@ -793,7 +794,13 @@ async def log_requests(request: Request, call_next):
         # Reject oversized bodies before any handler/parsing work — several
         # endpoints are public, so this can't be left to per-key rate limits.
         content_length = request.headers.get("content-length")
-        if content_length is not None and content_length.isdigit() and int(content_length) > MAX_BODY_BYTES:
+        if content_length is not None and content_length.isdigit() and (
+            # More digits than the cap itself ⇒ certainly over it. Checked first so
+            # a pathologically long digit string never reaches int(), which would
+            # raise past CPython's int-parse limit (~4300 digits) instead of 413ing.
+            len(content_length) > len(str(MAX_BODY_BYTES))
+            or int(content_length) > MAX_BODY_BYTES
+        ):
             response = JSONResponse(
                 {"detail": f"Request body too large (max {MAX_BODY_BYTES} bytes)."},
                 status_code=413,
