@@ -954,6 +954,16 @@ class TestGoogleAuth:
         assert r.status_code == 200
         assert client.get("/api/tables", headers={"X-API-Key": r.json()["api_key"]}).status_code == 200
 
+    def test_precreated_account_gets_google_name_on_signin(self):
+        # /approve before first sign-in placeholders the name with the email;
+        # the first real sign-in must replace it with the Google profile name.
+        admin_key = self._signin("admin@example.com").json()["api_key"]
+        client.post("/api/admin/registrations/r5@example.com/approve",
+                    headers={"X-API-Key": admin_key})
+        r = self._signin("r5@example.com")
+        assert r.status_code == 200
+        assert r.json()["name"] == "r5"
+
     def test_list_registrations_filters_by_status(self):
         admin_key = self._signin("admin@example.com").json()["api_key"]
         self._signin("p1@example.com")

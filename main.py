@@ -1991,11 +1991,19 @@ def auth_google(body: GoogleAuthRequest, request: Request) -> dict[str, Any]:
                "requested_at": now, "updated_at": now, "approved_by": "auto:open"}
         _registrations.upsert(email, reg)
         logger.info("registration_created", extra={"data": {"email": email, "status": reg["status"]}})
-    elif reg.get("status") == "pending":
-        # Accounts that registered while admin review was required are approved
-        # on their next sign-in.
-        reg.update(status="approved", updated_at=now, approved_by="auto:open")
-        _registrations.upsert(email, reg)
+    else:
+        updates: dict[str, Any] = {}
+        if reg.get("status") == "pending":
+            # Accounts that registered while admin review was required are
+            # approved on their next sign-in.
+            updates.update(status="approved", approved_by="auto:open")
+        if reg.get("name") != name:
+            # Keep the Google profile name canonical — accounts pre-created via
+            # /approve default their name to the email placeholder.
+            updates["name"] = name
+        if updates:
+            reg.update(updated_at=now, **updates)
+            _registrations.upsert(email, reg)
 
     if reg["status"] != "approved":  # only `revoked` remains
         raise HTTPException(status_code=403, detail="Your access has been revoked.")
