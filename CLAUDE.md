@@ -197,7 +197,17 @@ Never build SQL by interpolating user values (always bind with `?`).
   and private/loopback/link-local/metadata targets, **unwrapping IPv4-mapped/6to4
   IPv6** so they can't smuggle a private v4; enforced at submit *and* before each
   send (narrows DNS rebinding — full closure needs network egress filtering);
-  redirects aren't followed. `CALLBACK_ALLOW_PRIVATE=1` bypasses for local dev.
+  redirects aren't followed; the target must be **globally routable** (`not
+  ip.is_global` is rejected, covering CGNAT and other non-private-but-non-public
+  ranges). `CALLBACK_ALLOW_PRIVATE=1` bypasses for local dev.
+- **Abuse hardening**: request bodies are capped via `Content-Length`
+  (`MAX_BODY_BYTES`, default 1 MiB → `413`); query complexity is bounded in the
+  Pydantic models (≤100 values per condition, ≤50 conditions per and/or/not
+  clause, ≤50 fields/group_by/aggregates/sort entries) since `/api/explore`
+  accepts the same model unauthenticated; CSV exports neutralise spreadsheet
+  formula injection (`_csv_safe` prefixes text cells starting `=`/`+`/`-`/`@`
+  with `'` — server-side and in the dashboard's `toCSV`); configured API keys
+  are compared constant-time (`_configured_principal`).
 - **Prometheus metrics** at `GET /metrics` (no auth): the same request middleware
   records `research_api_http_requests_total` + `_http_request_duration_seconds`,
   labelled by the **route template** (`/jobs/{job_id}`) to bound cardinality; the

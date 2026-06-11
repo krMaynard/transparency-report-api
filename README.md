@@ -194,10 +194,10 @@ X-Webhook-Signature: sha256=<hmac of the raw body>
   and compare to the `X-Webhook-Signature` header before trusting the payload.
 - **Delivery** is retried with backoff (`CALLBACK_MAX_ATTEMPTS`) off the query
   worker threads; `done` and `failed` jobs notify, cancellations don't.
-- **SSRF-guarded**: the URL must be plain `http(s)` to a public host. Callbacks to
-  loopback / private / link-local / cloud-metadata addresses are rejected with
-  `400` at submit and re-checked before each send (set `CALLBACK_ALLOW_PRIVATE=1`
-  only for local development).
+- **SSRF-guarded**: the URL must be plain `http(s)` to a **globally-routable**
+  host. Callbacks to loopback / private / link-local / CGNAT / cloud-metadata or
+  any other non-public address are rejected with `400` at submit and re-checked
+  before each send (set `CALLBACK_ALLOW_PRIVATE=1` only for local development).
 - Set `PUBLIC_BASE_URL` so the links in the payload are absolute.
 
 ## Authentication
@@ -540,6 +540,7 @@ All tuneable values are read from environment variables at startup:
 | `CALLBACK_MAX_ATTEMPTS` | `3` | Webhook delivery attempts before giving up |
 | `CALLBACK_WORKERS` | `8` | Size of the bounded webhook delivery thread pool |
 | `CALLBACK_ALLOW_PRIVATE` | `0` | Allow callbacks to private/loopback hosts (dev only) |
+| `MAX_BODY_BYTES` | `1048576` | Max accepted request body size (via `Content-Length`); larger → `413` |
 
 Copy `.env.example` to `.env` and edit before running Docker Compose.
 

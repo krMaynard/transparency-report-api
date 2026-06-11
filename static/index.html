@@ -501,7 +501,13 @@ function truncNote(d) {
 }
 
 function toCSV(d) {
-  const cell = (v) => { const s = v == null ? "" : String(v); return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const cell = (v) => {
+    let s = v == null ? "" : String(v);
+    // Neutralise spreadsheet formula injection: only string cells, so negative
+    // numbers stay numbers (matches the server-side CSV escaping).
+    if (typeof v === "string" && /^[=+\-@\t\r]/.test(s)) s = "'" + s;
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
   return [d.columns.map(cell).join(","), ...d.rows.map(r => r.map(cell).join(","))].join("\n");
 }
 

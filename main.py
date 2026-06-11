@@ -36,6 +36,7 @@ Configuration (environment variables):
     CALLBACK_MAX_ATTEMPTS     webhook delivery attempts before giving up (default: 3)
     CALLBACK_WORKERS          size of the bounded webhook delivery pool (default: 8)
     CALLBACK_ALLOW_PRIVATE    allow callbacks to private/loopback hosts — dev only (default: off)
+    MAX_BODY_BYTES            max request body size accepted, via Content-Length (default: 1 MiB)
 """
 import base64
 import csv
@@ -61,7 +62,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.security import APIKeyHeader
@@ -146,6 +147,10 @@ CALLBACK_TIMEOUT = int(os.getenv("CALLBACK_TIMEOUT_SECONDS", "10"))
 CALLBACK_MAX_ATTEMPTS = int(os.getenv("CALLBACK_MAX_ATTEMPTS", "3"))
 CALLBACK_WORKERS = int(os.getenv("CALLBACK_WORKERS", "8"))
 CALLBACK_ALLOW_PRIVATE = os.getenv("CALLBACK_ALLOW_PRIVATE", "").lower() in ("1", "true", "yes")
+# Cap request body size (by Content-Length) so the unauthenticated endpoints
+# can't be fed multi-megabyte JSON bodies. Chunked uploads without a
+# Content-Length aren't covered here — bound those at the fronting proxy.
+MAX_BODY_BYTES = int(os.getenv("MAX_BODY_BYTES", str(1024 * 1024)))
 
 
 # ── Structured logging ──────────────────────────────────────────────────────────
@@ -221,12 +226,24 @@ def _load_api_keys() -> dict[str, dict[str, str]]:
 API_KEYS = _load_api_keys()
 
 
+def _configured_principal(key: str) -> dict[str, str] | None:
+    """Constant-time scan of the configured keys. A dict lookup short-circuits on
+    the first differing character, which leaks key prefixes through response
+    timing; compare_digest checks every byte regardless."""
+    found = None
+    for k, principal in API_KEYS.items():
+        if hmac.compare_digest(k.encode(), key.encode()):
+            found = principal
+    return found
+
+
 def _lookup_principal(key: str) -> dict[str, str] | None:
     """Resolve a key to its principal: a configured key, an issued portal key, or
     a Google session. Google sessions are re-checked against the registration on
     every use, so an admin revoke takes effect immediately (not just at TTL)."""
-    if key in API_KEYS:
-        return API_KEYS[key]
+    configured = _configured_principal(key)
+    if configured is not None:
+        return configured
     rec = _key_store.get(key)  # None if unknown or expired
     if rec is None:
         return None
@@ -324,9 +341,13 @@ def _validate_callback_url(url: str) -> None:
         # to the embedded v4 so the guard can't be bypassed through them.
         if isinstance(ip, ipaddress.IPv6Address):
             ip = ip.ipv4_mapped or ip.sixtofour or ip
+        # Require a globally-routable address rather than denylisting categories:
+        # `not is_global` also covers ranges the explicit flags miss (CGNAT
+        # 100.64.0.0/10, 192.0.0.0/24 protocol assignments, benchmarking nets…).
         if (
             ip.is_private or ip.is_loopback or ip.is_link_local
             or ip.is_reserved or ip.is_multicast or ip.is_unspecified
+            or not ip.is_global
         ):
             raise CallbackUrlError("callback_url resolves to a non-public address.")
 
@@ -769,7 +790,16 @@ async def log_requests(request: Request, call_next):
     request.state.request_id = request_id
     status = 500
     try:
-        response = await call_next(request)
+        # Reject oversized bodies before any handler/parsing work — several
+        # endpoints are public, so this can't be left to per-key rate limits.
+        content_length = request.headers.get("content-length")
+        if content_length is not None and content_length.isdigit() and int(content_length) > MAX_BODY_BYTES:
+            response = JSONResponse(
+                {"detail": f"Request body too large (max {MAX_BODY_BYTES} bytes)."},
+                status_code=413,
+            )
+        else:
+            response = await call_next(request)
         status = response.status_code
     except Exception:
         logger.exception(
@@ -928,8 +958,16 @@ class Condition(BaseModel):
     operation: Operation = Field(..., description="EQ, IN, GT, GTE, LT, LTE.")
     field_name: str = Field(..., description="A queryable field; see GET /fields.")
     field_values: list[str | int | float] = Field(
-        ..., min_length=1, description="One or more values; always bound as parameters."
+        ..., min_length=1, max_length=100,
+        description="One or more values (max 100); always bound as parameters.",
     )
+
+
+# Hard caps on query complexity. /api/explore takes the same model with no auth,
+# so without bounds a single request could carry thousands of conditions or
+# aggregate columns and compile into an enormous statement.
+_MAX_CONDITIONS = 50
+_MAX_OUTPUT_COLUMNS = 50
 
 
 class BooleanQuery(BaseModel):
@@ -937,9 +975,9 @@ class BooleanQuery(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    and_: list[Condition] = Field(default_factory=list, alias="and")
-    or_: list[Condition] = Field(default_factory=list, alias="or")
-    not_: list[Condition] = Field(default_factory=list, alias="not")
+    and_: list[Condition] = Field(default_factory=list, alias="and", max_length=_MAX_CONDITIONS)
+    or_: list[Condition] = Field(default_factory=list, alias="or", max_length=_MAX_CONDITIONS)
+    not_: list[Condition] = Field(default_factory=list, alias="not", max_length=_MAX_CONDITIONS)
 
 
 class Aggregate(BaseModel):
@@ -964,11 +1002,21 @@ class QueryRequest(BaseModel):
     query: BooleanQuery = Field(default_factory=BooleanQuery, description="Filters.")
     fields: list[str] | None = Field(
         default=None,
+        max_length=_MAX_OUTPUT_COLUMNS,
         description="Columns to return for a raw (non-aggregated) query. Defaults to all fields.",
     )
-    group_by: list[str] = Field(default_factory=list, description="Dimension fields to group by.")
-    aggregates: list[Aggregate] = Field(default_factory=list, description="Aggregate columns.")
-    sort: list[Sort] = Field(default_factory=list, description="Result ordering.")
+    group_by: list[str] = Field(
+        default_factory=list, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Dimension fields to group by.",
+    )
+    aggregates: list[Aggregate] = Field(
+        default_factory=list, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Aggregate columns.",
+    )
+    sort: list[Sort] = Field(
+        default_factory=list, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Result ordering.",
+    )
     max_count: int = Field(default=100, ge=1, description="Row limit (capped at ROW_LIMIT).")
     callback_url: str | None = Field(
         default=None,
@@ -2150,13 +2198,32 @@ def submit_query(
 
 
 @api_router.get("/jobs")
-def list_jobs(limit: int = 50, principal: dict = Depends(require_api_key)) -> dict[str, Any]:
+def list_jobs(
+    limit: int = Query(default=50, ge=1, le=500),
+    principal: dict = Depends(require_api_key),
+) -> dict[str, Any]:
     return {"jobs": [j.to_public() for j in _store.list_for_owner(principal["key"], limit)]}
 
 
 @api_router.get("/jobs/{job_id}")
 def get_job(job_id: str, principal: dict = Depends(require_api_key)) -> dict[str, Any]:
     return _job_for_owner(job_id, principal["key"]).to_public()
+
+
+# Spreadsheet formula sigils. A text cell beginning with one of these is executed
+# as a formula when the CSV is opened in Excel / Google Sheets / LibreOffice, so a
+# value like `=HYPERLINK(...)` in the dataset (t11 carries free text from
+# third-party transparency reports) would become CSV injection.
+_CSV_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _csv_safe(value: Any) -> Any:
+    """Neutralise spreadsheet formula injection in a CSV cell. Only string cells
+    are escaped (with the conventional leading apostrophe) — numbers must stay
+    numbers, so a negative count is never mangled."""
+    if isinstance(value, str) and value.startswith(_CSV_FORMULA_PREFIXES):
+        return "'" + value
+    return value
 
 
 def _render_result(
@@ -2172,7 +2239,7 @@ def _render_result(
         buf = io.StringIO()
         writer = csv.writer(buf)
         writer.writerow(cols)
-        writer.writerows(rows)
+        writer.writerows([[_csv_safe(v) for v in row] for row in rows])
         return PlainTextResponse(
             buf.getvalue(),
             media_type="text/csv",
