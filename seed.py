@@ -216,29 +216,36 @@ def build_gr_db(data: dict[str, Any], db_path: str) -> int:
     country_names = data["country_names"]
     conn = sqlite3.connect(db_path)
     try:
-        conn.executemany(
-            "INSERT INTO gr_periods (id, name) VALUES (?, ?)",
-            list(enumerate(data["periods"])),
-        )
-        conn.executemany(
-            "INSERT INTO gr_countries (id, code, name) VALUES (?, ?, ?)",
-            [(i, countries[i], country_names[i]) for i in range(len(countries))],
-        )
-        conn.executemany(
-            "INSERT INTO gr_requestors (id, name) VALUES (?, ?)",
-            list(enumerate(data["requestors"])),
-        )
-        conn.executemany(
-            "INSERT INTO gr_products (id, name) VALUES (?, ?)",
-            list(enumerate(data["products"])),
-        )
-        conn.executemany(
-            "INSERT INTO gr_reasons (id, name) VALUES (?, ?)",
-            list(enumerate(data["reasons"])),
-        )
-        rows = data["rows"]
-        conn.executemany("INSERT INTO gr_removals VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", rows)
-        conn.commit()
+        with conn:
+            conn.executemany(
+                "INSERT INTO gr_periods (id, name) VALUES (?, ?)",
+                list(enumerate(data["periods"])),
+            )
+            conn.executemany(
+                "INSERT INTO gr_countries (id, code, name) VALUES (?, ?, ?)",
+                [(i, code, name) for i, (code, name) in enumerate(zip(countries, country_names))],
+            )
+            conn.executemany(
+                "INSERT INTO gr_requestors (id, name) VALUES (?, ?)",
+                list(enumerate(data["requestors"])),
+            )
+            conn.executemany(
+                "INSERT INTO gr_products (id, name) VALUES (?, ?)",
+                list(enumerate(data["products"])),
+            )
+            conn.executemany(
+                "INSERT INTO gr_reasons (id, name) VALUES (?, ?)",
+                list(enumerate(data["reasons"])),
+            )
+            rows = data["rows"]
+            conn.executemany(
+                "INSERT INTO gr_removals ("
+                "period_id, country_id, requestor_id, product_id, reason_id, "
+                "num_requests, items_requested, removed_legal, removed_policy, "
+                "not_found, not_enough_info, no_action, already_removed"
+                ") VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                rows,
+            )
         return len(rows)
     finally:
         conn.close()
@@ -265,7 +272,7 @@ def main() -> None:
     for table, n in summary.items():
         print(f"  {table}: {n}")
 
-    if os.path.exists(args.gr_source):
+    if os.path.isfile(args.gr_source):
         with open(args.gr_source, "r", encoding="utf-8") as f:
             gr_data = json.load(f)
         gr_rows = build_gr_db(gr_data, args.db)
