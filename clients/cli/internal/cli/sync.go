@@ -594,7 +594,7 @@ func syncResource(ctx context.Context, c interface {
 
 		totalCount += stored
 		atomic.AddInt64(&progressCount, int64(stored))
-		if resourceSupportsPagination(resource) && nextCursor == "" && pageSize.cursorParam != "offset" && len(items) >= pageSize.limit && pageMayHaveMore(data) {
+		if resourceSupportsPagination(resource) && nextCursor == "" && pageSize.cursorType != "offset" && len(items) >= pageSize.limit && pageMayHaveMore(data) {
 			emitSyncMissingPaginationCursorWarning(syncEvents, humanFriendly, resource, "")
 		}
 
@@ -632,7 +632,18 @@ func syncResource(ctx context.Context, c interface {
 					currentOffset, _ := strconv.Atoi(cursor)
 					capExitCursor = strconv.Itoa(currentOffset + pageSize.limit)
 				} else {
+					// No resume cursor available for this cursor-based paginator.
+					// Suppress capExitHit to avoid writing "" as the sync cursor
+					// (which would clear the previous position), but still warn
+					// the operator that data was truncated.
 					truncatedByCap = false
+					if !latestOnly {
+						if humanFriendly {
+							fmt.Fprintf(os.Stderr, "\n  %s: reached --max-pages limit (%d pages, %d items); no cursor available to resume later\n", resource, maxPages, totalCount)
+						} else {
+							fmt.Fprintf(syncEvents, `{"event":"sync_warning","resource":"%s","reason":"max_pages_cap_hit_no_cursor","message":"reached --max-pages cap of %d; data may be truncated but no resume cursor is available"}`+"\n", resource, maxPages)
+						}
+					}
 				}
 			}
 			if truncatedByCap && capExitCursor != cursor {

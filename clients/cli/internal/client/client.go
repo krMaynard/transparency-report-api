@@ -93,7 +93,7 @@ func New(cfg *config.Config, timeout time.Duration, rateLimit float64) *Client {
 		// cross-domain 3xx (open redirect or partner handoff) must not
 		// receive the auth credential, even though we are inside
 		// CheckRedirect where Go's automatic stripping has already run.
-		if req.URL.Host == via[0].URL.Host {
+		if req.URL.Hostname() == via[0].URL.Hostname() {
 			if h, err := c.authHeader(req.Context()); err == nil && h != "" {
 				req.Header.Set("X-API-Key", h)
 			}

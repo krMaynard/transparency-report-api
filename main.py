@@ -746,7 +746,8 @@ def _openapi_servers() -> list[dict[str, str]]:
     if PUBLIC_BASE_URL:
         servers.append({"url": PUBLIC_BASE_URL, "description": "Public deployment"})
     servers.append({"url": "/", "description": "This origin"})
-    servers.append({"url": "http://localhost:8000", "description": "Local development"})
+    if not PUBLIC_BASE_URL:
+        servers.append({"url": "http://localhost:8000", "description": "Local development"})
     return servers
 
 

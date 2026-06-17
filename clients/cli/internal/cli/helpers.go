@@ -739,7 +739,14 @@ func paginatedGet(ctx context.Context, c interface {
 			break
 		}
 
-		// For direct arrays, can't paginate without cursor
+		// For direct arrays, can't paginate without cursor. When --all is
+		// requested on a cursor-based paginator and the response is a bare
+		// array, warn that only a single page was returned: the separate
+		// offset-paginator check below won't fire because nextCursorPath is
+		// set (just absent from the response).
+		if fetchAll && paginationType != "" && paginationType != "offset" && paginationType != "page" {
+			emitMissingPaginationSignalWarning()
+		}
 		break
 	}
 
