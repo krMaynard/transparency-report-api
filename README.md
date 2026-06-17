@@ -4,13 +4,14 @@
 
 A FastAPI service that lets a researcher describe a query with **structured
 parameters** (no SQL), runs it asynchronously on a worker thread, and serves the
-results back as JSON or CSV. Backed by a read-only SQLite database seeded from the
-aggregated **EU Digital Services Act (DSA) VLOP transparency reports** —
-content-moderation statistics for 33 designated Very Large Online Platforms /
-Search Engines (H2 2025), tables 3–11 of the DSA Implementing Regulation template
-(`../krMaynard.github.io/data/vlop-dsa.json`).
+results back as JSON or CSV. Backed by a read-only SQLite database seeded from
+public transparency-reporting datasets — the aggregated **EU Digital Services Act
+(DSA) VLOP transparency reports** (content-moderation statistics for 33 designated
+Very Large Online Platforms / Search Engines, H2 2025, tables 3–11 of the DSA
+Implementing Regulation template; `../krMaynard.github.io/data/vlop-dsa.json`) and
+**Google Government content-removal requests**.
 
-A query names one of the 9 DSA **report tables** (`GET /api/tables`) and then
+A query names one of the **report tables** (`GET /api/tables`) and then
 describes filters, group-bys, and aggregates over that table's fields.
 
 ## Demo walkthrough

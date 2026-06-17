@@ -11,7 +11,7 @@
 
 ### 1.1 Purpose
 
-`transparency-reports-api` is a FastAPI service that exposes a read-only SQLite database (seeded from the aggregated EU DSA VLOP transparency reports, tables 3–11) as a queryable HTTP API. Queries are described with **structured parameters** (a TikTok-Research-API-style boolean query, not SQL) and compiled server-side into a single parameterised SELECT. It is designed to demonstrate the **async-job / poll pattern** for long-running queries without tying up HTTP connections, behind a query interface that never executes caller-authored SQL.
+`transparency-reports-api` is a FastAPI service that exposes a read-only SQLite database (seeded from transparency-reporting datasets: the aggregated EU DSA VLOP transparency reports, tables 3–11, and Google Government content-removal requests) as a queryable HTTP API. Queries are described with **structured parameters** (a TikTok-Research-API-style boolean query, not SQL) and compiled server-side into a single parameterised SELECT. It is designed to demonstrate the **async-job / poll pattern** for long-running queries without tying up HTTP connections, behind a query interface that never executes caller-authored SQL.
 
 ### 1.2 Problem Statement
 
