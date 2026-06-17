@@ -366,6 +366,31 @@ curl -i -H 'X-API-Key: bob' "http://127.0.0.1:8000/api/jobs/$JOB"   # -> 404
 # (click "Authorize" and paste a key)
 ```
 
+## Command-line client
+
+A ready-to-build Go CLI (and MCP server) for this API lives in
+[`clients/cli/`](clients/cli/). It was generated from the service's own
+`/openapi.json` with [CLI Printing Press](https://github.com/mvanhorn/cli-printing-press),
+so its commands mirror the endpoints (`tables`, `fields`, `schema`, `overview`,
+`query`, `ask`, …) and it adds agent-friendly conveniences — `--agent` (JSON +
+non-interactive), `--compact`, `--csv`, a `doctor` health check, and an offline
+SQLite cache via `sync`. It defaults to the production base URL and honours
+`X-API-Key`.
+
+```bash
+cd clients/cli
+go build -o dsa-research ./cmd/dsa-research-pp-cli
+
+# Point it at a local server and use a demo key:
+export DSA_RESEARCH_BASE_URL=http://localhost:8000
+export DSA_RESEARCH_APIKEY_HEADER=alice
+./dsa-research overview --agent          # public, no key needed
+./dsa-research tables --agent            # authenticated
+```
+
+See [`clients/cli/README.md`](clients/cli/README.md) for the full command list
+and the MCP-server build (`cmd/dsa-research-pp-mcp`).
+
 ## Endpoints
 
 The dashboard is served at `/` and the JSON API lives under `/api/*` on the same

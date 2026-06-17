@@ -731,6 +731,25 @@ _executor = ThreadPoolExecutor(max_workers=WORKER_THREADS, thread_name_prefix="s
 # receivers during retry backoff) can't exhaust threads or starve query workers.
 _callback_executor = ThreadPoolExecutor(max_workers=CALLBACK_WORKERS, thread_name_prefix="callback-worker")
 
+
+def _openapi_servers() -> list[dict[str, str]]:
+    """The OpenAPI ``servers`` list, so the published spec is self-describing.
+
+    FastAPI emits no ``servers`` block by default, which leaves the spec without
+    a base URL — SDK/CLI generators that consume ``/openapi.json`` then can't
+    resolve a real host. We advertise the configured public origin first (when
+    ``PUBLIC_BASE_URL`` is set), then a relative same-origin entry (keeps the
+    Swagger "Try it out" button working wherever the docs happen to be served),
+    then localhost for local development.
+    """
+    servers: list[dict[str, str]] = []
+    if PUBLIC_BASE_URL:
+        servers.append({"url": PUBLIC_BASE_URL, "description": "Public deployment"})
+    servers.append({"url": "/", "description": "This origin"})
+    servers.append({"url": "http://localhost:8000", "description": "Local development"})
+    return servers
+
+
 app = FastAPI(
     title="DSA VLOP Transparency Query API (async jobs)",
     description=(
@@ -741,6 +760,7 @@ app = FastAPI(
         "API: boolean and/or/not clauses of {operation, field_name, field_values}."
     ),
     version="0.5.0",
+    servers=_openapi_servers(),
 )
 
 

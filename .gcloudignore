@@ -22,6 +22,7 @@ conftest.py
 demo.py
 scripts/
 docs/
+clients/
 *.md
 .env
 .dockerignore

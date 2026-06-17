@@ -1,0 +1,557 @@
+{
+  "api_name": "dsa-research",
+  "base_url": "https://transparency.kieranmaynard.com",
+  "description": "Query the aggregated EU Digital Services Act VLOP transparency reports (tables 3–11) with structured parameters (no SQL). Pick a `table` (GET /tables), describe filters/group_by/aggregates, get a job id, then poll for results as JSON or CSV. Query syntax follows the TikTok Research API: boolean and/or/not clauses of {operation, field_name, field_values}.",
+  "mcp_ready": "full",
+  "http_transport": "standard",
+  "auth": {
+    "type": "api_key",
+    "header": "X-API-Key",
+    "in": "header",
+    "env_vars": [
+      "DSA_RESEARCH_APIKEY_HEADER"
+    ],
+    "env_var_specs": [
+      {
+        "name": "DSA_RESEARCH_APIKEY_HEADER",
+        "kind": "per_call",
+        "required": true,
+        "sensitive": true,
+        "inferred": true
+      }
+    ]
+  },
+  "required_headers": [],
+  "tools": [
+    {
+      "name": "admin_approve-registration",
+      "description": "Restore (or pre-create) an approved account — e.g. to undo a revoke. Required: email. Returns the new ResponseApproveRegistrationApiAdminRegistrationsEmailApprovePost.",
+      "method": "POST",
+      "path": "/api/admin/registrations/{email}/approve",
+      "params": [
+        {
+          "name": "email",
+          "type": "string",
+          "location": "path",
+          "description": "Email",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "admin_list-registrations",
+      "description": "List researcher registrations, optionally filtered by status. Optional: status. Returns the ResponseListRegistrationsApiAdminRegistrationsGet.",
+      "method": "GET",
+      "path": "/api/admin/registrations",
+      "params": [
+        {
+          "name": "status",
+          "type": "string",
+          "location": "query",
+          "description": "Status"
+        }
+      ]
+    },
+    {
+      "name": "admin_revoke-registration",
+      "description": "Revoke an account's access (its live sessions stop working immediately). Required: email. Returns the new ResponseRevokeRegistrationApiAdminRegistrationsEmailRevokePost.",
+      "method": "POST",
+      "path": "/api/admin/registrations/{email}/revoke",
+      "params": [
+        {
+          "name": "email",
+          "type": "string",
+          "location": "path",
+          "description": "Email",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "ask_ask",
+      "description": "Authenticated natural-language query: an LLM translates the question into the *structured* QueryRequest (never SQL), which is then run through the exact same compile_query trust boundary as /api/explore. The model only proposes — a bad field is a 400, and no model-authored SQL can reach the database. Requires an API key (sign in to get one) — LLM calls cost money, so this is gated and rate-limited per key. Disabled (503) unless ANTHROPIC_API_KEY is set. Required: question. Returns the new ResponseAskApiAskPost.",
+      "method": "POST",
+      "path": "/api/ask",
+      "params": [
+        {
+          "name": "question",
+          "type": "string",
+          "location": "body",
+          "description": "A natural-language question about the DSA VLOP data.",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-api_root",
+      "description": "Root. Returns the ResponseRootApiGet.",
+      "method": "GET",
+      "path": "/api",
+      "params": []
+    },
+    {
+      "name": "dsa-vlop-transparency-auth_google",
+      "description": "Auth Google. Required: credential. Returns the new ResponseAuthGoogleApiAuthGooglePost.",
+      "method": "POST",
+      "path": "/api/auth/google",
+      "params": [
+        {
+          "name": "credential",
+          "type": "string",
+          "location": "body",
+          "description": "Google ID token (JWT) from Google Identity Services / FedCM.",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-jobs_cancel",
+      "description": "Cancel Job. Required: job_id. Returns the ResponseCancelJobApiJobsJobIdDelete. Destructive.",
+      "method": "DELETE",
+      "path": "/api/jobs/{job_id}",
+      "params": [
+        {
+          "name": "job_id",
+          "type": "string",
+          "location": "path",
+          "description": "Job id",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-jobs_get",
+      "description": "Get Job. Required: job_id. Returns the ResponseGetJobApiJobsJobIdGet.",
+      "method": "GET",
+      "path": "/api/jobs/{job_id}",
+      "params": [
+        {
+          "name": "job_id",
+          "type": "string",
+          "location": "path",
+          "description": "Job id",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-jobs_list",
+      "description": "List Jobs. Optional: limit (default: 50). Returns the ResponseListJobsApiJobsGet.",
+      "method": "GET",
+      "path": "/api/jobs",
+      "params": [
+        {
+          "name": "limit",
+          "type": "int",
+          "location": "query",
+          "description": "Limit"
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-jobs_download_job-result",
+      "description": "Secure download via a signed, expiring URL — no API key needed. The link is a capability: the HMAC signature authorises this exact job + format + expiry, so possession of a valid, unexpired URL is sufficient. Required: job_id, expires, sig. Optional: format (default: json).",
+      "method": "GET",
+      "path": "/api/jobs/{job_id}/download",
+      "params": [
+        {
+          "name": "job_id",
+          "type": "string",
+          "location": "path",
+          "description": "Job id",
+          "required": true
+        },
+        {
+          "name": "expires",
+          "type": "int",
+          "location": "query",
+          "description": "Expires",
+          "required": true
+        },
+        {
+          "name": "sig",
+          "type": "string",
+          "location": "query",
+          "description": "Sig",
+          "required": true
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "location": "query",
+          "description": "Format"
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-jobs_result_get-job",
+      "description": "Get Job Result. Required: job_id. Optional: format (default: json).",
+      "method": "GET",
+      "path": "/api/jobs/{job_id}/result",
+      "params": [
+        {
+          "name": "job_id",
+          "type": "string",
+          "location": "path",
+          "description": "Job id",
+          "required": true
+        },
+        {
+          "name": "format",
+          "type": "string",
+          "location": "query",
+          "description": "Format"
+        }
+      ]
+    },
+    {
+      "name": "dsa-vlop-transparency-version_version",
+      "description": "The deployed build (commit SHA on Cloud Run, else 'dev') + app version. Returns the ResponseVersionVersionGet.",
+      "method": "GET",
+      "path": "/version",
+      "params": []
+    },
+    {
+      "name": "explore_explore",
+      "description": "Public, synchronous, bounded query for the interactive dashboard. Same validated structured-query model as POST /api/query (no SQL is ever accepted; every field/operation is checked against the table registry and all values are bound), but it runs inline and hard-caps the row count — no auth, no job, no webhook. IP-rate-limited so the open endpoint can't be hammered. Optional: aggregates, callback_url, derived (plus 9 more). Returns the new ResponseExploreApiExplorePost.",
+      "method": "POST",
+      "path": "/api/explore",
+      "params": [
+        {
+          "name": "aggregates",
+          "type": "array",
+          "location": "body",
+          "description": "Aggregate columns."
+        },
+        {
+          "name": "callback_url",
+          "type": "string",
+          "location": "body",
+          "description": "Optional http(s) webhook POSTed (HMAC-signed) when the job finishes."
+        },
+        {
+          "name": "derived",
+          "type": "array",
+          "location": "body",
+          "description": "Computed columns over leg aggregates (composite queries only)."
+        },
+        {
+          "name": "fields",
+          "type": "string",
+          "location": "body",
+          "description": "Columns to return for a raw (non-aggregated) query. Defaults to all fields."
+        },
+        {
+          "name": "group_by",
+          "type": "string_csv_array",
+          "location": "body",
+          "description": "Dimension fields to group by."
+        },
+        {
+          "name": "having-and",
+          "wire_name": "having.and",
+          "type": "array",
+          "location": "body",
+          "description": "And"
+        },
+        {
+          "name": "having-not",
+          "wire_name": "having.not",
+          "type": "array",
+          "location": "body",
+          "description": "Not"
+        },
+        {
+          "name": "having-or",
+          "wire_name": "having.or",
+          "type": "array",
+          "location": "body",
+          "description": "Or"
+        },
+        {
+          "name": "join_on",
+          "type": "string_csv_array",
+          "location": "body",
+          "description": "Dimensions to merge legs on; must be a dimension of every leg's table."
+        },
+        {
+          "name": "legs",
+          "type": "string",
+          "location": "body",
+          "description": "Composite query: named single-table sub-queries to merge (2–4; leg names are letters/digits/underscores)."
+        },
+        {
+          "name": "max_count",
+          "type": "int",
+          "location": "body",
+          "description": "Row limit (capped at ROW_LIMIT)."
+        },
+        {
+          "name": "query-and",
+          "wire_name": "query.and",
+          "type": "array",
+          "location": "body",
+          "description": "And"
+        },
+        {
+          "name": "query-not",
+          "wire_name": "query.not",
+          "type": "array",
+          "location": "body",
+          "description": "Not"
+        },
+        {
+          "name": "query-or",
+          "wire_name": "query.or",
+          "type": "array",
+          "location": "body",
+          "description": "Or"
+        },
+        {
+          "name": "sort",
+          "type": "array",
+          "location": "body",
+          "description": "Result ordering."
+        },
+        {
+          "name": "table",
+          "type": "string",
+          "location": "body",
+          "description": "Which DSA report table to query (see GET /tables)."
+        }
+      ]
+    },
+    {
+      "name": "explore_options",
+      "description": "Public metadata for the dashboard's query builder: each table's queryable dimensions and measures, from the fixed registry (no DB, no secrets). Returns the ResponseExploreOptionsApiExploreOptionsGet.",
+      "method": "GET",
+      "path": "/api/explore/options",
+      "params": []
+    },
+    {
+      "name": "fields_list",
+      "description": "Fields for a report table (`?table=…`), or an overview of all tables. Optional: table. Returns the ResponseListFieldsApiFieldsGet.",
+      "method": "GET",
+      "path": "/api/fields",
+      "params": [
+        {
+          "name": "table",
+          "type": "string",
+          "location": "query",
+          "description": "Table"
+        }
+      ]
+    },
+    {
+      "name": "healthz_health",
+      "description": "Health. Returns the ResponseHealthHealthzGet.",
+      "method": "GET",
+      "path": "/healthz",
+      "params": []
+    },
+    {
+      "name": "metrics_metrics",
+      "description": "Prometheus metrics. No auth — scrape over an internal network only.",
+      "method": "GET",
+      "path": "/metrics",
+      "params": []
+    },
+    {
+      "name": "overview_overview",
+      "description": "Public headline aggregates for the dashboard — no auth. Memoised: the read-only DB is static, so we compute the fixed queries once (no user input reaches SQL) and serve from memory thereafter. Returns the ResponseOverviewApiOverviewGet.",
+      "method": "GET",
+      "path": "/api/overview",
+      "params": []
+    },
+    {
+      "name": "portal_page",
+      "description": "Serve the researcher portal single-page app.",
+      "method": "GET",
+      "path": "/portal",
+      "params": []
+    },
+    {
+      "name": "portal_register",
+      "description": "Issue a demo API key for a researcher (no real authentication). Required: email, name. Returns the new ResponsePortalRegisterApiPortalRegisterPost.",
+      "method": "POST",
+      "path": "/api/portal/register",
+      "params": [
+        {
+          "name": "email",
+          "type": "string",
+          "location": "body",
+          "description": "Contact email.",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "location": "body",
+          "description": "Researcher's name.",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "portal_revoke-key",
+      "description": "Revoke the calling key/session (configured demo keys can't be revoked). Returns the ResponseRevokeKeyApiPortalKeyDelete. Destructive.",
+      "method": "DELETE",
+      "path": "/api/portal/key",
+      "params": []
+    },
+    {
+      "name": "query_submit",
+      "description": "Submit Query. Optional: aggregates, callback_url, derived (plus 9 more). Returns the new ResponseSubmitQueryApiQueryPost.",
+      "method": "POST",
+      "path": "/api/query",
+      "params": [
+        {
+          "name": "aggregates",
+          "type": "array",
+          "location": "body",
+          "description": "Aggregate columns."
+        },
+        {
+          "name": "callback_url",
+          "type": "string",
+          "location": "body",
+          "description": "Optional http(s) webhook POSTed (HMAC-signed) when the job finishes."
+        },
+        {
+          "name": "derived",
+          "type": "array",
+          "location": "body",
+          "description": "Computed columns over leg aggregates (composite queries only)."
+        },
+        {
+          "name": "fields",
+          "type": "string",
+          "location": "body",
+          "description": "Columns to return for a raw (non-aggregated) query. Defaults to all fields."
+        },
+        {
+          "name": "group_by",
+          "type": "string_csv_array",
+          "location": "body",
+          "description": "Dimension fields to group by."
+        },
+        {
+          "name": "having-and",
+          "wire_name": "having.and",
+          "type": "array",
+          "location": "body",
+          "description": "And"
+        },
+        {
+          "name": "having-not",
+          "wire_name": "having.not",
+          "type": "array",
+          "location": "body",
+          "description": "Not"
+        },
+        {
+          "name": "having-or",
+          "wire_name": "having.or",
+          "type": "array",
+          "location": "body",
+          "description": "Or"
+        },
+        {
+          "name": "join_on",
+          "type": "string_csv_array",
+          "location": "body",
+          "description": "Dimensions to merge legs on; must be a dimension of every leg's table."
+        },
+        {
+          "name": "legs",
+          "type": "string",
+          "location": "body",
+          "description": "Composite query: named single-table sub-queries to merge (2–4; leg names are letters/digits/underscores)."
+        },
+        {
+          "name": "max_count",
+          "type": "int",
+          "location": "body",
+          "description": "Row limit (capped at ROW_LIMIT)."
+        },
+        {
+          "name": "query-and",
+          "wire_name": "query.and",
+          "type": "array",
+          "location": "body",
+          "description": "And"
+        },
+        {
+          "name": "query-not",
+          "wire_name": "query.not",
+          "type": "array",
+          "location": "body",
+          "description": "Not"
+        },
+        {
+          "name": "query-or",
+          "wire_name": "query.or",
+          "type": "array",
+          "location": "body",
+          "description": "Or"
+        },
+        {
+          "name": "sort",
+          "type": "array",
+          "location": "body",
+          "description": "Result ordering."
+        },
+        {
+          "name": "table",
+          "type": "string",
+          "location": "body",
+          "description": "Which DSA report table to query (see GET /tables)."
+        }
+      ]
+    },
+    {
+      "name": "readyz_ready",
+      "description": "Ready. Returns the ResponseReadyReadyzGet.",
+      "method": "GET",
+      "path": "/readyz",
+      "params": []
+    },
+    {
+      "name": "schema_table",
+      "description": "The queryable field registry (dimensions + measures) for a report table. Required: table. Returns the ResponseTableSchemaApiSchemaTableGet.",
+      "method": "GET",
+      "path": "/api/schema/{table}",
+      "params": [
+        {
+          "name": "table",
+          "type": "string",
+          "location": "path",
+          "description": "Table",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "static_vendored-asset",
+      "description": "Serve a vendored third-party asset (e.g. Chart.js) from static/vendor. Required: filename.",
+      "method": "GET",
+      "path": "/static/vendor/{filename}",
+      "params": [
+        {
+          "name": "filename",
+          "type": "string",
+          "location": "path",
+          "description": "Filename",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "tables_list",
+      "description": "The queryable DSA report tables and the dataset's reporting period. Returns the ResponseListTablesApiTablesGet.",
+      "method": "GET",
+      "path": "/api/tables",
+      "params": []
+    }
+  ]
+}
