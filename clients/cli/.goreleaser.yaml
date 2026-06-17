@@ -1,0 +1,51 @@
+version: 2
+project_name: dsa-research-pp-cli
+changelog:
+  disable: true
+builds:
+  - id: dsa-research-pp-cli
+    main: ./cmd/dsa-research-pp-cli
+    binary: dsa-research-pp-cli
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X dsa-research-pp-cli/internal/cli.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+  - id: dsa-research-pp-mcp
+    main: ./cmd/dsa-research-pp-mcp
+    binary: dsa-research-pp-mcp
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+    targets:
+      - darwin_amd64
+      - darwin_arm64
+      - linux_amd64
+      - linux_arm64
+      - windows_amd64
+      - windows_arm64
+archives:
+  - formats: [tar.gz]
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+checksum:
+  name_template: checksums.txt
+brews:
+  - name: dsa-research-pp-cli
+    repository:
+      owner: kieran-maynard
+      name: homebrew-tap
+    homepage: "https://github.com/kieran-maynard/dsa-research-pp-cli"
+    description: "Query the aggregated EU Digital Services Act VLOP transparency reports (tables 3–11) with structured parameters (no SQL)"
+    install: |
+      bin.install "dsa-research-pp-cli"
+      bin.install "dsa-research-pp-mcp"

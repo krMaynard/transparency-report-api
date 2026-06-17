@@ -1,0 +1,16 @@
+# agentcookie.toml: secrets-bus adoption manifest v2
+# See docs/spec-agentcookie-secrets-bus-v2-adoption.md
+schema_version = 2
+name = "dsa-research-pp-cli"
+display_name = "Dsa Vlop Transparency"
+description = "Query the aggregated EU Digital Services Act VLOP transparency reports (tables 3–11) with structured parameters (no SQL)"
+project_kind = "cli"
+
+[secrets.file]
+path = "~/.config/dsa-research-pp-cli/config.toml"
+
+[sync]
+default = false
+
+[sync.keys]
+DSA_RESEARCH_APIKEY_HEADER = true
