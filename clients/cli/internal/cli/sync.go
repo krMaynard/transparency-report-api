@@ -449,6 +449,9 @@ func syncResource(ctx context.Context, c interface {
 	anomalyEmitted := false
 
 	for {
+		if err := ctx.Err(); err != nil {
+			return syncResult{Resource: resource, Count: totalCount, Err: err, Duration: time.Since(started)}
+		}
 		params := map[string]string{}
 
 		if resourceSupportsPagination(resource) {

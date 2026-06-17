@@ -650,6 +650,9 @@ func paginatedGet(ctx context.Context, c interface {
 	allItems := make([]json.RawMessage, 0)
 	page := 0
 	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		page++
 		if humanFriendly {
 			fmt.Fprintf(os.Stderr, "fetching page %d...\n", page)

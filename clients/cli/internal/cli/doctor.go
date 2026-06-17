@@ -496,6 +496,11 @@ func collectCacheReport(ctx context.Context, staleAfterSpec string) map[string]a
 		}
 		resources = append(resources, r)
 	}
+	if err := rows.Err(); err != nil {
+		report["status"] = "error"
+		report["error"] = err.Error()
+		return report
+	}
 	report["resources"] = resources
 	report["stale_after"] = staleAfter.String()
 

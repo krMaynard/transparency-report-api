@@ -72,6 +72,9 @@ and full resync. After archiving, use 'search' for instant full-text search.`,
 			}
 
 			for _, resource := range resources {
+				if err := cmd.Context().Err(); err != nil {
+					return err
+				}
 				res := syncResource(cmd.Context(), c, s, resource, "", full, 100, false, nil, syncEventWriter)
 				if res.Err != nil {
 					fmt.Fprintf(cmd.ErrOrStderr(), "  %s: error: %v\n", resource, res.Err)

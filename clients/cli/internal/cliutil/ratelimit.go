@@ -168,11 +168,16 @@ func retryAfterFromNumber(value int64) time.Duration {
 		return defaultRetryWait
 	}
 	if value > int64(MaxRetryWait/time.Second) {
-		if wait := retryAfterEpochWait(value); wait > 0 {
+		if value >= unixEpochSecondsThreshold {
+			wait := retryAfterEpochWait(value)
 			if wait > MaxRetryWait {
 				return MaxRetryWait
 			}
-			return wait
+			if wait > 0 {
+				return wait
+			}
+			// Epoch already elapsed → retry promptly rather than waiting the cap.
+			return defaultRetryWait
 		}
 		return MaxRetryWait
 	}
