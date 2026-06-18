@@ -392,6 +392,35 @@ export DSA_RESEARCH_APIKEY_HEADER=alice
 See [`clients/cli/README.md`](clients/cli/README.md) for the full command list
 and the MCP-server build (`cmd/dsa-research-pp-mcp`).
 
+## MCP server (for agents)
+
+A native [Model Context Protocol](https://modelcontextprotocol.io) **stdio**
+server lives in [`mcp_server.py`](mcp_server.py). It exposes this API's no-SQL
+query interface to MCP hosts (Claude Desktop, Claude Code, …) as five tools —
+`list_tables`, `describe_table`, `dataset_overview`, `run_query`, and `ask` — so
+an agent can explore the dataset directly. It's a thin front end over the running
+HTTP API: every tool hits a real endpoint, so queries pass through the same
+`compile_query` trust boundary (no SQL, validated fields, bound parameters).
+
+The MCP SDK pulls a newer `starlette` than the API pins, so it installs into its
+own virtualenv (kept out of the deployed image):
+
+```bash
+# In one terminal: a running server for the MCP server to talk to.
+uvicorn main:app --port 8000
+
+# In another: the MCP server (or just `make mcp`).
+python -m venv .venv-mcp && . .venv-mcp/bin/activate
+pip install -r requirements-mcp.txt
+export TRANSPARENCY_API_URL=http://127.0.0.1:8000
+export TRANSPARENCY_API_KEY=alice      # optional — enables `ask`
+python mcp_server.py                    # speaks MCP over stdio
+```
+
+To register it with a host, see [`mcp-config.example.json`](mcp-config.example.json)
+and the full guide in [`docs/MCP.md`](docs/MCP.md) (tool reference, config env
+vars, Claude Desktop / Claude Code setup).
+
 ## Endpoints
 
 The dashboard is served at `/` and the JSON API lives under `/api/*` on the same
