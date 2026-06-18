@@ -34,10 +34,13 @@ jobs:
           pip install pytest httpx pyflakes mypy
 
       - name: Lint (pyflakes)
-        run: python -m pyflakes main.py seed.py demo.py conftest.py test_api.py
+        run: python -m pyflakes main.py seed.py demo.py conftest.py mcp_server.py test_api.py test_mcp_server.py
 
       - name: Type check (mypy)
         run: python -m mypy
 
       - name: Run tests
-        run: python -m pytest test_api.py -q
+        # The MCP server's tool functions are exercised against the app via an
+        # in-process TestClient (test_mcp_server.py); the `mcp` SDK itself isn't
+        # installed here, so the build_server() test self-skips.
+        run: python -m pytest test_api.py test_mcp_server.py -q

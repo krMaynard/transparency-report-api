@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 .venv/
+.venv-mcp/
 venv/
 demo.db
 .DS_Store

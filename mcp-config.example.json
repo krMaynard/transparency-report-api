@@ -1,0 +1,16 @@
+{
+  "//": "Example MCP host config for the native stdio server (mcp_server.py).",
+  "//1": "Claude Desktop: merge `mcpServers` into claude_desktop_config.json.",
+  "//2": "Use ABSOLUTE paths to the .venv-mcp python and to mcp_server.py.",
+  "//3": "Start a server first (make serve); see docs/MCP.md for details.",
+  "mcpServers": {
+    "transparency-report-api": {
+      "command": "/absolute/path/to/transparency-report-api/.venv-mcp/bin/python",
+      "args": ["/absolute/path/to/transparency-report-api/mcp_server.py"],
+      "env": {
+        "TRANSPARENCY_API_URL": "http://127.0.0.1:8000",
+        "TRANSPARENCY_API_KEY": "alice"
+      }
+    }
+  }
+}

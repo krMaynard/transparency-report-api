@@ -44,6 +44,10 @@ Built to demonstrate two things:
 | `requirements.txt` | `fastapi` + `uvicorn[standard]` + `anthropic` (NL queries) |
 | `demo.db` | SQLite DB (git-ignored, produced by `seed.py`) |
 | `clients/cli/` | Generated Go CLI + MCP server for this API (CLI Printing Press, from `/openapi.json`) — own module; built on demand, excluded from the Docker/Cloud Build image |
+| `mcp_server.py` | Native Python MCP **stdio** server — a thin HTTP front end over the API (5 tools: `list_tables`/`describe_table`/`dataset_overview`/`run_query`/`ask`). Does **not** import `main`; talks to a running server over `httpx`, so its deps (`mcp`+`httpx`) stay out of the app image and clear of the `fastapi`/`starlette` pins. Configured via `TRANSPARENCY_API_URL`/`_API_KEY`/`_API_TIMEOUT`. See [`docs/MCP.md`](docs/MCP.md) |
+| `requirements-mcp.txt` | Deps for `mcp_server.py` only (`mcp`, `httpx`) — install into a separate venv (`make mcp`); kept out of `requirements.txt`/the Docker image |
+| `mcp-config.example.json` | Example MCP host config (Claude Desktop / Claude Code) for `mcp_server.py` |
+| `test_mcp_server.py` | Tests for `mcp_server.py` — drives the tool functions against the app via an in-process `TestClient` (no network, no `mcp` SDK needed; the `build_server()` test self-skips when the SDK is absent) |
 | `.github/workflows/ci.yml` | CI: `pyflakes` lint + `pytest` on every PR/push (Python 3.11 & 3.12) |
 | `.github/workflows/deploy.yml` | CD: build/push image + deploy to Cloud Run on push to `main` (WIF; skips until configured) |
 | `.gcloudignore` | Trims the Cloud Build upload context (keeps Dockerfile + `data/`) |
@@ -51,10 +55,12 @@ Built to demonstrate two things:
 ## CI
 
 GitHub Actions runs `pyflakes`, `mypy` (config in `mypy.ini`, over
-`main.py`/`seed.py`/`demo.py`/`conftest.py`), and `pytest test_api.py` on every
-pull request and push to `main` (`ci.yml`). Keep all three green — the suite is
-hermetic (no Redis/server/`demo.db` needed; `conftest.py` builds a temp DB). Run
-them locally before pushing (`make lint typecheck test`).
+`main.py`/`seed.py`/`demo.py`/`conftest.py`/`mcp_server.py`), and `pytest
+test_api.py test_mcp_server.py` on every pull request and push to `main`
+(`ci.yml`). Keep all three green — the suite is hermetic (no Redis/server/MCP
+SDK/`demo.db` needed; `conftest.py` builds a temp DB and `test_mcp_server.py`
+drives the API in-process via `TestClient`). Run them locally before pushing
+(`make lint typecheck test`).
 
 `deploy.yml` builds + pushes the image and rolls a Cloud Run revision on push to
 `main` via Workload Identity Federation, stamping the commit SHA as `APP_VERSION`.
