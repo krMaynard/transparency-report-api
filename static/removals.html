@@ -682,7 +682,12 @@
   }
 
   function renderCompliance(rows) {
-    if (!rows.length) return;
+    if (!rows.length) {
+      destroyChart('chart-compliance');
+      var loadingEl = document.getElementById('cmp-loading');
+      if (loadingEl) loadingEl.classList.add('hidden');
+      return;
+    }
     var r = rows[0];
     // cols: removed_legal, removed_policy, already_removed, not_found, not_enough_info, no_action
     var labels = ['Removed (legal)', 'Removed (policy)', 'Already removed', 'Not found', 'Not enough info', 'No action'];
@@ -780,6 +785,9 @@
         )),
       ]);
 
+      // Sort chronologically using allPeriods order (avoids lexicographic sorting bugs)
+      results[0].rows.sort(function(a, b) { return allPeriods.indexOf(a[0]) - allPeriods.indexOf(b[0]); });
+      results[1].rows.sort(function(a, b) { return allPeriods.indexOf(a[0]) - allPeriods.indexOf(b[0]); });
       renderTimeSeries(results[0].rows, breakdown);
       renderRate(results[1].rows);
       renderTopCountries(results[2].rows);

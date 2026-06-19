@@ -2080,15 +2080,9 @@ _gr_overview_cache_lock = threading.Lock()
 def _compute_gr_overview() -> dict[str, Any]:
     conn = _connect_ro()
     try:
-        total_requests = conn.execute(
-            "SELECT COALESCE(SUM(num_requests), 0) FROM gr_removals"
-        ).fetchone()[0]
-        total_items = conn.execute(
-            "SELECT COALESCE(SUM(items_requested), 0) FROM gr_removals"
-        ).fetchone()[0]
-        country_count = conn.execute(
-            "SELECT COUNT(DISTINCT country_id) FROM gr_removals"
-        ).fetchone()[0]
+        total_requests, total_items, country_count = conn.execute(
+            "SELECT COALESCE(SUM(num_requests), 0), COALESCE(SUM(items_requested), 0), COUNT(DISTINCT country_id) FROM gr_removals"
+        ).fetchone()
         periods = [r[0] for r in conn.execute(
             "SELECT name FROM gr_periods ORDER BY id"
         ).fetchall()]
