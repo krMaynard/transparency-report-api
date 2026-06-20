@@ -2017,6 +2017,12 @@ def portal_page() -> FileResponse:
     )
 
 
+@app.get("/privacy", response_class=HTMLResponse)
+def privacy_page() -> FileResponse:
+    """Serve the privacy policy page."""
+    return _serve_page("privacy.html", "Privacy policy")
+
+
 # The dashboard aggregates never change at runtime (the DB is opened mode=ro and
 # baked into the image), so compute them once and memoise — this public endpoint
 # then serves from memory instead of re-querying on every hit.
