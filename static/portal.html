@@ -47,6 +47,39 @@
   .site-nav .nav-links { display: flex; gap: 1.4rem; align-items: center; }
   .site-nav .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; }
   .site-nav .nav-links a:hover { color: var(--accent); }
+  /* Cross-site language switcher (globe) — CSS-only <details> disclosure */
+  .site-nav .nav-right { display: flex; align-items: center; gap: 1.4rem; }
+  .lang-switcher { position: relative; }
+  .lang-switcher > summary {
+    display: inline-flex; align-items: center; gap: 0.38rem; list-style: none; cursor: pointer;
+    padding: 0.34rem 0.55rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel); color: var(--fg); font-weight: 600; font-size: 0.85rem; line-height: 1; white-space: nowrap;
+  }
+  .lang-switcher > summary::-webkit-details-marker { display: none; }
+  .lang-switcher > summary:hover,
+  .lang-switcher[open] > summary { border-color: var(--accent); color: var(--accent); }
+  .lang-switcher .lang-globe { width: 17px; height: 17px; }
+  .lang-switcher .lang-caret { width: 11px; height: 11px; opacity: .75; transition: transform .2s ease; }
+  .lang-switcher[open] .lang-caret { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; min-width: 170px; margin: 0; padding: .3rem;
+    list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 12px 30px var(--shadow); z-index: 60;
+  }
+  .lang-menu li { margin: 0; }
+  .lang-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    padding: .5rem .65rem; border-radius: 8px; text-decoration: none; color: var(--fg); font-size: .9rem; white-space: nowrap;
+  }
+  .lang-opt:hover { background: var(--panel2); }
+  .lang-opt.is-current { font-weight: 700; }
+  .lang-check { width: 16px; height: 16px; color: var(--accent); }
+  @media (max-width: 640px) {
+    .site-nav { flex-wrap: wrap; row-gap: .5rem; }
+    .site-nav .nav-links { flex-wrap: wrap; gap: 0.9rem 1.1rem; }
+    .lang-switcher > summary > span { display: none; }
+    .lang-switcher > summary { padding: .3rem .42rem; }
+  }
   .theme-toggle {
     background: none; border: 0; color: var(--muted); cursor: pointer; padding: 4px;
     display: inline-flex; width: auto; margin: 0;
@@ -211,12 +244,27 @@
 <a class="skip-link" href="#main">Skip to content</a>
 <nav class="site-nav" aria-label="Site">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
-  <div class="nav-links">
-    <a href="https://kieranmaynard.com/work.html">Work</a>
-    <a href="https://kieranmaynard.com/transparency.html">Products</a>
-    <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
-    <a href="https://kieranmaynard.com/blog.html">Blog</a>
-    <a href="mailto:kieranmaynard@gmail.com">Contact</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="https://kieranmaynard.com/work.html">Work</a>
+      <a href="https://kieranmaynard.com/transparency.html">Products</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
+      <a href="https://kieranmaynard.com/blog.html">Blog</a>
+      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+    </div>
+    <details class="lang-switcher">
+      <summary class="lang-current" aria-label="Language" title="Language">
+        <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.7 2.6 15.3 0 18"/><path d="M12 3c-2.6 2.7-2.6 15.3 0 18"/></svg>
+        <span>English</span>
+        <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+      </summary>
+      <ul class="lang-menu">
+        <li><a class="lang-opt is-current" href="https://kieranmaynard.com/" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="https://kieranmaynard.com/ja/"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="https://kieranmaynard.com/zh/"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="https://kieranmaynard.com/ko/"><span>한국어</span></a></li>
+      </ul>
+    </details>
     <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
