@@ -126,7 +126,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.aliexpress.com/p/transparencycenter/dsa.html",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -148,7 +148,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.linkedin.com/help/linkedin/answer/a1678508",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -159,7 +159,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.booking.com/content/dsa.html",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -170,7 +170,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.apple.com/legal/dsa/transparency/eu/app-store/",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -181,7 +181,7 @@
     "tier": "vlose",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.microsoft.com/en-us/corporate-responsibility/eu-dsa-report-bing",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -192,7 +192,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://eur.shein.com/digital-service-act-a-1994.html",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -203,7 +203,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://wikimediafoundation.org/who-we-are/transparency/2025-2/",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -214,7 +214,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://corporate.zalando.com/en/investor-relations/corporate-governance/transparency-hub",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -225,7 +225,7 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.temu.com/digital-services-act-help.html",
     "click_steps": [],
     "report_url": null,
     "notes": null
@@ -250,7 +250,7 @@
     "transparency_page_url": null,
     "click_steps": [],
     "report_url": null,
-    "notes": null
+    "notes": "EC found Aylo in breach of DSA obligations; no public transparency report published"
   },
   {
     "service_name": "XVideos",
@@ -261,7 +261,7 @@
     "transparency_page_url": null,
     "click_steps": [],
     "report_url": null,
-    "notes": null
+    "notes": "EC found WGCZ in breach of DSA obligations; no public transparency report published"
   },
   {
     "service_name": "XNXX",
@@ -272,6 +272,6 @@
     "transparency_page_url": null,
     "click_steps": [],
     "report_url": null,
-    "notes": "Designated December 2023; confirmed active for H2 2025"
+    "notes": "Designated December 2023; EC found NKL Associates in breach of DSA obligations; no public transparency report published"
   }
 ]
