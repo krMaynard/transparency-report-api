@@ -10,8 +10,9 @@
 #   VLOPs/VLOSEs: EC designated list (digital-strategy.ec.europa.eu)
 #   Others: platforms with significant EU user base (>10M MAU)
 
-# --- VLOPs missing from registry ---
-Stripchat	WebGroup Czech Republic	vlop
+# --- Former VLOPs (de-designated, may still publish annual reports as online-platform) ---
+# Stripchat de-designated May 2025 (user base fell below 45M EU MAU threshold)
+Stripchat	Technius Ltd	online-platform
 
 # --- Major online platforms (Article 24, annual reports) ---
 # Social / messaging

@@ -247,10 +247,10 @@
     "tier": "vlop",
     "period_start": "2025-07-01",
     "period_end": "2025-12-31",
-    "transparency_page_url": null,
+    "transparency_page_url": "https://www.pornhub.com/information/transparency",
     "click_steps": [],
     "report_url": null,
-    "notes": "EC found Aylo in breach of DSA obligations; no public transparency report published"
+    "notes": null
   },
   {
     "service_name": "XVideos",
@@ -261,7 +261,7 @@
     "transparency_page_url": null,
     "click_steps": [],
     "report_url": null,
-    "notes": "EC found WGCZ in breach of DSA obligations; no public transparency report published"
+    "notes": null
   },
   {
     "service_name": "XNXX",
@@ -272,6 +272,6 @@
     "transparency_page_url": null,
     "click_steps": [],
     "report_url": null,
-    "notes": "Designated December 2023; EC found NKL Associates in breach of DSA obligations; no public transparency report published"
+    "notes": "Designated July 2024 (separate from the December 2023 adult VLOP batch)"
   }
 ]
