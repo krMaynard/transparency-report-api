@@ -917,6 +917,14 @@ _J_SCOPE = "JOIN scopes sc ON sc.id = f.scope_id"
 _J_SURF = "JOIN surfaces su ON su.id = f.surface_id"
 _CAT_DIMS = {"category_code": "c.code", "category_label": "c.label"}
 
+_J_RPT = "JOIN reports r ON r.id = f.report_id"
+_RPT_DIMS = {
+    "report_period":       "r.period",
+    "report_period_start": "r.period_start",
+    "report_period_end":   "r.period_end",
+    "report_tier":         "r.tier",
+}
+
 _J_GR_PER = "JOIN gr_periods    per ON per.id = f.period_id"
 _J_GR_CTY = "JOIN gr_countries  cty ON cty.id = f.country_id"
 _J_GR_REQ = "JOIN gr_requestors req ON req.id = f.requestor_id"
@@ -926,15 +934,15 @@ _J_GR_RSN = "JOIN gr_reasons    rsn ON rsn.id = f.reason_id"
 TABLES: dict[str, TableSpec] = {
     "t3_member_state_orders": TableSpec(
         "Member-State orders to act on illegal content / to provide information (Art. 9 & 10), by category and scope.",
-        f"FROM t3_member_state_orders f {_J_SVC} {_J_CAT} {_J_SCOPE}",
-        {**_SVC, **_CAT_DIMS, "scope": "sc.name"},
+        f"FROM t3_member_state_orders f {_J_RPT} {_J_SVC} {_J_CAT} {_J_SCOPE}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS, "scope": "sc.name"},
         {"orders_to_act": "f.orders_to_act", "items": "f.items",
          "orders_to_provide_info": "f.orders_to_provide_info"},
     ),
     "t4_notices": TableSpec(
         "Notices submitted under Art. 16, by category, with Trusted-Flagger (tf_) breakdowns.",
-        f"FROM t4_notices f {_J_SVC} {_J_CAT}",
-        {**_SVC, **_CAT_DIMS},
+        f"FROM t4_notices f {_J_RPT} {_J_SVC} {_J_CAT}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS},
         {"notices": "f.notices", "tf_notices": "f.tf_notices", "items": "f.items",
          "tf_items": "f.tf_items", "median_time": "f.median_time", "tf_median_time": "f.tf_median_time",
          "actions_law": "f.actions_law", "tf_actions_law": "f.tf_actions_law",
@@ -942,44 +950,44 @@ TABLES: dict[str, TableSpec] = {
     ),
     "t5_own_initiative_illegal": TableSpec(
         "Own-initiative actions on illegal content, by category × restriction type.",
-        f"FROM t5_own_initiative_illegal f {_J_SVC} {_J_CAT}",
-        {**_SVC, **_CAT_DIMS},
+        f"FROM t5_own_initiative_illegal f {_J_RPT} {_J_SVC} {_J_CAT}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS},
         dict(_OWN_INIT_MEASURES),
     ),
     "t6_own_initiative_tos": TableSpec(
         "Own-initiative actions on ToS violations, by category × restriction type × surface.",
-        f"FROM t6_own_initiative_tos f {_J_SVC} {_J_CAT} {_J_SURF}",
-        {**_SVC, **_CAT_DIMS, "surface": "su.name"},
+        f"FROM t6_own_initiative_tos f {_J_RPT} {_J_SVC} {_J_CAT} {_J_SURF}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS, "surface": "su.name"},
         dict(_OWN_INIT_MEASURES),
     ),
     "t7_appeals_recidivism": TableSpec(
         "Appeals & recidivism (internal complaints, out-of-court disputes, repeat-offender suspensions), by section × indicator × scope × surface.",
-        f"FROM t7_appeals_recidivism f {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
-        {**_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
+        f"FROM t7_appeals_recidivism f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
         {"value": "f.value"},
     ),
     "t8_automated_means": TableSpec(
         "Use of automated means for content moderation, by section × indicator × scope × surface.",
-        f"FROM t8_automated_means f {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
-        {**_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
+        f"FROM t8_automated_means f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
         {"value": "f.value"},
     ),
     "t9_human_resources": TableSpec(
         "Human resources dedicated to content moderation, by section × indicator × scope.",
-        f"FROM t9_human_resources f {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE}",
-        {**_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name"},
+        f"FROM t9_human_resources f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE}",
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name"},
         {"value": "f.value"},
     ),
     "t10_amar": TableSpec(
         "Average Monthly Active Recipients (AMAR) in the EU, by scope.",
-        f"FROM t10_amar f {_J_SVC} {_J_SCOPE}",
-        {**_SVC, "scope": "sc.name"},
+        f"FROM t10_amar f {_J_RPT} {_J_SVC} {_J_SCOPE}",
+        {**_RPT_DIMS, **_SVC, "scope": "sc.name"},
         {"value": "f.value"},
     ),
     "t11_qualitative": TableSpec(
         "Qualitative description (free text), by indicator. No numeric measures — request `qualitative_text` in `fields`.",
-        f"FROM t11_qualitative f {_J_SVC} {_J_IND}",
-        {**_SVC, "indicator": "i.name", "qualitative_text": "f.value_text"},
+        f"FROM t11_qualitative f {_J_RPT} {_J_SVC} {_J_IND}",
+        {**_RPT_DIMS, **_SVC, "indicator": "i.name", "qualitative_text": "f.value_text"},
         {},
     ),
     "gr_removals": TableSpec(
