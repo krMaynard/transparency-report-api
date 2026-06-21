@@ -56,6 +56,7 @@ import json
 import re
 import sys
 import time
+import urllib.parse
 from pathlib import Path
 from typing import Any
 
@@ -132,30 +133,58 @@ def _score_url(url: str, service_name: str) -> float:
     return score
 
 
-def _search_duckduckgo(page: Any, query: str) -> list[tuple[str, str, str]]:
-    """Search DuckDuckGo; return [(title, url, snippet), ...]."""
+def _dismiss_google_consent(page: Any) -> None:
+    """Dismiss Google's GDPR consent page if shown (best-effort, never raises)."""
+    try:
+        for selector in [
+            "button#L2AGLb",
+            "button[jsname='b3VHJd']",
+            "[aria-label='Accept all']",
+            "[aria-label='Agree to all']",
+        ]:
+            try:
+                btn = page.locator(selector).first
+                if btn.is_visible(timeout=1500):
+                    btn.click(timeout=2000)
+                    time.sleep(0.4)
+                    return
+            except Exception:
+                continue
+        for text in ["Accept all", "Agree to all", "I agree"]:
+            try:
+                btn = page.get_by_role("button", name=re.compile(text, re.IGNORECASE)).first
+                if btn.is_visible(timeout=800):
+                    btn.click(timeout=2000)
+                    time.sleep(0.4)
+                    return
+            except Exception:
+                continue
+    except Exception:
+        pass
+
+
+def _search_google(page: Any, query: str) -> list[tuple[str, str, str]]:
+    """Search Google; return [(title, url, snippet), ...]."""
     results: list[tuple[str, str, str]] = []
     try:
+        encoded = urllib.parse.quote_plus(query)
         page.goto(
-            f"https://duckduckgo.com/?q={query.replace(' ', '+')}&ia=web",
+            f"https://www.google.com/search?q={encoded}&num=10&hl=en&gl=us",
             wait_until="domcontentloaded",
             timeout=20000,
         )
+        _dismiss_google_consent(page)
         page.wait_for_load_state("networkidle", timeout=10000)
-        time.sleep(1)
 
-        # Extract result links
-        anchors = page.locator("article[data-testid='result'] a[data-testid='result-title-a']").all()
-        snippets = page.locator("article[data-testid='result'] [data-result='snippet']").all()
-        for i, anchor in enumerate(anchors[:10]):
+        # Google result links wrap an <h3> title; filter out google.com URLs
+        links = page.locator("a:has(h3)").all()
+        for link in links[:15]:
             try:
-                href = anchor.get_attribute("href") or ""
-                title = (anchor.inner_text() or "").strip()
-                snippet = ""
-                if i < len(snippets):
-                    snippet = (snippets[i].inner_text() or "").strip()
-                if href.startswith("http"):
-                    results.append((title, href, snippet))
+                href = link.get_attribute("href") or ""
+                if not href.startswith("http") or "google." in href.lower():
+                    continue
+                title = (link.locator("h3").first.inner_text() or "").strip()
+                results.append((title or href, href, ""))
             except Exception:
                 continue
     except Exception as exc:
@@ -181,7 +210,7 @@ def _find_transparency_url(
 
     for query in queries:
         print(f"    search: {query[:70]}", file=sys.stderr)
-        results = _search_duckduckgo(page, query)
+        results = _search_google(page, query)
         for title, url, _snippet in results:
             if url in seen:
                 continue
@@ -210,7 +239,7 @@ def _search_annex_files(page: Any, dry_run: bool) -> list[dict[str, Any]]:
     for phrase in _ANNEX_PHRASES:
         query = f"{phrase} filetype:csv OR filetype:xlsx 2026"
         print(f"  annex search: {query}", file=sys.stderr)
-        results = _search_duckduckgo(page, query)
+        results = _search_google(page, query)
 
         for title, url, snippet in results:
             if url in found_urls:
