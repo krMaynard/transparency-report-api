@@ -1,0 +1,227 @@
+[
+  {
+    "service_name": "Google Maps",
+    "platform": "Google",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Google Play",
+    "platform": "Google",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": "Google publishes a combined multi-service DSA report"
+  },
+  {
+    "service_name": "Google Search",
+    "platform": "Google",
+    "tier": "vlop-vlose",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Google Shopping",
+    "platform": "Google",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Multi-Services",
+    "platform": "Google",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": "Google catch-all reporting unit for cross-product enforcement"
+  },
+  {
+    "service_name": "YouTube",
+    "platform": "Google",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "X",
+    "platform": "X",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "TikTok",
+    "platform": "TikTok",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Facebook",
+    "platform": "Meta",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Instagram",
+    "platform": "Meta",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Pinterest",
+    "platform": "Pinterest",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "AliExpress",
+    "platform": "Alibaba",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Amazon",
+    "platform": "Amazon",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "LinkedIn",
+    "platform": "Microsoft",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Booking.com",
+    "platform": "Booking.com",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "App Store",
+    "platform": "Apple",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Bing",
+    "platform": "Microsoft",
+    "tier": "vlose",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "SHEIN",
+    "platform": "Shein",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Wikipedia",
+    "platform": "Wikimedia",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Zalando",
+    "platform": "Zalando",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Temu",
+    "platform": "Temu",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Snapchat",
+    "platform": "Snap",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "Pornhub",
+    "platform": "Aylo",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "XVideos",
+    "platform": "WebGroup Czech Republic",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": null
+  },
+  {
+    "service_name": "XNXX",
+    "platform": "NKL Associates",
+    "tier": "vlop",
+    "period_start": "2025-07-01",
+    "period_end": "2025-12-31",
+    "report_url": null,
+    "notes": "Designated December 2023; confirmed active for H2 2025"
+  }
+]
