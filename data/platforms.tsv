@@ -1,0 +1,50 @@
+# DSA platforms to add to the registry.
+# Format: service_name<TAB>platform<TAB>tier
+# Tier values: vlop, vlose, online-platform, hosting, intermediary
+#
+# Run discovery:
+#   python scripts/discover-platforms.py --from-names data/platforms.tsv --out draft.json
+#   # Review draft.json, then merge into data/registry.json
+#
+# Sources:
+#   VLOPs/VLOSEs: EC designated list (digital-strategy.ec.europa.eu)
+#   Others: platforms with significant EU user base (>10M MAU)
+
+# --- VLOPs missing from registry ---
+Stripchat	WebGroup Czech Republic	vlop
+
+# --- Major online platforms (Article 24, annual reports) ---
+# Social / messaging
+Reddit	Reddit	online-platform
+Twitch	Amazon	online-platform
+Telegram	Telegram	online-platform
+Discord	Discord	online-platform
+BeReal	BeReal	online-platform
+Mastodon	Mastodon gGmbH	online-platform
+Tumblr	Automattic	online-platform
+
+# Video / streaming
+Dailymotion	Dailymotion	online-platform
+Twitch	Amazon	online-platform
+Vimeo	Vimeo	online-platform
+
+# Marketplaces / commerce
+eBay	eBay	online-platform
+Etsy	Etsy	online-platform
+Vinted	Vinted	online-platform
+Leboncoin	Schibsted	online-platform
+OLX	Naspers	online-platform
+
+# Search / browsers
+Ecosia	Ecosia	online-platform
+Qwant	Qwant	online-platform
+
+# App / software
+Microsoft Store	Microsoft	online-platform
+Steam	Valve	online-platform
+Google Play (non-VLOP)	Google	online-platform
+
+# Accommodation / travel
+Airbnb	Airbnb	online-platform
+Expedia	Expedia	online-platform
+Tripadvisor	Tripadvisor	online-platform
