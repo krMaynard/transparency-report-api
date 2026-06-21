@@ -43,15 +43,29 @@ CREATE TABLE indicators (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
 CREATE TABLE scopes     (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
 CREATE TABLE surfaces   (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
 
+-- Report dimension: one row per submitted transparency report (one dataset = one report).
+-- Supports multi-period ingestion when non-VLOP annual reports are added.
+-- tier: vlop | vlose | vlop-vlose | online-platform | hosting | intermediary
+CREATE TABLE reports (
+    id           INTEGER PRIMARY KEY,
+    period       TEXT NOT NULL,
+    period_start TEXT NOT NULL,
+    period_end   TEXT NOT NULL,
+    tier         TEXT NOT NULL DEFAULT 'vlop',
+    generated    TEXT
+);
+CREATE INDEX idx_reports_period ON reports(period_start, period_end);
+
 -- Table 3 — Member-State orders (Art. 9 & 10), by category × scope.
 CREATE TABLE t3_member_state_orders (
-    service_id INTEGER NOT NULL, category_id INTEGER NOT NULL, scope_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL,
+    category_id INTEGER NOT NULL, scope_id INTEGER NOT NULL,
     orders_to_act INTEGER, items INTEGER, orders_to_provide_info INTEGER
 );
 
 -- Table 4 — Notices (Art. 16), by category, with Trusted-Flagger breakdowns.
 CREATE TABLE t4_notices (
-    service_id INTEGER NOT NULL, category_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL, category_id INTEGER NOT NULL,
     notices INTEGER, tf_notices INTEGER, items INTEGER, tf_items INTEGER,
     median_time INTEGER, tf_median_time INTEGER,
     actions_law INTEGER, tf_actions_law INTEGER, actions_tos INTEGER, tf_actions_tos INTEGER
@@ -59,7 +73,7 @@ CREATE TABLE t4_notices (
 
 -- Table 5 — Own-initiative actions on illegal content, by category × restriction type.
 CREATE TABLE t5_own_initiative_illegal (
-    service_id INTEGER NOT NULL, category_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL, category_id INTEGER NOT NULL,
     measures INTEGER, automated INTEGER,
     vis_removal INTEGER, vis_disable INTEGER, vis_demoted INTEGER, vis_age_restricted INTEGER,
     vis_interaction_restricted INTEGER, vis_labelled INTEGER, vis_other INTEGER,
@@ -70,7 +84,7 @@ CREATE TABLE t5_own_initiative_illegal (
 
 -- Table 6 — Own-initiative actions on ToS violations (same shape as t5, + surface).
 CREATE TABLE t6_own_initiative_tos (
-    service_id INTEGER NOT NULL, category_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL, category_id INTEGER NOT NULL,
     measures INTEGER, automated INTEGER,
     vis_removal INTEGER, vis_disable INTEGER, vis_demoted INTEGER, vis_age_restricted INTEGER,
     vis_interaction_restricted INTEGER, vis_labelled INTEGER, vis_other INTEGER,
@@ -82,27 +96,36 @@ CREATE TABLE t6_own_initiative_tos (
 
 -- Table 7 — Appeals & recidivism, by section × indicator × scope × surface.
 CREATE TABLE t7_appeals_recidivism (
-    service_id INTEGER NOT NULL, section_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL,
+    section_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL,
     scope_id INTEGER NOT NULL, value INTEGER, surface_id INTEGER NOT NULL
 );
 
 -- Table 8 — Use of automated means, by section × indicator × scope × surface.
 CREATE TABLE t8_automated_means (
-    service_id INTEGER NOT NULL, section_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL,
+    section_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL,
     scope_id INTEGER NOT NULL, value INTEGER, surface_id INTEGER NOT NULL
 );
 
 -- Table 9 — Human resources for content moderation, by section × indicator × scope.
 CREATE TABLE t9_human_resources (
-    service_id INTEGER NOT NULL, section_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL,
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL,
+    section_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL,
     scope_id INTEGER NOT NULL, value INTEGER
 );
 
 -- Table 10 — Average Monthly Active Recipients (AMAR), by scope.
-CREATE TABLE t10_amar (service_id INTEGER NOT NULL, scope_id INTEGER NOT NULL, value INTEGER);
+CREATE TABLE t10_amar (
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL,
+    scope_id INTEGER NOT NULL, value INTEGER
+);
 
 -- Table 11 — Qualitative description (free text), by indicator.
-CREATE TABLE t11_qualitative (service_id INTEGER NOT NULL, indicator_id INTEGER NOT NULL, value_text TEXT);
+CREATE TABLE t11_qualitative (
+    report_id INTEGER NOT NULL, service_id INTEGER NOT NULL,
+    indicator_id INTEGER NOT NULL, value_text TEXT
+);
 
 CREATE INDEX idx_t3_service  ON t3_member_state_orders(service_id);
 CREATE INDEX idx_t4_service  ON t4_notices(service_id);
@@ -113,6 +136,15 @@ CREATE INDEX idx_t8_service  ON t8_automated_means(service_id);
 CREATE INDEX idx_t9_service  ON t9_human_resources(service_id);
 CREATE INDEX idx_t10_service ON t10_amar(service_id);
 CREATE INDEX idx_t11_service ON t11_qualitative(service_id);
+CREATE INDEX idx_t3_report   ON t3_member_state_orders(report_id);
+CREATE INDEX idx_t4_report   ON t4_notices(report_id);
+CREATE INDEX idx_t5_report   ON t5_own_initiative_illegal(report_id);
+CREATE INDEX idx_t6_report   ON t6_own_initiative_tos(report_id);
+CREATE INDEX idx_t7_report   ON t7_appeals_recidivism(report_id);
+CREATE INDEX idx_t8_report   ON t8_automated_means(report_id);
+CREATE INDEX idx_t9_report   ON t9_human_resources(report_id);
+CREATE INDEX idx_t10_report  ON t10_amar(report_id);
+CREATE INDEX idx_t11_report  ON t11_qualitative(report_id);
 
 -- Google Government Removal Requests (2019–2025)
 CREATE TABLE gr_periods    (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
@@ -193,11 +225,25 @@ def build_db(data: dict[str, Any], db_path: str) -> dict[str, int]:
             [(k, str(v)) for k, v in data.get("meta", {}).items()],
         )
 
+        meta = data.get("meta", {})
+        period = meta.get("period", "/")
+        period_start, _, period_end = period.partition("/")
+        tier = meta.get("tier", "vlop")
+        generated = meta.get("generated")
+        conn.execute(
+            "INSERT INTO reports (id, period, period_start, period_end, tier, generated) VALUES (0,?,?,?,?,?)",
+            (period, period_start.strip(), period_end.strip(), tier, generated),
+        )
+
         summary: dict[str, int] = {}
         for table, (ncols, key) in _FACT_TABLES.items():
             rows = data.get(key, [])
-            placeholders = ", ".join(["?"] * ncols)
-            conn.executemany(f"INSERT INTO {table} VALUES ({placeholders})", rows)
+            # Prepend report_id=0 to each row (ncols describes the source JSON width).
+            placeholders = ", ".join(["?"] * (ncols + 1))
+            conn.executemany(
+                f"INSERT INTO {table} VALUES ({placeholders})",
+                [[0] + list(row) for row in rows],
+            )
             summary[table] = len(rows)
 
         conn.commit()
