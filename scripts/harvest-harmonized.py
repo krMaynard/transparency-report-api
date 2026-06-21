@@ -48,7 +48,6 @@ Run with --show-headers to print the actual CSV headers without inserting.
 """
 import argparse
 import csv
-import io
 import json
 import os
 import sqlite3
@@ -284,15 +283,12 @@ def _upsert_dim(conn: sqlite3.Connection, table: str, name: str) -> int:
 
 def _insert_report(conn: sqlite3.Connection, service_name: str, period_start: str,
                    period_end: str, tier: str, generated: str | None) -> int:
-    """Insert a new reports row; return its id. Errors if already exists."""
-    existing = conn.execute(
-        "SELECT r.id FROM reports r JOIN services s ON s.id = r.service_id "
-        "WHERE s.name = ? AND r.period_start = ? AND r.period_end = ?",
-        (service_name, period_start, period_end),
-    ).fetchone() if _col_exists(conn, "reports", "service_id") else None
+    """Insert a new reports row; return its id.
 
-    # Fallback: reports table doesn't have a service_id column yet in the current
-    # schema (reports is per-dataset, not per-service). Use period uniqueness.
+    If a row already exists for the same period_start/period_end/tier, it is
+    reused.  service_name is accepted for forward-compatibility (a future schema
+    may add a service_id FK to reports).
+    """
     existing = conn.execute(
         "SELECT id FROM reports WHERE period_start = ? AND period_end = ? AND tier = ?",
         (period_start, period_end, tier),
@@ -310,11 +306,6 @@ def _insert_report(conn: sqlite3.Connection, service_name: str, period_start: st
         (new_id, period, period_start, period_end, tier, generated),
     )
     return new_id
-
-
-def _col_exists(conn: sqlite3.Connection, table: str, col: str) -> bool:
-    cols = [r[1] for r in conn.execute(f"PRAGMA table_info({table})").fetchall()]
-    return col in cols
 
 
 # ---------------------------------------------------------------------------
@@ -504,7 +495,7 @@ def harvest_service(entry: dict[str, Any], db_path: str,
     _tmpdir = None
     if work_dir is None:
         if not report_url:
-            print(f"  SKIP — no report_url in registry")
+            print("  SKIP — no report_url in registry")
             return {}
         _tmpdir = tempfile.mkdtemp(prefix=f"harvest_{name.replace(' ', '_')}_")
         work_dir = Path(_tmpdir)
