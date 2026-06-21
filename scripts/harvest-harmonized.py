@@ -209,7 +209,7 @@ def _open_csv(path: Path, col_map: dict[str, str]) -> tuple[list[str], list[dict
         inv = {v.lower(): k for k, v in col_map.items()}
         rows = []
         for raw_row in reader:
-            row = {inv.get(h.lower().strip(), h): v for h, v in raw_row.items()}
+            row = {inv.get(h.lower().strip(), h): v for h, v in raw_row.items() if h is not None}
             rows.append(row)
     return raw_headers, rows
 
@@ -269,7 +269,8 @@ def _xlsx_to_csvs(xlsx_path: Path, dest: Path) -> list[Path]:
 def _download(url: str, dest: Path) -> None:
     req = urllib.request.Request(url, headers={"User-Agent": "transparency-report-harvester/1.0"})
     with urllib.request.urlopen(req, timeout=60) as resp, dest.open("wb") as f:
-        f.write(resp.read())
+        while chunk := resp.read(65536):
+            f.write(chunk)
 
 
 def _extract_zip(zip_path: Path, dest: Path) -> None:
@@ -538,8 +539,8 @@ def harvest_service(entry: dict[str, Any], db_path: str,
         if not report_url:
             print("  SKIP — no report_url in registry")
             return {}
-        _tmpdir = tempfile.mkdtemp(prefix=f"harvest_{name.replace(' ', '_')}_")
-        work_dir = Path(_tmpdir)
+        _tmpdir = tempfile.TemporaryDirectory(prefix=f"harvest_{name.replace(' ', '_')}_")
+        work_dir = Path(_tmpdir.name)
         print(f"  Downloading {report_url}")
         dl_path = work_dir / "report.zip"
         _download(report_url, dl_path)
