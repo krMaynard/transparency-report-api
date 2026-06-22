@@ -470,6 +470,9 @@ async function onAuthSuccess(data) {
   }
   $("#login-card").classList.add("hidden");
   show($("#key-card"));
+  // Schema normally loads on page open; retry here only if that initial
+  // (public) load failed — e.g. a transient network error.
+  if ($("#schema-card").classList.contains("hidden")) loadSchema().catch(() => {});
 }
 
 // ── Google sign-in ──────────────────────────────────────────────────────────

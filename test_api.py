@@ -182,9 +182,11 @@ class TestAuth:
         assert client.get("/api/jobs", headers={"X-API-Key": "bogus"}).status_code == 401
 
     def test_valid_key_ok(self):
-        r = client.get("/api/tables", headers=ALICE)
+        # Use a gated endpoint so this actually exercises key validation
+        # (schema endpoints are public now).
+        r = client.get("/api/jobs", headers=ALICE)
         assert r.status_code == 200
-        assert [t["name"] for t in r.json()["tables"]]
+        assert "jobs" in r.json()
 
 
 # ── Schema ────────────────────────────────────────────────────────────────────
