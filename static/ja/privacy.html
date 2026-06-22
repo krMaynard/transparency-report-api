@@ -309,6 +309,13 @@ display: flex; align-items: center; justify-content: space-between;
       API リファレンス
     </a>
 
+    <a href="/ja/privacy" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      プライバシー
+    </a>
+
     <hr class="nav-hr">
 
     <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -370,7 +377,7 @@ display: flex; align-items: center; justify-content: space-between;
       <tr>
         <td>Google アカウントのメールアドレス（Google でサインインした場合）</td>
         <td>アカウントの識別、レート制限、管理者による取り消し</td>
-        <td>キーを取り消すか、セッションの有効期限が切れるまで</td>
+        <td>セッションの有効期限が切れるまで（またはサーバーの再起動時）</td>
       </tr>
       <tr>
         <td>デモ登録時に入力するメールアドレス</td>
@@ -427,7 +434,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>本サイトは、Google Identity Services がサインイン状態のために設定するもの以外に、分析ツール、広告ネットワーク、トラッキングピクセル、Cookie を使用しません。</p>
 
   <h2>データの削除とお問い合わせ</h2>
-  <p>API キーをすぐに取り消すには、<a href="/ja/portal">研究者ポータル</a>の<strong>キーを取り消す</strong>ボタンを使用してください。これにより、セッションキーとアカウント記録が削除されます。</p>
+  <p>API キーとセッションは短命です。それぞれ有効期間（TTL）が設定され、メモリ上にのみ保持されるため、期限切れ時またはサーバー再起動時に自動的に破棄されます。クエリ結果がディスクに書き込まれることはありません。</p>
   <p>その他のご質問やデータ削除のご依頼は、こちらまでお問い合わせください：<a href="mailto:kieranmaynard@gmail.com">kieranmaynard@gmail.com</a></p>
 
 </main>
