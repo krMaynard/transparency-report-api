@@ -23,7 +23,7 @@
     --fg: #333; --muted: #666; --accent: #2a9d8f; --accent-dark: #1e7268; --accent2: #1e7268;
     --on-accent: #fff; --shadow: rgba(0,0,0,.07);
     --mono: ui-monospace, SFMono-Regular, "DejaVu Sans Mono", Menlo, monospace;
-    --topbar-h: 52px;
+    --topbar-h: 52px; --header-h: var(--topbar-h);
     --sidebar-w: 220px;
   }
   [data-theme="dark"] {
@@ -39,6 +39,7 @@
   }
 
   /* ── Site banner ─────────────────────────────────────────────── */
+  .page-header { position: sticky; top: 0; z-index: 200; }
   .site-nav {
     display: flex; justify-content: space-between; align-items: center;
     padding: 0.9rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border);
@@ -83,8 +84,7 @@
 
   /* ── Top bar ────────────────────────────────────────────────── */
   .topbar {
-    position: sticky; top: 0; z-index: 200;
-    display: flex; align-items: center; justify-content: space-between;
+display: flex; align-items: center; justify-content: space-between;
     height: var(--topbar-h); padding: 0 1rem;
     background: var(--panel); border-bottom: 1px solid var(--border);
   }
@@ -113,13 +113,13 @@
   [data-theme="dark"] .theme-toggle .theme-icon-dark { display: none; }
 
   /* ── App body (sidebar + main) ──────────────────────────────── */
-  .app-body { display: flex; min-height: calc(100vh - var(--topbar-h)); }
+  .app-body { display: flex; min-height: calc(100vh - var(--header-h)); }
 
   /* ── Sidebar ────────────────────────────────────────────────── */
   .sidebar {
     width: var(--sidebar-w); flex-shrink: 0;
-    position: sticky; top: var(--topbar-h);
-    height: calc(100vh - var(--topbar-h));
+    position: sticky; top: var(--header-h);
+    height: calc(100vh - var(--header-h));
     overflow-y: auto;
     background: var(--panel); border-right: 1px solid var(--border);
     display: flex; flex-direction: column;
@@ -286,7 +286,7 @@
   @media (max-width: 720px) {
     .hamburger { display: flex; }
     .sidebar {
-      position: fixed; left: 0; top: var(--topbar-h); bottom: 0; z-index: 210;
+      position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 210;
       transform: translateX(calc(-1 * var(--sidebar-w)));
     }
     .sidebar.is-open { transform: translateX(0); }
@@ -301,6 +301,7 @@
 <a class="skip-link" href="#main">Saltar al contenido</a>
 
 <!-- ── Site banner ──────────────────────────────────────────────────────── -->
+<div class="page-header">
 <nav class="site-nav" aria-label="Sitio">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
@@ -352,6 +353,7 @@
     </button>
   </div>
 </header>
+</div>
 
 <div class="app-body">
 
@@ -511,6 +513,21 @@
     });
   }
   // Mobile sidebar toggle
+    // Keep --header-h in sync with the actual rendered height of the site
+  // banner + topbar (which varies as the nav links wrap on narrow widths),
+  // so the fixed/sticky sidebar starts right below it instead of overlapping.
+  var pageHeader = document.querySelector('.page-header');
+  if (pageHeader) {
+    var syncHeaderHeight = function () {
+      document.documentElement.style.setProperty('--header-h', pageHeader.offsetHeight + 'px');
+    };
+    syncHeaderHeight();
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncHeaderHeight).observe(pageHeader);
+    } else {
+      window.addEventListener('resize', syncHeaderHeight);
+    }
+  }
   var hamburger = document.getElementById('hamburger');
   var sidebar   = document.getElementById('sidebar');
   var overlay   = document.getElementById('sidebar-overlay');
