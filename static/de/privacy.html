@@ -309,6 +309,13 @@ display: flex; align-items: center; justify-content: space-between;
       API-Referenz
     </a>
 
+    <a href="/de/privacy" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      Datenschutz
+    </a>
+
     <hr class="nav-hr">
 
     <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -370,7 +377,7 @@ display: flex; align-items: center; justify-content: space-between;
       <tr>
         <td>E-Mail des Google-Kontos (bei Anmeldung mit Google)</td>
         <td>Konto-Identität, Ratenbegrenzung, Widerruf durch Administrator</td>
-        <td>Bis du deinen Schlüssel widerrufst oder deine Sitzung abläuft</td>
+        <td>Bis deine Sitzung abläuft (oder der Server neu startet)</td>
       </tr>
       <tr>
         <td>E-Mail, die du bei der Demo-Registrierung angibst</td>
@@ -427,7 +434,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>Diese Website verwendet keine Analyse, keine Werbenetzwerke, keine Tracking-Pixel und keine Cookies über die hinaus, die Google Identity Services für den Anmeldestatus setzt.</p>
 
   <h2>Datenlöschung und Kontakt</h2>
-  <p>Um deinen API-Schlüssel sofort zu widerrufen, nutze die Schaltfläche <strong>Schlüssel widerrufen</strong> im <a href="/de/portal">Forschungsportal</a>. Damit werden dein Sitzungsschlüssel und dein Kontoeintrag entfernt.</p>
+  <p>API-Schlüssel und Sitzungen sind kurzlebig: Jeder ist durch eine Lebensdauer (TTL) begrenzt und wird nur im Arbeitsspeicher gehalten, sodass er automatisch verworfen wird, wenn er abläuft oder der Server neu startet. Abfrageergebnisse werden nie auf die Festplatte geschrieben.</p>
   <p>Bei allen anderen Fragen oder Anträgen auf Datenlöschung wende dich an: <a href="mailto:kieranmaynard@gmail.com">kieranmaynard@gmail.com</a></p>
 
 </main>

@@ -309,6 +309,13 @@ display: flex; align-items: center; justify-content: space-between;
       API 参考
     </a>
 
+    <a href="/zh/privacy" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      隐私
+    </a>
+
     <hr class="nav-hr">
 
     <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -370,7 +377,7 @@ display: flex; align-items: center; justify-content: space-between;
       <tr>
         <td>Google 账号电子邮件（如果你使用 Google 登录）</td>
         <td>账号身份、速率限制、管理员撤销</td>
-        <td>直至你撤销密钥或会话过期</td>
+        <td>直至你的会话过期（或服务器重启）</td>
       </tr>
       <tr>
         <td>你在演示注册时提供的电子邮件</td>
@@ -427,7 +434,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>除 Google Identity Services 为登录状态设置的内容外，本网站不使用任何分析统计、广告网络、跟踪像素或 Cookie。</p>
 
   <h2>数据删除与联系方式</h2>
-  <p>如需立即撤销你的 API 密钥，请使用<a href="/zh/portal">研究者门户</a>上的<strong>撤销密钥</strong>按钮。此操作会删除你的会话密钥和账号记录。</p>
+  <p>API 密钥和会话都是短时的：每个都有生存时间（TTL）限制，且仅保存在内存中，因此会在过期或服务器重启时自动丢弃。查询结果绝不会写入磁盘。</p>
   <p>如有任何其他疑问或数据删除请求，请联系：<a href="mailto:kieranmaynard@gmail.com">kieranmaynard@gmail.com</a></p>
 
 </main>

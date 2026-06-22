@@ -309,6 +309,13 @@ display: flex; align-items: center; justify-content: space-between;
       Referencia de la API
     </a>
 
+    <a href="/es/privacy" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      Privacidad
+    </a>
+
     <hr class="nav-hr">
 
     <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -370,7 +377,7 @@ display: flex; align-items: center; justify-content: space-between;
       <tr>
         <td>Correo de la cuenta de Google (si inicias sesión con Google)</td>
         <td>Identidad de la cuenta, límite de frecuencia, revocación por administrador</td>
-        <td>Hasta que revoques tu clave o expire tu sesión</td>
+        <td>Hasta que expire tu sesión (o se reinicie el servidor)</td>
       </tr>
       <tr>
         <td>Correo que proporcionas en el registro de demostración</td>
@@ -427,7 +434,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>Este sitio no utiliza analíticas, redes publicitarias, píxeles de seguimiento ni cookies más allá de las que Google Identity Services establece para el estado de inicio de sesión.</p>
 
   <h2>Eliminación de datos y contacto</h2>
-  <p>Para revocar tu clave de API de inmediato, usa el botón <strong>Revocar clave</strong> del <a href="/es/portal">Portal de investigadores</a>. Esto elimina tu clave de sesión y el registro de tu cuenta.</p>
+  <p>Las claves de API y las sesiones son efímeras: cada una está limitada por un tiempo de vida (TTL) y se mantiene solo en memoria, por lo que se descarta automáticamente cuando expira o cuando se reinicia el servidor. Los resultados de las consultas nunca se escriben en disco.</p>
   <p>Para cualquier otra pregunta o solicitud de eliminación de datos, contacta con: <a href="mailto:kieranmaynard@gmail.com">kieranmaynard@gmail.com</a></p>
 
 </main>

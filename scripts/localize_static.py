@@ -121,6 +121,9 @@ COMMON = {
         ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
          '''Por <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Privacidad</a>'''),
+        ('''      Privacy
+    </a>''', '''      Privacidad
+    </a>'''),
     ],
     "fr": [
         ('''>Skip to content</a>''', '''>Aller au contenu</a>'''),
@@ -143,6 +146,9 @@ COMMON = {
         ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
          '''Par <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Confidentialité</a>'''),
+        ('''      Privacy
+    </a>''', '''      Confidentialité
+    </a>'''),
     ],
     "de": [
         ('''>Skip to content</a>''', '''>Zum Inhalt springen</a>'''),
@@ -165,6 +171,9 @@ COMMON = {
         ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
          '''Von <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Datenschutz</a>'''),
+        ('''      Privacy
+    </a>''', '''      Datenschutz
+    </a>'''),
     ],
 }
 
@@ -928,7 +937,7 @@ PAGES["es"]["privacy.html"] = [
     ('''<tr><th>What</th><th>Why</th><th>Retention</th></tr>''', '''<tr><th>Qué</th><th>Por qué</th><th>Conservación</th></tr>'''),
     ('''<td>Google account email (if you sign in with Google)</td>''', '''<td>Correo de la cuenta de Google (si inicias sesión con Google)</td>'''),
     ('''<td>Account identity, rate limiting, admin revocation</td>''', '''<td>Identidad de la cuenta, límite de frecuencia, revocación por administrador</td>'''),
-    ('''<td>Until you revoke your key or your session expires</td>''', '''<td>Hasta que revoques tu clave o expire tu sesión</td>'''),
+    ('''<td>Until your session expires (or the server restarts)</td>''', '''<td>Hasta que expire tu sesión (o se reinicie el servidor)</td>'''),
     ('''<td>Email you provide on demo registration</td>''', '''<td>Correo que proporcionas en el registro de demostración</td>'''),
     ('''<td>Key identifier, rate limiting</td>''', '''<td>Identificador de clave, límite de frecuencia</td>'''),
     ('''<td>Until the demo key expires (typically 24 hours)</td>''', '''<td>Hasta que expire la clave de demostración (normalmente 24 horas)</td>'''),
@@ -965,8 +974,8 @@ PAGES["es"]["privacy.html"] = [
     ('''This site does not use analytics, advertising networks, tracking pixels, or cookies beyond what Google Identity Services sets for sign-in state.''',
      '''Este sitio no utiliza analíticas, redes publicitarias, píxeles de seguimiento ni cookies más allá de las que Google Identity Services establece para el estado de inicio de sesión.'''),
     ('''<h2>Data deletion and contact</h2>''', '''<h2>Eliminación de datos y contacto</h2>'''),
-    ('''To revoke your API key immediately, use the <strong>Revoke key</strong> button on the <a href="/portal">Researcher Portal</a>. This removes your session key and account record.''',
-     '''Para revocar tu clave de API de inmediato, usa el botón <strong>Revocar clave</strong> del <a href="/portal">Portal de investigadores</a>. Esto elimina tu clave de sesión y el registro de tu cuenta.'''),
+    ('''API keys and sessions are short-lived: each is bound by a time-to-live and held only in memory, so it is discarded automatically when it expires or when the server restarts. Query results are never written to disk.''',
+     '''Las claves de API y las sesiones son efímeras: cada una está limitada por un tiempo de vida (TTL) y se mantiene solo en memoria, por lo que se descarta automáticamente cuando expira o cuando se reinicia el servidor. Los resultados de las consultas nunca se escriben en disco.'''),
     ('''For any other questions or data deletion requests, contact: <a''', '''Para cualquier otra pregunta o solicitud de eliminación de datos, contacta con: <a'''),
     ('''<p><a href="/">Home</a> ·''', '''<p><a href="/">Inicio</a> ·'''),
     # Bare title/h1 term — must run last so the longer sentences above (which
@@ -1005,7 +1014,7 @@ PAGES["fr"]["privacy.html"] = [
     ('''<tr><th>What</th><th>Why</th><th>Retention</th></tr>''', '''<tr><th>Quoi</th><th>Pourquoi</th><th>Conservation</th></tr>'''),
     ('''<td>Google account email (if you sign in with Google)</td>''', '''<td>E-mail du compte Google (si vous vous connectez avec Google)</td>'''),
     ('''<td>Account identity, rate limiting, admin revocation</td>''', '''<td>Identité du compte, limitation de débit, révocation par l’administrateur</td>'''),
-    ('''<td>Until you revoke your key or your session expires</td>''', '''<td>Jusqu’à ce que vous révoquiez votre clé ou que votre session expire</td>'''),
+    ('''<td>Until your session expires (or the server restarts)</td>''', '''<td>Jusqu’à l’expiration de votre session (ou au redémarrage du serveur)</td>'''),
     ('''<td>Email you provide on demo registration</td>''', '''<td>E-mail que vous fournissez lors de l’inscription de démonstration</td>'''),
     ('''<td>Key identifier, rate limiting</td>''', '''<td>Identifiant de clé, limitation de débit</td>'''),
     ('''<td>Until the demo key expires (typically 24 hours)</td>''', '''<td>Jusqu’à l’expiration de la clé de démonstration (généralement 24 heures)</td>'''),
@@ -1042,8 +1051,8 @@ PAGES["fr"]["privacy.html"] = [
     ('''This site does not use analytics, advertising networks, tracking pixels, or cookies beyond what Google Identity Services sets for sign-in state.''',
      '''Ce site n’utilise pas d’analytique, de réseaux publicitaires, de pixels de suivi ni de cookies au-delà de ceux que Google Identity Services définit pour l’état de connexion.'''),
     ('''<h2>Data deletion and contact</h2>''', '''<h2>Suppression des données et contact</h2>'''),
-    ('''To revoke your API key immediately, use the <strong>Revoke key</strong> button on the <a href="/portal">Researcher Portal</a>. This removes your session key and account record.''',
-     '''Pour révoquer votre clé d’API immédiatement, utilisez le bouton <strong>Révoquer la clé</strong> du <a href="/portal">Portail chercheurs</a>. Cela supprime votre clé de session et l’enregistrement de votre compte.'''),
+    ('''API keys and sessions are short-lived: each is bound by a time-to-live and held only in memory, so it is discarded automatically when it expires or when the server restarts. Query results are never written to disk.''',
+     '''Les clés d’API et les sessions sont éphémères : chacune est limitée par une durée de vie (TTL) et conservée uniquement en mémoire, elle est donc supprimée automatiquement à son expiration ou au redémarrage du serveur. Les résultats des requêtes ne sont jamais écrits sur le disque.'''),
     ('''For any other questions or data deletion requests, contact: <a''', '''Pour toute autre question ou demande de suppression de données, contactez : <a'''),
     ('''<p><a href="/">Home</a> ·''', '''<p><a href="/">Accueil</a> ·'''),
     # Bare title/h1 term — must run last (see Spanish note above).
@@ -1081,7 +1090,7 @@ PAGES["de"]["privacy.html"] = [
     ('''<tr><th>What</th><th>Why</th><th>Retention</th></tr>''', '''<tr><th>Was</th><th>Warum</th><th>Aufbewahrung</th></tr>'''),
     ('''<td>Google account email (if you sign in with Google)</td>''', '''<td>E-Mail des Google-Kontos (bei Anmeldung mit Google)</td>'''),
     ('''<td>Account identity, rate limiting, admin revocation</td>''', '''<td>Konto-Identität, Ratenbegrenzung, Widerruf durch Administrator</td>'''),
-    ('''<td>Until you revoke your key or your session expires</td>''', '''<td>Bis du deinen Schlüssel widerrufst oder deine Sitzung abläuft</td>'''),
+    ('''<td>Until your session expires (or the server restarts)</td>''', '''<td>Bis deine Sitzung abläuft (oder der Server neu startet)</td>'''),
     ('''<td>Email you provide on demo registration</td>''', '''<td>E-Mail, die du bei der Demo-Registrierung angibst</td>'''),
     ('''<td>Key identifier, rate limiting</td>''', '''<td>Schlüsselkennung, Ratenbegrenzung</td>'''),
     ('''<td>Until the demo key expires (typically 24 hours)</td>''', '''<td>Bis der Demo-Schlüssel abläuft (in der Regel 24 Stunden)</td>'''),
@@ -1118,8 +1127,8 @@ PAGES["de"]["privacy.html"] = [
     ('''This site does not use analytics, advertising networks, tracking pixels, or cookies beyond what Google Identity Services sets for sign-in state.''',
      '''Diese Website verwendet keine Analyse, keine Werbenetzwerke, keine Tracking-Pixel und keine Cookies über die hinaus, die Google Identity Services für den Anmeldestatus setzt.'''),
     ('''<h2>Data deletion and contact</h2>''', '''<h2>Datenlöschung und Kontakt</h2>'''),
-    ('''To revoke your API key immediately, use the <strong>Revoke key</strong> button on the <a href="/portal">Researcher Portal</a>. This removes your session key and account record.''',
-     '''Um deinen API-Schlüssel sofort zu widerrufen, nutze die Schaltfläche <strong>Schlüssel widerrufen</strong> im <a href="/portal">Forschungsportal</a>. Damit werden dein Sitzungsschlüssel und dein Kontoeintrag entfernt.'''),
+    ('''API keys and sessions are short-lived: each is bound by a time-to-live and held only in memory, so it is discarded automatically when it expires or when the server restarts. Query results are never written to disk.''',
+     '''API-Schlüssel und Sitzungen sind kurzlebig: Jeder ist durch eine Lebensdauer (TTL) begrenzt und wird nur im Arbeitsspeicher gehalten, sodass er automatisch verworfen wird, wenn er abläuft oder der Server neu startet. Abfrageergebnisse werden nie auf die Festplatte geschrieben.'''),
     ('''For any other questions or data deletion requests, contact: <a''', '''Bei allen anderen Fragen oder Anträgen auf Datenlöschung wende dich an: <a'''),
     ('''<p><a href="/">Home</a> ·''', '''<p><a href="/">Startseite</a> ·'''),
     # Bare title/h1 term — must run last (see Spanish note above).
@@ -1198,6 +1207,9 @@ COMMON["ja"] = [
      r'''作成：<a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
     (r'''>Privacy</a>''',
      r'''>プライバシー</a>'''),
+    (r'''      Privacy
+    </a>''', r'''      プライバシー
+    </a>'''),
 ]
 PAGES["ja"] = {}
 PAGES["ja"]["home.html"] = [
@@ -1647,8 +1659,8 @@ PAGES["ja"]["privacy.html"] = [
      r'''<td>Google アカウントのメールアドレス（Google でサインインした場合）</td>'''),
     (r'''<td>Account identity, rate limiting, admin revocation</td>''',
      r'''<td>アカウントの識別、レート制限、管理者による取り消し</td>'''),
-    (r'''<td>Until you revoke your key or your session expires</td>''',
-     r'''<td>キーを取り消すか、セッションの有効期限が切れるまで</td>'''),
+    (r'''<td>Until your session expires (or the server restarts)</td>''',
+     r'''<td>セッションの有効期限が切れるまで（またはサーバーの再起動時）</td>'''),
     (r'''<td>Email you provide on demo registration</td>''',
      r'''<td>デモ登録時に入力するメールアドレス</td>'''),
     (r'''<td>Key identifier, rate limiting</td>''',
@@ -1699,8 +1711,8 @@ PAGES["ja"]["privacy.html"] = [
      r'''本サイトは、Google Identity Services がサインイン状態のために設定するもの以外に、分析ツール、広告ネットワーク、トラッキングピクセル、Cookie を使用しません。'''),
     (r'''<h2>Data deletion and contact</h2>''',
      r'''<h2>データの削除とお問い合わせ</h2>'''),
-    (r'''To revoke your API key immediately, use the <strong>Revoke key</strong> button on the <a href="/portal">Researcher Portal</a>. This removes your session key and account record.''',
-     r'''API キーをすぐに取り消すには、<a href="/portal">研究者ポータル</a>の<strong>キーを取り消す</strong>ボタンを使用してください。これにより、セッションキーとアカウント記録が削除されます。'''),
+    (r'''API keys and sessions are short-lived: each is bound by a time-to-live and held only in memory, so it is discarded automatically when it expires or when the server restarts. Query results are never written to disk.''',
+     r'''API キーとセッションは短命です。それぞれ有効期間（TTL）が設定され、メモリ上にのみ保持されるため、期限切れ時またはサーバー再起動時に自動的に破棄されます。クエリ結果がディスクに書き込まれることはありません。'''),
     (r'''For any other questions or data deletion requests, contact: <a''',
      r'''その他のご質問やデータ削除のご依頼は、こちらまでお問い合わせください：<a'''),
     (r'''<p><a href="/">Home</a> ·''',
@@ -1751,6 +1763,9 @@ COMMON["zh"] = [
      r'''作者：<a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
     (r'''>Privacy</a>''',
      r'''>隐私</a>'''),
+    (r'''      Privacy
+    </a>''', r'''      隐私
+    </a>'''),
 ]
 PAGES["zh"] = {}
 PAGES["zh"]["home.html"] = [
@@ -2200,8 +2215,8 @@ PAGES["zh"]["privacy.html"] = [
      r'''<td>Google 账号电子邮件（如果你使用 Google 登录）</td>'''),
     (r'''<td>Account identity, rate limiting, admin revocation</td>''',
      r'''<td>账号身份、速率限制、管理员撤销</td>'''),
-    (r'''<td>Until you revoke your key or your session expires</td>''',
-     r'''<td>直至你撤销密钥或会话过期</td>'''),
+    (r'''<td>Until your session expires (or the server restarts)</td>''',
+     r'''<td>直至你的会话过期（或服务器重启）</td>'''),
     (r'''<td>Email you provide on demo registration</td>''',
      r'''<td>你在演示注册时提供的电子邮件</td>'''),
     (r'''<td>Key identifier, rate limiting</td>''',
@@ -2252,8 +2267,8 @@ PAGES["zh"]["privacy.html"] = [
      r'''除 Google Identity Services 为登录状态设置的内容外，本网站不使用任何分析统计、广告网络、跟踪像素或 Cookie。'''),
     (r'''<h2>Data deletion and contact</h2>''',
      r'''<h2>数据删除与联系方式</h2>'''),
-    (r'''To revoke your API key immediately, use the <strong>Revoke key</strong> button on the <a href="/portal">Researcher Portal</a>. This removes your session key and account record.''',
-     r'''如需立即撤销你的 API 密钥，请使用<a href="/portal">研究者门户</a>上的<strong>撤销密钥</strong>按钮。此操作会删除你的会话密钥和账号记录。'''),
+    (r'''API keys and sessions are short-lived: each is bound by a time-to-live and held only in memory, so it is discarded automatically when it expires or when the server restarts. Query results are never written to disk.''',
+     r'''API 密钥和会话都是短时的：每个都有生存时间（TTL）限制，且仅保存在内存中，因此会在过期或服务器重启时自动丢弃。查询结果绝不会写入磁盘。'''),
     (r'''For any other questions or data deletion requests, contact: <a''',
      r'''如有任何其他疑问或数据删除请求，请联系：<a'''),
     (r'''<p><a href="/">Home</a> ·''',
@@ -2304,6 +2319,9 @@ COMMON["ko"] = [
      r'''제작: <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
     (r'''>Privacy</a>''',
      r'''>개인정보</a>'''),
+    (r'''      Privacy
+    </a>''', r'''      개인정보
+    </a>'''),
 ]
 PAGES["ko"] = {}
 PAGES["ko"]["home.html"] = [
@@ -2753,8 +2771,8 @@ PAGES["ko"]["privacy.html"] = [
      r'''<td>Google 계정 이메일 (Google로 로그인하는 경우)</td>'''),
     (r'''<td>Account identity, rate limiting, admin revocation</td>''',
      r'''<td>계정 식별, 요청 빈도 제한, 관리자 취소</td>'''),
-    (r'''<td>Until you revoke your key or your session expires</td>''',
-     r'''<td>키를 취소하거나 세션이 만료될 때까지</td>'''),
+    (r'''<td>Until your session expires (or the server restarts)</td>''',
+     r'''<td>세션이 만료될 때까지(또는 서버가 재시작될 때)</td>'''),
     (r'''<td>Email you provide on demo registration</td>''',
      r'''<td>데모 등록 시 제공한 이메일</td>'''),
     (r'''<td>Key identifier, rate limiting</td>''',
@@ -2805,8 +2823,8 @@ PAGES["ko"]["privacy.html"] = [
      r'''이 사이트는 Google Identity Services가 로그인 상태를 위해 설정하는 것 외에는 분석 도구, 광고 네트워크, 추적 픽셀 또는 쿠키를 사용하지 않습니다.'''),
     (r'''<h2>Data deletion and contact</h2>''',
      r'''<h2>데이터 삭제 및 문의</h2>'''),
-    (r'''To revoke your API key immediately, use the <strong>Revoke key</strong> button on the <a href="/portal">Researcher Portal</a>. This removes your session key and account record.''',
-     r'''API 키를 즉시 취소하려면 <a href="/portal">연구자 포털</a>의 <strong>키 취소</strong> 버튼을 사용하세요. 이렇게 하면 세션 키와 계정 기록이 삭제됩니다.'''),
+    (r'''API keys and sessions are short-lived: each is bound by a time-to-live and held only in memory, so it is discarded automatically when it expires or when the server restarts. Query results are never written to disk.''',
+     r'''API 키와 세션은 수명이 짧습니다. 각각 수명(TTL)이 정해져 있고 메모리에만 보관되므로 만료되거나 서버가 재시작될 때 자동으로 폐기됩니다. 쿼리 결과는 절대 디스크에 기록되지 않습니다.'''),
     (r'''For any other questions or data deletion requests, contact: <a''',
      r'''기타 문의나 데이터 삭제 요청은 다음으로 연락하세요: <a'''),
     (r'''<p><a href="/">Home</a> ·''',
