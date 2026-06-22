@@ -1459,6 +1459,88 @@ class TestAccessibility:
         assert 'role="alert"' in html
 
 
+# ── Localized static pages (es / fr / de) ────────────────────────────────────
+
+class TestLocalization:
+    LOCALES = ("es", "fr", "de")
+    SUFFIXES = ("", "reports", "removals", "portal", "privacy")
+
+    def _path(self, loc, suffix):
+        # Home is served with a trailing slash (/es/); sub-pages without.
+        return f"/{loc}" + (f"/{suffix}" if suffix else "/")
+
+    def _inline_hashes(self, html):
+        # Every inline <script> block must be hashed — pages carry several
+        # (theme + page logic + chrome), and only the translated ones differ.
+        import re, hashlib, base64
+        blocks = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", html, re.S)
+        assert blocks, "expected an inline <script> block"
+        return [
+            "'sha256-" + base64.b64encode(hashlib.sha256(b.encode("utf-8")).digest()).decode() + "'"
+            for b in blocks
+        ]
+
+    def test_every_localized_page_is_served(self):
+        for loc in self.LOCALES:
+            for suffix in self.SUFFIXES:
+                path = self._path(loc, suffix)
+                r = client.get(path)
+                assert r.status_code == 200, path
+                assert "text/html" in r.headers["content-type"], path
+                assert f'<html lang="{loc}">' in r.text, path
+
+    def test_localized_pages_keep_strict_csp(self):
+        # The translated inline scripts differ from English, so the per-page CSP
+        # hashes must be recomputed from the served bytes — verify *every* inline
+        # block's hash is present, not just the first (theme) one.
+        for loc in self.LOCALES:
+            for suffix in self.SUFFIXES:
+                path = self._path(loc, suffix)
+                r = client.get(path)
+                csp = r.headers.get("Content-Security-Policy")
+                assert csp and "script-src 'self'" in csp, path
+                assert "'unsafe-inline'" not in csp.split("style-src")[0], path
+                for h in self._inline_hashes(r.text):
+                    assert h in csp, f"missing hash for {path}: {h}"
+
+    def test_localized_portal_allows_google_signin(self):
+        for loc in self.LOCALES:
+            csp = client.get(f"/{loc}/portal").headers.get("Content-Security-Policy", "")
+            assert "https://accounts.google.com" in csp, loc
+            assert "frame-src https://accounts.google.com" in csp, loc
+
+    def test_content_is_actually_translated(self):
+        # A representative translated string on each locale's home page.
+        markers = {
+            "es": "Transparencia de plataformas",
+            "fr": "Transparence des plateformes",
+            "de": "Plattform-Transparenz",
+        }
+        for loc, marker in markers.items():
+            assert marker in client.get(f"/{loc}/").text, loc
+
+    def test_switcher_links_across_locales(self):
+        # The in-site switcher on the Spanish dashboard points at the same page
+        # in every locale (English unprefixed, others prefixed).
+        html = client.get("/es/reports").text
+        for href in ('href="/reports"', 'href="/es/reports"',
+                     'href="/fr/reports"', 'href="/de/reports"'):
+            assert href in html, href
+        # Active locale carries aria-current.
+        assert 'is-current" href="/es/reports" aria-current="page"' in html
+
+    def test_internal_chrome_links_are_prefixed(self):
+        # Sidebar / brand links stay within the locale; the JSON API + Swagger don't.
+        html = client.get("/es/reports").text
+        assert 'href="/es/removals"' in html and 'href="/es/portal"' in html
+        assert 'href="/api"' in html and 'href="/docs"' in html  # never prefixed
+
+    def test_english_home_uses_in_site_switcher(self):
+        # The globe now switches the transparency site's own language.
+        html = client.get("/").text
+        assert 'href="/es/"' in html and 'href="/fr/"' in html and 'href="/de/"' in html
+
+
 # ── Google Government Removals table ─────────────────────────────────────────
 
 class TestGRTable:
