@@ -212,13 +212,13 @@ PAGES["fr"]["home.html"] = [
 
 PAGES["de"]["home.html"] = [
     ('''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
-     '''Transparenzdaten von Plattformen, nutzbar gemacht. Interaktive Dashboards und eine API für strukturierte Abfragen für die Transparenzberichte des Gesetzes über digitale Dienste der EU und die behördlichen Anfragen zur Entfernung von Inhalten von Google.'''),
+     '''Transparenzdaten von Plattformen, nutzbar gemacht. Interaktive Dashboards und eine API für strukturierte Abfragen für die Transparenzberichte des Gesetzes über digitale Dienste der EU und behördliche Anfragen zur Entfernung von Inhalten bei Google.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
      '''<span class="hero-eyebrow">Plattform-Transparenz</span>'''),
     ('''Platform transparency data,<br>made useful.''',
      '''Transparenzdaten von Plattformen,<br>nutzbar gemacht.'''),
     ('''<p>Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.</p>''',
-     '''<p>Interaktive Dashboards und eine API für strukturierte Abfragen für die Transparenzberichte des Gesetzes über digitale Dienste der EU und die behördlichen Anfragen zur Entfernung von Inhalten von Google.</p>'''),
+     '''<p>Interaktive Dashboards und eine API für strukturierte Abfragen für die Transparenzberichte des Gesetzes über digitale Dienste der EU und behördliche Anfragen zur Entfernung von Inhalten bei Google.</p>'''),
     ('''Explore the data''', '''Daten erkunden'''),
     ('''>API reference</a>''', '''>API-Referenz</a>'''),
     ('''>What's here</p>''', '''>Was es hier gibt</p>'''),
