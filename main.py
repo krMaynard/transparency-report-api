@@ -2068,7 +2068,9 @@ def _make_localized_handler(
 
 for _loc in _LOCALES:
     for _suffix, (_fname, _label, _hosts) in _LOCALIZED_PAGES.items():
-        _path = f"/{_loc}" + (f"/{_suffix}" if _suffix else "")
+        # Home is registered with a trailing slash (/es/) to match the switcher
+        # and brand links, so the common home navigation avoids a 307 redirect.
+        _path = f"/{_loc}" + (f"/{_suffix}" if _suffix else "/")
         app.add_api_route(
             _path,
             _make_localized_handler(f"{_loc}/{_fname}", _label, _hosts),

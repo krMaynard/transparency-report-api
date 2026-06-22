@@ -372,6 +372,9 @@ PAGES["es"]["index.html"] = [
      '''throw new Error("Tu sesión expiró: vuelve a iniciar sesión en el portal.");'''),
     ('''btn.disabled = true; btn.textContent = "Asking…";''', '''btn.disabled = true; btn.textContent = "Consultando…";'''),
     ('''btn.disabled = false; btn.textContent = "Ask";''', '''btn.disabled = false; btn.textContent = "Preguntar";'''),
+    ('''const fmt = (n) => (n ?? 0).toLocaleString();''', '''const fmt = (n) => (n ?? 0).toLocaleString('es-ES');'''),
+    ('''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
+     '''v.toLocaleString('es-ES', { maximumSignificantDigits: 4 })'''),
 ]
 
 PAGES["fr"]["index.html"] = [
@@ -474,6 +477,9 @@ PAGES["fr"]["index.html"] = [
      '''throw new Error("Votre session a expiré — reconnectez-vous sur le portail.");'''),
     ('''btn.disabled = true; btn.textContent = "Asking…";''', '''btn.disabled = true; btn.textContent = "Demande en cours…";'''),
     ('''btn.disabled = false; btn.textContent = "Ask";''', '''btn.disabled = false; btn.textContent = "Demander";'''),
+    ('''const fmt = (n) => (n ?? 0).toLocaleString();''', '''const fmt = (n) => (n ?? 0).toLocaleString('fr-FR');'''),
+    ('''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
+     '''v.toLocaleString('fr-FR', { maximumSignificantDigits: 4 })'''),
 ]
 
 PAGES["de"]["index.html"] = [
@@ -576,6 +582,9 @@ PAGES["de"]["index.html"] = [
      '''throw new Error("Deine Sitzung ist abgelaufen – melde dich erneut im Portal an.");'''),
     ('''btn.disabled = true; btn.textContent = "Asking…";''', '''btn.disabled = true; btn.textContent = "Frage läuft…";'''),
     ('''btn.disabled = false; btn.textContent = "Ask";''', '''btn.disabled = false; btn.textContent = "Fragen";'''),
+    ('''const fmt = (n) => (n ?? 0).toLocaleString();''', '''const fmt = (n) => (n ?? 0).toLocaleString('de-DE');'''),
+    ('''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
+     '''v.toLocaleString('de-DE', { maximumSignificantDigits: 4 })'''),
 ]
 
 PAGES["es"]["removals.html"] = [
@@ -625,6 +634,8 @@ PAGES["es"]["removals.html"] = [
     ('''>Researcher access</a>''', '''>Acceso para investigadores</a>'''),
     # ── inline JS ──
     ('''Number(n).toLocaleString('en-US')''', '''Number(n).toLocaleString('es-ES')'''),
+    ('''function fmtPct(n) { return n == null ? '—' : (n * 100).toFixed(1) + '%'; }''',
+     '''function fmtPct(n) { return n == null ? '—' : (n * 100).toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; }'''),
     ("'Items targeted'", "'Elementos señalados'"),
     ("label: 'Removal rate'", "label: 'Tasa de retirada'"),
     ('''var labels = ['Removed (legal)', 'Removed (policy)', 'Already removed', 'Not found', 'Not enough info', 'No action'];''',
@@ -692,6 +703,8 @@ PAGES["fr"]["removals.html"] = [
      '''— demandes gouvernementales de retrait détaillées (2019–1er sem. 2025). Données via <a'''),
     ('''>Researcher access</a>''', '''>Accès chercheurs</a>'''),
     ('''Number(n).toLocaleString('en-US')''', '''Number(n).toLocaleString('fr-FR')'''),
+    ('''function fmtPct(n) { return n == null ? '—' : (n * 100).toFixed(1) + '%'; }''',
+     '''function fmtPct(n) { return n == null ? '—' : (n * 100).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; }'''),
     ("'Items targeted'", "'Éléments visés'"),
     ("label: 'Removal rate'", "label: 'Taux de retrait'"),
     ('''var labels = ['Removed (legal)', 'Removed (policy)', 'Already removed', 'Not found', 'Not enough info', 'No action'];''',
@@ -759,6 +772,8 @@ PAGES["de"]["removals.html"] = [
      '''— detaillierte behördliche Entfernungsanfragen (2019–1. Hj. 2025). Daten über <a'''),
     ('''>Researcher access</a>''', '''>Zugang für Forschende</a>'''),
     ('''Number(n).toLocaleString('en-US')''', '''Number(n).toLocaleString('de-DE')'''),
+    ('''function fmtPct(n) { return n == null ? '—' : (n * 100).toFixed(1) + '%'; }''',
+     '''function fmtPct(n) { return n == null ? '—' : (n * 100).toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; }'''),
     ("'Items targeted'", "'Gemeldete Inhalte'"),
     ("label: 'Removal rate'", "label: 'Entfernungsrate'"),
     ('''var labels = ['Removed (legal)', 'Removed (policy)', 'Already removed', 'Not found', 'Not enough info', 'No action'];''',
@@ -822,6 +837,8 @@ PAGES["es"]["portal.html"] = [
     ('''$("#login-sub").textContent = "No sign-in method is enabled on this server.";''',
      '''$("#login-sub").textContent = "No hay ningún método de inicio de sesión habilitado en este servidor.";'''),
     ('''b.textContent = "Copied!";''', '''b.textContent = "¡Copiado!";'''),
+    ('''d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })''',
+     '''d.toLocaleDateString('es-ES', { year: "numeric", month: "long", day: "numeric" })'''),
 ]
 
 PAGES["fr"]["portal.html"] = [
@@ -865,6 +882,8 @@ PAGES["fr"]["portal.html"] = [
     ('''$("#login-sub").textContent = "No sign-in method is enabled on this server.";''',
      '''$("#login-sub").textContent = "Aucune méthode de connexion n’est activée sur ce serveur.";'''),
     ('''b.textContent = "Copied!";''', '''b.textContent = "Copié !";'''),
+    ('''d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })''',
+     '''d.toLocaleDateString('fr-FR', { year: "numeric", month: "long", day: "numeric" })'''),
 ]
 
 PAGES["de"]["portal.html"] = [
@@ -908,12 +927,13 @@ PAGES["de"]["portal.html"] = [
     ('''$("#login-sub").textContent = "No sign-in method is enabled on this server.";''',
      '''$("#login-sub").textContent = "Auf diesem Server ist keine Anmeldemethode aktiviert.";'''),
     ('''b.textContent = "Copied!";''', '''b.textContent = "Kopiert!";'''),
+    ('''d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })''',
+     '''d.toLocaleDateString('de-DE', { year: "numeric", month: "long", day: "numeric" })'''),
 ]
 
 PAGES["es"]["privacy.html"] = [
     ('''What data the Transparency Report API collects, why you're asked to sign in, and what happens to prompts.''',
      '''Qué datos recopila Transparency Report API, por qué se te pide iniciar sesión y qué ocurre con las indicaciones.'''),
-    ('''Privacy Policy''', '''Política de privacidad'''),
     ('''<p class="page-eyebrow">Legal</p>''', '''<p class="page-eyebrow">Legal</p>'''),
     ('''Last updated: June 2026''', '''Última actualización: junio de 2026'''),
     ('''· Questions: <a''', '''· Preguntas: <a'''),
@@ -983,12 +1003,14 @@ PAGES["es"]["privacy.html"] = [
      '''Para revocar tu clave de API de inmediato, usa el botón <strong>Revocar clave</strong> del <a href="/portal">Portal de investigadores</a>. Esto elimina tu clave de sesión y el registro de tu cuenta.'''),
     ('''For any other questions or data deletion requests, contact: <a''', '''Para cualquier otra pregunta o solicitud de eliminación de datos, contacta con: <a'''),
     ('''<p><a href="/">Home</a> ·''', '''<p><a href="/">Inicio</a> ·'''),
+    # Bare title/h1 term — must run last so the longer sentences above (which
+    # contain "Privacy Policy") are matched while still in English.
+    ('''Privacy Policy''', '''Política de privacidad'''),
 ]
 
 PAGES["fr"]["privacy.html"] = [
     ('''What data the Transparency Report API collects, why you're asked to sign in, and what happens to prompts.''',
      '''Quelles données Transparency Report API collecte, pourquoi l’on vous demande de vous connecter et ce qu’il advient des invites.'''),
-    ('''Privacy Policy''', '''Politique de confidentialité'''),
     ('''<p class="page-eyebrow">Legal</p>''', '''<p class="page-eyebrow">Mentions légales</p>'''),
     ('''Last updated: June 2026''', '''Dernière mise à jour : juin 2026'''),
     ('''· Questions: <a''', '''· Questions : <a'''),
@@ -1058,12 +1080,13 @@ PAGES["fr"]["privacy.html"] = [
      '''Pour révoquer votre clé d’API immédiatement, utilisez le bouton <strong>Révoquer la clé</strong> du <a href="/portal">Portail chercheurs</a>. Cela supprime votre clé de session et l’enregistrement de votre compte.'''),
     ('''For any other questions or data deletion requests, contact: <a''', '''Pour toute autre question ou demande de suppression de données, contactez : <a'''),
     ('''<p><a href="/">Home</a> ·''', '''<p><a href="/">Accueil</a> ·'''),
+    # Bare title/h1 term — must run last (see Spanish note above).
+    ('''Privacy Policy''', '''Politique de confidentialité'''),
 ]
 
 PAGES["de"]["privacy.html"] = [
     ('''What data the Transparency Report API collects, why you're asked to sign in, and what happens to prompts.''',
      '''Welche Daten Transparency Report API erfasst, warum du dich anmelden sollst und was mit Prompts geschieht.'''),
-    ('''Privacy Policy''', '''Datenschutzerklärung'''),
     ('''<p class="page-eyebrow">Legal</p>''', '''<p class="page-eyebrow">Rechtliches</p>'''),
     ('''Last updated: June 2026''', '''Zuletzt aktualisiert: Juni 2026'''),
     ('''· Questions: <a''', '''· Fragen: <a'''),
@@ -1133,6 +1156,8 @@ PAGES["de"]["privacy.html"] = [
      '''Um deinen API-Schlüssel sofort zu widerrufen, nutze die Schaltfläche <strong>Schlüssel widerrufen</strong> im <a href="/portal">Forschungsportal</a>. Damit werden dein Sitzungsschlüssel und dein Kontoeintrag entfernt.'''),
     ('''For any other questions or data deletion requests, contact: <a''', '''Bei allen anderen Fragen oder Anträgen auf Datenlöschung wende dich an: <a'''),
     ('''<p><a href="/">Home</a> ·''', '''<p><a href="/">Startseite</a> ·'''),
+    # Bare title/h1 term — must run last (see Spanish note above).
+    ('''Privacy Policy''', '''Datenschutzerklärung'''),
 ]
 
 
@@ -1145,9 +1170,14 @@ def localize(text: str, locale: str, page: str) -> str:
     text = text[:m.start()] + PLACEHOLDER + text[m.end():]
 
     if locale != "en":
-        for old, new in COMMON[locale]:
-            text = text.replace(old, new)
+        # Page-specific strings first, then the shared chrome. The per-page
+        # entries are longer, more-specific sentences that often *contain* a
+        # chrome phrase (e.g. "Researcher Portal", "Privacy Policy"); running the
+        # short chrome replacements first would clobber the substring and leave
+        # the surrounding sentence untranslated.
         for old, new in PAGES[locale].get(page, []):
+            text = text.replace(old, new)
+        for old, new in COMMON[locale]:
             text = text.replace(old, new)
         text = prefix_links(text, locale)
         text = text.replace('<html lang="en">', f'<html lang="{locale}">')

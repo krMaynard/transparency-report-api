@@ -1465,16 +1465,25 @@ class TestLocalization:
     LOCALES = ("es", "fr", "de")
     SUFFIXES = ("", "reports", "removals", "portal", "privacy")
 
-    def _inline_hash(self, html):
+    def _path(self, loc, suffix):
+        # Home is served with a trailing slash (/es/); sub-pages without.
+        return f"/{loc}" + (f"/{suffix}" if suffix else "/")
+
+    def _inline_hashes(self, html):
+        # Every inline <script> block must be hashed — pages carry several
+        # (theme + page logic + chrome), and only the translated ones differ.
         import re, hashlib, base64
         blocks = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", html, re.S)
         assert blocks, "expected an inline <script> block"
-        return "'sha256-" + base64.b64encode(hashlib.sha256(blocks[0].encode()).digest()).decode() + "'"
+        return [
+            "'sha256-" + base64.b64encode(hashlib.sha256(b.encode("utf-8")).digest()).decode() + "'"
+            for b in blocks
+        ]
 
     def test_every_localized_page_is_served(self):
         for loc in self.LOCALES:
             for suffix in self.SUFFIXES:
-                path = f"/{loc}" + (f"/{suffix}" if suffix else "")
+                path = self._path(loc, suffix)
                 r = client.get(path)
                 assert r.status_code == 200, path
                 assert "text/html" in r.headers["content-type"], path
@@ -1482,15 +1491,17 @@ class TestLocalization:
 
     def test_localized_pages_keep_strict_csp(self):
         # The translated inline scripts differ from English, so the per-page CSP
-        # hash must be recomputed from the served bytes — verify it matches.
+        # hashes must be recomputed from the served bytes — verify *every* inline
+        # block's hash is present, not just the first (theme) one.
         for loc in self.LOCALES:
             for suffix in self.SUFFIXES:
-                path = f"/{loc}" + (f"/{suffix}" if suffix else "")
+                path = self._path(loc, suffix)
                 r = client.get(path)
                 csp = r.headers.get("Content-Security-Policy")
                 assert csp and "script-src 'self'" in csp, path
                 assert "'unsafe-inline'" not in csp.split("style-src")[0], path
-                assert self._inline_hash(r.text) in csp, path
+                for h in self._inline_hashes(r.text):
+                    assert h in csp, f"missing hash for {path}: {h}"
 
     def test_localized_portal_allows_google_signin(self):
         for loc in self.LOCALES:
@@ -1506,7 +1517,7 @@ class TestLocalization:
             "de": "Plattform-Transparenz",
         }
         for loc, marker in markers.items():
-            assert marker in client.get(f"/{loc}").text, loc
+            assert marker in client.get(f"/{loc}/").text, loc
 
     def test_switcher_links_across_locales(self):
         # The in-site switcher on the Spanish dashboard points at the same page

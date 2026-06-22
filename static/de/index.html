@@ -529,7 +529,7 @@
 
 <script>
 const $ = (s) => document.querySelector(s);
-const fmt = (n) => (n ?? 0).toLocaleString();
+const fmt = (n) => (n ?? 0).toLocaleString('de-DE');
 // "2025-07-01/2025-12-31" -> "Jul–Dec 2025" (falls back to the raw value).
 const fmtPeriod = (p) => {
   const m = /^(\d{4})-(\d{2})-\d{2}\/(\d{4})-(\d{2})-\d{2}$/.exec(p || "");
@@ -747,7 +747,7 @@ const CMP_EXPRS = {
 // missing from one leg — kept by the full-outer merge) distinct from real zeros.
 const fmtCell = (v) => v == null ? "—"
   : Number.isInteger(v) ? fmt(v)
-  : v.toLocaleString(undefined, { maximumSignificantDigits: 4 });
+  : v.toLocaleString('de-DE', { maximumSignificantDigits: 4 });
 
 function cmpMeasures(table) {
   const t = exOptions.tables.find(x => x.table === table);

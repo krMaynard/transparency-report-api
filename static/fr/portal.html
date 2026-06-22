@@ -469,7 +469,7 @@ async function onAuthSuccess(data) {
   $("#apikey").textContent = apiKey;
   if (data.expires_at) {
     const d = new Date(data.expires_at);
-    $("#expires").textContent = "Expire le " + d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) + ".";
+    $("#expires").textContent = "Expire le " + d.toLocaleDateString('fr-FR', { year: "numeric", month: "long", day: "numeric" }) + ".";
   }
   $("#login-card").classList.add("hidden");
   show($("#key-card"));

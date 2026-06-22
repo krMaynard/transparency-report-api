@@ -538,7 +538,7 @@
     if (n == null) return '—';
     return Number(n).toLocaleString('fr-FR');
   }
-  function fmtPct(n) { return n == null ? '—' : (n * 100).toFixed(1) + '%'; }
+  function fmtPct(n) { return n == null ? '—' : (n * 100).toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %'; }
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
