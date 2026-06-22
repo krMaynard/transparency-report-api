@@ -138,6 +138,55 @@ def test_non_json_2xx_raises_friendly_error(monkeypatch):
     assert "returned invalid JSON" in str(exc.value)
 
 
+def test_register(monkeypatch):
+    _bind(monkeypatch)
+    out = mcp_server.register("Test User", "testuser@example.com")
+    assert "api_key" in out
+    assert out["api_key"].startswith("rk_")
+
+
+def test_submit_query_without_key_raises(monkeypatch):
+    _bind(monkeypatch)
+    with pytest.raises(mcp_server.ApiError) as exc:
+        mcp_server.submit_query({"table": "t4_notices", "max_count": 5})
+    assert "TRANSPARENCY_API_KEY" in str(exc.value)
+
+
+def test_submit_query_and_poll_job(monkeypatch):
+    _bind(monkeypatch, api_key="alice")
+    job = mcp_server.submit_query(
+        {
+            "table": "t4_notices",
+            "group_by": ["service_name"],
+            "aggregates": [
+                {"function": "SUM", "field_name": "notices", "alias": "total"}
+            ],
+            "sort": [{"field_name": "total", "order": "desc"}],
+            "max_count": 10,
+        }
+    )
+    assert "job_id" in job
+    result = mcp_server.poll_job(job["job_id"])
+    assert result["columns"] == ["service_name", "total"]
+    rows = {r[0]: r[1] for r in result["rows"]}
+    assert rows["YouTube"] == 140
+    assert rows["Facebook"] == 50
+
+
+def test_poll_job_without_key_raises(monkeypatch):
+    _bind(monkeypatch)
+    with pytest.raises(mcp_server.ApiError) as exc:
+        mcp_server.poll_job("some-job-id")
+    assert "TRANSPARENCY_API_KEY" in str(exc.value)
+
+
+def test_poll_job_missing_job_raises(monkeypatch):
+    _bind(monkeypatch, api_key="alice")
+    with pytest.raises(mcp_server.ApiError) as exc:
+        mcp_server.poll_job("nonexistent-job-id-xyz")
+    assert "failed (404" in str(exc.value)
+
+
 def test_build_server_registers_all_tools():
     pytest.importorskip("mcp")
     import asyncio
@@ -145,5 +194,8 @@ def test_build_server_registers_all_tools():
     server = mcp_server.build_server()
     tools = asyncio.run(server.list_tools())
     names = {t.name for t in tools}
-    assert names == {"list_tables", "describe_table", "dataset_overview", "run_query", "ask"}
+    assert names == {
+        "list_tables", "describe_table", "dataset_overview",
+        "run_query", "ask", "register", "submit_query", "poll_job",
+    }
     assert all(t.description for t in tools)
