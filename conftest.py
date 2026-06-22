@@ -43,11 +43,28 @@ _FIXTURE = {
     "t9": [[0, 0, 0, 0, 12]],
     # t10: [svc, scope, value]
     "t10": [[0, 0, 64767887], [1, 0, 50000000]],
-    # t11: [svc, indicator, value_text]
-    "t11": [[0, 1, "YouTube qualitative summary text."]],
+    # t11: [svc, indicator, value_text] — the second row's leading "=" exercises
+    # the CSV formula-injection escaping (test_csv_download_escapes_formula_cells).
+    "t11": [[0, 1, "YouTube qualitative summary text."],
+            [1, 1, '=HYPERLINK("http://evil.example/x")']],
 }
 
 seed.build_db(_FIXTURE, _DB)
+
+_GR_FIXTURE = {
+    "periods": ["January - June 2019", "July - December 2019"],
+    "countries": ["US", "DE"],
+    "country_names": ["United States", "Germany"],
+    "requestors": ["Government Officials", "Court Order directed at Google"],
+    "products": ["Web Search", "YouTube"],
+    "reasons": ["Defamation", "National security"],
+    "rows": [
+        [0, 0, 0, 0, 0, 5, 100, 80, 5, 10, 3, 2, 0],
+        [0, 1, 1, 1, 1, 3, 50, 40, 2, 5, 2, 1, 0],
+        [1, 0, 0, 0, 0, 7, 120, 90, 8, 12, 5, 5, 0],
+    ],
+}
+seed.build_gr_db(_GR_FIXTURE, _DB)
 
 os.environ.setdefault("DB_PATH", _DB)
 os.environ.setdefault("API_KEYS_JSON", '{"alice":{"name":"alice"},"bob":{"name":"bob"}}')

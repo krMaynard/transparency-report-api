@@ -1,0 +1,39 @@
+{
+  "manifest_version": "0.3",
+  "name": "dsa-research-pp-mcp",
+  "display_name": "Dsa Vlop Transparency",
+  "version": "0.0.0",
+  "description": "Query the aggregated EU Digital Services Act VLOP transparency reports (tables 3–11) with structured parameters (no SQL)",
+  "author": {
+    "name": "CLI Printing Press"
+  },
+  "license": "Apache-2.0",
+  "server": {
+    "type": "binary",
+    "entry_point": "bin/dsa-research-pp-mcp",
+    "mcp_config": {
+      "command": "${__dirname}/bin/dsa-research-pp-mcp",
+      "args": [],
+      "env": {
+        "DSA_RESEARCH_APIKEY_HEADER": "${user_config.dsa_research_apikey_header}"
+      }
+    }
+  },
+  "user_config": {
+    "dsa_research_apikey_header": {
+      "type": "string",
+      "title": "DSA_RESEARCH_APIKEY_HEADER",
+      "description": "Sets DSA_RESEARCH_APIKEY_HEADER for the Dsa Vlop Transparency MCP server.",
+      "sensitive": true,
+      "required": true
+    }
+  },
+  "compatibility": {
+    "claude_desktop": ">=1.0.0",
+    "platforms": [
+      "darwin",
+      "linux",
+      "win32"
+    ]
+  }
+}

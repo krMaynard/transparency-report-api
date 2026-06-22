@@ -522,6 +522,76 @@ class TestSafety:
         assert client.get("/api/jobs/doesnotexist", headers=ALICE).status_code == 404
 
 
+# ── Abuse hardening: complexity caps, body cap, CSV escaping ─────────────────────
+
+class TestAbuseHardening:
+    def test_oversized_in_list_is_422(self):
+        cond = {"operation": "IN", "field_name": "service_name", "field_values": ["x"] * 101}
+        r = client.post("/api/explore", json={"table": "t4_notices", "query": {"and": [cond]}})
+        assert r.status_code == 422
+
+    def test_too_many_conditions_is_422(self):
+        cond = {"operation": "EQ", "field_name": "service_name", "field_values": ["x"]}
+        r = client.post("/api/explore", json={"table": "t4_notices", "query": {"and": [cond] * 51}})
+        assert r.status_code == 422
+
+    def test_too_many_aggregates_is_422(self):
+        aggs = [{"function": "SUM", "field_name": "notices", "alias": f"a{i}"} for i in range(51)]
+        r = client.post("/api/explore", json={"table": "t4_notices", "aggregates": aggs})
+        assert r.status_code == 422
+
+    def test_oversized_body_is_413(self):
+        body = b'{"table": "' + b"x" * (2 * 1024 * 1024) + b'"}'
+        r = client.post(
+            "/api/explore", content=body, headers={"Content-Type": "application/json"}
+        )
+        assert r.status_code == 413
+
+    def test_huge_content_length_header_is_413_not_500(self):
+        # A digit string longer than CPython's int-parse limit (~4300 digits) must
+        # short-circuit on length, not blow up in int() and surface as a 500.
+        r = client.post(
+            "/api/explore", content=b"{}",
+            headers={"Content-Type": "application/json", "Content-Length": "9" * 5000},
+        )
+        assert r.status_code == 413
+
+    def test_jobs_limit_bounds_enforced(self):
+        assert client.get("/api/jobs?limit=0", headers=ALICE).status_code == 422
+        assert client.get("/api/jobs?limit=501", headers=ALICE).status_code == 422
+
+    def test_csv_safe_neutralises_formula_sigils(self):
+        import main
+
+        assert main._csv_safe("=HYPERLINK(1)") == "'=HYPERLINK(1)"
+        assert main._csv_safe("+1+2") == "'+1+2"
+        assert main._csv_safe("-2+3") == "'-2+3"
+        assert main._csv_safe("@cmd") == "'@cmd"
+        assert main._csv_safe("plain text") == "plain text"
+        assert main._csv_safe(-5) == -5  # numbers are never mangled
+        assert main._csv_safe(None) is None
+
+    def test_csv_download_escapes_formula_cells(self):
+        # The conftest fixture seeds a t11 row whose free text starts with "=" —
+        # the rendered CSV must neutralise it so Excel/Sheets won't execute it.
+        job = _submit_and_wait({
+            "table": "t11_qualitative",
+            "query": {"and": [{"operation": "EQ", "field_name": "service_name",
+                               "field_values": ["Facebook"]}]},
+            "fields": ["qualitative_text"],
+        })
+        assert job["status"] == "done"
+        r = client.get(f"/api/jobs/{job['job_id']}/result?format=csv", headers=ALICE)
+        assert r.status_code == 200
+        import csv as csv_mod
+        import io
+
+        data_rows = list(csv_mod.reader(io.StringIO(r.text)))[1:]
+        cells = [cell for row in data_rows for cell in row]
+        assert any(cell.startswith("'=") for cell in cells)
+        assert not any(cell.startswith("=") for cell in cells)
+
+
 # ── Cancel / delete ───────────────────────────────────────────────────────────
 
 class TestDelete:
@@ -723,6 +793,9 @@ class TestCallbacks:
                 "http://10.1.2.3/x",            # private
                 "http://[::1]/x",               # ipv6 loopback
                 "http://[::ffff:127.0.0.1]/x",  # ipv4-mapped ipv6 loopback (bypass attempt)
+                "http://100.64.0.1/x",          # CGNAT (not is_private, but not global)
+                "http://192.0.0.192/x",         # IETF protocol assignments
+                "http://198.18.0.1/x",          # benchmarking range
             ):
                 with pytest.raises(main.CallbackUrlError):
                     main._validate_callback_url(bad)
@@ -829,15 +902,8 @@ class TestGoogleAuth:
     def _signin(self, email):
         return client.post("/api/auth/google", json={"credential": email})
 
-    def test_new_user_is_pending(self):
+    def test_new_user_is_approved_immediately(self):
         r = self._signin("newbie@example.com")
-        assert r.status_code == 202
-        body = r.json()
-        assert body["status"] == "pending"
-        assert "api_key" not in body
-
-    def test_admin_is_auto_approved(self):
-        r = self._signin("admin@example.com")
         assert r.status_code == 200
         body = r.json()
         assert body["status"] == "approved"
@@ -849,26 +915,25 @@ class TestGoogleAuth:
     def test_unverified_email_is_401(self):
         assert self._signin("unverified:x@example.com").status_code == 401
 
-    def test_approval_flow_issues_working_key(self):
-        assert self._signin("res@example.com").status_code == 202
-        admin_key = self._signin("admin@example.com").json()["api_key"]
-        appr = client.post("/api/admin/registrations/res@example.com/approve",
-                           headers={"X-API-Key": admin_key})
-        assert appr.status_code == 200 and appr.json()["status"] == "approved"
+    def test_legacy_pending_account_is_approved_on_signin(self):
+        # Accounts left `pending` from when admin review existed sign straight in.
+        import main
+        main._registrations.upsert("res@example.com", {
+            "email": "res@example.com", "name": "res", "status": "pending",
+            "requested_at": "2026-01-01T00:00:00Z", "updated_at": "2026-01-01T00:00:00Z",
+            "approved_by": None,
+        })
         r = self._signin("res@example.com")
         assert r.status_code == 200
         assert client.get("/api/tables", headers={"X-API-Key": r.json()["api_key"]}).status_code == 200
 
     def test_non_admin_cannot_reach_admin_endpoints(self):
-        admin_key = self._signin("admin@example.com").json()["api_key"]
-        client.post("/api/admin/registrations/u@example.com/approve", headers={"X-API-Key": admin_key})
         user_key = self._signin("u@example.com").json()["api_key"]
         assert client.get("/api/admin/registrations", headers={"X-API-Key": user_key}).status_code == 403
         assert client.get("/api/admin/registrations").status_code == 401
 
     def test_revoke_invalidates_live_session(self):
         admin_key = self._signin("admin@example.com").json()["api_key"]
-        client.post("/api/admin/registrations/r3@example.com/approve", headers={"X-API-Key": admin_key})
         user_key = self._signin("r3@example.com").json()["api_key"]
         assert client.get("/api/tables", headers={"X-API-Key": user_key}).status_code == 200
         client.post("/api/admin/registrations/r3@example.com/revoke", headers={"X-API-Key": admin_key})
@@ -877,14 +942,37 @@ class TestGoogleAuth:
         # And a fresh sign-in is rejected as revoked.
         assert self._signin("r3@example.com").status_code == 403
 
+    def test_approve_restores_revoked_account(self):
+        admin_key = self._signin("admin@example.com").json()["api_key"]
+        self._signin("r4@example.com")
+        client.post("/api/admin/registrations/r4@example.com/revoke", headers={"X-API-Key": admin_key})
+        assert self._signin("r4@example.com").status_code == 403
+        appr = client.post("/api/admin/registrations/r4@example.com/approve",
+                           headers={"X-API-Key": admin_key})
+        assert appr.status_code == 200 and appr.json()["status"] == "approved"
+        r = self._signin("r4@example.com")
+        assert r.status_code == 200
+        assert client.get("/api/tables", headers={"X-API-Key": r.json()["api_key"]}).status_code == 200
+
+    def test_precreated_account_gets_google_name_on_signin(self):
+        # /approve before first sign-in placeholders the name with the email;
+        # the first real sign-in must replace it with the Google profile name.
+        admin_key = self._signin("admin@example.com").json()["api_key"]
+        client.post("/api/admin/registrations/r5@example.com/approve",
+                    headers={"X-API-Key": admin_key})
+        r = self._signin("r5@example.com")
+        assert r.status_code == 200
+        assert r.json()["name"] == "r5"
+
     def test_list_registrations_filters_by_status(self):
         admin_key = self._signin("admin@example.com").json()["api_key"]
         self._signin("p1@example.com")
         self._signin("p2@example.com")
-        body = client.get("/api/admin/registrations?status=pending",
+        client.post("/api/admin/registrations/p2@example.com/revoke", headers={"X-API-Key": admin_key})
+        body = client.get("/api/admin/registrations?status=revoked",
                           headers={"X-API-Key": admin_key}).json()
         emails = {r["email"] for r in body["registrations"]}
-        assert {"p1@example.com", "p2@example.com"} <= emails
+        assert emails == {"p2@example.com"}
 
     def test_cannot_revoke_admin(self):
         admin_key = self._signin("admin@example.com").json()["api_key"]
@@ -972,13 +1060,18 @@ class TestDashboard:
         assert isinstance(d["by_category"], list)
         assert "period" in d
 
-    def test_dashboard_served_at_root(self):
+    def test_home_page_served_at_root(self):
         r = client.get("/")
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+        assert "Platform transparency data" in r.text
+
+    def test_dashboard_served_at_reports(self):
+        r = client.get("/reports")
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "/api/overview" in r.text  # dashboard fetches the public overview
 
     def test_dashboard_uses_vendored_chartjs(self):
-        r = client.get("/")
+        r = client.get("/reports")
         # Chart.js is self-hosted, not loaded from a CDN.
         assert "/static/vendor/chart.umd.js" in r.text
         assert "cdn.jsdelivr.net" not in r.text
@@ -1038,6 +1131,161 @@ class TestExplore:
         assert r.status_code == 200
 
 
+# ── Composite (cross-table) queries ──────────────────────────────────────────
+
+def _ratio_query(**overrides):
+    """A canonical actions÷appeals composite over the fixture data."""
+    q = {
+        "legs": {
+            "actions": {"table": "t5_own_initiative_illegal",
+                        "aggregates": [{"function": "SUM", "field_name": "measures", "alias": "a"}]},
+            "appeals": {"table": "t7_appeals_recidivism",
+                        "aggregates": [{"function": "SUM", "field_name": "value", "alias": "p"}]},
+        },
+        "join_on": ["service_name"],
+        "derived": [{"alias": "ratio", "expr": "actions.a / appeals.p"}],
+        "sort": [{"field_name": "ratio", "order": "desc"}],
+    }
+    q.update(overrides)
+    return q
+
+
+class TestCompositeQueries:
+    def test_ratio_end_to_end_via_explore(self):
+        # Fixture: t5 has YouTube only (measures=9); t7 has YouTube=1000, Facebook=500.
+        r = client.post("/api/explore", json=_ratio_query())
+        assert r.status_code == 200
+        d = r.json()
+        assert d["columns"] == ["service_name", "a", "p", "ratio"]
+        rows = {row[0]: row for row in d["rows"]}
+        assert rows["YouTube"][1:] == [9, 1000, 0.009]
+        # Full-outer semantics: Facebook has no t5 rows but is kept, with NULLs.
+        assert rows["Facebook"][1:] == [None, 500, None]
+
+    def test_division_is_real_not_integer(self):
+        # SUM of INTEGER columns must not integer-divide (9/1000 → 0).
+        r = client.post("/api/explore", json=_ratio_query())
+        ratio = {row[0]: row[3] for row in r.json()["rows"]}["YouTube"]
+        assert 0 < ratio < 1
+
+    def test_divide_by_zero_yields_null(self):
+        q = _ratio_query(derived=[{"alias": "r", "expr": "actions.a / (appeals.p - appeals.p)"}],
+                         sort=[])
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200
+        assert all(row[3] is None for row in r.json()["rows"])
+
+    def test_having_filters_merged_rows(self):
+        q = _ratio_query(having={"and": [{"operation": "GT", "field_name": "p",
+                                          "field_values": [600]}]})
+        r = client.post("/api/explore", json=q)
+        assert [row[0] for row in r.json()["rows"]] == ["YouTube"]
+
+    def test_having_accepts_numeric_strings(self):
+        # The NL layer emits string values; numeric having columns coerce them.
+        q = _ratio_query(having={"and": [{"operation": "GT", "field_name": "ratio",
+                                          "field_values": ["0.001"]}]})
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200
+        assert [row[0] for row in r.json()["rows"]] == ["YouTube"]
+
+    def test_leg_filters_apply_per_leg(self):
+        q = _ratio_query()
+        q["legs"]["appeals"]["query"] = {
+            "and": [{"operation": "EQ", "field_name": "service_name", "field_values": ["Facebook"]}]}
+        r = client.post("/api/explore", json=q)
+        rows = {row[0]: row for row in r.json()["rows"]}
+        assert rows["Facebook"][2] == 500
+        assert rows["YouTube"][2] is None  # filtered out of the appeals leg only
+
+    def test_multi_dim_join(self):
+        q = _ratio_query(join_on=["service_name", "platform"])
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200
+        assert r.json()["columns"][:2] == ["service_name", "platform"]
+
+    def test_submitted_as_async_job(self):
+        job = _submit_and_wait(_ratio_query())
+        assert job["status"] == "done"
+        res = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=ALICE)
+        assert res.status_code == 200
+        assert res.json()["columns"] == ["service_name", "a", "p", "ratio"]
+
+    # ── validation errors ──────────────────────────────────────────────────────
+
+    def test_join_dim_must_be_shared(self):
+        # category_code exists on t5 but not on t7 → 400 naming the shared dims.
+        r = client.post("/api/explore", json=_ratio_query(join_on=["category_code"]))
+        assert r.status_code == 400
+        assert "shared" in r.json()["detail"].lower()
+
+    def test_unknown_leg_table_rejected(self):
+        q = _ratio_query()
+        q["legs"]["actions"]["table"] = "nope"
+        assert client.post("/api/explore", json=q).status_code == 400
+
+    def test_duplicate_aggregate_alias_across_legs_rejected(self):
+        q = _ratio_query()
+        q["legs"]["appeals"]["aggregates"][0]["alias"] = "a"
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 400 and "unique" in r.json()["detail"].lower()
+
+    def test_unknown_expr_reference_rejected(self):
+        q = _ratio_query(derived=[{"alias": "r", "expr": "actions.a / nosuch.x"}])
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 400 and "nosuch.x" in r.json()["detail"]
+
+    def test_expr_tolerates_surrounding_whitespace(self):
+        q = _ratio_query(derived=[{"alias": "ratio", "expr": "  actions.a / appeals.p  "}])
+        assert client.post("/api/explore", json=q).status_code == 200
+
+    def test_malformed_exprs_rejected(self):
+        for expr in ["actions.a /", "(actions.a", "actions.a ; DROP TABLE x",
+                     "actions.a + 'x'", "actions"]:
+            q = _ratio_query(derived=[{"alias": "r", "expr": expr}], sort=[])
+            assert client.post("/api/explore", json=q).status_code == 400, expr
+
+    def test_having_on_unknown_column_rejected(self):
+        q = _ratio_query(having={"and": [{"operation": "GT", "field_name": "nope",
+                                          "field_values": [1]}]})
+        assert client.post("/api/explore", json=q).status_code == 400
+
+    def test_sort_on_unknown_column_rejected(self):
+        q = _ratio_query(sort=[{"field_name": "nope", "order": "desc"}])
+        assert client.post("/api/explore", json=q).status_code == 400
+
+    def test_legs_and_table_mutually_exclusive(self):
+        q = _ratio_query(table="t4_notices")
+        assert client.post("/api/explore", json=q).status_code == 400
+
+    def test_composite_fields_require_legs(self):
+        q = {"table": "t4_notices", "group_by": ["platform"],
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+             "derived": [{"alias": "r", "expr": "x.y"}]}
+        assert client.post("/api/explore", json=q).status_code == 400
+
+    def test_single_leg_rejected(self):
+        q = _ratio_query()
+        del q["legs"]["appeals"]
+        q["derived"] = []
+        q["sort"] = []
+        assert client.post("/api/explore", json=q).status_code == 422  # model bound
+
+    def test_explore_leg_cap(self):
+        q = _ratio_query()
+        for name in ("third", "fourth"):
+            q["legs"][name] = {"table": "t10_amar",
+                               "aggregates": [{"function": "SUM", "field_name": "value", "alias": f"v_{name}"}]}
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 400 and "legs" in r.json()["detail"]
+        # The keyed job API accepts the same 4-leg query.
+        assert client.post("/api/query", json=q, headers=ALICE).status_code == 202
+
+    def test_options_advertises_composite(self):
+        d = client.get("/api/explore/options").json()
+        assert d["composite"]["max_legs"] >= 2
+
+
 # ── Natural-language query (POST /api/ask) ───────────────────────────────────
 
 class TestAsk:
@@ -1061,7 +1309,7 @@ class TestAsk:
         yield
 
     def test_ask_runs_generated_query(self):
-        r = client.post("/api/ask", json={"question": "top platforms by notices?"})
+        r = client.post("/api/ask", json={"question": "top platforms by notices?"}, headers=ALICE)
         assert r.status_code == 200
         d = r.json()
         assert d["question"] == "top platforms by notices?"
@@ -1070,13 +1318,36 @@ class TestAsk:
         assert 0 < len(d["rows"]) <= 5
         assert [row[1] for row in d["rows"]] == sorted([row[1] for row in d["rows"]], reverse=True)
 
+    def test_ask_composite_generated_query_runs(self, monkeypatch):
+        # The NL layer can emit the composite shape: legs + join_on + derived.
+        import main
+        monkeypatch.setattr(main, "_translate_question", lambda q: {
+            "table": "t5_own_initiative_illegal", "filters": [], "group_by": [],
+            "aggregates": [], "max_count": 10,
+            "legs": [
+                {"name": "actions", "table": "t5_own_initiative_illegal", "filters": [],
+                 "aggregate": {"function": "SUM", "field": "measures", "alias": "a"}},
+                {"name": "appeals", "table": "t7_appeals_recidivism", "filters": [],
+                 "aggregate": {"function": "SUM", "field": "value", "alias": "p"}},
+            ],
+            "join_on": ["service_name"],
+            "derived": [{"alias": "ratio", "expr": "actions.a / appeals.p"}],
+            "sort": [{"field": "ratio", "order": "desc"}],
+        })
+        r = client.post("/api/ask", json={"question": "ratio of actions to appeals?"}, headers=ALICE)
+        assert r.status_code == 200
+        d = r.json()
+        assert d["columns"] == ["service_name", "a", "p", "ratio"]
+        rows = {row[0]: row for row in d["rows"]}
+        assert rows["YouTube"][3] == 0.009
+
     def test_ask_caps_rows(self, monkeypatch):
         import main
         monkeypatch.setattr(main, "_translate_question", lambda q: {
             "table": "t4_notices", "filters": [], "group_by": [],
             "aggregates": [], "sort": [], "max_count": 100000,
         })
-        r = client.post("/api/ask", json={"question": "everything"})
+        r = client.post("/api/ask", json={"question": "everything"}, headers=ALICE)
         # raw (non-aggregated) query, capped at EXPLORE_MAX_ROWS
         assert r.status_code == 200 and r.json()["row_count"] <= 500
 
@@ -1085,7 +1356,7 @@ class TestAsk:
         bad = {"table": "t4_notices", "filters": [], "group_by": ["not_a_field"],
                "aggregates": [], "sort": [], "max_count": 10}
         monkeypatch.setattr(main, "_translate_question", lambda q: bad)
-        r = client.post("/api/ask", json={"question": "huh"})
+        r = client.post("/api/ask", json={"question": "huh"}, headers=ALICE)
         assert r.status_code == 422
         assert r.json()["detail"]["generated"] == bad  # surfaces the model's attempt
 
@@ -1094,12 +1365,12 @@ class TestAsk:
         def boom(q):
             raise RuntimeError("model unavailable")
         monkeypatch.setattr(main, "_translate_question", boom)
-        assert client.post("/api/ask", json={"question": "x"}).status_code == 502
+        assert client.post("/api/ask", json={"question": "x"}, headers=ALICE).status_code == 502
 
     def test_ask_disabled_is_503(self, monkeypatch):
         import main
         monkeypatch.setattr(main, "NL_QUERY_ENABLED", False)
-        assert client.post("/api/ask", json={"question": "x"}).status_code == 503
+        assert client.post("/api/ask", json={"question": "x"}, headers=ALICE).status_code == 503
 
     def test_ask_caches_translation(self, monkeypatch):
         import main
@@ -1110,15 +1381,19 @@ class TestAsk:
                     "aggregates": [{"function": "SUM", "field": "notices", "alias": "v"}],
                     "sort": [{"field": "v", "order": "desc"}], "max_count": 3}
         monkeypatch.setattr(main, "_translate_question", counting)
-        r1 = client.post("/api/ask", json={"question": "Top platforms?"})
-        r2 = client.post("/api/ask", json={"question": "  top   PLATFORMS? "})  # same, normalized
+        r1 = client.post("/api/ask", json={"question": "Top platforms?"}, headers=ALICE)
+        r2 = client.post("/api/ask", json={"question": "  top   PLATFORMS? "}, headers=ALICE)  # same, normalized
         assert r1.status_code == 200 and r2.status_code == 200
         assert calls["n"] == 1  # second served from cache
         assert r1.json()["cached"] is False and r2.json()["cached"] is True
 
     def test_ask_reports_truncated(self):
-        r = client.post("/api/ask", json={"question": "top platforms by notices?"})
+        r = client.post("/api/ask", json={"question": "top platforms by notices?"}, headers=ALICE)
         assert "truncated" in r.json()  # cap indicator present
+
+    def test_ask_requires_key(self):
+        # No key → 401 from require_api_key, before any LLM work (gated like /api/query).
+        assert client.post("/api/ask", json={"question": "x"}).status_code == 401
 
 
 def test_askquery_to_request_maps_count_star():
@@ -1164,11 +1439,15 @@ class TestCSP:
 # ── Accessibility landmarks on the served HTML pages ─────────────────────────
 
 class TestAccessibility:
-    def test_dashboard_a11y_landmarks(self):
+    def test_home_a11y_landmarks(self):
         html = client.get("/").text
         assert 'href="#main"' in html and 'class="skip-link"' in html  # skip link
+        assert 'id="main"' in html                                      # main landmark
+
+    def test_dashboard_a11y_landmarks(self):
+        html = client.get("/reports").text
+        assert 'href="#main"' in html and 'class="skip-link"' in html  # skip link
         assert 'id="main"' in html                                     # main landmark
-        assert 'aria-label="Primary"' in html                          # labelled nav
         assert 'role="alert"' in html                                  # error live region
         # Canvases carry an accessible table alternative, so hide them from AT.
         assert 'id="chart-platforms" height="150" aria-hidden="true"' in html
@@ -1178,4 +1457,173 @@ class TestAccessibility:
         assert 'href="#main"' in html and 'class="skip-link"' in html
         assert 'id="main"' in html
         assert 'role="alert"' in html
-        assert 'type="email"' in html and 'autocomplete="email"' in html
+
+
+# ── Localized static pages (es / fr / de) ────────────────────────────────────
+
+class TestLocalization:
+    LOCALES = ("es", "fr", "de", "ja", "zh", "ko")
+    SUFFIXES = ("", "reports", "removals", "portal", "privacy")
+
+    def _path(self, loc, suffix):
+        # Home is served with a trailing slash (/es/); sub-pages without.
+        return f"/{loc}" + (f"/{suffix}" if suffix else "/")
+
+    def _inline_hashes(self, html):
+        # Every inline <script> block must be hashed — pages carry several
+        # (theme + page logic + chrome), and only the translated ones differ.
+        import re, hashlib, base64
+        blocks = re.findall(r"<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>", html, re.S)
+        assert blocks, "expected an inline <script> block"
+        return [
+            "'sha256-" + base64.b64encode(hashlib.sha256(b.encode("utf-8")).digest()).decode() + "'"
+            for b in blocks
+        ]
+
+    def test_every_localized_page_is_served(self):
+        for loc in self.LOCALES:
+            for suffix in self.SUFFIXES:
+                path = self._path(loc, suffix)
+                r = client.get(path)
+                assert r.status_code == 200, path
+                assert "text/html" in r.headers["content-type"], path
+                assert f'<html lang="{loc}">' in r.text, path
+
+    def test_localized_pages_keep_strict_csp(self):
+        # The translated inline scripts differ from English, so the per-page CSP
+        # hashes must be recomputed from the served bytes — verify *every* inline
+        # block's hash is present, not just the first (theme) one.
+        for loc in self.LOCALES:
+            for suffix in self.SUFFIXES:
+                path = self._path(loc, suffix)
+                r = client.get(path)
+                csp = r.headers.get("Content-Security-Policy")
+                assert csp and "script-src 'self'" in csp, path
+                assert "'unsafe-inline'" not in csp.split("style-src")[0], path
+                for h in self._inline_hashes(r.text):
+                    assert h in csp, f"missing hash for {path}: {h}"
+
+    def test_localized_portal_allows_google_signin(self):
+        for loc in self.LOCALES:
+            csp = client.get(f"/{loc}/portal").headers.get("Content-Security-Policy", "")
+            assert "https://accounts.google.com" in csp, loc
+            assert "frame-src https://accounts.google.com" in csp, loc
+
+    def test_content_is_actually_translated(self):
+        # A representative translated string on each locale's home page.
+        markers = {
+            "es": "Transparencia de plataformas",
+            "fr": "Transparence des plateformes",
+            "de": "Plattform-Transparenz",
+            "ja": "プラットフォームの透明性",
+            "zh": "平台透明度",
+            "ko": "플랫폼 투명성",
+        }
+        for loc, marker in markers.items():
+            assert marker in client.get(f"/{loc}/").text, loc
+
+    def test_switcher_links_across_locales(self):
+        # The in-site switcher on the Spanish dashboard points at the same page
+        # in every locale (English unprefixed, others prefixed).
+        html = client.get("/es/reports").text
+        for href in ('href="/reports"', 'href="/es/reports"',
+                     'href="/fr/reports"', 'href="/de/reports"'):
+            assert href in html, href
+        # Active locale carries aria-current.
+        assert 'is-current" href="/es/reports" aria-current="page"' in html
+
+    def test_internal_chrome_links_are_prefixed(self):
+        # Sidebar / brand links stay within the locale; the JSON API + Swagger don't.
+        html = client.get("/es/reports").text
+        assert 'href="/es/removals"' in html and 'href="/es/portal"' in html
+        assert 'href="/api"' in html and 'href="/docs"' in html  # never prefixed
+
+    def test_english_home_uses_in_site_switcher(self):
+        # The globe now switches the transparency site's own language.
+        html = client.get("/").text
+        assert 'href="/es/"' in html and 'href="/fr/"' in html and 'href="/de/"' in html
+
+
+# ── Google Government Removals table ─────────────────────────────────────────
+
+class TestGRTable:
+    def test_gr_table_listed(self):
+        r = client.get("/api/tables", headers=ALICE)
+        assert r.status_code == 200
+        names = [t["name"] for t in r.json()["tables"]]
+        assert "gr_removals" in names
+
+    def test_gr_fields_endpoint(self):
+        r = client.get("/api/fields?table=gr_removals", headers=ALICE)
+        assert r.status_code == 200
+        body = r.json()
+        assert {"period", "country_code", "country_name", "requestor", "product", "reason"} <= set(body["dimensions"]["fields"])
+        assert {"num_requests", "items_requested", "removed_legal"} <= set(body["measures"]["fields"])
+
+    def test_gr_count_all(self):
+        job = _submit_and_wait({
+            "table": "gr_removals",
+            "aggregates": [{"function": "COUNT", "alias": "n"}],
+        })
+        assert job["status"] == "done"
+        r = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=ALICE)
+        body = r.json()
+        assert body["columns"] == ["n"]
+        assert body["rows"][0][0] == 3  # 3 rows in the fixture
+
+    def test_gr_filter_by_country_code(self):
+        job = _submit_and_wait({
+            "table": "gr_removals",
+            "query": {"and": [{"operation": "EQ", "field_name": "country_code", "field_values": ["US"]}]},
+            "aggregates": [{"function": "SUM", "field_name": "num_requests", "alias": "reqs"}],
+        })
+        assert job["status"] == "done"
+        r = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=ALICE)
+        body = r.json()
+        # US rows in fixture: period0/US (num_requests=5) + period1/US (num_requests=7) = 12
+        assert body["rows"][0][0] == 12
+
+    def test_gr_group_by_period(self):
+        job = _submit_and_wait({
+            "table": "gr_removals",
+            "aggregates": [{"function": "SUM", "field_name": "num_requests", "alias": "reqs"}],
+            "group_by": ["period"],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        r = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=ALICE)
+        body = r.json()
+        assert body["columns"] == ["period", "reqs"]
+        assert len(body["rows"]) == 2
+        assert body["rows"][0][0] == "January - June 2019"
+        # period 0 total: rows 0 (5) + 1 (3) = 8
+        assert body["rows"][0][1] == 8
+
+    def test_gr_invalid_field_rejected(self):
+        r = client.post("/api/query", json={
+            "table": "gr_removals",
+            "query": {"and": [{"operation": "EQ", "field_name": "nonexistent_field", "field_values": ["x"]}]},
+        }, headers=ALICE)
+        assert r.status_code == 400
+
+    def test_gr_overview_removals(self):
+        r = client.get("/api/overview/removals")
+        assert r.status_code == 200
+        d = r.json()
+        assert "total_requests" in d and "total_items" in d
+        assert "country_count" in d and "period_count" in d
+        assert isinstance(d["periods"], list) and len(d["periods"]) >= 1
+        assert isinstance(d["countries"], list) and isinstance(d["countries"][0], dict)
+        assert "code" in d["countries"][0] and "name" in d["countries"][0]
+        assert isinstance(d["requestors"], list)
+        assert isinstance(d["products"], list)
+        assert isinstance(d["reasons"], list)
+        # Fixture has 3 rows: spot-check totals are non-negative integers
+        assert d["total_requests"] >= 0
+        assert d["total_items"] >= 0
+
+    def test_removals_page_served(self):
+        r = client.get("/removals")
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+        assert "/api/overview/removals" in r.text
+        assert "Government Requests" in r.text

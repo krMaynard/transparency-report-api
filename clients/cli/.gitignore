@@ -1,0 +1,8 @@
+# Go build output / local binaries (the CLI is built on demand, not committed)
+/dsa-research-pp-cli
+/dsa-research-pp-mcp
+/dist/
+/build/
+*.mcpb
+*.test
+*.out

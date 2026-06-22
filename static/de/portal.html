@@ -1,0 +1,613 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Forschungsdatenportal · Transparency Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script>
+  // Match the main site: set the theme before first paint to avoid a flash.
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f2f2f2; --panel: #fff; --panel2: #f5f5f5; --border: #e8e8e8;
+    --fg: #333; --muted: #666; --accent: #2a9d8f; --accent-dark: #1e7268; --accent2: #1e7268;
+    --on-accent: #fff; --shadow: rgba(0,0,0,.07);
+    --mono: ui-monospace, SFMono-Regular, "DejaVu Sans Mono", Menlo, monospace;
+    --topbar-h: 52px; --header-h: var(--topbar-h);
+    --sidebar-w: 220px;
+  }
+  [data-theme="dark"] {
+    --bg: #15181c; --panel: #1d2025; --panel2: #2a2f35; --border: #2c3138;
+    --fg: #e8e8e8; --muted: #b0b0b0; --accent: #4ec1b1; --accent-dark: #6ed3c4; --accent2: #6ed3c4;
+    --on-accent: #08110f; --shadow: rgba(0,0,0,.45);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg);
+    color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  /* Top site bar — mirrors kieranmaynard.com */
+  .page-header { position: sticky; top: 0; z-index: 200; }
+  .site-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.9rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .site-nav .nav-name { font-weight: 700; font-size: 1rem; color: var(--fg); text-decoration: none; }
+  .site-nav .nav-links { display: flex; gap: 1.4rem; align-items: center; }
+  .site-nav .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .site-nav .nav-links a:hover { color: var(--accent); }
+  /* Cross-site language switcher (globe) — CSS-only <details> disclosure */
+  .site-nav .nav-right { display: flex; align-items: center; gap: 1.4rem; }
+  .lang-switcher { position: relative; }
+  .lang-switcher > summary {
+    display: inline-flex; align-items: center; gap: 0.38rem; list-style: none; cursor: pointer;
+    padding: 0.34rem 0.55rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel); color: var(--fg); font-weight: 600; font-size: 0.85rem; line-height: 1; white-space: nowrap;
+  }
+  .lang-switcher > summary::-webkit-details-marker { display: none; }
+  .lang-switcher > summary:hover,
+  .lang-switcher[open] > summary { border-color: var(--accent); color: var(--accent); }
+  .lang-switcher .lang-globe { width: 17px; height: 17px; }
+  .lang-switcher .lang-caret { width: 11px; height: 11px; opacity: .75; transition: transform .2s ease; }
+  .lang-switcher[open] .lang-caret { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; min-width: 170px; margin: 0; padding: .3rem;
+    list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 12px 30px var(--shadow); z-index: 201;
+  }
+  .lang-menu li { margin: 0; }
+  .lang-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    padding: .5rem .65rem; border-radius: 8px; text-decoration: none; color: var(--fg); font-size: .9rem; white-space: nowrap;
+  }
+  .lang-opt:hover { background: var(--panel2); }
+  .lang-opt.is-current { font-weight: 700; }
+  .lang-check { width: 16px; height: 16px; color: var(--accent); }
+  @media (max-width: 640px) {
+    .site-nav { flex-wrap: wrap; row-gap: .5rem; }
+    .site-nav .nav-links { flex-wrap: wrap; gap: 0.9rem 1.1rem; }
+    .lang-switcher > summary > span { display: none; }
+    .lang-switcher > summary { padding: .3rem .42rem; }
+  }
+  .theme-toggle {
+    background: none; border: 0; color: var(--muted); cursor: pointer; padding: 4px;
+    display: inline-flex; width: auto; margin: 0;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle svg { width: 20px; height: 20px; }
+  .theme-icon-light { display: none; }
+  [data-theme="dark"] .theme-toggle .theme-icon-light { display: block; }
+  [data-theme="dark"] .theme-toggle .theme-icon-dark { display: none; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 1.5rem; }
+  header { text-align: center; margin-bottom: 28px; }
+  header .badge {
+    display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--border); border-radius: 999px;
+    padding: 3px 12px; background: var(--panel); margin-bottom: 14px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; color: var(--muted); }
+  /* ── Top bar ─────────────────────────────────────────────────── */
+  .topbar {
+display: flex; align-items: center;
+    height: var(--topbar-h); padding: 0 1rem;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 0.6rem; }
+  .topbar-brand { font-weight: 700; font-size: 0.95rem; color: var(--fg); text-decoration: none; white-space: nowrap; }
+  .topbar-brand:hover { color: var(--accent); }
+  .hamburger {
+    display: none; align-items: center; justify-content: center;
+    background: none; border: 0; color: var(--fg); cursor: pointer; padding: 6px;
+    border-radius: 6px; width: auto; margin: 0;
+  }
+  .hamburger:hover { color: var(--accent); background: var(--panel2); }
+  .hamburger svg { width: 20px; height: 20px; display: block; }
+
+  /* ── App body + sidebar ──────────────────────────────────────── */
+  .app-body { display: flex; min-height: calc(100vh - var(--header-h)); }
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: sticky; top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+    background: var(--panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transition: transform 0.22s ease;
+  }
+  .sidebar nav { flex: 1; padding: 0.75rem 0.5rem; }
+  .nav-section {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 0.55rem 0.75rem 0.25rem;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.45rem 0.75rem; border-radius: 7px;
+    color: var(--fg); text-decoration: none; font-size: 13.5px;
+    margin: 1px 0; position: relative;
+  }
+  .nav-item svg { flex-shrink: 0; color: var(--muted); }
+  .nav-item:hover { background: var(--panel2); color: var(--accent); }
+  .nav-item:hover svg { color: var(--accent); }
+  .nav-item.is-active {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent-dark); font-weight: 600;
+  }
+  [data-theme="dark"] .nav-item.is-active { color: var(--accent); }
+  .nav-item.is-active svg { color: var(--accent); }
+  .nav-item.is-active::before {
+    content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 2px; background: var(--accent);
+  }
+  .nav-item.is-soon { color: var(--muted); cursor: default; }
+  .nav-item.is-soon:hover { background: none; color: var(--muted); }
+  .nav-item.is-soon svg { opacity: 0.5; }
+  .soon-badge {
+    margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .05em;
+    background: var(--panel2); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 1px 7px;
+  }
+  .nav-item.is-ext { color: var(--muted); font-size: 12.5px; }
+  .nav-item.is-ext:hover { color: var(--accent); }
+  .nav-hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0.75rem; }
+  .sidebar-footer {
+    padding: 0.75rem 1rem; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+  }
+  .sidebar-footer a { color: var(--muted); text-decoration: none; }
+  .sidebar-footer a:hover { color: var(--accent); }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 205; background: rgba(0,0,0,.4); }
+  .sidebar-overlay.is-open { display: block; }
+  .main-area { flex: 1; min-width: 0; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; margin: 0 0 20px; box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  }
+  .card h2 { margin: 0 0 4px; font-size: 18px; }
+  .card .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  input {
+    width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--panel2); color: var(--fg); font-size: 15px;
+  }
+  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(42,157,143,.2); }
+  button {
+    margin-top: 20px; width: 100%; padding: 12px 16px; border: 0; border-radius: 9px;
+    background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 650; cursor: pointer;
+  }
+  button:hover { background: var(--accent-dark); }
+  button:disabled { opacity: .6; cursor: default; }
+  .hidden { display: none !important; }
+  .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
+  [data-theme="dark"] .error { color: #ff7b72; }
+  .keyrow { display: flex; gap: 10px; align-items: stretch; }
+  .keybox {
+    flex: 1; font-family: var(--mono); font-size: 14px; background: var(--panel2); color: var(--accent2);
+    border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; overflow-x: auto;
+    white-space: nowrap;
+  }
+  .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
+  .dim { color: var(--muted); }
+  .field-cat { margin: 6px 0 16px; }
+  .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  .tbl { margin: 0 0 18px; }
+  .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  th { color: var(--muted); font-weight: 600; }
+  td.type { font-family: var(--mono); color: var(--accent2); }
+  td.flag { color: var(--muted); font-family: var(--mono); }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
+  footer a { color: var(--accent); text-decoration: none; }
+  .gbtn { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 44px; }
+  .divider { display: flex; align-items: center; text-align: center; color: var(--muted); font-size: 13px; margin: 18px 0 4px; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .divider span { padding: 0 12px; }
+  /* Keyboard focus visibility — a clear ring on every interactive control. */
+  a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
+  [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 10;
+    background: var(--accent); color: var(--on-accent); padding: 8px 14px;
+    border-radius: 8px; font-weight: 700; transition: top .15s;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (max-width: 720px) {
+    .hamburger { display: flex; }
+    .sidebar {
+      position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 210;
+      transform: translateX(calc(-1 * var(--sidebar-w)));
+    }
+    .sidebar.is-open { transform: translateX(0); }
+    .wrap { padding: 20px 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+<div class="page-header">
+<nav class="site-nav" aria-label="Seite">
+  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="https://kieranmaynard.com/work.html">Arbeit</a>
+      <a href="https://kieranmaynard.com/transparency.html">Produkte</a>
+      <a href="https://kieranmaynard.com/consulting.html">Beratung</a>
+      <a href="https://kieranmaynard.com/blog.html">Blog</a>
+      <a href="https://kieranmaynard.com/contact.html">Kontakt</a>
+    </div>
+    <details class="lang-switcher">
+      <summary class="lang-current" aria-label="Sprache" title="Sprache">
+        <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.7 2.6 15.3 0 18"/><path d="M12 3c-2.6 2.7-2.6 15.3 0 18"/></svg>
+        <span>Deutsch</span>
+        <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+      </summary>
+      <ul class="lang-menu">
+        <li><a class="lang-opt" href="/portal"><span>English</span></a></li>
+        <li><a class="lang-opt" href="/es/portal"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/portal"><span>Français</span></a></li>
+        <li><a class="lang-opt is-current" href="/de/portal" aria-current="page"><span>Deutsch</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/ja/portal"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/portal"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/portal"><span>한국어</span></a></li>
+      </ul>
+    </details>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Dunkelmodus umschalten" aria-pressed="false">
+      <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
+      <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" class="hamburger" id="hamburger"
+            aria-label="Navigation umschalten" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <a href="/de/" class="topbar-brand">Transparency Report API</a>
+  </div>
+</header>
+</div>
+
+<div class="app-body">
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar" aria-label="Anwendungsnavigation">
+  <nav>
+    <div class="nav-section">Datensätze</div>
+
+    <a href="/de/reports" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <rect x="1" y="9" width="3" height="6" rx="1"/>
+        <rect x="6" y="5" width="3" height="10" rx="1"/>
+        <rect x="11" y="1" width="3" height="14" rx="1"/>
+      </svg>
+      DSA-Berichte
+    </a>
+
+    <a href="/de/removals" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25"/>
+        <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
+      </svg>
+      Behördliche Entfernungen
+    </a>
+
+    <hr class="nav-hr">
+    <div class="nav-section">Werkzeuge</div>
+
+    <a href="/de/portal" class="nav-item is-active">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+      </svg>
+      Forschungsportal
+    </a>
+
+    <a href="/docs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M3 1h8l3 3v11H3V1zm7 .5V4.5H12.5L10 1.5zM4 6h8v1H4zm0 2.5h8v1H4zm0 2.5h5v1H4z"/>
+      </svg>
+      API-Dokumentation
+    </a>
+
+    <a href="/api" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
+      </svg>
+      API-Referenz
+    </a>
+
+    <hr class="nav-hr">
+
+    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
+      </svg>
+      kieranmaynard.com
+    </a>
+
+    <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
+      </svg>
+      GitHub
+    </a>
+  </nav>
+  <div class="sidebar-footer">Von <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/de/privacy">Datenschutz</a></div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<div class="main-area">
+<div class="wrap">
+  <header>
+    <span class="badge">Forschungsportal</span>
+    <h1>Forschungsdatenportal</h1>
+    <p>Transparenz der Inhaltsmoderation von VLOP nach dem EU-DSA – Zugang anfordern und das Schema erkunden.</p>
+  </header>
+
+ <main id="main" tabindex="-1">
+  <!-- Step 1: sign in -->
+  <section class="card" id="login-card">
+    <h2>API-Zugang anfordern</h2>
+    <p class="sub" id="login-sub">Melde dich an, um einen API-Schlüssel zu erhalten.</p>
+
+    <!-- Google sign-in (shown when GOOGLE_CLIENT_ID is configured) -->
+    <div id="google-block" class="hidden">
+      <div class="gbtn" id="google-btn"></div>
+      <p class="hint">Melde dich mit einem beliebigen Google-Konto an – dein API-Schlüssel wird sofort ausgestellt.</p>
+    </div>
+
+    <!-- Divider, shown only when both Google and key-based sign-in are available -->
+    <div class="divider hidden" id="auth-divider"><span>oder melde dich mit deinen Angaben an</span></div>
+
+    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
+    <form id="login-form" autocomplete="off" class="hidden">
+      <label for="name">Vollständiger Name</label>
+      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
+      <label for="email">Geschäftliche E-Mail</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
+      <button id="submit" type="submit">API-Schlüssel anfordern</button>
+    </form>
+    <div class="error" id="error" role="alert"></div>
+  </section>
+
+  <!-- Step 2: issued key -->
+  <section class="card hidden" id="key-card">
+    <h2>Willkommen, <span id="who">Forschende/r</span> 👋</h2>
+    <p class="sub">Dein API-Schlüssel wurde ausgestellt. Halte ihn geheim.</p>
+    <div class="keyrow">
+      <div class="keybox" id="apikey"></div>
+      <button class="copy" id="copy" type="button">Kopieren</button>
+    </div>
+    <p class="hint">Sende ihn bei jeder Anfrage als <code>X-API-Key</code>-Header. Probiere ihn in der
+      <a href="/docs" target="_blank" rel="noopener">interaktiven API-Dokumentation</a> aus.</p>
+    <p class="hint" id="expires"></p>
+  </section>
+
+  <!-- Step 3: schema -->
+  <section class="card hidden" id="schema-card">
+    <h2>Datensatzschema</h2>
+    <p class="sub">Alles, was du abfragen kannst, geladen mit deinem neuen Schlüssel.</p>
+    <p class="hint" id="dataset-meta"></p>
+
+    <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">Berichtstabellen</h3>
+    <div id="tables"></div>
+  </section>
+ </main>
+
+  <footer>Bereitgestellt von Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/de/privacy">Datenschutz</a></footer>
+</div><!-- /.wrap -->
+</div><!-- /.main-area -->
+</div><!-- /.app-body -->
+
+<script>
+const $ = (sel) => document.querySelector(sel);
+let apiKey = null;
+
+function show(el) { el.classList.remove("hidden"); }
+
+async function api(path, key) {
+  const res = await fetch(path, { headers: key ? { "X-API-Key": key } : {} });
+  if (!res.ok) throw new Error(`${path} → ${res.status}`);
+  return res.json();
+}
+
+function pillsHTML(names) {
+  return (names.length ? names : ["—"]).map((n) => `<span class="pill">${n}</span>`).join("");
+}
+
+function renderTable(t) {
+  return `<div class="tbl">
+    <div class="name">${t.table}</div>
+    <p class="hint">${t.description || ""}</p>
+    <div class="field-cat"><h3>Dimensionen <span class="dim">· filtern / gruppieren / sortieren</span></h3>${pillsHTML(t.dimensions.fields)}</div>
+    <div class="field-cat"><h3>Maße <span class="dim">· filtern / aggregieren</span></h3>${pillsHTML(t.measures.fields)}</div>
+  </div>`;
+}
+
+async function loadSchema() {
+  const meta = await api("/api/tables", apiKey);
+  $("#dataset-meta").textContent = `${meta.dataset} · Zeitraum ${meta.period} · ${meta.tables.length} Berichtstabellen`;
+  // Fetch every table's field registry in parallel rather than one roundtrip at a time.
+  const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`, apiKey)));
+  $("#tables").innerHTML = details.map(renderTable).join("");
+  show($("#schema-card"));
+}
+
+// Common success path for both Google sign-in and detail-based registration: an issued
+// key/session that unlocks the schema view.
+async function onAuthSuccess(data) {
+  apiKey = data.api_key;
+  // Share the key with the dashboard's Ask box (same origin, picked up on focus).
+  try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
+  $("#who").textContent = data.name;
+  $("#apikey").textContent = apiKey;
+  if (data.expires_at) {
+    const d = new Date(data.expires_at);
+    $("#expires").textContent = "Läuft ab am " + d.toLocaleDateString('de-DE', { year: "numeric", month: "long", day: "numeric" }) + ".";
+  }
+  $("#login-card").classList.add("hidden");
+  show($("#key-card"));
+  await loadSchema();
+}
+
+// ── Google sign-in ──────────────────────────────────────────────────────────
+// The GSI client library (FedCM-backed) hands us an ID token; we POST it to
+// /auth/google, which verifies it and mints a session for any verified account.
+async function onGoogleCredential(resp) {
+  $("#error").textContent = "";
+  try {
+    const r = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: resp.credential }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || "Anmeldung fehlgeschlagen");
+    await onAuthSuccess(data);
+  } catch (err) {
+    $("#error").textContent = err.message;
+  }
+}
+
+function setupGoogle(clientId) {
+  const render = () => {
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+    google.accounts.id.initialize({
+      client_id: clientId,
+      callback: onGoogleCredential,
+      use_fedcm_for_prompt: true,
+    });
+    google.accounts.id.renderButton($("#google-btn"), {
+      theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left",
+    });
+    show($("#google-block"));
+    return true;
+  };
+  // The library loads async — poll briefly until it's ready.
+  if (!render()) {
+    let tries = 0;
+    const iv = setInterval(() => { if (render() || ++tries > 50) clearInterval(iv); }, 100);
+  }
+}
+
+$("#login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("#error").textContent = "";
+  const name = $("#name").value.trim();
+  const email = $("#email").value.trim();
+  if (!name || !email) { $("#error").textContent = "Bitte fülle beide Felder aus."; return; }
+
+  const btn = $("#submit");
+  btn.disabled = true; btn.textContent = "Schlüssel wird ausgestellt…";
+  try {
+    const res = await fetch("/api/portal/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || "Registrierung fehlgeschlagen");
+    await onAuthSuccess(data);
+  } catch (err) {
+    $("#error").textContent = err.message;
+  } finally {
+    btn.disabled = false; btn.textContent = "API-Schlüssel anfordern";
+  }
+});
+
+// Decide which sign-in methods to offer based on server config.
+async function init() {
+  let cfg = {};
+  try { cfg = (await (await fetch("/api")).json()).auth_config || {}; } catch (_) {}
+  const googleOn = !!(cfg.google_signin && cfg.google_client_id);
+  const demoOn = !!cfg.demo_keys;
+
+  if (googleOn) setupGoogle(cfg.google_client_id);
+  if (demoOn) show($("#login-form"));
+  if (googleOn && demoOn) show($("#auth-divider"));
+
+  $("#login-sub").textContent = googleOn
+    ? "Melde dich mit deinem Google-Konto an, um Zugang anzufordern."
+    : "Melde dich mit deinen Angaben an, um einen API-Schlüssel zu erhalten.";
+  if (!googleOn && !demoOn) {
+    $("#login-sub").textContent = "Auf diesem Server ist keine Anmeldemethode aktiviert.";
+  }
+}
+init();
+
+$("#copy").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
+  const b = $("#copy"); const t = b.textContent; b.textContent = "Kopiert!";
+  setTimeout(() => (b.textContent = t), 1200);
+});
+</script>
+<script>
+  // Hamburger — mobile sidebar toggle
+  (function () {
+      // Keep --header-h in sync with the actual rendered height of the site
+  // banner + topbar (which varies as the nav links wrap on narrow widths),
+  // so the fixed/sticky sidebar starts right below it instead of overlapping.
+  var pageHeader = document.querySelector('.page-header');
+  if (pageHeader) {
+    var syncHeaderHeight = function () {
+      document.documentElement.style.setProperty('--header-h', pageHeader.offsetHeight + 'px');
+    };
+    syncHeaderHeight();
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncHeaderHeight).observe(pageHeader);
+    } else {
+      window.addEventListener('resize', syncHeaderHeight);
+    }
+  }
+    var hamburger = document.getElementById('hamburger');
+    var sidebar   = document.getElementById('sidebar');
+    var overlay   = document.getElementById('sidebar-overlay');
+    if (!hamburger || !sidebar || !overlay) return;
+    function openSidebar()  { sidebar.classList.add('is-open'); overlay.classList.add('is-open'); hamburger.setAttribute('aria-expanded','true'); overlay.removeAttribute('aria-hidden'); }
+    function closeSidebar() { sidebar.classList.remove('is-open'); overlay.classList.remove('is-open'); hamburger.setAttribute('aria-expanded','false'); overlay.setAttribute('aria-hidden','true'); }
+    hamburger.addEventListener('click', function () { sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar(); });
+    overlay.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+  })();
+</script>
+<script>
+  // Dark-mode toggle — persists to localStorage, shared with the main site.
+  (function () {
+    const btn = document.querySelector('[data-theme-toggle]');
+    if (!btn) return;
+    const sync = () => btn.setAttribute('aria-pressed',
+      String(document.documentElement.getAttribute('data-theme') === 'dark'));
+    sync();
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      sync();
+    });
+  })();
+</script>
+</body>
+</html>

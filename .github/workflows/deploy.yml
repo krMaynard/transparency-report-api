@@ -44,7 +44,10 @@ jobs:
           IMAGE="${REGION}-docker.pkg.dev/${PROJECT_ID}/${REPO}/research-api"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
           # Immutable, traceable tag = the commit SHA; also move :latest.
-          gcloud builds submit --quiet --tag "${IMAGE}:${GITHUB_SHA}" .
+          # Regional, project-owned logs bucket — the global default logs bucket
+          # isn't usable on this project, which fails `builds submit` otherwise.
+          gcloud builds submit --quiet --tag "${IMAGE}:${GITHUB_SHA}" \
+            --default-buckets-behavior=REGIONAL_USER_OWNED_BUCKET .
           gcloud artifacts docker tags add "${IMAGE}:${GITHUB_SHA}" "${IMAGE}:latest" --quiet
 
       - name: Deploy new revision (no traffic)
@@ -68,10 +71,12 @@ jobs:
         # an identity-token Authorization header.
         if: ${{ vars.DEPLOY != 'false' }}
         run: |
+          # `describe` doesn't take --filter; filter the traffic list in the
+          # format projection instead, then normalize gcloud's list rendering.
           URL=$(gcloud run services describe "${SERVICE}" \
             --region "${REGION}" --project "${PROJECT_ID}" \
-            --flatten="status.traffic[]" --filter="status.traffic.tag=candidate" \
-            --format="value(status.traffic.url)")
+            --format='value(status.traffic.filter("tag:candidate").extract(url))')
+          URL="${URL//[\[\]\' ]/}"
           echo "Probing ${URL}/readyz"
           curl --fail --silent --show-error --retry 10 --retry-all-errors --retry-delay 3 "${URL}/readyz"
 
@@ -81,3 +86,35 @@ jobs:
           gcloud run services update-traffic "${SERVICE}" \
             --region "${REGION}" --project "${PROJECT_ID}" \
             --to-latest --quiet
+
+      - name: Enable LLM "Ask" from the ANTHROPIC_API_KEY repo secret
+        # Syncs the GitHub repo secret into Secret Manager and binds it on the
+        # service so POST /api/ask is enabled. No-ops cleanly if the secret isn't
+        # set. The deployer SA needs to add secret versions
+        # (roles/secretmanager.secretVersionAdder) + run.developer; pre-create the
+        # secret and grant the runtime SA roles/secretmanager.secretAccessor once
+        # if you'd rather not grant the deployer roles/secretmanager.admin.
+        if: ${{ vars.DEPLOY != 'false' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+        run: |
+          if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+            echo "ANTHROPIC_API_KEY repo secret not set — leaving /api/ask disabled."
+            exit 0
+          fi
+          SECRET=research-api-anthropic-key
+          gcloud secrets describe "$SECRET" --project "$PROJECT_ID" >/dev/null 2>&1 \
+            || gcloud secrets create "$SECRET" --replication-policy=automatic --project "$PROJECT_ID"
+          printf '%s' "$ANTHROPIC_API_KEY" \
+            | gcloud secrets versions add "$SECRET" --data-file=- --project "$PROJECT_ID"
+          # Project number for the runtime (Compute default) SA, parsed from the
+          # WIF provider var — avoids gcloud projects describe, which needs the
+          # Cloud Resource Manager API (not enabled for the deployer SA).
+          PROJNUM="$(printf '%s' "$WIF_PROVIDER" | cut -d/ -f2)"
+          gcloud secrets add-iam-policy-binding "$SECRET" \
+            --member="serviceAccount:${PROJNUM}-compute@developer.gserviceaccount.com" \
+            --role=roles/secretmanager.secretAccessor --project "$PROJECT_ID" >/dev/null || true
+          gcloud run services update "$SERVICE" \
+            --region "$REGION" --project "$PROJECT_ID" \
+            --update-secrets "ANTHROPIC_API_KEY=${SECRET}:latest" --quiet

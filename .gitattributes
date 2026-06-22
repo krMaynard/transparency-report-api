@@ -1,0 +1,4 @@
+# The CLI under clients/cli/ is generated from /openapi.json by CLI Printing
+# Press. Mark it generated so GitHub Linguist excludes it from language stats
+# and collapses it in diffs by default.
+clients/cli/** linguist-generated=true

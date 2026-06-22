@@ -36,6 +36,7 @@ Configuration (environment variables):
     CALLBACK_MAX_ATTEMPTS     webhook delivery attempts before giving up (default: 3)
     CALLBACK_WORKERS          size of the bounded webhook delivery pool (default: 8)
     CALLBACK_ALLOW_PRIVATE    allow callbacks to private/loopback hosts — dev only (default: off)
+    MAX_BODY_BYTES            max request body size accepted, via Content-Length (default: 1 MiB)
 """
 import base64
 import csv
@@ -59,14 +60,15 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
+from collections.abc import Callable
 from typing import Any, Literal
 
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse
 from fastapi.security import APIKeyHeader
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -91,10 +93,11 @@ ISSUED_KEY_TTL = int(os.getenv("ISSUED_KEY_TTL_SECONDS", str(30 * 24 * 3600)))
 REGISTER_MAX_PER_WINDOW = int(os.getenv("PORTAL_REGISTER_MAX_PER_WINDOW", "10"))
 REGISTER_WINDOW = int(os.getenv("PORTAL_REGISTER_WINDOW_SECONDS", "3600"))
 # Google sign-in (FedCM via Google Identity Services). GOOGLE_CLIENT_ID is your
-# OAuth 2.0 Web client ID (the `aud` we verify ID tokens against). ADMIN_EMAILS is
-# a comma-separated allowlist of accounts that are implicitly approved and may
-# approve/revoke other researchers. A successful login mints a first-party session
-# key into the issued-key store, living GOOGLE_SESSION_TTL seconds.
+# OAuth 2.0 Web client ID (the `aud` we verify ID tokens against). Any verified
+# Google account is approved automatically on first sign-in; ADMIN_EMAILS is a
+# comma-separated allowlist of accounts that may use the admin endpoints to
+# revoke (and restore) other researchers. A successful login mints a first-party
+# session key into the issued-key store, living GOOGLE_SESSION_TTL seconds.
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
 ADMIN_EMAILS = frozenset(
     e.strip().lower() for e in os.getenv("ADMIN_EMAILS", "").split(",") if e.strip()
@@ -107,7 +110,7 @@ ALLOW_DEMO_KEYS = os.getenv("ALLOW_DEMO_KEYS", "1").lower() in ("1", "true", "ye
 # on each Cloud Run revision; defaults to "dev" locally. Surfaced at GET /version
 # and in the X-Version response header so you can confirm what's actually live.
 APP_VERSION = os.getenv("APP_VERSION") or "dev"
-# Combined-site layout: the dashboard is served at "/", and the JSON API lives
+# Combined-site layout: the home page is served at "/", the dashboard at "/reports", and the JSON API lives
 # under this prefix on the same origin (no CORS). Operational endpoints
 # (/healthz, /readyz, /metrics, /version) and pages (/portal) stay at the root.
 API_PREFIX = "/api"
@@ -123,6 +126,7 @@ QUERY_RATE_WINDOW = int(os.getenv("QUERY_RATE_WINDOW_SECONDS", "60"))
 # validated structured query inline, but hard-caps rows and is IP-rate-limited so
 # the unauthenticated endpoint can't be abused.
 EXPLORE_MAX_ROWS = int(os.getenv("EXPLORE_MAX_ROWS", "500"))
+EXPLORE_MAX_LEGS = int(os.getenv("EXPLORE_MAX_LEGS", "2"))
 EXPLORE_RATE_MAX = int(os.getenv("EXPLORE_RATE_MAX_PER_WINDOW", "60"))
 EXPLORE_RATE_WINDOW = int(os.getenv("EXPLORE_RATE_WINDOW_SECONDS", "60"))
 # Natural-language → structured-query (POST /api/ask). An LLM (Claude) translates
@@ -146,6 +150,10 @@ CALLBACK_TIMEOUT = int(os.getenv("CALLBACK_TIMEOUT_SECONDS", "10"))
 CALLBACK_MAX_ATTEMPTS = int(os.getenv("CALLBACK_MAX_ATTEMPTS", "3"))
 CALLBACK_WORKERS = int(os.getenv("CALLBACK_WORKERS", "8"))
 CALLBACK_ALLOW_PRIVATE = os.getenv("CALLBACK_ALLOW_PRIVATE", "").lower() in ("1", "true", "yes")
+# Cap request body size (by Content-Length) so the unauthenticated endpoints
+# can't be fed multi-megabyte JSON bodies. Chunked uploads without a
+# Content-Length aren't covered here — bound those at the fronting proxy.
+MAX_BODY_BYTES = int(os.getenv("MAX_BODY_BYTES", str(1024 * 1024)))
 
 
 # ── Structured logging ──────────────────────────────────────────────────────────
@@ -221,12 +229,25 @@ def _load_api_keys() -> dict[str, dict[str, str]]:
 API_KEYS = _load_api_keys()
 
 
+def _configured_principal(key: str) -> dict[str, str] | None:
+    """Constant-time scan of the configured keys. A dict lookup short-circuits on
+    the first differing character, which leaks key prefixes through response
+    timing; compare_digest checks every byte regardless."""
+    found = None
+    key_bytes = key.encode()
+    for k, principal in API_KEYS.items():
+        if hmac.compare_digest(k.encode(), key_bytes):
+            found = principal
+    return found
+
+
 def _lookup_principal(key: str) -> dict[str, str] | None:
     """Resolve a key to its principal: a configured key, an issued portal key, or
     a Google session. Google sessions are re-checked against the registration on
     every use, so an admin revoke takes effect immediately (not just at TTL)."""
-    if key in API_KEYS:
-        return API_KEYS[key]
+    configured = _configured_principal(key)
+    if configured is not None:
+        return configured
     rec = _key_store.get(key)  # None if unknown or expired
     if rec is None:
         return None
@@ -324,9 +345,13 @@ def _validate_callback_url(url: str) -> None:
         # to the embedded v4 so the guard can't be bypassed through them.
         if isinstance(ip, ipaddress.IPv6Address):
             ip = ip.ipv4_mapped or ip.sixtofour or ip
+        # Require a globally-routable address rather than denylisting categories:
+        # `not is_global` also covers ranges the explicit flags miss (CGNAT
+        # 100.64.0.0/10, 192.0.0.0/24 protocol assignments, benchmarking nets…).
         if (
             ip.is_private or ip.is_loopback or ip.is_link_local
             or ip.is_reserved or ip.is_multicast or ip.is_unspecified
+            or not ip.is_global
         ):
             raise CallbackUrlError("callback_url resolves to a non-public address.")
 
@@ -626,9 +651,10 @@ class RedisKeyStore:
         return n
 
 
-# Researcher registrations (Google sign-in + admin approval). Durable approval
-# state keyed by lowercased email — NOT expiring like session keys. Listable so an
-# admin can see who's pending.
+# Researcher registrations (Google sign-in; auto-approved on first sign-in).
+# Durable account state keyed by lowercased email — NOT expiring like session
+# keys. Its job is revocation: an admin revoke flips the status and kills live
+# sessions at once (re-checked per request). Listable for the admin endpoints.
 
 
 class MemoryRegistrationStore:
@@ -706,16 +732,39 @@ _executor = ThreadPoolExecutor(max_workers=WORKER_THREADS, thread_name_prefix="s
 # receivers during retry backoff) can't exhaust threads or starve query workers.
 _callback_executor = ThreadPoolExecutor(max_workers=CALLBACK_WORKERS, thread_name_prefix="callback-worker")
 
+
+def _openapi_servers() -> list[dict[str, str]]:
+    """The OpenAPI ``servers`` list, so the published spec is self-describing.
+
+    FastAPI emits no ``servers`` block by default, which leaves the spec without
+    a base URL — SDK/CLI generators that consume ``/openapi.json`` then can't
+    resolve a real host. We advertise the configured public origin first (when
+    ``PUBLIC_BASE_URL`` is set), then a relative same-origin entry (keeps the
+    Swagger "Try it out" button working wherever the docs happen to be served),
+    then localhost for local development.
+    """
+    servers: list[dict[str, str]] = []
+    if PUBLIC_BASE_URL:
+        servers.append({"url": PUBLIC_BASE_URL, "description": "Public deployment"})
+    servers.append({"url": "/", "description": "This origin"})
+    if not PUBLIC_BASE_URL:
+        servers.append({"url": "http://localhost:8000", "description": "Local development"})
+    return servers
+
+
 app = FastAPI(
-    title="DSA VLOP Transparency Query API (async jobs)",
+    title="Transparency Report API (async jobs)",
     description=(
-        "Query the aggregated EU Digital Services Act VLOP transparency reports "
-        "(tables 3–11) with structured parameters (no SQL). Pick a `table` "
-        "(GET /tables), describe filters/group_by/aggregates, get a job id, then "
-        "poll for results as JSON or CSV. Query syntax follows the TikTok Research "
-        "API: boolean and/or/not clauses of {operation, field_name, field_values}."
+        "Query public transparency reports — the aggregated EU Digital Services "
+        "Act VLOP content-moderation reports (tables 3–11) and Google Government "
+        "content-removal requests — with structured parameters (no SQL). Pick a "
+        "`table` (GET /tables), describe filters/group_by/aggregates, get a job "
+        "id, then poll for results as JSON or CSV. Query syntax follows the "
+        "TikTok Research API: boolean and/or/not clauses of {operation, "
+        "field_name, field_values}."
     ),
     version="0.5.0",
+    servers=_openapi_servers(),
 )
 
 
@@ -769,7 +818,22 @@ async def log_requests(request: Request, call_next):
     request.state.request_id = request_id
     status = 500
     try:
-        response = await call_next(request)
+        # Reject oversized bodies before any handler/parsing work — several
+        # endpoints are public, so this can't be left to per-key rate limits.
+        content_length = request.headers.get("content-length")
+        if content_length is not None and content_length.isdigit() and (
+            # More digits than the cap itself ⇒ certainly over it. Checked first so
+            # a pathologically long digit string never reaches int(), which would
+            # raise past CPython's int-parse limit (~4300 digits) instead of 413ing.
+            len(content_length) > len(str(MAX_BODY_BYTES))
+            or int(content_length) > MAX_BODY_BYTES
+        ):
+            response = JSONResponse(
+                {"detail": f"Request body too large (max {MAX_BODY_BYTES} bytes)."},
+                status_code=413,
+            )
+        else:
+            response = await call_next(request)
         status = response.status_code
     except Exception:
         logger.exception(
@@ -854,18 +918,32 @@ _J_SCOPE = "JOIN scopes sc ON sc.id = f.scope_id"
 _J_SURF = "JOIN surfaces su ON su.id = f.surface_id"
 _CAT_DIMS = {"category_code": "c.code", "category_label": "c.label"}
 
+_J_RPT = "JOIN reports r ON r.id = f.report_id"
+_RPT_DIMS = {
+    "report_period":       "r.period",
+    "report_period_start": "r.period_start",
+    "report_period_end":   "r.period_end",
+    "report_tier":         "r.tier",
+}
+
+_J_GR_PER = "JOIN gr_periods    per ON per.id = f.period_id"
+_J_GR_CTY = "JOIN gr_countries  cty ON cty.id = f.country_id"
+_J_GR_REQ = "JOIN gr_requestors req ON req.id = f.requestor_id"
+_J_GR_PRD = "JOIN gr_products   prd ON prd.id = f.product_id"
+_J_GR_RSN = "JOIN gr_reasons    rsn ON rsn.id = f.reason_id"
+
 TABLES: dict[str, TableSpec] = {
     "t3_member_state_orders": TableSpec(
         "Member-State orders to act on illegal content / to provide information (Art. 9 & 10), by category and scope.",
-        f"FROM t3_member_state_orders f {_J_SVC} {_J_CAT} {_J_SCOPE}",
-        {**_SVC, **_CAT_DIMS, "scope": "sc.name"},
+        f"FROM t3_member_state_orders f {_J_RPT} {_J_SVC} {_J_CAT} {_J_SCOPE}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS, "scope": "sc.name"},
         {"orders_to_act": "f.orders_to_act", "items": "f.items",
          "orders_to_provide_info": "f.orders_to_provide_info"},
     ),
     "t4_notices": TableSpec(
         "Notices submitted under Art. 16, by category, with Trusted-Flagger (tf_) breakdowns.",
-        f"FROM t4_notices f {_J_SVC} {_J_CAT}",
-        {**_SVC, **_CAT_DIMS},
+        f"FROM t4_notices f {_J_RPT} {_J_SVC} {_J_CAT}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS},
         {"notices": "f.notices", "tf_notices": "f.tf_notices", "items": "f.items",
          "tf_items": "f.tf_items", "median_time": "f.median_time", "tf_median_time": "f.tf_median_time",
          "actions_law": "f.actions_law", "tf_actions_law": "f.tf_actions_law",
@@ -873,45 +951,67 @@ TABLES: dict[str, TableSpec] = {
     ),
     "t5_own_initiative_illegal": TableSpec(
         "Own-initiative actions on illegal content, by category × restriction type.",
-        f"FROM t5_own_initiative_illegal f {_J_SVC} {_J_CAT}",
-        {**_SVC, **_CAT_DIMS},
+        f"FROM t5_own_initiative_illegal f {_J_RPT} {_J_SVC} {_J_CAT}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS},
         dict(_OWN_INIT_MEASURES),
     ),
     "t6_own_initiative_tos": TableSpec(
         "Own-initiative actions on ToS violations, by category × restriction type × surface.",
-        f"FROM t6_own_initiative_tos f {_J_SVC} {_J_CAT} {_J_SURF}",
-        {**_SVC, **_CAT_DIMS, "surface": "su.name"},
+        f"FROM t6_own_initiative_tos f {_J_RPT} {_J_SVC} {_J_CAT} {_J_SURF}",
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS, "surface": "su.name"},
         dict(_OWN_INIT_MEASURES),
     ),
     "t7_appeals_recidivism": TableSpec(
         "Appeals & recidivism (internal complaints, out-of-court disputes, repeat-offender suspensions), by section × indicator × scope × surface.",
-        f"FROM t7_appeals_recidivism f {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
-        {**_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
+        f"FROM t7_appeals_recidivism f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
         {"value": "f.value"},
     ),
     "t8_automated_means": TableSpec(
         "Use of automated means for content moderation, by section × indicator × scope × surface.",
-        f"FROM t8_automated_means f {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
-        {**_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
+        f"FROM t8_automated_means f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
         {"value": "f.value"},
     ),
     "t9_human_resources": TableSpec(
         "Human resources dedicated to content moderation, by section × indicator × scope.",
-        f"FROM t9_human_resources f {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE}",
-        {**_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name"},
+        f"FROM t9_human_resources f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE}",
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name"},
         {"value": "f.value"},
     ),
     "t10_amar": TableSpec(
         "Average Monthly Active Recipients (AMAR) in the EU, by scope.",
-        f"FROM t10_amar f {_J_SVC} {_J_SCOPE}",
-        {**_SVC, "scope": "sc.name"},
+        f"FROM t10_amar f {_J_RPT} {_J_SVC} {_J_SCOPE}",
+        {**_RPT_DIMS, **_SVC, "scope": "sc.name"},
         {"value": "f.value"},
     ),
     "t11_qualitative": TableSpec(
         "Qualitative description (free text), by indicator. No numeric measures — request `qualitative_text` in `fields`.",
-        f"FROM t11_qualitative f {_J_SVC} {_J_IND}",
-        {**_SVC, "indicator": "i.name", "qualitative_text": "f.value_text"},
+        f"FROM t11_qualitative f {_J_RPT} {_J_SVC} {_J_IND}",
+        {**_RPT_DIMS, **_SVC, "indicator": "i.name", "qualitative_text": "f.value_text"},
         {},
+    ),
+    "gr_removals": TableSpec(
+        "Google Government Removal Requests — requests from governments worldwide to remove content from Google products (2019–2025), by period × country × requestor type × product × reason.",
+        f"FROM gr_removals f {_J_GR_PER} {_J_GR_CTY} {_J_GR_REQ} {_J_GR_PRD} {_J_GR_RSN}",
+        {
+            "period":       "per.name",
+            "country_code": "cty.code",
+            "country_name": "cty.name",
+            "requestor":    "req.name",
+            "product":      "prd.name",
+            "reason":       "rsn.name",
+        },
+        {
+            "num_requests":    "f.num_requests",
+            "items_requested": "f.items_requested",
+            "removed_legal":   "f.removed_legal",
+            "removed_policy":  "f.removed_policy",
+            "not_found":       "f.not_found",
+            "not_enough_info": "f.not_enough_info",
+            "no_action":       "f.no_action",
+            "already_removed": "f.already_removed",
+        },
     ),
 }
 
@@ -928,8 +1028,23 @@ class Condition(BaseModel):
     operation: Operation = Field(..., description="EQ, IN, GT, GTE, LT, LTE.")
     field_name: str = Field(..., description="A queryable field; see GET /fields.")
     field_values: list[str | int | float] = Field(
-        ..., min_length=1, description="One or more values; always bound as parameters."
+        ..., min_length=1, max_length=100,
+        description="One or more values (max 100); always bound as parameters.",
     )
+
+
+# Hard caps on query complexity. /api/explore takes the same model with no auth,
+# so without bounds a single request could carry thousands of conditions or
+# aggregate columns and compile into an enormous statement.
+_MAX_CONDITIONS = 50
+_MAX_OUTPUT_COLUMNS = 50
+# Composite (multi-leg) query bounds. /api/explore additionally caps legs at
+# EXPLORE_MAX_LEGS since it is unauthenticated.
+_MAX_LEGS = 4
+_MAX_JOIN_DIMS = 4
+_MAX_DERIVED = 10
+_MAX_EXPR_LEN = 200
+_MAX_EXPR_DEPTH = 10
 
 
 class BooleanQuery(BaseModel):
@@ -937,9 +1052,9 @@ class BooleanQuery(BaseModel):
 
     model_config = ConfigDict(populate_by_name=True)
 
-    and_: list[Condition] = Field(default_factory=list, alias="and")
-    or_: list[Condition] = Field(default_factory=list, alias="or")
-    not_: list[Condition] = Field(default_factory=list, alias="not")
+    and_: list[Condition] = Field(default_factory=list, alias="and", max_length=_MAX_CONDITIONS)
+    or_: list[Condition] = Field(default_factory=list, alias="or", max_length=_MAX_CONDITIONS)
+    not_: list[Condition] = Field(default_factory=list, alias="not", max_length=_MAX_CONDITIONS)
 
 
 class Aggregate(BaseModel):
@@ -955,8 +1070,41 @@ class Sort(BaseModel):
     order: SortOrder = "desc"
 
 
+class Leg(BaseModel):
+    """One sub-query of a composite query: filters + aggregates over a single
+    table. Every leg is implicitly grouped by the composite's `join_on` keys, so
+    all legs aggregate to the same grain before being merged (full-outer)."""
+
+    table: str = Field(..., description="DSA report table this leg queries (see GET /tables).")
+    query: BooleanQuery = Field(default_factory=BooleanQuery, description="Filters for this leg only.")
+    aggregates: list[Aggregate] = Field(
+        ..., min_length=1, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Aggregate columns; aliases must be unique across all legs.",
+    )
+
+
+class DerivedColumn(BaseModel):
+    """A computed output column over leg aggregates, e.g. a ratio."""
+
+    alias: str = Field(..., description="Output column name (letters, digits, underscore).")
+    expr: str = Field(
+        ..., min_length=1, max_length=_MAX_EXPR_LEN,
+        description="Arithmetic (+ - * / and parentheses) over `leg.alias` references "
+                    "and numeric literals, e.g. '100 * appeals.n / actions.a'. "
+                    "Division is NULL-safe (x/0 → null).",
+    )
+
+
 class QueryRequest(BaseModel):
-    """Structured query. No SQL is accepted."""
+    """Structured query. No SQL is accepted.
+
+    Two shapes share this model:
+    - **Single-table** (the default): set `table` plus `query`/`fields`/`group_by`/
+      `aggregates`.
+    - **Composite** (cross-table): set `legs` + `join_on` instead — each leg is a
+      single-table aggregate sub-query; legs are merged full-outer on `join_on`
+      and `derived` columns compute arithmetic (e.g. ratios) across them.
+    """
 
     table: str | None = Field(
         default=None, description="Which DSA report table to query (see GET /tables)."
@@ -964,17 +1112,54 @@ class QueryRequest(BaseModel):
     query: BooleanQuery = Field(default_factory=BooleanQuery, description="Filters.")
     fields: list[str] | None = Field(
         default=None,
+        max_length=_MAX_OUTPUT_COLUMNS,
         description="Columns to return for a raw (non-aggregated) query. Defaults to all fields.",
     )
-    group_by: list[str] = Field(default_factory=list, description="Dimension fields to group by.")
-    aggregates: list[Aggregate] = Field(default_factory=list, description="Aggregate columns.")
-    sort: list[Sort] = Field(default_factory=list, description="Result ordering.")
+    group_by: list[str] = Field(
+        default_factory=list, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Dimension fields to group by.",
+    )
+    aggregates: list[Aggregate] = Field(
+        default_factory=list, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Aggregate columns.",
+    )
+    sort: list[Sort] = Field(
+        default_factory=list, max_length=_MAX_OUTPUT_COLUMNS,
+        description="Result ordering.",
+    )
     max_count: int = Field(default=100, ge=1, description="Row limit (capped at ROW_LIMIT).")
     callback_url: str | None = Field(
         default=None,
         max_length=2048,
         description="Optional http(s) webhook POSTed (HMAC-signed) when the job finishes.",
     )
+    # ── Composite (cross-table) shape ──────────────────────────────────────────
+    legs: dict[str, Leg] | None = Field(
+        default=None,
+        description="Composite query: named single-table sub-queries to merge "
+                    f"(2–{_MAX_LEGS}; leg names are letters/digits/underscores).",
+    )
+    join_on: list[str] = Field(
+        default_factory=list, max_length=_MAX_JOIN_DIMS,
+        description="Dimensions to merge legs on; must be a dimension of every leg's table.",
+    )
+    derived: list[DerivedColumn] = Field(
+        default_factory=list, max_length=_MAX_DERIVED,
+        description="Computed columns over leg aggregates (composite queries only).",
+    )
+    having: BooleanQuery = Field(
+        default_factory=BooleanQuery,
+        description="Post-merge filter on output columns (join_on dims, leg "
+                    "aggregate aliases, derived aliases). Composite queries only.",
+    )
+
+    @model_validator(mode="after")
+    def _bound_legs(self) -> "QueryRequest":
+        # Cheap structural bound enforced at parse time because /api/explore takes
+        # this model unauthenticated; semantic validation lives in compile_query.
+        if self.legs is not None and not (2 <= len(self.legs) <= _MAX_LEGS):
+            raise ValueError(f"`legs` must contain between 2 and {_MAX_LEGS} sub-queries.")
+        return self
 
 
 class QueryCompileError(ValueError):
@@ -1032,14 +1217,17 @@ def _compile_condition(cond: Condition, spec: TableSpec) -> tuple[str, list[Any]
     raise QueryCompileError(f"Unsupported operation '{op}'.")  # pragma: no cover
 
 
-def _compile_where(q: BooleanQuery, spec: TableSpec) -> tuple[str, list[Any]]:
+def _compile_bool(q: BooleanQuery, compile_cond: Any) -> tuple[str, list[Any]]:
+    """Combine a BooleanQuery's and/or/not clauses; `compile_cond` turns one
+    Condition into (sql_fragment, params) — table-scoped for WHERE clauses,
+    output-column-scoped for composite HAVING clauses."""
     groups: list[str] = []
     params: list[Any] = []
 
     def _and(conditions: list[Condition]) -> str:
         frags = []
         for c in conditions:
-            frag, p = _compile_condition(c, spec)
+            frag, p = compile_cond(c)
             frags.append(frag)
             params.extend(p)
         return " AND ".join(frags)
@@ -1049,19 +1237,23 @@ def _compile_where(q: BooleanQuery, spec: TableSpec) -> tuple[str, list[Any]]:
     if q.or_:
         frags = []
         for c in q.or_:
-            frag, p = _compile_condition(c, spec)
+            frag, p = compile_cond(c)
             frags.append(frag)
             params.extend(p)
         groups.append("(" + " OR ".join(frags) + ")")
     if q.not_:
         frags = []
         for c in q.not_:
-            frag, p = _compile_condition(c, spec)
+            frag, p = compile_cond(c)
             frags.append(f"NOT ({frag})")
             params.extend(p)
         groups.append(" AND ".join(frags))
 
     return " AND ".join(g for g in groups if g), params
+
+
+def _compile_where(q: BooleanQuery, spec: TableSpec) -> tuple[str, list[Any]]:
+    return _compile_bool(q, lambda c: _compile_condition(c, spec))
 
 
 def _safe_alias(alias: str) -> str:
@@ -1070,8 +1262,303 @@ def _safe_alias(alias: str) -> str:
     return alias
 
 
+# ── Derived-column expressions (composite queries) ────────────────────────────
+#
+# A tiny recursive-descent parser for four-function arithmetic over `leg.alias`
+# references and numeric literals. The expression is tokenised with a strict
+# regex and compiled to SQL during the parse — user text is never interpolated:
+# references resolve through a pre-validated map and numbers are re-emitted from
+# the regex-matched literal. Division compiles to CAST(x AS REAL) / NULLIF(y, 0)
+# so integer SUMs divide as reals and ÷0 yields NULL instead of an error.
+
+_EXPR_TOKEN = re.compile(
+    r"\s*(?:(?P<num>\d+(?:\.\d+)?)"
+    r"|(?P<ref>[A-Za-z_][A-Za-z0-9_]*\.[A-Za-z_][A-Za-z0-9_]*)"
+    r"|(?P<op>[-+*/()]))"
+)
+
+
+def _tokenize_expr(expr: str) -> list[tuple[str, str]]:
+    # The token regex consumes leading whitespace per token; trailing whitespace
+    # would otherwise fail to match anything and read as a confusing error.
+    expr = expr.strip()
+    tokens: list[tuple[str, str]] = []
+    pos = 0
+    while pos < len(expr):
+        m = _EXPR_TOKEN.match(expr, pos)
+        if m is None:
+            raise QueryCompileError(
+                f"Invalid expression near '{expr[pos:pos + 20]}': only numbers, "
+                "`leg.alias` references, + - * / and parentheses are allowed."
+            )
+        tokens.append((m.lastgroup or "", m.group(m.lastgroup or "")))
+        pos = m.end()
+    if not tokens:
+        raise QueryCompileError("Empty derived expression.")
+    return tokens
+
+
+def _compile_expr(expr: str, refs: dict[str, str]) -> str:
+    """Parse + compile a derived-column expression to SQL. `refs` maps the legal
+    `leg.alias` references onto already-validated SQL column expressions."""
+    tokens = _tokenize_expr(expr)
+    pos = 0
+
+    def peek() -> tuple[str, str] | None:
+        return tokens[pos] if pos < len(tokens) else None
+
+    def take() -> tuple[str, str]:
+        nonlocal pos
+        tok = tokens[pos]
+        pos += 1
+        return tok
+
+    def parse_sum(depth: int) -> str:
+        left = parse_product(depth)
+        while (tok := peek()) and tok[1] in ("+", "-"):
+            take()
+            right = parse_product(depth)
+            left = f"({left} {tok[1]} {right})"
+        return left
+
+    def parse_product(depth: int) -> str:
+        left = parse_factor(depth)
+        while (tok := peek()) and tok[1] in ("*", "/"):
+            take()
+            right = parse_factor(depth)
+            if tok[1] == "/":
+                left = f"(CAST({left} AS REAL) / NULLIF({right}, 0))"
+            else:
+                left = f"({left} * {right})"
+        return left
+
+    def parse_factor(depth: int) -> str:
+        if depth > _MAX_EXPR_DEPTH:
+            raise QueryCompileError("Expression is nested too deeply.")
+        tok = peek()
+        if tok is None:
+            raise QueryCompileError(f"Incomplete expression '{expr}'.")
+        kind, text = take()
+        if kind == "num":
+            return text
+        if kind == "ref":
+            if text not in refs:
+                raise QueryCompileError(
+                    f"Unknown reference '{text}' in derived expression; use "
+                    "`leg.alias` where `leg` is a leg name and `alias` one of its "
+                    f"aggregate aliases. Available: {', '.join(sorted(refs)) or '(none)'}."
+                )
+            return refs[text]
+        if text == "-":
+            return f"(-{parse_factor(depth + 1)})"
+        if text == "(":
+            inner = parse_sum(depth + 1)
+            nxt = peek()
+            if nxt is None or nxt[1] != ")":
+                raise QueryCompileError(f"Unbalanced parentheses in expression '{expr}'.")
+            take()
+            return inner
+        raise QueryCompileError(f"Unexpected '{text}' in expression '{expr}'.")
+
+    sql = parse_sum(0)
+    if pos != len(tokens):
+        raise QueryCompileError(f"Unexpected trailing '{tokens[pos][1]}' in expression '{expr}'.")
+    return sql
+
+
+def _coerce_number(value: Any, field_name: str) -> float | int:
+    """Numeric `having` values may arrive as strings (e.g. from the NL layer);
+    coerce rather than reject, since the comparison column is always numeric."""
+    if isinstance(value, bool):
+        raise QueryCompileError(f"Field '{field_name}' requires numeric values.")
+    if isinstance(value, (int, float)):
+        return value
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        raise QueryCompileError(f"Field '{field_name}' requires numeric values.")
+
+
+def _compile_output_condition(cond: Condition, col_types: dict[str, str]) -> tuple[str, list[Any]]:
+    """Compile a `having` condition against the composite's output columns.
+    Column names were validated by _safe_alias / the dimension registry, so they
+    are safe to emit; values are always bound."""
+    field = cond.field_name
+    if field not in col_types:
+        raise QueryCompileError(
+            f"Unknown `having` field '{field}'; it must be an output column "
+            f"(one of: {', '.join(col_types)})."
+        )
+    numeric = col_types[field] == "numeric"
+    op = cond.operation
+    values = cond.field_values
+
+    if op in _COMPARATORS:
+        if not numeric:
+            raise QueryCompileError(f"Operation {op} is only valid on numeric output columns, not '{field}'.")
+        if len(values) != 1:
+            raise QueryCompileError(f"Operation {op} takes exactly one value.")
+        return f"{field} {_COMPARATORS[op]} ?", [_coerce_number(values[0], field)]
+
+    if op == "EQ":
+        if len(values) != 1:
+            raise QueryCompileError("Operation EQ takes exactly one value; use IN for multiple.")
+        if numeric:
+            return f"{field} = ?", [_coerce_number(values[0], field)]
+        _require_string(values[0], field)
+        return f"{field} = ?", [values[0]]
+
+    if op == "IN":
+        bound: list[Any] = []
+        for v in values:
+            if numeric:
+                bound.append(_coerce_number(v, field))
+            else:
+                _require_string(v, field)
+                bound.append(v)
+        placeholders = ", ".join(["?"] * len(values))
+        return f"{field} IN ({placeholders})", bound
+
+    raise QueryCompileError(f"Unsupported operation '{op}'.")  # pragma: no cover
+
+
+def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
+    """Compile a multi-leg composite query to one parameterised statement.
+
+    Shape: each leg compiles to a CTE (its own single-table WHERE + aggregates,
+    grouped by the join keys); a `spine` CTE is the UNION of every leg's keys
+    (full-outer semantics — a service missing from one leg still appears, with
+    NULLs); the outer SELECT LEFT JOINs each leg back to the spine, computes the
+    derived columns, and applies having/sort/limit. Every value is bound; every
+    identifier comes from the validated registry or _safe_alias."""
+    legs = req.legs or {}
+    if req.table:
+        raise QueryCompileError("Use either `table` (single-table) or `legs` (composite), not both.")
+    if req.fields or req.group_by or req.aggregates:
+        raise QueryCompileError(
+            "Composite queries take filters/aggregates inside each leg; "
+            "top-level `fields`/`group_by`/`aggregates` are not allowed."
+        )
+    if not req.join_on:
+        raise QueryCompileError(
+            "Composite queries require `join_on`: the dimension(s) every leg is "
+            "grouped by and merged on (e.g. [\"service_name\"])."
+        )
+    if len(set(req.join_on)) != len(req.join_on):
+        raise QueryCompileError("Duplicate field in `join_on`.")
+
+    # Resolve every leg's table and check the join keys are shared dimensions.
+    specs: dict[str, TableSpec] = {}
+    for leg_name, leg in legs.items():
+        _safe_alias(leg_name)
+        spec = TABLES.get(leg.table)
+        if spec is None:
+            raise QueryCompileError(f"Unknown table '{leg.table}' in leg '{leg_name}'. See GET /tables.")
+        specs[leg_name] = spec
+    for dim in req.join_on:
+        for leg_name, leg in legs.items():
+            if dim not in specs[leg_name].dimensions:
+                shared = set.intersection(*(set(s.dimensions) for s in specs.values()))
+                raise QueryCompileError(
+                    f"join_on field '{dim}' is not a dimension of table '{leg.table}' "
+                    f"(leg '{leg_name}'). Dimensions shared by every leg here: "
+                    f"{', '.join(sorted(shared)) or '(none)'}."
+                )
+
+    # Output columns: join keys (text), then leg aggregate aliases (numeric,
+    # globally unique), then derived aliases (numeric).
+    col_types: dict[str, str] = {d: "text" for d in req.join_on}
+    refs: dict[str, str] = {}  # "leg.alias" → "l_leg.alias" for derived exprs
+    params: list[Any] = []
+    ctes: list[str] = []
+    outer_cols = [f"spine.{d} AS {d}" for d in req.join_on]
+
+    for leg_name, leg in legs.items():
+        spec = specs[leg_name]
+        select_parts = [f"{spec.dimensions[d]} AS {d}" for d in req.join_on]
+        for agg in leg.aggregates:
+            alias = _safe_alias(agg.alias)
+            if alias in col_types:
+                raise QueryCompileError(
+                    f"Duplicate output column '{alias}': aggregate aliases must be "
+                    "unique across all legs and must not clash with join_on fields."
+                )
+            if agg.function == "COUNT" and agg.field_name in ("*", ""):
+                expr = "COUNT(*)"
+            elif agg.field_name not in spec.measures:
+                raise QueryCompileError(
+                    f"Aggregate field '{agg.field_name}' must be a numeric measure of "
+                    f"'{leg.table}' (leg '{leg_name}'). See GET /fields?table={leg.table}"
+                )
+            else:
+                expr = f"{agg.function}({spec.measures[agg.field_name]})"
+            select_parts.append(f"{expr} AS {alias}")
+            col_types[alias] = "numeric"
+            refs[f"{leg_name}.{alias}"] = f"l_{leg_name}.{alias}"
+            outer_cols.append(f"l_{leg_name}.{alias} AS {alias}")
+        where, leg_params = _compile_where(leg.query, spec)
+        leg_sql = f"SELECT {', '.join(select_parts)} {spec.from_sql}"
+        if where:
+            leg_sql += f" WHERE {where}"
+        leg_sql += " GROUP BY " + ", ".join(spec.dimensions[d] for d in req.join_on)
+        ctes.append(f"l_{leg_name} AS ({leg_sql})")
+        params.extend(leg_params)
+
+    for d in req.derived:
+        alias = _safe_alias(d.alias)
+        if alias in col_types:
+            raise QueryCompileError(f"Duplicate or clashing derived alias '{alias}'.")
+        outer_cols.append(f"{_compile_expr(d.expr, refs)} AS {alias}")
+        col_types[alias] = "numeric"
+
+    key_cols = ", ".join(req.join_on)
+    spine = " UNION ".join(f"SELECT {key_cols} FROM l_{leg_name}" for leg_name in legs)
+    ctes.append(f"spine AS ({spine})")
+
+    # `IS` (SQLite's NULL-safe equality) instead of `=`: the dimension columns are
+    # NOT NULL today, but a future nullable dimension would silently fail to join
+    # under `=` (NULL = NULL is UNKNOWN) and surface as bogus all-NULL rows.
+    joins = " ".join(
+        f"LEFT JOIN l_{leg_name} ON "
+        + " AND ".join(f"l_{leg_name}.{d} IS spine.{d}" for d in req.join_on)
+        for leg_name in legs
+    )
+    inner = f"SELECT {', '.join(outer_cols)} FROM spine {joins}"
+
+    # Wrapping the merge in a subselect lets having/sort address output columns
+    # by name (already validated identifiers; values bound as parameters).
+    sql = "WITH " + ", ".join(ctes) + f" SELECT * FROM ({inner})"
+    having_sql, having_params = _compile_bool(
+        req.having, lambda c: _compile_output_condition(c, col_types)
+    )
+    if having_sql:
+        sql += f" WHERE {having_sql}"
+        params.extend(having_params)
+
+    order_parts = []
+    for s in req.sort:
+        if s.field_name not in col_types:
+            raise QueryCompileError(
+                f"Cannot sort by '{s.field_name}'; it is not an output column "
+                f"(one of: {', '.join(col_types)})."
+            )
+        order_parts.append(f"{s.field_name} {'DESC' if s.order == 'desc' else 'ASC'}")
+    if order_parts:
+        sql += " ORDER BY " + ", ".join(order_parts)
+    sql += f" LIMIT {min(req.max_count, ROW_LIMIT)}"
+
+    return sql, params, list(col_types)
+
+
 def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
-    """Validate a structured query and compile it to (sql, params, output_columns)."""
+    """Validate a structured query and compile it to (sql, params, output_columns).
+    Dispatches on shape: `legs` → composite (cross-table merge), else single-table."""
+    if req.legs is not None:
+        return _compile_composite(req)
+    if req.join_on or req.derived or req.having.and_ or req.having.or_ or req.having.not_:
+        raise QueryCompileError(
+            "`join_on`/`derived`/`having` are only valid in a composite query — supply `legs`."
+        )
     if not req.table:
         raise QueryCompileError(
             "`table` is required. Choose one of: " + ", ".join(TABLES) + ". See GET /tables."
@@ -1335,15 +1822,15 @@ def root() -> dict[str, Any]:
             "GET /api/overview": "Public headline aggregates powering the dashboard (no auth)",
             "GET /api/explore/options": "Public: tables + their dimensions/measures for the query builder",
             "POST /api/explore": "Public: run a bounded structured query inline (no auth, row-capped, rate-limited)",
-            "POST /api/ask": "Public: ask in natural language — an LLM writes the structured query (if enabled)",
+            "POST /api/ask": "Ask in natural language (requires an API key) — an LLM writes the structured query (if enabled)",
             "GET /portal": "Researcher portal (web UI: sign in, get a key, browse the schema)",
-            "POST /api/auth/google": "Sign in with a Google ID token (FedCM/GIS) → session key, or pending approval",
-            "POST /api/portal/register": "Demo: issue an API key without auth (disabled when ALLOW_DEMO_KEYS=0)",
+            "POST /api/auth/google": "Sign in with a Google ID token (FedCM/GIS) → session key",
+            "POST /api/portal/register": "Issue an API key without sign-in (disabled when ALLOW_DEMO_KEYS=0)",
             "DELETE /api/portal/key": "Revoke your session / portal-issued key",
             "GET /api/admin/registrations": "Admin: list researcher registrations",
-            "POST /api/admin/registrations/{email}/approve": "Admin: approve an account",
+            "POST /api/admin/registrations/{email}/approve": "Admin: restore a revoked account",
             "POST /api/admin/registrations/{email}/revoke": "Admin: revoke an account",
-            "POST /api/query": "Submit a structured query over a `table` (optional callback_url webhook), returns 202 + job_id",
+            "POST /api/query": "Submit a structured query — single-table (`table`) or composite (`legs`+`join_on`+`derived`) — returns 202 + job_id",
             "GET /api/jobs": "List your jobs",
             "GET /api/jobs/{job_id}": "Job status (your jobs only)",
             "GET /api/jobs/{job_id}/result?format=json|csv": "Result (only when status=done)",
@@ -1448,7 +1935,8 @@ def _page_csp(html: str, *, script_hosts=(), connect_hosts=(), frame_hosts=(), i
     directives = [
         "default-src 'self'",
         " ".join(["script-src", "'self'", *hashes, *script_hosts]),
-        "style-src 'self' 'unsafe-inline'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
         " ".join(["img-src", "'self'", "data:", *img_hosts]),
         " ".join(["connect-src", "'self'", *connect_hosts]),
         " ".join(["frame-src", *(frame_hosts or ["'none'"])]),
@@ -1472,7 +1960,14 @@ def _serve_page(filename: str, label: str, **csp_hosts) -> FileResponse:
         with open(path, "rb") as f:
             csp = _page_csp(f.read().decode("utf-8"), **csp_hosts)
         _csp_cache[filename] = csp
-    return FileResponse(path, media_type="text/html", headers={"Content-Security-Policy": csp})
+    # no-cache (not no-store): browsers may keep a copy but must revalidate, so a
+    # deploy is picked up immediately instead of serving a stale page. The CSP
+    # hash is tied to the exact bytes, so a stale HTML/CSP mismatch breaks pages.
+    return FileResponse(
+        path,
+        media_type="text/html",
+        headers={"Content-Security-Policy": csp, "Cache-Control": "no-cache"},
+    )
 
 
 # Third-party assets we vendor and serve ourselves (filename → media type).
@@ -1499,11 +1994,23 @@ def vendored_asset(filename: str) -> FileResponse:
 
 
 @app.get("/", response_class=HTMLResponse)
+def home_page() -> FileResponse:
+    """Serve the product home page."""
+    return _serve_page("home.html", "Home page")
+
+
+@app.get("/reports", response_class=HTMLResponse)
 def dashboard_page() -> FileResponse:
     """Serve the public VLOP transparency dashboard (reads GET /api/overview)."""
     # Chart.js is vendored same-origin (/static/vendor/chart.umd.js), so the CSP
     # needs no third-party script origin — `script-src 'self'` + inline hashes.
     return _serve_page("index.html", "Dashboard page")
+
+
+@app.get("/removals", response_class=HTMLResponse)
+def removals_page() -> FileResponse:
+    """Serve the Google Government Removals dashboard."""
+    return _serve_page("removals.html", "Removals page")
 
 
 @app.get("/portal", response_class=HTMLResponse)
@@ -1517,6 +2024,60 @@ def portal_page() -> FileResponse:
         frame_hosts=["https://accounts.google.com"],
         img_hosts=["https://*.googleusercontent.com", "https://*.gstatic.com"],
     )
+
+
+@app.get("/privacy", response_class=HTMLResponse)
+def privacy_page() -> FileResponse:
+    """Serve the privacy policy page."""
+    return _serve_page("privacy.html", "Privacy policy")
+
+
+# ── Localized static pages (es / fr / de) ─────────────────────────────────────
+# The site chrome and page content are translated into Spanish, French, and
+# German (generated by scripts/localize_static.py) and served under a locale
+# prefix: /es, /es/reports, /es/removals, /es/portal, /es/privacy (and fr/de).
+# Each localized file lives at static/<locale>/<file> and goes through the same
+# _serve_page / per-page-CSP machinery as the English originals — the inline
+# <script> hashes are recomputed per file, so the strict CSP holds. The JSON API
+# (/api/*), Swagger (/docs) and the operational endpoints stay locale-agnostic.
+_LOCALES = ("es", "fr", "de", "ja", "zh", "ko")
+_PORTAL_CSP_HOSTS: dict[str, list[str]] = {
+    "script_hosts": ["https://accounts.google.com"],
+    "connect_hosts": ["https://accounts.google.com"],
+    "frame_hosts": ["https://accounts.google.com"],
+    "img_hosts": ["https://*.googleusercontent.com", "https://*.gstatic.com"],
+}
+# url suffix -> (filename, label, per-page CSP host kwargs)
+_LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
+    "": ("home.html", "Home page", {}),
+    "reports": ("index.html", "Dashboard page", {}),
+    "removals": ("removals.html", "Removals page", {}),
+    "portal": ("portal.html", "Portal page", _PORTAL_CSP_HOSTS),
+    "privacy": ("privacy.html", "Privacy policy", {}),
+}
+
+
+def _make_localized_handler(
+    filename: str, label: str, csp_hosts: dict[str, list[str]]
+) -> Callable[[], FileResponse]:
+    def handler() -> FileResponse:
+        return _serve_page(filename, label, **csp_hosts)
+
+    return handler
+
+
+for _loc in _LOCALES:
+    for _suffix, (_fname, _label, _hosts) in _LOCALIZED_PAGES.items():
+        # Home is registered with a trailing slash (/es/) to match the switcher
+        # and brand links, so the common home navigation avoids a 307 redirect.
+        _path = f"/{_loc}" + (f"/{_suffix}" if _suffix else "/")
+        app.add_api_route(
+            _path,
+            _make_localized_handler(f"{_loc}/{_fname}", _label, _hosts),
+            methods=["GET"],
+            response_class=HTMLResponse,
+            include_in_schema=False,
+        )
 
 
 # The dashboard aggregates never change at runtime (the DB is opened mode=ro and
@@ -1575,6 +2136,59 @@ def overview() -> dict[str, Any]:
     return _overview_cache
 
 
+_gr_overview_cache: dict[str, Any] | None = None
+_gr_overview_cache_lock = threading.Lock()
+
+
+def _compute_gr_overview() -> dict[str, Any]:
+    conn = _connect_ro()
+    try:
+        total_requests, total_items, country_count = conn.execute(
+            "SELECT COALESCE(SUM(num_requests), 0), COALESCE(SUM(items_requested), 0), COUNT(DISTINCT country_id) FROM gr_removals"
+        ).fetchone()
+        periods = [r[0] for r in conn.execute(
+            "SELECT name FROM gr_periods ORDER BY id"
+        ).fetchall()]
+        countries = [{"code": r[0], "name": r[1]} for r in conn.execute(
+            "SELECT code, name FROM gr_countries ORDER BY name"
+        ).fetchall()]
+        requestors = [r[0] for r in conn.execute(
+            "SELECT name FROM gr_requestors ORDER BY name"
+        ).fetchall()]
+        products = [r[0] for r in conn.execute(
+            "SELECT name FROM gr_products ORDER BY name"
+        ).fetchall()]
+        reasons = [r[0] for r in conn.execute(
+            "SELECT name FROM gr_reasons ORDER BY name"
+        ).fetchall()]
+        return {
+            "total_requests": total_requests,
+            "total_items": total_items,
+            "country_count": country_count,
+            "period_count": len(periods),
+            "periods": periods,
+            "countries": countries,
+            "requestors": requestors,
+            "products": products,
+            "reasons": reasons,
+        }
+    finally:
+        conn.close()
+
+
+@api_router.get("/overview/removals")
+def overview_removals() -> dict[str, Any]:
+    """Public headline stats and filter options for the Government Removals dataset — no auth.
+    Returns totals, the ordered period list (chronological), and dimension value lists for
+    populating filter dropdowns. Memoised like /overview."""
+    global _gr_overview_cache
+    if _gr_overview_cache is None:
+        with _gr_overview_cache_lock:
+            if _gr_overview_cache is None:
+                _gr_overview_cache = _compute_gr_overview()
+    return _gr_overview_cache
+
+
 @api_router.get("/explore/options")
 def explore_options() -> dict[str, Any]:
     """Public metadata for the dashboard's query builder: each table's queryable
@@ -1591,6 +2205,15 @@ def explore_options() -> dict[str, Any]:
         ],
         "aggregates": ["SUM", "AVG", "MAX", "MIN", "COUNT"],
         "max_rows": EXPLORE_MAX_ROWS,
+        # Composite (cross-table) queries: legs are merged full-outer on join_on
+        # dimensions shared by every leg's table; derived columns are arithmetic
+        # over `leg.alias` references. The UI derives valid join dimensions by
+        # intersecting the `dimensions` lists above.
+        "composite": {
+            "max_legs": EXPLORE_MAX_LEGS,
+            "derived_operators": "+ - * / ( )",
+            "join_on": "any dimension present in every leg's table",
+        },
     }
 
 
@@ -1604,36 +2227,35 @@ class AskRequest(BaseModel):
 # JSON schema the LLM must fill — a constrained, flat projection of QueryRequest.
 # Strict so structured outputs reliably return a valid object; compile_query still
 # does the real validation against the table registry afterward.
+_ASK_FILTERS_SCHEMA: dict[str, Any] = {
+    "type": "array",
+    "items": {
+        "type": "object", "additionalProperties": False,
+        "properties": {
+            "field": {"type": "string"},
+            "op": {"type": "string", "enum": ["EQ", "IN", "GT", "GTE", "LT", "LTE"]},
+            "values": {"type": "array", "items": {"type": "string"}},
+        },
+        "required": ["field", "op", "values"],
+    },
+}
+_ASK_AGG_SCHEMA: dict[str, Any] = {
+    "type": "object", "additionalProperties": False,
+    "properties": {
+        "function": {"type": "string", "enum": ["SUM", "AVG", "MIN", "MAX", "COUNT"]},
+        "field": {"type": "string"},
+        "alias": {"type": "string"},
+    },
+    "required": ["function", "field", "alias"],
+}
 _ASK_SCHEMA: dict[str, Any] = {
     "type": "object",
     "additionalProperties": False,
     "properties": {
         "table": {"type": "string", "enum": list(TABLES)},
-        "filters": {
-            "type": "array",
-            "items": {
-                "type": "object", "additionalProperties": False,
-                "properties": {
-                    "field": {"type": "string"},
-                    "op": {"type": "string", "enum": ["EQ", "IN", "GT", "GTE", "LT", "LTE"]},
-                    "values": {"type": "array", "items": {"type": "string"}},
-                },
-                "required": ["field", "op", "values"],
-            },
-        },
+        "filters": _ASK_FILTERS_SCHEMA,
         "group_by": {"type": "array", "items": {"type": "string"}},
-        "aggregates": {
-            "type": "array",
-            "items": {
-                "type": "object", "additionalProperties": False,
-                "properties": {
-                    "function": {"type": "string", "enum": ["SUM", "AVG", "MIN", "MAX", "COUNT"]},
-                    "field": {"type": "string"},
-                    "alias": {"type": "string"},
-                },
-                "required": ["function", "field", "alias"],
-            },
-        },
+        "aggregates": {"type": "array", "items": _ASK_AGG_SCHEMA},
         "sort": {
             "type": "array",
             "items": {
@@ -1646,8 +2268,37 @@ _ASK_SCHEMA: dict[str, Any] = {
             },
         },
         "max_count": {"type": "integer"},
+        # Composite (cross-table) shape: when `legs` is non-empty the flat fields
+        # above (except sort/max_count) are ignored and the query merges the legs
+        # on join_on, with derived arithmetic columns (e.g. ratios).
+        "legs": {
+            "type": "array",
+            "items": {
+                "type": "object", "additionalProperties": False,
+                "properties": {
+                    "name": {"type": "string"},
+                    "table": {"type": "string", "enum": list(TABLES)},
+                    "filters": _ASK_FILTERS_SCHEMA,
+                    "aggregate": _ASK_AGG_SCHEMA,
+                },
+                "required": ["name", "table", "filters", "aggregate"],
+            },
+        },
+        "join_on": {"type": "array", "items": {"type": "string"}},
+        "derived": {
+            "type": "array",
+            "items": {
+                "type": "object", "additionalProperties": False,
+                "properties": {
+                    "alias": {"type": "string"},
+                    "expr": {"type": "string"},
+                },
+                "required": ["alias", "expr"],
+            },
+        },
     },
-    "required": ["table", "filters", "group_by", "aggregates", "sort", "max_count"],
+    "required": ["table", "filters", "group_by", "aggregates", "sort", "max_count",
+                 "legs", "join_on", "derived"],
 }
 
 
@@ -1676,6 +2327,17 @@ def _ask_system_prompt() -> str:
         "- service_name and platform exist on every table; platform is the parent company.",
         "- Default max_count to 10 unless the question implies otherwise.",
         "- Aggregate aliases must be letters, digits, or underscores.",
+        "- For single-table questions leave `legs`, `join_on`, and `derived` empty.",
+        "",
+        "Cross-table questions (ratios/comparisons across two tables, e.g. 'ratio of "
+        "actions to appeals', 'notices per monthly active user'): fill `legs` (2–4 "
+        "named single-table sub-queries, each with one aggregate), `join_on` (dimensions "
+        "present in EVERY leg's table — usually [\"service_name\"]), and `derived` "
+        "(arithmetic + - * / ( ) over `legname.alias` references, e.g. "
+        "\"appeals.p / actions.a\"). Legs are merged on join_on; sort may reference any "
+        "leg alias or derived alias. Set `table` to the first leg's table (it is "
+        "ignored when legs are present) and leave the flat filters/group_by/aggregates "
+        "empty.",
     ]
     return "\n".join(lines)
 
@@ -1728,28 +2390,54 @@ def _translate_question(question: str) -> dict[str, Any]:
     return json.loads(text)
 
 
+def _ask_conditions(filters: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {"operation": f["op"], "field_name": f["field"], "field_values": f["values"]}
+        for f in filters
+    ]
+
+
+def _ask_aggregate(a: dict[str, Any]) -> dict[str, Any]:
+    is_count_star = a["function"] == "COUNT" and a.get("field", "*") in ("", "*", "rows", "(rows)")
+    return {
+        "function": a["function"],
+        "field_name": "*" if is_count_star else a["field"],
+        "alias": a["alias"],
+    }
+
+
 def _askquery_to_request(aq: dict[str, Any]) -> QueryRequest:
     """Map the LLM's constrained AskQuery dict onto the real QueryRequest model.
     QueryRequest construction + compile_query perform the actual validation."""
-    conditions = [
-        {"operation": f["op"], "field_name": f["field"], "field_values": f["values"]}
-        for f in aq.get("filters", [])
-    ]
-    aggregates = []
-    for a in aq.get("aggregates", []):
-        is_count_star = a["function"] == "COUNT" and a.get("field", "*") in ("", "*", "rows", "(rows)")
-        aggregates.append({
-            "function": a["function"],
-            "field_name": "*" if is_count_star else a["field"],
-            "alias": a["alias"],
-        })
+    sort = [{"field_name": s["field"], "order": s["order"]} for s in aq.get("sort", [])]
+    max_count = aq.get("max_count") or 10
+
+    legs = aq.get("legs") or []
+    if legs:
+        # Composite shape: the flat single-table fields are ignored by design.
+        payload: dict[str, Any] = {
+            "legs": {
+                leg["name"]: {
+                    "table": leg["table"],
+                    "query": {"and": _ask_conditions(leg.get("filters", []))},
+                    "aggregates": [_ask_aggregate(leg["aggregate"])],
+                }
+                for leg in legs
+            },
+            "join_on": aq.get("join_on", []),
+            "derived": aq.get("derived", []),
+            "sort": sort,
+            "max_count": max_count,
+        }
+        return QueryRequest.model_validate(payload)
+
     payload = {
         "table": aq.get("table"),
-        "query": {"and": conditions},
+        "query": {"and": _ask_conditions(aq.get("filters", []))},
         "group_by": aq.get("group_by", []),
-        "aggregates": aggregates,
-        "sort": [{"field_name": s["field"], "order": s["order"]} for s in aq.get("sort", [])],
-        "max_count": aq.get("max_count") or 10,
+        "aggregates": [_ask_aggregate(a) for a in aq.get("aggregates", [])],
+        "sort": sort,
+        "max_count": max_count,
     }
     # model_validate runs the same field validation as a request body would.
     return QueryRequest.model_validate(payload)
@@ -1785,6 +2473,13 @@ def explore(body: QueryRequest, request: Request) -> dict[str, Any]:
             detail="Too many queries from here. Please slow down.",
             headers={"Retry-After": str(EXPLORE_RATE_WINDOW)},
         )
+    # The public endpoint gets a tighter composite budget than the keyed job API.
+    if body.legs is not None and len(body.legs) > EXPLORE_MAX_LEGS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Public composite queries are limited to {EXPLORE_MAX_LEGS} legs; "
+                   "use POST /api/query (with an API key) for more.",
+        )
     try:
         return _run_query_bounded(body)
     except QueryCompileError as exc:
@@ -1792,20 +2487,20 @@ def explore(body: QueryRequest, request: Request) -> dict[str, Any]:
 
 
 @api_router.post("/ask")
-def ask(body: AskRequest, request: Request) -> dict[str, Any]:
-    """Public natural-language query: an LLM translates the question into the
+def ask(body: AskRequest, principal: dict = Depends(require_api_key)) -> dict[str, Any]:
+    """Authenticated natural-language query: an LLM translates the question into the
     *structured* QueryRequest (never SQL), which is then run through the exact same
     compile_query trust boundary as /api/explore. The model only proposes — a bad
     field is a 400, and no model-authored SQL can reach the database.
 
-    Disabled (503) unless ANTHROPIC_API_KEY is set; IP-rate-limited (LLM calls
-    cost money) on the same limiter as /api/explore."""
+    Requires an API key (sign in to get one) — LLM calls cost money, so this is
+    gated and rate-limited per key. Disabled (503) unless ANTHROPIC_API_KEY is set."""
     if not NL_QUERY_ENABLED:
         raise HTTPException(
             status_code=503,
             detail="Natural-language queries aren't enabled on this server (set ANTHROPIC_API_KEY).",
         )
-    if _key_store.incr(f"ask:{_client_ip(request)}", ASK_RATE_WINDOW) > ASK_RATE_MAX:
+    if _key_store.incr(f"ask:{principal['key']}", ASK_RATE_WINDOW) > ASK_RATE_MAX:
         raise HTTPException(
             status_code=429,
             detail="Too many questions from here. Please slow down.",
@@ -1843,7 +2538,7 @@ def portal_register(body: RegisterRequest, request: Request) -> dict[str, Any]:
     if not ALLOW_DEMO_KEYS:
         raise HTTPException(
             status_code=404,
-            detail="Demo registration is disabled. Sign in with Google at POST /auth/google.",
+            detail="Open registration is disabled. Sign in with Google at POST /api/auth/google.",
         )
     name = body.name.strip()
     email = body.email.strip()
@@ -1874,7 +2569,7 @@ def portal_register(body: RegisterRequest, request: Request) -> dict[str, Any]:
         "name": name,
         "expires_at": expires_at,
         "header": "X-API-Key",
-        "note": "Pass this key in the X-API-Key header on every request. Demo key — not for production.",
+        "note": "Pass this key in the X-API-Key header on every request.",
     }
 
 
@@ -1888,16 +2583,17 @@ def revoke_key(principal: dict = Depends(require_api_key)) -> dict[str, Any]:
     return {"revoked": True}
 
 
-# ── Google sign-in + admin approval ───────────────────────────────────────────
+# ── Google sign-in ────────────────────────────────────────────────────────────
 #
 # Frontend uses Google Identity Services (FedCM in supporting browsers) to obtain
-# an ID token, POSTs it here, and we verify it server-side. New accounts land in a
-# `pending` registration until an admin approves; admins (ADMIN_EMAILS) are
-# implicitly approved. Approved accounts get a first-party session key.
+# an ID token, POSTs it here, and we verify it server-side. Any verified Google
+# account is approved automatically on first sign-in (no admin review) and gets a
+# first-party session key. Admins keep a kill switch: a revoked account can't sign
+# in and its live sessions die immediately (status re-checked on every request).
 
 
 @api_router.post("/auth/google")
-def auth_google(body: GoogleAuthRequest, request: Request, response: Response) -> dict[str, Any]:
+def auth_google(body: GoogleAuthRequest, request: Request) -> dict[str, Any]:
     if not GOOGLE_CLIENT_ID:
         raise HTTPException(status_code=503, detail="Google sign-in is not configured on this server.")
     # Throttle sign-in attempts per IP (reuses the registration limiter window).
@@ -1920,24 +2616,27 @@ def auth_google(body: GoogleAuthRequest, request: Request, response: Response) -
     now = _now()
 
     reg = _registrations.get(email)
-    is_admin = email in ADMIN_EMAILS
     if reg is None:
-        reg = {"email": email, "name": name,
-               "status": "approved" if is_admin else "pending",
-               "requested_at": now, "updated_at": now,
-               "approved_by": "auto:admin" if is_admin else None}
+        reg = {"email": email, "name": name, "status": "approved",
+               "requested_at": now, "updated_at": now, "approved_by": "auto:open"}
         _registrations.upsert(email, reg)
         logger.info("registration_created", extra={"data": {"email": email, "status": reg["status"]}})
-    elif is_admin and reg.get("status") != "approved":
-        reg.update(status="approved", updated_at=now, approved_by="auto:admin")
-        _registrations.upsert(email, reg)
+    else:
+        updates: dict[str, Any] = {}
+        if reg.get("status") == "pending":
+            # Accounts that registered while admin review was required are
+            # approved on their next sign-in.
+            updates.update(status="approved", approved_by="auto:open")
+        if reg.get("name") != name:
+            # Keep the Google profile name canonical — accounts pre-created via
+            # /approve default their name to the email placeholder.
+            updates["name"] = name
+        if updates:
+            reg.update(updated_at=now, **updates)
+            _registrations.upsert(email, reg)
 
-    if reg["status"] == "revoked":
+    if reg["status"] != "approved":  # only `revoked` remains
         raise HTTPException(status_code=403, detail="Your access has been revoked.")
-    if reg["status"] != "approved":
-        response.status_code = 202
-        return {"status": "pending", "email": email,
-                "message": "Your access request is awaiting admin approval."}
 
     key, expires_at = _mint_session(email, reg.get("name") or name)
     logger.info("session_minted", extra={"data": {"email": email}})
@@ -1957,7 +2656,7 @@ def list_registrations(status: str | None = None, _: dict = Depends(require_admi
 
 @api_router.post("/admin/registrations/{email}/approve")
 def approve_registration(email: str, admin: dict = Depends(require_admin)) -> dict[str, Any]:
-    """Approve an account (pre-approval is allowed before the user has signed in)."""
+    """Restore (or pre-create) an approved account — e.g. to undo a revoke."""
     email = email.strip().lower()
     now = _now()
     reg = _registrations.get(email)
@@ -2142,13 +2841,32 @@ def submit_query(
 
 
 @api_router.get("/jobs")
-def list_jobs(limit: int = 50, principal: dict = Depends(require_api_key)) -> dict[str, Any]:
+def list_jobs(
+    limit: int = Query(default=50, ge=1, le=500),
+    principal: dict = Depends(require_api_key),
+) -> dict[str, Any]:
     return {"jobs": [j.to_public() for j in _store.list_for_owner(principal["key"], limit)]}
 
 
 @api_router.get("/jobs/{job_id}")
 def get_job(job_id: str, principal: dict = Depends(require_api_key)) -> dict[str, Any]:
     return _job_for_owner(job_id, principal["key"]).to_public()
+
+
+# Spreadsheet formula sigils. A text cell beginning with one of these is executed
+# as a formula when the CSV is opened in Excel / Google Sheets / LibreOffice, so a
+# value like `=HYPERLINK(...)` in the dataset (t11 carries free text from
+# third-party transparency reports) would become CSV injection.
+_CSV_FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
+
+
+def _csv_safe(value: Any) -> Any:
+    """Neutralise spreadsheet formula injection in a CSV cell. Only string cells
+    are escaped (with the conventional leading apostrophe) — numbers must stay
+    numbers, so a negative count is never mangled."""
+    if isinstance(value, str) and value.startswith(_CSV_FORMULA_PREFIXES):
+        return "'" + value
+    return value
 
 
 def _render_result(
@@ -2164,7 +2882,7 @@ def _render_result(
         buf = io.StringIO()
         writer = csv.writer(buf)
         writer.writerow(cols)
-        writer.writerows(rows)
+        writer.writerows([[_csv_safe(v) for v in row] for row in rows])
         return PlainTextResponse(
             buf.getvalue(),
             media_type="text/csv",

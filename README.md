@@ -1,16 +1,21 @@
-# research-api
+# transparency-report-api
 
-[![CI](https://github.com/krMaynard/research-api/actions/workflows/ci.yml/badge.svg)](https://github.com/krMaynard/research-api/actions/workflows/ci.yml)
+[![CI](https://github.com/krMaynard/transparency-report-api/actions/workflows/ci.yml/badge.svg)](https://github.com/krMaynard/transparency-report-api/actions/workflows/ci.yml)
 
 A FastAPI service that lets a researcher describe a query with **structured
 parameters** (no SQL), runs it asynchronously on a worker thread, and serves the
-results back as JSON or CSV. Backed by a read-only SQLite database seeded from the
-aggregated **EU Digital Services Act (DSA) VLOP transparency reports** —
-content-moderation statistics for 33 designated Very Large Online Platforms /
-Search Engines (H2 2025), tables 3–11 of the DSA Implementing Regulation template
-(`../krMaynard.github.io/data/vlop-dsa.json`).
+results back as JSON or CSV. Backed by a read-only SQLite database seeded from
+public transparency-reporting datasets:
 
-A query names one of the 9 DSA **report tables** (`GET /api/tables`) and then
+- **EU Digital Services Act (DSA) VLOP transparency reports** — content-moderation
+  statistics for 25 designated Very Large Online Platforms / Search Engines (H2 2025,
+  tables 3–11 of the DSA Implementing Regulation template). The vendored snapshot lives
+  at `data/vlop-dsa.json`; coverage expands as more platforms self-publish harmonized
+  reports and are ingested via the harvesting pipeline.
+- **Google Government content-removal requests** — 160 countries, 13 reporting
+  periods (2019–2025), 42 products, 22 stated reasons.
+
+A query names one of the **report tables** (`GET /api/tables`) and then
 describes filters, group-bys, and aggregates over that table's fields.
 
 ## Demo walkthrough
@@ -58,10 +63,9 @@ in supporting browsers, with non-FedCM fallback elsewhere:
 
 - The frontend gets a Google **ID token** and POSTs it to `POST /api/auth/google`; the
   server verifies it (signature, `aud=GOOGLE_CLIENT_ID`, issuer, expiry, verified email).
-- A new account becomes a **`pending`** registration (`202`); an **admin** (`ADMIN_EMAILS`,
-  implicitly approved) approves it via `POST /api/admin/registrations/{email}/approve`.
-- An approved login mints a first-party **session key** (`gs_…`, TTL
-  `GOOGLE_SESSION_TTL_SECONDS`) used as `X-API-Key` like any other.
+- Any verified Google account is **approved automatically on first sign-in** — there is
+  no admin review step. A successful login mints a first-party **session key** (`gs_…`,
+  TTL `GOOGLE_SESSION_TTL_SECONDS`) used as `X-API-Key` like any other.
 - Sessions are **revocable**: `POST /api/admin/registrations/{email}/revoke` (or
   `DELETE /api/portal/key` to sign yourself out) takes effect on the next request, because
   Google sessions are re-checked against the registration each call.
@@ -125,6 +129,56 @@ caller-authored SQL.
 
 Call `GET /api/fields` for the full list of queryable dimensions, measures, and
 operations.
+
+### Composite queries (cross-table joins & ratios)
+
+A query may instead name **`legs`** — 2–4 named single-table sub-queries that are
+merged on shared dimensions, with computed columns over the merged result. This
+answers cross-table questions like *"what is the ratio of actions to appeals?"*
+without ever accepting SQL:
+
+```json
+{
+  "legs": {
+    "actions": {"table": "t5_own_initiative_illegal",
+                 "aggregates": [{"function": "SUM", "field_name": "measures", "alias": "a"}]},
+    "appeals": {"table": "t7_appeals_recidivism",
+                 "query": {"and": [{"operation": "EQ", "field_name": "section",
+                                    "field_values": ["Internal complaints mechanism"]}]},
+                 "aggregates": [{"function": "SUM", "field_name": "value", "alias": "p"}]}
+  },
+  "join_on": ["service_name"],
+  "derived": [{"alias": "appeals_per_action", "expr": "appeals.p / actions.a"}],
+  "having": {"and": [{"operation": "GT", "field_name": "appeals_per_action", "field_values": [0.01]}]},
+  "sort": [{"field_name": "appeals_per_action", "order": "desc"}]
+}
+```
+
+- **`legs`** — each leg is a normal single-table sub-query (its own `query`
+  filters + `aggregates`), implicitly grouped by `join_on`, so every leg
+  aggregates to the same grain before merging. Aggregate aliases must be unique
+  across legs.
+- **`join_on`** — the merge keys; must be a dimension of *every* leg's table
+  (`service_name`/`platform` always qualify; `category_code` works for t3–t6
+  pairs, `section`/`indicator`/`scope` for t7–t9 pairs, etc.).
+- **Full-outer merge** — a service present in one leg but not another is kept,
+  with `null` for the missing side (visible data gaps instead of silently
+  dropped rows).
+- **`derived`** — four-function arithmetic (`+ - * / ( )`) over `leg.alias`
+  references and numeric literals, parsed into a validated AST (never
+  interpolated). Division is real-valued and NULL-safe (`x/0` → `null`).
+- **`having`** — the same condition grammar, applied post-merge to output
+  columns (join dims, leg aliases, derived aliases).
+- **`sort`/`max_count`** — over any output column, as usual.
+
+Composites run everywhere single-table queries do: `POST /api/query` (async
+job), `POST /api/explore` (public, capped at `EXPLORE_MAX_LEGS`, default 2),
+`POST /api/ask` (the LLM can emit the composite shape), and the dashboard's
+**Compare tables** panel (presets like *actions per appeal* and *notices per
+1,000 users*). Validation is the same trust boundary: every table/field/alias
+is checked against the registry, every value is bound, and the whole composite
+compiles to one parameterised statement (legs as CTEs + a key-spine UNION +
+LEFT JOINs).
 
 ### Ask in plain English (LLM → structured query)
 
@@ -194,15 +248,15 @@ X-Webhook-Signature: sha256=<hmac of the raw body>
   and compare to the `X-Webhook-Signature` header before trusting the payload.
 - **Delivery** is retried with backoff (`CALLBACK_MAX_ATTEMPTS`) off the query
   worker threads; `done` and `failed` jobs notify, cancellations don't.
-- **SSRF-guarded**: the URL must be plain `http(s)` to a public host. Callbacks to
-  loopback / private / link-local / cloud-metadata addresses are rejected with
-  `400` at submit and re-checked before each send (set `CALLBACK_ALLOW_PRIVATE=1`
-  only for local development).
+- **SSRF-guarded**: the URL must be plain `http(s)` to a **globally-routable**
+  host. Callbacks to loopback / private / link-local / CGNAT / cloud-metadata or
+  any other non-public address are rejected with `400` at submit and re-checked
+  before each send (set `CALLBACK_ALLOW_PRIVATE=1` only for local development).
 - Set `PUBLIC_BASE_URL` so the links in the payload are absolute.
 
 ## Authentication
 
-Every endpoint except `/`, `/docs`, and `/openapi.json` requires a key in the
+Every endpoint except the public pages (`/`, `/reports`, `/removals`, `/portal`, `/privacy`), `/docs`, and `/openapi.json` requires a key in the
 `X-API-Key` header. To keep the demo obviously-not-production, the keys are
 just the two researcher names: `alice` and `bob`.
 
@@ -217,13 +271,13 @@ manager rather than using the demo fallback. See `PRODUCTIONIZE.md`.
 
 ```bash
 # 1. Install and seed
-git clone https://github.com/krMaynard/research-api.git
-cd research-api
+git clone https://github.com/krMaynard/transparency-report-api.git
+cd transparency-report-api
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-# seed.py reads ../krMaynard.github.io/data/vlop-dsa.json by default;
-# override with --source if the JSON lives elsewhere
+# seed.py reads data/vlop-dsa.json (vendored snapshot) by default;
+# or pass --source to point at a different JSON file
 python seed.py
 # python seed.py --source /path/to/vlop-dsa.json --db demo.db
 
@@ -317,33 +371,91 @@ curl -i -H 'X-API-Key: bob' "http://127.0.0.1:8000/api/jobs/$JOB"   # -> 404
 # (click "Authorize" and paste a key)
 ```
 
+## Command-line client
+
+A ready-to-build Go CLI (and MCP server) for this API lives in
+[`clients/cli/`](clients/cli/). It was generated from the service's own
+`/openapi.json` with [CLI Printing Press](https://github.com/mvanhorn/cli-printing-press),
+so its commands mirror the endpoints (`tables`, `fields`, `schema`, `overview`,
+`query`, `ask`, …) and it adds agent-friendly conveniences — `--agent` (JSON +
+non-interactive), `--compact`, `--csv`, a `doctor` health check, and an offline
+SQLite cache via `sync`. It defaults to the production base URL and honours
+`X-API-Key`.
+
+```bash
+cd clients/cli
+go build -o dsa-research ./cmd/dsa-research-pp-cli
+
+# Point it at a local server and use a demo key:
+export DSA_RESEARCH_BASE_URL=http://localhost:8000
+export DSA_RESEARCH_APIKEY_HEADER=alice
+./dsa-research overview --agent          # public, no key needed
+./dsa-research tables --agent            # authenticated
+```
+
+See [`clients/cli/README.md`](clients/cli/README.md) for the full command list
+and the MCP-server build (`cmd/dsa-research-pp-mcp`).
+
+## MCP server (for agents)
+
+A native [Model Context Protocol](https://modelcontextprotocol.io) **stdio**
+server lives in [`mcp_server.py`](mcp_server.py). It exposes this API's no-SQL
+query interface to MCP hosts (Claude Desktop, Claude Code, …) as five tools —
+`list_tables`, `describe_table`, `dataset_overview`, `run_query`, and `ask` — so
+an agent can explore the dataset directly. It's a thin front end over the running
+HTTP API: every tool hits a real endpoint, so queries pass through the same
+`compile_query` trust boundary (no SQL, validated fields, bound parameters).
+
+The MCP SDK pulls a newer `starlette` than the API pins, so it installs into its
+own virtualenv (kept out of the deployed image):
+
+```bash
+# In one terminal: a running server for the MCP server to talk to.
+uvicorn main:app --port 8000
+
+# In another: the MCP server (or just `make mcp`).
+python -m venv .venv-mcp && . .venv-mcp/bin/activate
+pip install -r requirements-mcp.txt
+export TRANSPARENCY_API_URL=http://127.0.0.1:8000
+export TRANSPARENCY_API_KEY=alice      # optional — enables `ask`
+python mcp_server.py                    # speaks MCP over stdio
+```
+
+To register it with a host, see [`mcp-config.example.json`](mcp-config.example.json)
+and the full guide in [`docs/MCP.md`](docs/MCP.md) (tool reference, config env
+vars, Claude Desktop / Claude Code setup).
+
 ## Endpoints
 
-The dashboard is served at `/` and the JSON API lives under `/api/*` on the same
-origin (no CORS). Operational endpoints and pages stay at the root.
+The site has a multi-page layout; the JSON API lives under `/api/*` on the same
+origin (no CORS). Operational endpoints stay at the root.
 
 | Method | Path                                | Auth | Description                                    |
 |--------|-------------------------------------|------|------------------------------------------------|
-| GET    | `/`                                 | —    | Public VLOP transparency **dashboard** (web UI) |
-| GET    | `/api/overview`                     | —    | Public headline aggregates powering the dashboard |
+| GET    | `/`                                 | —    | Product home page                              |
+| GET    | `/reports`                          | —    | **DSA Reports** dashboard — Chart.js overview, query builder, Compare tables, Ask box |
+| GET    | `/removals`                         | —    | **Government Removals** dashboard — time-series view of Google's content-removal data |
+| GET    | `/portal`                           | —    | Researcher portal (web UI)                      |
+| GET    | `/privacy`                          | —    | Privacy policy                                 |
+| GET    | `/api/overview`                     | —    | Public headline aggregates for the DSA Reports dashboard |
+| GET    | `/api/overview/removals`            | —    | Public headline aggregates for the Government Removals dashboard |
 | GET    | `/api/explore/options`              | —    | Public: tables + their dimensions/measures (query-builder metadata) |
 | POST   | `/api/explore`                      | —    | Public: run a bounded structured query **inline** (row-capped, IP-rate-limited) |
 | POST   | `/api/ask`                          | —    | Public: ask in natural language — an LLM writes the structured query (if `ANTHROPIC_API_KEY` set) |
 | GET    | `/api`                              | —    | API service info                               |
-| GET    | `/portal`                           | —    | Researcher portal (web UI)                      |
-| POST   | `/api/auth/google`                  | —    | Verify a Google ID token → session key, or `202` pending approval |
+| POST   | `/api/auth/google`                  | —    | Verify a Google ID token → session key (any verified account) |
 | POST   | `/api/portal/register`              | —    | Demo: issue a key without auth (disabled when `ALLOW_DEMO_KEYS=0`) |
 | DELETE | `/api/portal/key`                   | key  | Revoke your own session / portal-issued key    |
 | GET    | `/api/admin/registrations`          | admin| List researcher registrations (`?status=`)     |
-| POST   | `/api/admin/registrations/{email}/approve` | admin | Approve an account                  |
+| POST   | `/api/admin/registrations/{email}/approve` | admin | Restore a revoked account           |
 | POST   | `/api/admin/registrations/{email}/revoke`  | admin | Revoke an account (kills live sessions) |
 | GET    | `/healthz`                          | —    | Liveness probe                                 |
 | GET    | `/readyz`                           | —    | Readiness probe (checks DB connection)         |
 | GET    | `/version`                          | —    | Deployed build (commit SHA); also `X-Version` header |
 | GET    | `/metrics`                          | —    | Prometheus metrics (scrape over internal net)  |
-| GET    | `/api/tables`                       | key  | List the DSA report tables + dataset period    |
+| GET    | `/api/tables`                       | key  | List the queryable tables + dataset period     |
 | GET    | `/api/fields?table=…`               | key  | A table's queryable fields and operations      |
-| GET    | `/api/schema/{table}`               | key  | A report table's field registry                |
+| GET    | `/api/schema/{table}`               | key  | A table's full field registry                  |
 | POST   | `/api/query`                        | key  | Submit a structured query over a `table` (optional `callback_url`) — returns `202 + job_id` |
 | GET    | `/api/jobs`                         | key  | List **your** jobs                             |
 | GET    | `/api/jobs/{job_id}`                | key  | Job status (your jobs only)                    |
@@ -406,12 +518,17 @@ auth) remains available for clients that prefer header auth.
 > zero-config default is a random per-process key, so signed links would
 > otherwise break on restart and wouldn't validate across multiple workers.
 
-## Schema (EU DSA VLOP transparency reports)
+## Schema
 
-Star schema — shared dimension tables plus one fact table per DSA report table
-(H2 2025, 33 services). Dimensions: `services(id, name, platform)` (platform =
-parent company), `categories(id, code, label)`, `sections`, `indicators`,
-`scopes`, `surfaces`. Report tables (queried via `table`):
+The database holds two independent datasets, each queryable via `table` in the
+structured query API.
+
+### DSA VLOP transparency reports
+
+Star schema — shared dimension tables plus one fact table per Annex I report
+part (H2 2025, currently 25 services, expanding as more platforms publish).
+DSA dimensions: `services(id, name, platform)` (platform = parent company),
+`categories(id, code, label)`, `sections`, `indicators`, `scopes`, `surfaces`.
 
 | `table` | DSA report | Key fields |
 |---------|-----------|-----------|
@@ -425,9 +542,16 @@ parent company), `categories(id, code, label)`, `sections`, `indicators`,
 | `t10_amar` | Avg Monthly Active Recipients | scope → `value` |
 | `t11_qualitative` | Qualitative descriptions | indicator → `qualitative_text` (free text, no measures) |
 
-Every table also has the `service_name` and `platform` dimensions. Run
-`GET /api/tables`, then `GET /api/schema/{table}` for a table's exact dimension/measure
-fields and a runnable example.
+Every `t*` table also has the `service_name` and `platform` dimensions.
+
+### Google Government Removal Requests
+
+| `table` | Description | Key dimensions | Key measures |
+|---------|-------------|----------------|--------------|
+| `gr_removals` | Government requests to remove content from Google products, 2019–2025 | `period`, `country_code`, `country_name`, `requestor`, `product`, `reason` | `num_requests`, `items_requested`, `removed_legal`, `removed_policy`, `not_found`, `no_action`, `already_removed` |
+
+Run `GET /api/tables`, then `GET /api/schema/{table}` for a table's exact
+dimension/measure fields and a runnable example.
 
 ## Sample queries
 
@@ -513,7 +637,7 @@ All tuneable values are read from environment variables at startup:
 | `JOB_TTL_SECONDS` | `86400` | How long to retain jobs in Redis (24 h) |
 | `API_KEYS_JSON` | `alice` / `bob` demo keys | JSON object: `{"<key>": {"name": "<name>"}, …}` |
 | `GOOGLE_CLIENT_ID` | _(unset — sign-in disabled)_ | OAuth 2.0 Web client ID; the `aud` Google ID tokens are verified against |
-| `ADMIN_EMAILS` | _(empty)_ | Comma-separated admin allowlist — implicitly approved, can approve/revoke others |
+| `ADMIN_EMAILS` | _(empty)_ | Comma-separated admin allowlist — can revoke/restore other accounts |
 | `GOOGLE_SESSION_TTL_SECONDS` | `604800` | Lifetime of a first-party session minted after Google sign-in (7 days) |
 | `ALLOW_DEMO_KEYS` | `1` | Demo `alice`/`bob` keys + open `/api/portal/register`; set `0` in production |
 | `ALLOWED_ORIGINS` | _(empty — same-origin only)_ | Comma-separated browser origins allowed for cross-origin API calls (CORS) |
@@ -526,6 +650,7 @@ All tuneable values are read from environment variables at startup:
 | `QUERY_RATE_MAX_PER_WINDOW` | `60` | Max `POST /api/query` submissions per API key per window |
 | `QUERY_RATE_WINDOW_SECONDS` | `60` | Query rate-limit window |
 | `EXPLORE_MAX_ROWS` | `500` | Hard row cap for the public `POST /api/explore` endpoint |
+| `EXPLORE_MAX_LEGS` | `2` | Max composite-query legs on the public `/api/explore` (keyed `/api/query` allows 4) |
 | `EXPLORE_RATE_MAX_PER_WINDOW` | `60` | Max public `/api/explore` queries per IP per window |
 | `EXPLORE_RATE_WINDOW_SECONDS` | `60` | Public explore rate-limit window |
 | `ANTHROPIC_API_KEY` | _(unset — `/api/ask` disabled)_ | Set to enable natural-language queries (Claude); read by the SDK |
@@ -540,6 +665,7 @@ All tuneable values are read from environment variables at startup:
 | `CALLBACK_MAX_ATTEMPTS` | `3` | Webhook delivery attempts before giving up |
 | `CALLBACK_WORKERS` | `8` | Size of the bounded webhook delivery thread pool |
 | `CALLBACK_ALLOW_PRIVATE` | `0` | Allow callbacks to private/loopback hosts (dev only) |
+| `MAX_BODY_BYTES` | `1048576` | Max accepted request body size (via `Content-Length`); larger → `413` |
 
 Copy `.env.example` to `.env` and edit before running Docker Compose.
 
@@ -585,8 +711,8 @@ gcloud run services add-iam-policy-binding research-api --region "$REGION" \
 
 Then create an **OAuth 2.0 Web client ID** in Google Cloud and add the Cloud Run
 URL (and any custom domain) to its *Authorized JavaScript origins* — that's the
-value of `GOOGLE_CLIENT_ID`. Sign in at `/portal`; the first `ADMIN_EMAILS`
-account is auto-approved and can approve others.
+value of `GOOGLE_CLIENT_ID`. Sign in at `/portal` with any Google account — a key
+is issued immediately; `ADMIN_EMAILS` accounts can revoke (and restore) access.
 
 ### Continuous deployment (GitHub Actions)
 
@@ -728,14 +854,15 @@ make portal-gifs                        # → docs/gifs/portal-*.gif
   download URLs carry their HMAC in the query string, so the full URL is never
   leaked via `Referer`), `X-Frame-Options: DENY`, `Permissions-Policy`
   (geolocation/camera/mic/payment off), and `Strict-Transport-Security` (HSTS).
-  The two HTML pages (`/`, `/portal`) send a **Content-Security-Policy** that
-  locks `script-src` to `'self'` plus each page's own inline `<script>` (allowlisted
-  by sha256 hash — computed from the file, so never stale). Chart.js is **vendored
-  same-origin** (`static/vendor/chart.umd.js`), so the dashboard needs no
-  third-party script origin at all; the portal allows only `accounts.google.com`
-  for Google sign-in. No `'unsafe-inline'` for scripts; `frame-ancestors 'none'`
-  blocks clickjacking. DB values are HTML-escaped before render. If Chart.js fails
-  to load, the dashboard degrades to data tables rather than blank panels.
+  All HTML pages (`/reports`, `/removals`, `/portal`, `/privacy`, and the home
+  `/`) send a per-page **Content-Security-Policy** that locks `script-src` to
+  `'self'` plus each page's own inline `<script>` (allowlisted by sha256 hash —
+  computed from the file, so never stale). Chart.js is **vendored same-origin**
+  (`static/vendor/chart.umd.js`), so the dashboards need no third-party script
+  origin at all; the portal allows only `accounts.google.com` for Google sign-in.
+  No `'unsafe-inline'` for scripts; `frame-ancestors 'none'` blocks clickjacking.
+  DB values are HTML-escaped before render. If Chart.js fails to load, the
+  dashboards degrade to data tables rather than blank panels.
 - When `REDIS_URL` is set, jobs and results persist across restarts and are
   shared across multiple processes. Without it, everything lives in memory
   and a restart clears all jobs.

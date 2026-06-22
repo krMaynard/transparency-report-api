@@ -1,4 +1,4 @@
-.PHONY: install seed serve test lint typecheck gifs portal-gifs
+.PHONY: install seed serve mcp test lint typecheck gifs portal-gifs
 
 install:
 	pip install -r requirements.txt -r requirements-dev.txt
@@ -9,12 +9,18 @@ seed:
 serve:
 	uvicorn main:app --port 8000 --reload
 
+# Native MCP stdio server (talks to a running API — start `make serve` first).
+# Installs into its own venv so the MCP SDK's deps don't touch the app's pins.
+mcp:
+	python -m venv .venv-mcp && . .venv-mcp/bin/activate && \
+		pip install -q -r requirements-mcp.txt && python mcp_server.py
+
 test:
-	pytest test_api.py -v
+	pytest test_api.py test_mcp_server.py -v
 
 # Same lint CI runs on every PR/push.
 lint:
-	python -m pyflakes main.py seed.py demo.py conftest.py test_api.py
+	python -m pyflakes main.py seed.py demo.py conftest.py mcp_server.py test_api.py test_mcp_server.py
 
 # Static type check (config in mypy.ini); also runs in CI.
 typecheck:

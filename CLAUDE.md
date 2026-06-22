@@ -1,13 +1,15 @@
-# research-api — Claude context
+# transparency-report-api — Claude context
 
 ## What this is
 
 A FastAPI service that accepts **structured query parameters** (not SQL) via
 HTTP, runs the resulting query asynchronously on background worker threads, and
 returns results as JSON or CSV. Backed by a read-only SQLite database seeded from
-the aggregated **EU Digital Services Act (DSA) VLOP transparency reports** —
-content-moderation statistics for 33 designated Very Large Online Platforms /
-Search Engines (H2 2025), tables 3–11 of the DSA Implementing Regulation template.
+transparency-reporting datasets: the aggregated **EU Digital Services Act (DSA)
+VLOP transparency reports** (content-moderation statistics for 33 designated Very
+Large Online Platforms / Search Engines, H2 2025, tables 3–11 of the DSA
+Implementing Regulation template) and **Google Government content-removal
+requests**.
 
 Built to demonstrate two things:
 
@@ -30,9 +32,11 @@ Built to demonstrate two things:
 | `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
-| `static/index.html` | Public VLOP dashboard (served at `/`) — Chart.js overview + interactive query builder + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
+| `static/index.html` | Public VLOP dashboard (served at `/`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/portal.html` | Researcher portal single-page app (served at `/portal`) — Google sign-in + demo fallback |
+| `static/{es,fr,de}/*.html` | Localized copies of the five pages (Spanish/French/German), served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
 | `scripts/refresh-dataset.sh` | Re-vendor `data/vlop-dsa.json` from the canonical sibling-repo dataset |
@@ -41,17 +45,46 @@ Built to demonstrate two things:
 | `scripts/make_portal_gifs.py` | Portal-workflow GIF generator (Playwright + Pillow) → `docs/gifs/portal-*.gif` |
 | `requirements.txt` | `fastapi` + `uvicorn[standard]` + `anthropic` (NL queries) |
 | `demo.db` | SQLite DB (git-ignored, produced by `seed.py`) |
+| `clients/cli/` | Generated Go CLI + MCP server for this API (CLI Printing Press, from `/openapi.json`) — own module; built on demand, excluded from the Docker/Cloud Build image |
+| `mcp_server.py` | Native Python MCP **stdio** server — a thin HTTP front end over the API (5 tools: `list_tables`/`describe_table`/`dataset_overview`/`run_query`/`ask`). Does **not** import `main`; talks to a running server over `httpx`, so its deps (`mcp`+`httpx`) stay out of the app image and clear of the `fastapi`/`starlette` pins. Configured via `TRANSPARENCY_API_URL`/`_API_KEY`/`_API_TIMEOUT`. See [`docs/MCP.md`](docs/MCP.md) |
+| `requirements-mcp.txt` | Deps for `mcp_server.py` only (`mcp`, `httpx`) — install into a separate venv (`make mcp`); kept out of `requirements.txt`/the Docker image |
+| `mcp-config.example.json` | Example MCP host config (Claude Desktop / Claude Code) for `mcp_server.py` |
+| `test_mcp_server.py` | Tests for `mcp_server.py` — drives the tool functions against the app via an in-process `TestClient` (no network, no `mcp` SDK needed; the `build_server()` test self-skips when the SDK is absent) |
 | `.github/workflows/ci.yml` | CI: `pyflakes` lint + `pytest` on every PR/push (Python 3.11 & 3.12) |
 | `.github/workflows/deploy.yml` | CD: build/push image + deploy to Cloud Run on push to `main` (WIF; skips until configured) |
 | `.gcloudignore` | Trims the Cloud Build upload context (keeps Dockerfile + `data/`) |
 
+## Localization
+
+The five static pages are localized into **Spanish (`/es`), French (`/fr`), and
+German (`/de`)** alongside the English originals (served at the root). English is
+the source of truth; the translations are **generated**, not hand-written:
+
+- `scripts/localize_static.py` holds the per-locale translation tables (chrome +
+  page strings, including inline-JS UI strings) and emits `static/<locale>/*.html`
+  from `static/*.html`. After **any** change to an English page, re-run
+  `python scripts/localize_static.py` so all four languages stay in sync, and
+  commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
+- Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
+  `/<locale>/removals`, `/<locale>/portal`, `/<locale>/privacy` for each locale,
+  all through `_serve_page` (so each localized file gets its own recomputed
+  per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
+  endpoints stay locale-agnostic; localized pages call the same `/api/*`.
+- The globe **language switcher** (formerly a cross-site link to
+  kieranmaynard.com) now switches the transparency site's own language —
+  English / Español / Français / Deutsch — pointing at the equivalent page in
+  each locale. The switcher block is rebuilt by the generator, so it is
+  consistent across every page and locale.
+
 ## CI
 
 GitHub Actions runs `pyflakes`, `mypy` (config in `mypy.ini`, over
-`main.py`/`seed.py`/`demo.py`/`conftest.py`), and `pytest test_api.py` on every
-pull request and push to `main` (`ci.yml`). Keep all three green — the suite is
-hermetic (no Redis/server/`demo.db` needed; `conftest.py` builds a temp DB). Run
-them locally before pushing (`make lint typecheck test`).
+`main.py`/`seed.py`/`demo.py`/`conftest.py`/`mcp_server.py`), and `pytest
+test_api.py test_mcp_server.py` on every pull request and push to `main`
+(`ci.yml`). Keep all three green — the suite is hermetic (no Redis/server/MCP
+SDK/`demo.db` needed; `conftest.py` builds a temp DB and `test_mcp_server.py`
+drives the API in-process via `TestClient`). Run them locally before pushing
+(`make lint typecheck test`).
 
 `deploy.yml` builds + pushes the image and rolls a Cloud Run revision on push to
 `main` via Workload Identity Federation, stamping the commit SHA as `APP_VERSION`.
@@ -75,7 +108,7 @@ uvicorn main:app --port 8000
 Repos are expected as siblings:
 ```
 parent/
-  research-api/            ← this repo
+  transparency-report-api/  ← this repo
   krMaynard.github.io/ ← source data lives at data/vlop-dsa.json
 ```
 
@@ -93,13 +126,14 @@ Two mechanisms, both presented as `X-API-Key` to the rest of the app:
 - **Google sign-in (production).** The frontend uses Google Identity Services
   (FedCM in supporting browsers) to get an ID token and POSTs it to
   `/auth/google`. `_verify_id_token` validates it against `GOOGLE_CLIENT_ID`.
-  New accounts become a `pending` registration; an admin (`ADMIN_EMAILS`,
-  comma-separated, implicitly approved) approves via `/admin/registrations/*`.
-  An approved login mints a first-party **session key** (`gs_…`) into
-  `_key_store` (TTL `GOOGLE_SESSION_TTL`). `_lookup_principal` re-checks the
-  registration on every request, so an admin revoke kills live sessions at once.
-  Durable approval state lives in `_registrations` (Redis-backed when configured,
-  else in-memory — same pattern as `_key_store`).
+  Any verified Google account is **approved automatically on first sign-in**
+  (no admin review); a login mints a first-party **session key** (`gs_…`) into
+  `_key_store` (TTL `GOOGLE_SESSION_TTL`). Admins (`ADMIN_EMAILS`,
+  comma-separated) keep a kill switch via `/admin/registrations/*` (revoke /
+  restore). `_lookup_principal` re-checks the registration on every request, so
+  an admin revoke kills live sessions at once. Durable account state lives in
+  `_registrations` (Redis-backed when configured, else in-memory — same pattern
+  as `_key_store`).
 - **Demo keys (dev).** Hard-coded `alice`/`bob` + the open `/portal/register`.
   Gated by `ALLOW_DEMO_KEYS` (default on); set `ALLOW_DEMO_KEYS=0` in production.
 
@@ -144,6 +178,18 @@ FROM/joins and the registry of:
 `compile_query` is the single trust boundary — it resolves `req.table` to a
 `TableSpec` and validates every field/operation against that table's registry.
 Never build SQL by interpolating user values (always bind with `?`).
+
+**Composite (cross-table) queries**: instead of `table`, a request may carry
+`legs` (2–4 named single-table sub-queries, each validated against its own
+`TableSpec`; ≤2 on public `/api/explore` via `EXPLORE_MAX_LEGS`), `join_on`
+(merge keys — must be a dimension of every leg's table; each leg is implicitly
+grouped by them), `derived` (four-function arithmetic over `leg.alias` refs,
+parsed by `_compile_expr` into SQL with `NULLIF` division — never interpolated),
+and `having` (the condition grammar over output columns). `_compile_composite`
+emits one statement: leg CTEs + a `spine` CTE (UNION of leg keys → full-outer
+semantics, unmatched keys kept with NULLs) + LEFT JOINs + an outer
+having/sort/limit. `compile_query` dispatches on the presence of `legs`, so
+every endpoint (query/explore/ask) gets composites through the same boundary.
 
 ## Key design decisions
 
@@ -197,7 +243,17 @@ Never build SQL by interpolating user values (always bind with `?`).
   and private/loopback/link-local/metadata targets, **unwrapping IPv4-mapped/6to4
   IPv6** so they can't smuggle a private v4; enforced at submit *and* before each
   send (narrows DNS rebinding — full closure needs network egress filtering);
-  redirects aren't followed. `CALLBACK_ALLOW_PRIVATE=1` bypasses for local dev.
+  redirects aren't followed; the target must be **globally routable** (`not
+  ip.is_global` is rejected, covering CGNAT and other non-private-but-non-public
+  ranges). `CALLBACK_ALLOW_PRIVATE=1` bypasses for local dev.
+- **Abuse hardening**: request bodies are capped via `Content-Length`
+  (`MAX_BODY_BYTES`, default 1 MiB → `413`); query complexity is bounded in the
+  Pydantic models (≤100 values per condition, ≤50 conditions per and/or/not
+  clause, ≤50 fields/group_by/aggregates/sort entries) since `/api/explore`
+  accepts the same model unauthenticated; CSV exports neutralise spreadsheet
+  formula injection (`_csv_safe` prefixes text cells starting `=`/`+`/`-`/`@`
+  with `'` — server-side and in the dashboard's `toCSV`); configured API keys
+  are compared constant-time (`_configured_principal`).
 - **Prometheus metrics** at `GET /metrics` (no auth): the same request middleware
   records `research_api_http_requests_total` + `_http_request_duration_seconds`,
   labelled by the **route template** (`/jobs/{job_id}`) to bound cardinality; the
@@ -260,20 +316,20 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/` | — | Public VLOP transparency dashboard (web UI) |
 | GET | `/api/overview` | — | Public headline aggregates powering the dashboard |
 | GET | `/api/explore/options` | — | Public: tables + dimensions/measures for the query builder |
-| POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited) |
+| POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited, ≤`EXPLORE_MAX_LEGS` composite legs) |
 | POST | `/api/ask` | — | Public: NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; off unless `ANTHROPIC_API_KEY` set |
 | GET | `/api` | — | API service info |
 | GET | `/portal` | — | Researcher portal web UI (sign in → key → schema) |
-| POST | `/api/auth/google` | — | Verify a Google ID token → session key, or `202` pending approval |
+| POST | `/api/auth/google` | — | Verify a Google ID token → session key (any verified account) |
 | POST | `/api/portal/register` | — | Demo: issue a key without auth (`ALLOW_DEMO_KEYS`) |
 | DELETE | `/api/portal/key` | key | Revoke your own session / portal-issued key |
 | GET | `/api/admin/registrations` | admin | List researcher registrations (`?status=`) |
-| POST | `/api/admin/registrations/{email}/approve` | admin | Approve an account |
+| POST | `/api/admin/registrations/{email}/approve` | admin | Restore a revoked account |
 | POST | `/api/admin/registrations/{email}/revoke` | admin | Revoke an account |
 | GET | `/api/tables` | key | List the DSA report tables + dataset period |
 | GET | `/api/fields?table=…` | key | Fields + operations for a table (no arg → table overview) |
 | GET | `/api/schema/{table}` | key | Field registry for a report table |
-| POST | `/api/query` | key | Submit structured query (optional `callback_url`) → 202 + job_id |
+| POST | `/api/query` | key | Submit structured query — single-table or composite (optional `callback_url`) → 202 + job_id |
 | GET | `/api/jobs` | key | List your jobs |
 | GET | `/api/jobs/{id}` | key | Job status |
 | GET | `/api/jobs/{id}/result?format=json\|csv` | key | Result (status=done only) |
