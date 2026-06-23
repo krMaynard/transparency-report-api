@@ -33,7 +33,7 @@ _DEFAULT_GR_SOURCE = os.getenv(
 _DEFAULT_DB = os.getenv("DB_PATH", os.path.join(HERE, "demo.db"))
 
 
-def _category_label(code: str, labels: dict[str, str]) -> str:
+def _category_label(code: str, labels: dict[str, str] | None) -> str:
     """Human label for a category code.
 
     Use the dataset's explicit label when present; otherwise normalize the raw
@@ -41,7 +41,7 @@ def _category_label(code: str, labels: dict[str, str]) -> str:
     instead of surfacing the SCREAMING_SNAKE_CASE code in the UI — strip the
     namespace prefix, drop underscores, and sentence-case it.
     """
-    explicit = labels.get(code)
+    explicit = labels.get(code) if labels else None
     if explicit:
         return explicit
     s = code
@@ -49,8 +49,8 @@ def _category_label(code: str, labels: dict[str, str]) -> str:
         if s.startswith(prefix):
             s = s[len(prefix):]
             break
-    s = s.replace("_", " ").strip().lower()
-    return (s[:1].upper() + s[1:]) if s else code
+    s = s.replace("_", " ").strip()
+    return s.capitalize() if s else code
 
 
 SCHEMA = """
