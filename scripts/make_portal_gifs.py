@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Generate showcase GIFs of the researcher portal workflow (sign in → key → schema).
+"""Generate showcase GIFs of the API-key workflow (sign in → key → schema).
 
-Drives the real ``/portal`` page in headless Chromium with Playwright, captures
-frames through the flow, and assembles them into animated GIFs with Pillow.
+Drives the real ``/api-key`` and ``/schema`` pages in headless Chromium with
+Playwright, captures frames through the flow, and assembles them into animated
+GIFs with Pillow.
 
 Output (in ``docs/gifs/``):
     portal-full.gif      the whole workflow
@@ -81,7 +82,7 @@ def _capture(base: str) -> list[tuple[Image.Image, int, str]]:
             img = Image.open(BytesIO(page.screenshot())).convert("RGB")
             frames.append((img, ms, step))
 
-        page.goto(f"{base}/portal")
+        page.goto(f"{base}/api-key")
         page.wait_for_selector("#name")
         page.wait_for_timeout(300)
         shot(1300, "login")  # landing
@@ -106,10 +107,9 @@ def _capture(base: str) -> list[tuple[Image.Image, int, str]]:
         page.wait_for_timeout(300)
         shot(2000, "key")  # API key revealed
 
-        # The schema loads with the new key.
-        page.wait_for_selector("#schema-card:not(.hidden)")
+        # The schema now lives on its own public page.
+        page.goto(f"{base}/schema")
         page.wait_for_function("document.querySelector('#tables').children.length > 0")
-        page.eval_on_selector("#schema-card", "el => el.scrollIntoView({block: 'start'})")
         page.wait_for_timeout(300)
         shot(2000, "schema")  # fields + first tables
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")

@@ -367,11 +367,19 @@
     <hr class="nav-hr">
     <div class="nav-section">工具</div>
 
-    <a href="/zh/portal" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/zh/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      研究者门户
+      数据架构
+    </a>
+
+    <a href="/zh/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API 密钥
     </a>
 
     <a href="/docs" class="nav-item">
@@ -434,7 +442,7 @@
       <button id="ask-run" type="button">提问</button>
     </div>
     <div class="chips" id="ask-chips"></div>
-    <div class="ask-gate hidden" id="ask-gate">自然语言提问需要 API 密钥——它会运行一个语言模型。<a href="/zh/portal">前往门户登录 →</a></div>
+    <div class="ask-gate hidden" id="ask-gate">自然语言提问需要 API 密钥——它会运行一个语言模型。<a href="/zh/api-key">获取 API 密钥 →</a></div>
     <div class="error" id="ask-error" role="alert"></div>
     <p class="explain" id="ask-explain"></p>
     <canvas id="ask-chart" height="150" aria-hidden="true"></canvas>
@@ -521,7 +529,7 @@
 
   <footer>
     公开概览来自同源 API <code>/api/overview</code>。
-    研究者可通过<a href="/zh/portal">门户</a> + <a href="/docs">API</a> 运行自定义查询。 · <a href="/zh/privacy">隐私</a>
+    研究者可使用 <a href="/zh/api-key">API 密钥</a> + <a href="/docs">API</a> 运行自定义查询。 · <a href="/zh/privacy">隐私</a>
   </footer>
 </div><!-- .wrap -->
 </div><!-- .main-area -->
@@ -983,7 +991,7 @@ async function runAsk() {
     });
     if (res.status === 401) {
       localStorage.removeItem("vlop_api_key"); askGate(true);
-      throw new Error("你的会话已过期——请在门户重新登录。");
+      throw new Error("你的会话已过期——请重新登录以获取新密钥。");
     }
     const d = await res.json();
     if (!res.ok) {
@@ -1018,8 +1026,8 @@ async function setupAsk() {
   $("#ask-refine").addEventListener("click", () => lastAsk && refineInBuilder(lastAsk.query));
   $("#ask-csv").addEventListener("click", () => lastAsk && downloadBlob("vlop-ask.csv", toCSV(lastAsk), "text/csv"));
   $("#ask-json-dl").addEventListener("click", () => lastAsk && downloadBlob("vlop-ask.json", JSON.stringify(lastAsk, null, 2), "application/json"));
-  // Gate the LLM Ask box behind a portal key (Google login). Re-check when the
-  // user returns from the portal (focus) or signs in in another tab (storage).
+  // Gate the LLM Ask box behind an API key (Google login). Re-check when the
+  // user returns from the API-key page (focus) or signs in in another tab (storage).
   const refreshGate = () => askGate(!localStorage.getItem("vlop_api_key"));
   window.addEventListener("storage", refreshGate);        // signed in in another tab
   window.addEventListener("focus", refreshGate);          // returned to this tab

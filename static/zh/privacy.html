@@ -288,11 +288,19 @@ display: flex; align-items: center; justify-content: space-between;
     <hr class="nav-hr">
     <div class="nav-section">工具</div>
 
-    <a href="/zh/portal" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/zh/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      研究者门户
+      数据架构
+    </a>
+
+    <a href="/zh/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API 密钥
     </a>
 
     <a href="/docs" class="nav-item">
@@ -358,7 +366,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>有两种方式可供选择：</p>
   <ul>
     <li><strong>Google 登录。</strong>使用 Google 账号登录会自动创建一个会话密钥。你由 Google 提供的电子邮件地址会作为账号标识符存储，仅用于实施速率限制以及在必要时撤销访问权限。本服务绝不会看到你的 Google 密码——身份验证完全由 Google Identity Services 处理。</li>
-    <li><strong>演示注册</strong>（在启用时）。在门户提交电子邮件地址会签发一个短期有效的演示密钥。该电子邮件会作为该密钥的标识符存储。</li>
+    <li><strong>演示注册</strong>（在启用时）。在 API 密钥页面提交电子邮件地址会签发一个短期有效的演示密钥。该电子邮件会作为该密钥的标识符存储。</li>
   </ul>
 
   <h2>所收集的数据</h2>
@@ -433,7 +441,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p><a href="/zh/">首页</a> · <a href="/zh/portal">研究者门户</a> · <a href="/api">API</a> · <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+  <p><a href="/zh/">首页</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/api">API</a> · <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">GitHub</a></p>
 </footer>
 
 </div>

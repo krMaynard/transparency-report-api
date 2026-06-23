@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Portal de datos de investigación · Transparency Report</title>
+<title>Esquema del conjunto de datos · Transparency Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async></script>
 <script>
   // Match the main site: set the theme before first paint to avoid a flash.
   (function () {
@@ -178,47 +177,19 @@ display: flex; align-items: center;
   }
   .card h2 { margin: 0 0 4px; font-size: 18px; }
   .card .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
-  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
-  input {
-    width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
-    background: var(--panel2); color: var(--fg); font-size: 15px;
-  }
-  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(42,157,143,.2); }
-  button {
-    margin-top: 20px; width: 100%; padding: 12px 16px; border: 0; border-radius: 9px;
-    background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 650; cursor: pointer;
-  }
-  button:hover { background: var(--accent-dark); }
-  button:disabled { opacity: .6; cursor: default; }
   .hidden { display: none !important; }
   .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
   [data-theme="dark"] .error { color: #ff7b72; }
-  .keyrow { display: flex; gap: 10px; align-items: stretch; }
-  .keybox {
-    flex: 1; font-family: var(--mono); font-size: 14px; background: var(--panel2); color: var(--accent2);
-    border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; overflow-x: auto;
-    white-space: nowrap;
-  }
-  .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
   .tbl { margin: 0 0 18px; }
   .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
-  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
-  th { color: var(--muted); font-weight: 600; }
-  td.type { font-family: var(--mono); color: var(--accent2); }
-  td.flag { color: var(--muted); font-family: var(--mono); }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
   footer a { color: var(--accent); text-decoration: none; }
-  .gbtn { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 44px; }
-  .divider { display: flex; align-items: center; text-align: center; color: var(--muted); font-size: 13px; margin: 18px 0 4px; }
-  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-  .divider span { padding: 0 12px; }
   /* Keyboard focus visibility — a clear ring on every interactive control. */
   a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
   [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
@@ -260,13 +231,13 @@ display: flex; align-items: center;
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/portal"><span>English</span></a></li>
-        <li><a class="lang-opt is-current" href="/es/portal" aria-current="page"><span>Español</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/fr/portal"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/portal"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/ja/portal"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/portal"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/portal"><span>한국어</span></a></li>
+        <li><a class="lang-opt" href="/schema"><span>English</span></a></li>
+        <li><a class="lang-opt is-current" href="/es/schema" aria-current="page"><span>Español</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/fr/schema"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/schema"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/ja/schema"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/schema"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/schema"><span>한국어</span></a></li>
       </ul>
     </details>
     <button type="button" class="theme-toggle" data-theme-toggle aria-label="Alternar modo oscuro" aria-pressed="false">
@@ -317,11 +288,19 @@ display: flex; align-items: center;
     <hr class="nav-hr">
     <div class="nav-section">Herramientas</div>
 
-    <a href="/es/portal" class="nav-item is-active">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/es/schema" class="nav-item is-active">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Portal de investigadores
+      Esquema
+    </a>
+
+    <a href="/es/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      Clave de API
     </a>
 
     <a href="/docs" class="nav-item">
@@ -362,56 +341,15 @@ display: flex; align-items: center;
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">Portal de investigadores</span>
-    <h1>Portal de datos de investigación</h1>
-    <p>Transparencia de moderación de contenidos de VLOP bajo el DSA de la UE: solicita acceso y explora el esquema.</p>
+    <span class="badge">Referencia</span>
+    <h1>Esquema del conjunto de datos</h1>
+    <p>Todo lo que puedes consultar, sin necesidad de iniciar sesión.</p>
   </header>
 
  <main id="main" tabindex="-1">
-  <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
-    <h2>Solicitar acceso a la API</h2>
-    <p class="sub" id="login-sub">Inicia sesión para obtener una clave de API.</p>
-
-    <!-- Google sign-in (shown when GOOGLE_CLIENT_ID is configured) -->
-    <div id="google-block" class="hidden">
-      <div class="gbtn" id="google-btn"></div>
-      <p class="hint">Inicia sesión con cualquier cuenta de Google: tu clave de API se emite al instante.</p>
-    </div>
-
-    <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>o inicia sesión con tus datos</span></div>
-
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
-    <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">Nombre completo</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">Correo profesional</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">Solicitar clave de API</button>
-    </form>
-    <div class="error" id="error" role="alert"></div>
-  </section>
-
-  <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
-    <h2>Bienvenido/a, <span id="who">investigador/a</span> 👋</h2>
-    <p class="sub">Tu clave de API se ha emitido. Mantenla en secreto.</p>
-    <div class="keyrow">
-      <div class="keybox" id="apikey"></div>
-      <button class="copy" id="copy" type="button">Copiar</button>
-    </div>
-    <p class="hint">Envíala en cada solicitud como cabecera <code>X-API-Key</code>. Pruébala en la
-      <a href="/docs" target="_blank" rel="noopener">documentación interactiva de la API</a>.</p>
-    <p class="hint" id="expires"></p>
-  </section>
-
-  <!-- Step 3: schema -->
-  <section class="card hidden" id="schema-card">
-    <h2>Esquema del conjunto de datos</h2>
-    <p class="sub">Todo lo que puedes consultar, sin necesidad de iniciar sesión.</p>
-    <p class="hint" id="dataset-meta"></p>
-
+  <section class="card">
+    <p class="hint" id="dataset-meta" aria-busy="true">Cargando…</p>
+    <div class="error hidden" id="error" role="alert"></div>
     <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">Tablas de informes</h3>
     <div id="tables"></div>
   </section>
@@ -424,12 +362,11 @@ display: flex; align-items: center;
 
 <script>
 const $ = (sel) => document.querySelector(sel);
-let apiKey = null;
 
 function show(el) { el.classList.remove("hidden"); }
 
-async function api(path, key) {
-  const res = await fetch(path, { headers: key ? { "X-API-Key": key } : {} });
+async function api(path) {
+  const res = await fetch(path);
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
@@ -447,125 +384,22 @@ function renderTable(t) {
   </div>`;
 }
 
+// The dataset schema is public — no API key needed for /api/tables or /api/schema/*.
 async function loadSchema() {
-  const meta = await api("/api/tables", apiKey);
-  $("#dataset-meta").textContent = `${meta.dataset} · período ${meta.period} · ${meta.tables.length} tablas de informes`;
+  const meta = await api("/api/tables");
+  const m = $("#dataset-meta");
+  m.textContent = `${meta.dataset} · período ${meta.period} · ${meta.tables.length} tablas de informes`;
+  m.removeAttribute("aria-busy");
   // Fetch every table's field registry in parallel rather than one roundtrip at a time.
-  const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`, apiKey)));
+  const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`)));
   $("#tables").innerHTML = details.map(renderTable).join("");
-  show($("#schema-card"));
 }
 
-// Common success path for both Google sign-in and detail-based registration:
-// reveal the issued key. The schema is public and already shown on load.
-async function onAuthSuccess(data) {
-  apiKey = data.api_key;
-  // Share the key with the dashboard's Ask box (same origin, picked up on focus).
-  try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
-  $("#apikey").textContent = apiKey;
-  if (data.expires_at) {
-    const d = new Date(data.expires_at);
-    $("#expires").textContent = "Expira el " + d.toLocaleDateString('es-ES', { year: "numeric", month: "long", day: "numeric" }) + ".";
-  }
-  $("#login-card").classList.add("hidden");
-  show($("#key-card"));
-  // Schema normally loads on page open; retry here only if that initial
-  // (public) load failed — e.g. a transient network error.
-  if ($("#schema-card").classList.contains("hidden")) loadSchema().catch(() => {});
-}
-
-// ── Google sign-in ──────────────────────────────────────────────────────────
-// The GSI client library (FedCM-backed) hands us an ID token; we POST it to
-// /auth/google, which verifies it and mints a session for any verified account.
-async function onGoogleCredential(resp) {
-  $("#error").textContent = "";
-  try {
-    const r = await fetch("/api/auth/google", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential: resp.credential }),
-    });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "Error al iniciar sesión");
-    await onAuthSuccess(data);
-  } catch (err) {
-    $("#error").textContent = err.message;
-  }
-}
-
-function setupGoogle(clientId) {
-  const render = () => {
-    if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: onGoogleCredential,
-      use_fedcm_for_prompt: true,
-    });
-    google.accounts.id.renderButton($("#google-btn"), {
-      theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left",
-    });
-    show($("#google-block"));
-    return true;
-  };
-  // The library loads async — poll briefly until it's ready.
-  if (!render()) {
-    let tries = 0;
-    const iv = setInterval(() => { if (render() || ++tries > 50) clearInterval(iv); }, 100);
-  }
-}
-
-$("#login-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  $("#error").textContent = "";
-  const name = $("#name").value.trim();
-  const email = $("#email").value.trim();
-  if (!name || !email) { $("#error").textContent = "Por favor, rellena ambos campos."; return; }
-
-  const btn = $("#submit");
-  btn.disabled = true; btn.textContent = "Emitiendo clave…";
-  try {
-    const res = await fetch("/api/portal/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Error en el registro");
-    await onAuthSuccess(data);
-  } catch (err) {
-    $("#error").textContent = err.message;
-  } finally {
-    btn.disabled = false; btn.textContent = "Solicitar clave de API";
-  }
-});
-
-// Decide which sign-in methods to offer based on server config.
-async function init() {
-  // The dataset schema is public — load and show it for everyone, no sign-in needed.
-  loadSchema().catch(() => {});
-  let cfg = {};
-  try { cfg = (await (await fetch("/api")).json()).auth_config || {}; } catch (_) {}
-  const googleOn = !!(cfg.google_signin && cfg.google_client_id);
-  const demoOn = !!cfg.demo_keys;
-
-  if (googleOn) setupGoogle(cfg.google_client_id);
-  if (demoOn) show($("#login-form"));
-  if (googleOn && demoOn) show($("#auth-divider"));
-
-  $("#login-sub").textContent = googleOn
-    ? "Inicia sesión con tu cuenta de Google para solicitar acceso."
-    : "Inicia sesión con tus datos para obtener una clave de API.";
-  if (!googleOn && !demoOn) {
-    $("#login-sub").textContent = "No hay ningún método de inicio de sesión habilitado en este servidor.";
-  }
-}
-init();
-
-$("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "¡Copiado!";
-  setTimeout(() => (b.textContent = t), 1200);
+loadSchema().catch((err) => {
+  $("#dataset-meta").classList.add("hidden");
+  const e = $("#error");
+  e.textContent = "No se pudo cargar el esquema: " + err.message;
+  show(e);
 });
 </script>
 <script>

@@ -38,19 +38,20 @@ result, secure download, validation, and isolation:
 A GIF for every step lives in [`docs/gifs/`](docs/gifs/). They're generated
 headlessly from `demo.py` — see [Regenerating the showcase GIFs](#regenerating-the-showcase-gifs).
 
-## Researcher portal
+## API key & schema pages
 
-A self-service web portal at **`/portal`**: a researcher signs in with their
-name and email, is issued a working API key, and the page browses the dataset
-schema (queryable fields + tables/columns) using that key.
+A self-service sign-in page at **`/api-key`** (the old `/portal` URL 308-redirects
+here): a researcher signs in with their name and email — or any Google account — and
+is issued a working API key. The dataset **schema** (queryable fields + tables/columns)
+now lives on its own public page at **`/schema`**, browsable by anyone with no sign-in.
 
-![Researcher portal workflow](docs/gifs/portal-full.gif)
+![API key workflow](docs/gifs/portal-full.gif)
 
 | Sign in | API key issued | Schema |
 |---|---|---|
 | ![Login](docs/gifs/portal-1-login.gif) | ![Key](docs/gifs/portal-2-key.gif) | ![Schema](docs/gifs/portal-3-schema.gif) |
 
-Open `http://127.0.0.1:8000/portal` after starting the server. Issued keys/sessions
+Open `http://127.0.0.1:8000/api-key` after starting the server. Issued keys/sessions
 are **persisted in Redis** when `REDIS_URL`/Upstash is configured (surviving restarts,
 shared across workers), falling back to in-memory — same model as the job store.
 
@@ -256,7 +257,7 @@ X-Webhook-Signature: sha256=<hmac of the raw body>
 
 ## Authentication
 
-Every endpoint except the public pages (`/`, `/reports`, `/removals`, `/portal`, `/privacy`), `/docs`, and `/openapi.json` requires a key in the
+Every endpoint except the public pages (`/`, `/reports`, `/removals`, `/schema`, `/api-key`, `/privacy`), `/docs`, and `/openapi.json` requires a key in the
 `X-API-Key` header. To keep the demo obviously-not-production, the keys are
 just the two researcher names: `alice` and `bob`.
 
@@ -435,7 +436,8 @@ origin (no CORS). Operational endpoints stay at the root.
 | GET    | `/`                                 | —    | Product home page                              |
 | GET    | `/reports`                          | —    | **DSA Reports** dashboard — Chart.js overview, query builder, Compare tables, Ask box |
 | GET    | `/removals`                         | —    | **Government Removals** dashboard — time-series view of Google's content-removal data |
-| GET    | `/portal`                           | —    | Researcher portal (web UI)                      |
+| GET    | `/schema`                           | —    | Dataset-schema browser (web UI, no sign-in)     |
+| GET    | `/api-key`                          | —    | API-key sign-in page (web UI); `/portal` 308-redirects here |
 | GET    | `/privacy`                          | —    | Privacy policy                                 |
 | GET    | `/api/overview`                     | —    | Public headline aggregates for the DSA Reports dashboard |
 | GET    | `/api/overview/removals`            | —    | Public headline aggregates for the Government Removals dashboard |
@@ -711,7 +713,7 @@ gcloud run services add-iam-policy-binding research-api --region "$REGION" \
 
 Then create an **OAuth 2.0 Web client ID** in Google Cloud and add the Cloud Run
 URL (and any custom domain) to its *Authorized JavaScript origins* — that's the
-value of `GOOGLE_CLIENT_ID`. Sign in at `/portal` with any Google account — a key
+value of `GOOGLE_CLIENT_ID`. Sign in at `/api-key` with any Google account — a key
 is issued immediately; `ADMIN_EMAILS` accounts can revoke (and restore) access.
 
 ### Continuous deployment (GitHub Actions)
@@ -823,8 +825,8 @@ in sync with the script automatically — add a step to `demo.py` and it gets it
 own GIF on the next run.
 
 The **portal** GIFs come from `scripts/make_portal_gifs.py`, which drives the
-real `/portal` page in headless Chromium (Playwright) and assembles the frames
-the same way:
+real `/api-key` and `/schema` pages in headless Chromium (Playwright) and assembles
+the frames the same way:
 
 ```bash
 pip install -r requirements-dev.txt
@@ -854,8 +856,8 @@ make portal-gifs                        # → docs/gifs/portal-*.gif
   download URLs carry their HMAC in the query string, so the full URL is never
   leaked via `Referer`), `X-Frame-Options: DENY`, `Permissions-Policy`
   (geolocation/camera/mic/payment off), and `Strict-Transport-Security` (HSTS).
-  All HTML pages (`/reports`, `/removals`, `/portal`, `/privacy`, and the home
-  `/`) send a per-page **Content-Security-Policy** that locks `script-src` to
+  All HTML pages (`/reports`, `/removals`, `/schema`, `/api-key`, `/privacy`, and the
+  home `/`) send a per-page **Content-Security-Policy** that locks `script-src` to
   `'self'` plus each page's own inline `<script>` (allowlisted by sha256 hash —
   computed from the file, so never stale). Chart.js is **vendored same-origin**
   (`static/vendor/chart.umd.js`), so the dashboards need no third-party script

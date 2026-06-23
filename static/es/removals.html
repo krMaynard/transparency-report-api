@@ -325,11 +325,19 @@ display: flex; align-items: center; justify-content: space-between;
     <hr class="nav-hr">
     <div class="nav-section">Herramientas</div>
 
-    <a href="/es/portal" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/es/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Portal de investigadores
+      Esquema
+    </a>
+
+    <a href="/es/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      Clave de API
     </a>
 
     <a href="/docs" class="nav-item">
@@ -501,7 +509,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>Fuente: <a href="https://transparencyreport.google.com/government-removals/overview" target="_blank" rel="noopener noreferrer">Google Transparency Report</a> — solicitudes gubernamentales de retirada detalladas (2019–1.er sem. 2025). Datos vía <a href="/api">Transparency Report API</a> · <a href="/es/portal">Acceso para investigadores</a> · <a href="/es/privacy">Privacidad</a></p>
+  <p>Fuente: <a href="https://transparencyreport.google.com/government-removals/overview" target="_blank" rel="noopener noreferrer">Google Transparency Report</a> — solicitudes gubernamentales de retirada detalladas (2019–1.er sem. 2025). Datos vía <a href="/api">Transparency Report API</a> · <a href="/es/api-key">Clave de API</a> · <a href="/es/privacy">Privacidad</a></p>
 </footer>
 
 </div>
@@ -765,15 +773,16 @@ display: flex; align-items: center; justify-content: space-between;
     }
     count.textContent = rows.length + ' filas';
     tbody.innerHTML = rows.map(function(r) {
-      var removed = (r[5]||0) + (r[6]||0) + (r[7]||0);
+      // cols: period, country, requestor, product, reason, reqs(5), items(6), legal(7), policy(8), already(9)
+      var removed = (r[7]||0) + (r[8]||0) + (r[9]||0);
       return '<tr>'
         + '<td>' + esc(r[0]) + '</td>'
         + '<td>' + esc(r[1]) + '</td>'
         + '<td>' + esc(r[2]) + '</td>'
         + '<td>' + esc(r[3]) + '</td>'
         + '<td>' + esc(r[4]) + '</td>'
-        + '<td class="num">' + fmt(r[8]) + '</td>'
-        + '<td class="num">' + fmt(r[9]) + '</td>'
+        + '<td class="num">' + fmt(r[5]) + '</td>'
+        + '<td class="num">' + fmt(r[6]) + '</td>'
         + '<td class="num">' + fmt(removed) + '</td>'
         + '</tr>';
     }).join('');

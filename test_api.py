@@ -61,11 +61,25 @@ class TestInfra:
 # ── Researcher portal ─────────────────────────────────────────────────────────
 
 class TestPortal:
-    def test_portal_page_served(self):
-        r = client.get("/portal")
+    def test_api_key_page_served(self):
+        r = client.get("/api-key")
         assert r.status_code == 200
         assert "text/html" in r.headers["content-type"]
-        assert "Research Data Portal" in r.text
+        assert "Get an API key" in r.text
+
+    def test_schema_page_served(self):
+        r = client.get("/schema")
+        assert r.status_code == 200
+        assert "text/html" in r.headers["content-type"]
+        assert "Dataset schema" in r.text
+
+    def test_old_portal_url_redirects(self):
+        r = client.get("/portal", follow_redirects=False)
+        assert r.status_code == 308
+        assert r.headers["location"] == "/api-key"
+        r = client.get("/es/portal", follow_redirects=False)
+        assert r.status_code == 308
+        assert r.headers["location"] == "/es/api-key"
 
     def test_register_issues_working_key(self):
         r = client.post("/api/portal/register", json={"name": "Ada Lovelace", "email": "ada@rs.org"})
@@ -1458,8 +1472,8 @@ class TestCSP:
         # The inline-script hash is present, so a strict CSP won't break the page.
         assert self._inline_hash(r.text) in csp
 
-    def test_portal_csp(self):
-        r = client.get("/portal")
+    def test_api_key_csp(self):
+        r = client.get("/api-key")
         csp = r.headers.get("Content-Security-Policy")
         assert "script-src 'self'" in csp and "https://accounts.google.com" in csp
         assert "frame-src https://accounts.google.com" in csp  # GSI sign-in iframe
@@ -1482,8 +1496,14 @@ class TestAccessibility:
         # Canvases carry an accessible table alternative, so hide them from AT.
         assert 'id="chart-platforms" height="150" aria-hidden="true"' in html
 
-    def test_portal_a11y_landmarks(self):
-        html = client.get("/portal").text
+    def test_api_key_a11y_landmarks(self):
+        html = client.get("/api-key").text
+        assert 'href="#main"' in html and 'class="skip-link"' in html
+        assert 'id="main"' in html
+        assert 'role="alert"' in html
+
+    def test_schema_a11y_landmarks(self):
+        html = client.get("/schema").text
         assert 'href="#main"' in html and 'class="skip-link"' in html
         assert 'id="main"' in html
         assert 'role="alert"' in html
@@ -1493,7 +1513,7 @@ class TestAccessibility:
 
 class TestLocalization:
     LOCALES = ("es", "fr", "de", "ja", "zh", "ko")
-    SUFFIXES = ("", "reports", "removals", "portal", "privacy")
+    SUFFIXES = ("", "reports", "removals", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.
@@ -1533,9 +1553,9 @@ class TestLocalization:
                 for h in self._inline_hashes(r.text):
                     assert h in csp, f"missing hash for {path}: {h}"
 
-    def test_localized_portal_allows_google_signin(self):
+    def test_localized_api_key_allows_google_signin(self):
         for loc in self.LOCALES:
-            csp = client.get(f"/{loc}/portal").headers.get("Content-Security-Policy", "")
+            csp = client.get(f"/{loc}/api-key").headers.get("Content-Security-Policy", "")
             assert "https://accounts.google.com" in csp, loc
             assert "frame-src https://accounts.google.com" in csp, loc
 
@@ -1565,7 +1585,8 @@ class TestLocalization:
     def test_internal_chrome_links_are_prefixed(self):
         # Sidebar / brand links stay within the locale; Swagger + the JSON API don't.
         html = client.get("/es/reports").text
-        assert 'href="/es/removals"' in html and 'href="/es/portal"' in html
+        assert 'href="/es/removals"' in html and 'href="/es/api-key"' in html
+        assert 'href="/es/schema"' in html
         assert 'href="/docs"' in html  # Swagger link is locale-agnostic, never prefixed
         assert "/api/explore" in html and "/es/api/" not in html  # API calls aren't prefixed
 
