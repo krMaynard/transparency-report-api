@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MCP Server — Transparency Report API</title>
+<title>MCP 서버 — Transparency Report API</title>
 <meta name="description" content="네이티브 MCP stdio 서버를 통해 Claude Desktop 또는 Claude Code를 DSA VLOP 투명성 데이터셋에 직접 연결하세요." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -377,42 +377,42 @@ pip install mcp httpx</pre>
     <tr><th>도구</th><th>인증</th><th>설명</th></tr>
     <tr>
       <td><code>list_tables</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">공개</span></td>
       <td>쿼리 가능한 모든 DSA 보고서 테이블과 해당 차원, 측정값 및 사용 가능한 집계 함수를 나열합니다. 여기서 시작하세요.</td>
     </tr>
     <tr>
       <td><code>describe_table</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">공개</span></td>
       <td>테이블의 필드, 유효한 작업, 실행 가능한 예시 쿼리를 설명합니다. API 키가 설정된 경우 전체 필드 레지스트리를 반환합니다.</td>
     </tr>
     <tr>
       <td><code>dataset_overview</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">공개</span></td>
       <td>주요 집계: 보고 기간, 플랫폼 수, 제16조 통지 총계, 상위 플랫폼 및 카테고리.</td>
     </tr>
     <tr>
       <td><code>run_query</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">공개</span></td>
       <td><code>POST /api/explore</code>를 통해 구조화 쿼리를 동기적으로 실행합니다. 행 수 제한 있음; API 키 불필요. 빠른 탐색에 적합합니다.</td>
     </tr>
     <tr>
       <td><code>ask</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API 키</span></td>
       <td>자연어 질문을 합니다. LLM이 이를 구조화 쿼리(SQL 아님)로 변환하여 <code>run_query</code>와 동일한 유효성 검사를 통과합니다.</td>
     </tr>
     <tr>
       <td><code>register</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">공개</span></td>
       <td>데모 API 키에 등록합니다(<code>POST /api/portal/register</code> 호출). <code>{"api_key": "rk_…", "expires_at": "…"}</code>를 반환합니다. 로그인 불필요.</td>
     </tr>
     <tr>
       <td><code>submit_query</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API 키</span></td>
       <td>구조화 쿼리를 비동기 작업 대기열에 제출합니다(<code>POST /api/query</code>). 행 수 제한 없음. <code>job_id</code>와 함께 즉시 반환합니다.</td>
     </tr>
     <tr>
       <td><code>poll_job</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API 키</span></td>
       <td>제출된 작업이 완료될 때까지 폴링한 후 결과 행을 반환합니다. 지수 백오프 사용; 구성 가능한 타임아웃(기본 60초).</td>
     </tr>
   </table>
@@ -446,7 +446,7 @@ pip install mcp httpx</pre>
   </div>
 
   <table aria-label="Environment variables">
-    <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+    <tr><th>변수</th><th>기본값</th><th>설명</th></tr>
     <tr>
       <td><code>TRANSPARENCY_API_URL</code></td>
       <td><code>http://127.0.0.1:8000</code></td>

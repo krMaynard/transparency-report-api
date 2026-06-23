@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MCP Server — Transparency Report API</title>
+<title>Serveur MCP — Transparency Report API</title>
 <meta name="description" content="Connectez Claude Desktop ou Claude Code directement au jeu de données de transparence DSA VLOP via le serveur MCP stdio natif." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -397,7 +397,7 @@ pip install mcp httpx</pre>
     </tr>
     <tr>
       <td><code>ask</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">Clé API</span></td>
       <td>Posez une question en langage naturel. Un LLM la traduit en requête structurée (jamais SQL) qui passe par la même validation que <code>run_query</code>.</td>
     </tr>
     <tr>
@@ -407,12 +407,12 @@ pip install mcp httpx</pre>
     </tr>
     <tr>
       <td><code>submit_query</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">Clé API</span></td>
       <td>Soumettre une requête structurée à la file d'attente des tâches asynchrones (<code>POST /api/query</code>). Sans limite de lignes. Retourne immédiatement avec un <code>job_id</code>.</td>
     </tr>
     <tr>
       <td><code>poll_job</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">Clé API</span></td>
       <td>Sonde un travail soumis jusqu'à sa complétion, puis retourne les lignes de résultats. Utilise le recul exponentiel ; délai d'attente configurable (par défaut 60 s).</td>
     </tr>
   </table>
@@ -446,7 +446,7 @@ pip install mcp httpx</pre>
   </div>
 
   <table aria-label="Environment variables">
-    <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+    <tr><th>Variable</th><th>Par défaut</th><th>Description</th></tr>
     <tr>
       <td><code>TRANSPARENCY_API_URL</code></td>
       <td><code>http://127.0.0.1:8000</code></td>

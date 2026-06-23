@@ -1038,6 +1038,10 @@ PAGES["es"]["mcp.html"] = [
      '''<a href="https://github.com/krMaynard/transparency-report-api/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Documentación completa de MCP en GitHub →</a>'''),
     ('''<p><a href="/">Home</a> · <a href="/reports">DSA Reports</a> · <a href="/portal">Researcher Portal</a> · <a href="/docs">API Reference</a></p>''',
      '''<p><a href="/">Inicio</a> · <a href="/reports">Informes DSA</a> · <a href="/portal">Portal de investigadores</a> · <a href="/docs">Referencia de la API</a></p>'''),
+    ('''<title>MCP Server — Transparency Report API</title>''', '''<title>Servidor MCP — Transparency Report API</title>'''),
+    ('''<tr><th>Variable</th><th>Default</th><th>Description</th></tr>''', '''<tr><th>Variable</th><th>Predeterminado</th><th>Descripción</th></tr>'''),
+    ('''<span class="badge badge-pub">public</span>''', '''<span class="badge badge-pub">público</span>'''),
+    ('''<span class="badge badge-key">API key</span>''', '''<span class="badge badge-key">Clave API</span>'''),
 ]
 
 PAGES["fr"]["privacy.html"] = [
@@ -1162,6 +1166,9 @@ PAGES["fr"]["mcp.html"] = [
      '''<a href="https://github.com/krMaynard/transparency-report-api/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Documentation MCP complète sur GitHub →</a>'''),
     ('''<p><a href="/">Home</a> · <a href="/reports">DSA Reports</a> · <a href="/portal">Researcher Portal</a> · <a href="/docs">API Reference</a></p>''',
      '''<p><a href="/">Accueil</a> · <a href="/reports">Rapports DSA</a> · <a href="/portal">Portail chercheurs</a> · <a href="/docs">Référence API</a></p>'''),
+    ('''<title>MCP Server — Transparency Report API</title>''', '''<title>Serveur MCP — Transparency Report API</title>'''),
+    ('''<tr><th>Variable</th><th>Default</th><th>Description</th></tr>''', '''<tr><th>Variable</th><th>Par défaut</th><th>Description</th></tr>'''),
+    ('''<span class="badge badge-key">API key</span>''', '''<span class="badge badge-key">Clé API</span>'''),
 ]
 
 PAGES["de"]["privacy.html"] = [
@@ -1286,6 +1293,10 @@ PAGES["de"]["mcp.html"] = [
      '''<a href="https://github.com/krMaynard/transparency-report-api/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">Vollständige MCP-Dokumentation auf GitHub →</a>'''),
     ('''<p><a href="/">Home</a> · <a href="/reports">DSA Reports</a> · <a href="/portal">Researcher Portal</a> · <a href="/docs">API Reference</a></p>''',
      '''<p><a href="/">Startseite</a> · <a href="/reports">DSA-Berichte</a> · <a href="/portal">Forschungsportal</a> · <a href="/docs">API-Referenz</a></p>'''),
+    ('''<title>MCP Server — Transparency Report API</title>''', '''<title>MCP-Server — Transparency Report API</title>'''),
+    ('''<tr><th>Variable</th><th>Default</th><th>Description</th></tr>''', '''<tr><th>Variable</th><th>Standard</th><th>Beschreibung</th></tr>'''),
+    ('''<span class="badge badge-pub">public</span>''', '''<span class="badge badge-pub">öffentlich</span>'''),
+    ('''<span class="badge badge-key">API key</span>''', '''<span class="badge badge-key">API-Schlüssel</span>'''),
 ]
 
 
@@ -1921,6 +1932,10 @@ PAGES["ja"]["mcp.html"] = [
      r'''<a href="https://github.com/krMaynard/transparency-report-api/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">GitHub の完全な MCP ドキュメント →</a>'''),
     (r'''<p><a href="/">Home</a> · <a href="/reports">DSA Reports</a> · <a href="/portal">Researcher Portal</a> · <a href="/docs">API Reference</a></p>''',
      r'''<p><a href="/">ホーム</a> · <a href="/reports">DSA レポート</a> · <a href="/portal">研究者ポータル</a> · <a href="/docs">API リファレンス</a></p>'''),
+    (r'''<title>MCP Server — Transparency Report API</title>''', r'''<title>MCP サーバー — Transparency Report API</title>'''),
+    (r'''<tr><th>Variable</th><th>Default</th><th>Description</th></tr>''', r'''<tr><th>変数</th><th>デフォルト</th><th>説明</th></tr>'''),
+    (r'''<span class="badge badge-pub">public</span>''', r'''<span class="badge badge-pub">公開</span>'''),
+    (r'''<span class="badge badge-key">API key</span>''', r'''<span class="badge badge-key">API キー</span>'''),
 ]
 
 COMMON["zh"] = [
@@ -2527,6 +2542,10 @@ PAGES["zh"]["mcp.html"] = [
      r'''<a href="https://github.com/krMaynard/transparency-report-api/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">GitHub 上的完整 MCP 文档 →</a>'''),
     (r'''<p><a href="/">Home</a> · <a href="/reports">DSA Reports</a> · <a href="/portal">Researcher Portal</a> · <a href="/docs">API Reference</a></p>''',
      r'''<p><a href="/">首页</a> · <a href="/reports">DSA 报告</a> · <a href="/portal">研究者门户</a> · <a href="/docs">API 参考</a></p>'''),
+    (r'''<title>MCP Server — Transparency Report API</title>''', r'''<title>MCP 服务器 — Transparency Report API</title>'''),
+    (r'''<tr><th>Variable</th><th>Default</th><th>Description</th></tr>''', r'''<tr><th>变量</th><th>默认值</th><th>说明</th></tr>'''),
+    (r'''<span class="badge badge-pub">public</span>''', r'''<span class="badge badge-pub">公开</span>'''),
+    (r'''<span class="badge badge-key">API key</span>''', r'''<span class="badge badge-key">API 密钥</span>'''),
 ]
 
 COMMON["ko"] = [
@@ -3133,6 +3152,10 @@ PAGES["ko"]["mcp.html"] = [
      r'''<a href="https://github.com/krMaynard/transparency-report-api/blob/main/docs/MCP.md" target="_blank" rel="noopener noreferrer">GitHub의 전체 MCP 문서 →</a>'''),
     (r'''<p><a href="/">Home</a> · <a href="/reports">DSA Reports</a> · <a href="/portal">Researcher Portal</a> · <a href="/docs">API Reference</a></p>''',
      r'''<p><a href="/">홈</a> · <a href="/reports">DSA 보고서</a> · <a href="/portal">연구자 포털</a> · <a href="/docs">API 레퍼런스</a></p>'''),
+    (r'''<title>MCP Server — Transparency Report API</title>''', r'''<title>MCP 서버 — Transparency Report API</title>'''),
+    (r'''<tr><th>Variable</th><th>Default</th><th>Description</th></tr>''', r'''<tr><th>변수</th><th>기본값</th><th>설명</th></tr>'''),
+    (r'''<span class="badge badge-pub">public</span>''', r'''<span class="badge badge-pub">공개</span>'''),
+    (r'''<span class="badge badge-key">API key</span>''', r'''<span class="badge badge-key">API 키</span>'''),
 ]
 
 

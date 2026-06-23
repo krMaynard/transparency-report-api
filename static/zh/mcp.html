@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MCP Server — Transparency Report API</title>
+<title>MCP 服务器 — Transparency Report API</title>
 <meta name="description" content="通过原生 MCP stdio 服务器，将 Claude Desktop 或 Claude Code 直接连接到 DSA VLOP 透明度数据集。" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -377,42 +377,42 @@ pip install mcp httpx</pre>
     <tr><th>工具</th><th>认证</th><th>说明</th></tr>
     <tr>
       <td><code>list_tables</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公开</span></td>
       <td>列出所有可查询的 DSA 报告表及其维度、指标和可用聚合函数。从这里开始。</td>
     </tr>
     <tr>
       <td><code>describe_table</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公开</span></td>
       <td>描述某张表的字段、有效操作和可运行的示例查询。设置 API 密钥后返回完整字段注册表。</td>
     </tr>
     <tr>
       <td><code>dataset_overview</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公开</span></td>
       <td>主要聚合：报告期、平台数量、第 16 条通知总数、顶级平台和分类。</td>
     </tr>
     <tr>
       <td><code>run_query</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公开</span></td>
       <td>通过 <code>POST /api/explore</code> 同步运行结构化查询。有行数上限；无需 API 密钥。适合快速探索。</td>
     </tr>
     <tr>
       <td><code>ask</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API 密钥</span></td>
       <td>提出自然语言问题。LLM 将其翻译为结构化查询（非 SQL），经过与 <code>run_query</code> 相同的验证后运行。</td>
     </tr>
     <tr>
       <td><code>register</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公开</span></td>
       <td>注册演示 API 密钥（调用 <code>POST /api/portal/register</code>）。返回 <code>{"api_key": "rk_…", "expires_at": "…"}</code>。无需登录。</td>
     </tr>
     <tr>
       <td><code>submit_query</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API 密钥</span></td>
       <td>将结构化查询提交到异步作业队列（<code>POST /api/query</code>）。无行数上限。立即返回 <code>job_id</code>。</td>
     </tr>
     <tr>
       <td><code>poll_job</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API 密钥</span></td>
       <td>轮询已提交的作业直到完成，然后返回结果行。使用指数退避；可配置超时（默认 60 秒）。</td>
     </tr>
   </table>
@@ -446,7 +446,7 @@ pip install mcp httpx</pre>
   </div>
 
   <table aria-label="Environment variables">
-    <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+    <tr><th>变量</th><th>默认值</th><th>说明</th></tr>
     <tr>
       <td><code>TRANSPARENCY_API_URL</code></td>
       <td><code>http://127.0.0.1:8000</code></td>

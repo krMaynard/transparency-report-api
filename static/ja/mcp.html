@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MCP Server — Transparency Report API</title>
+<title>MCP サーバー — Transparency Report API</title>
 <meta name="description" content="ネイティブ MCP stdio サーバーを使用して、Claude Desktop または Claude Code を DSA VLOP 透明性データセットに直接接続します。" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -377,42 +377,42 @@ pip install mcp httpx</pre>
     <tr><th>ツール</th><th>認証</th><th>説明</th></tr>
     <tr>
       <td><code>list_tables</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公開</span></td>
       <td>すべてのクエリ可能な DSA レポートテーブルとその次元、測定値、使用可能な集計関数を一覧表示します。ここから始めてください。</td>
     </tr>
     <tr>
       <td><code>describe_table</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公開</span></td>
       <td>テーブルのフィールド、有効な操作、実行可能なサンプルクエリを説明します。API キーが設定されている場合は完全なフィールドレジストリを返します。</td>
     </tr>
     <tr>
       <td><code>dataset_overview</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公開</span></td>
       <td>主要な集計：レポート期間、プラットフォーム数、第 16 条通知の合計、上位プラットフォームとカテゴリー。</td>
     </tr>
     <tr>
       <td><code>run_query</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公開</span></td>
       <td><code>POST /api/explore</code> を通じて構造化クエリを同期的に実行します。行数上限あり；API キー不要。クイック探索に最適。</td>
     </tr>
     <tr>
       <td><code>ask</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API キー</span></td>
       <td>自然言語で質問します。LLM がそれを構造化クエリ（SQL ではない）に変換し、<code>run_query</code> と同じバリデーションを通過します。</td>
     </tr>
     <tr>
       <td><code>register</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">公開</span></td>
       <td>デモ API キーに登録します（<code>POST /api/portal/register</code> を呼び出し）。<code>{"api_key": "rk_…", "expires_at": "…"}</code> を返します。サインイン不要。</td>
     </tr>
     <tr>
       <td><code>submit_query</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API キー</span></td>
       <td>構造化クエリを非同期ジョブキューに送信します（<code>POST /api/query</code>）。行数制限なし。<code>job_id</code> を即座に返します。</td>
     </tr>
     <tr>
       <td><code>poll_job</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">API キー</span></td>
       <td>送信されたジョブが完了するまでポーリングし、結果行を返します。指数バックオフを使用；タイムアウト設定可能（デフォルト 60 秒）。</td>
     </tr>
   </table>
@@ -446,7 +446,7 @@ pip install mcp httpx</pre>
   </div>
 
   <table aria-label="Environment variables">
-    <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+    <tr><th>変数</th><th>デフォルト</th><th>説明</th></tr>
     <tr>
       <td><code>TRANSPARENCY_API_URL</code></td>
       <td><code>http://127.0.0.1:8000</code></td>

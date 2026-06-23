@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>MCP Server — Transparency Report API</title>
+<title>Servidor MCP — Transparency Report API</title>
 <meta name="description" content="Conecta Claude Desktop o Claude Code directamente al conjunto de datos de transparencia DSA VLOP a través del servidor MCP stdio nativo." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -377,42 +377,42 @@ pip install mcp httpx</pre>
     <tr><th>Herramienta</th><th>Autenticación</th><th>Descripción</th></tr>
     <tr>
       <td><code>list_tables</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">público</span></td>
       <td>Lista todas las tablas de informes DSA consultables con sus dimensiones, medidas y funciones de agregación disponibles. Empieza aquí.</td>
     </tr>
     <tr>
       <td><code>describe_table</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">público</span></td>
       <td>Describe los campos de una tabla, las operaciones válidas y una consulta de ejemplo ejecutable. Devuelve el registro completo de campos cuando se configura una clave de API.</td>
     </tr>
     <tr>
       <td><code>dataset_overview</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">público</span></td>
       <td>Agregados principales: período de informes, recuento de plataformas, total de notificaciones del artículo 16, principales plataformas y categorías.</td>
     </tr>
     <tr>
       <td><code>run_query</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">público</span></td>
       <td>Ejecuta una consulta estructurada de forma síncrona a través de <code>POST /api/explore</code>. Con límite de filas; sin necesidad de clave de API. Ideal para exploración rápida.</td>
     </tr>
     <tr>
       <td><code>ask</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">Clave API</span></td>
       <td>Haz una pregunta en lenguaje natural. Un LLM la traduce a una consulta estructurada (nunca SQL) que pasa por la misma validación que <code>run_query</code>.</td>
     </tr>
     <tr>
       <td><code>register</code></td>
-      <td><span class="badge badge-pub">public</span></td>
+      <td><span class="badge badge-pub">público</span></td>
       <td>Regístrate para obtener una clave de API de demostración (llama a <code>POST /api/portal/register</code>). Devuelve <code>{"api_key": "rk_…", "expires_at": "…"}</code>. No se requiere inicio de sesión.</td>
     </tr>
     <tr>
       <td><code>submit_query</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">Clave API</span></td>
       <td>Envía una consulta estructurada a la cola de trabajos asíncronos (<code>POST /api/query</code>). Sin límite de filas. Devuelve inmediatamente un <code>job_id</code>.</td>
     </tr>
     <tr>
       <td><code>poll_job</code></td>
-      <td><span class="badge badge-key">API key</span></td>
+      <td><span class="badge badge-key">Clave API</span></td>
       <td>Sondea un trabajo enviado hasta que se completa y devuelve las filas de resultados. Usa retroceso exponencial; tiempo de espera configurable (predeterminado 60 s).</td>
     </tr>
   </table>
@@ -446,7 +446,7 @@ pip install mcp httpx</pre>
   </div>
 
   <table aria-label="Environment variables">
-    <tr><th>Variable</th><th>Default</th><th>Description</th></tr>
+    <tr><th>Variable</th><th>Predeterminado</th><th>Descripción</th></tr>
     <tr>
       <td><code>TRANSPARENCY_API_URL</code></td>
       <td><code>http://127.0.0.1:8000</code></td>
