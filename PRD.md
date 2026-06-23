@@ -42,13 +42,13 @@ Analysts and researchers who need to run ad-hoc queries against shared datasets 
 
 ## 2. Users & Personas
 
-### 2.1 Alice — The Researcher
+### 2.1 Momo — The Researcher
 
-Alice wants to run exploratory SQL against a public dataset from a notebook or script. She submits a query, polls until it finishes, and downloads the result as CSV for further analysis. She cares about **result fidelity** and **response format flexibility** (JSON vs CSV).
+Momo wants to run exploratory SQL against a public dataset from a notebook or script. She submits a query, polls until it finishes, and downloads the result as CSV for further analysis. She cares about **result fidelity** and **response format flexibility** (JSON vs CSV).
 
-### 2.2 Bob — The Second Researcher
+### 2.2 Honggildong — The Second Researcher
 
-Bob runs independently on the same API instance. He should never see Alice's jobs — not even whether a job ID exists. He cares about **data isolation**.
+Honggildong runs independently on the same API instance. He should never see Momo's jobs — not even whether a job ID exists. He cares about **data isolation**.
 
 ### 2.3 Demo Operator
 
@@ -72,7 +72,7 @@ A developer giving a live presentation who runs `demo.py --pause` to step throug
 | ID | Requirement |
 |----|-------------|
 | F-05 | All data endpoints require an `X-API-Key` header. Missing or unrecognized keys receive `401 Unauthorized`. |
-| F-06 | API keys map to a user name (metadata). Default demo keys are `alice` and `bob`; the key-to-name mapping is configurable via `API_KEYS_JSON` env var. |
+| F-06 | API keys map to a user name (metadata). Default demo keys are `momo` and `honggildong`; the key-to-name mapping is configurable via `API_KEYS_JSON` env var. |
 | F-07 | Jobs are owned by the API key that created them. Requests for another owner's job ID return `404 Not Found` (not `403`), preventing job-existence timing attacks. |
 
 ### 3.3 Schema Discovery
@@ -246,7 +246,7 @@ Results (columns + rows) are stored separately from the job object, keyed by `jo
 **Request:**
 ```http
 POST /query
-X-API-Key: alice
+X-API-Key: momo
 Content-Type: application/json
 
 {
@@ -266,7 +266,7 @@ Content-Type: application/json
 {
   "job_id": "a1b2c3d4...",
   "status": "queued",
-  "submitted_by": "alice",
+  "submitted_by": "momo",
   "submitted_at": "2026-05-26T12:00:00Z",
   "started_at": null,
   "finished_at": null,
@@ -280,7 +280,7 @@ Content-Type: application/json
 
 ```http
 GET /jobs/a1b2c3d4...
-X-API-Key: alice
+X-API-Key: momo
 ```
 
 Returns the same job object with updated `status`, timestamps, and `row_count`. When `status=done`, a `result_url` field is also present.
@@ -289,7 +289,7 @@ Returns the same job object with updated `status`, timestamps, and `row_count`. 
 
 ```http
 GET /jobs/a1b2c3d4.../result?format=json
-X-API-Key: alice
+X-API-Key: momo
 ```
 
 ```json
