@@ -34,8 +34,9 @@ Built to demonstrate two things:
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
 | `static/index.html` | Public VLOP dashboard (served at `/`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
-| `static/portal.html` | Researcher portal single-page app (served at `/portal`) — Google sign-in + demo fallback |
-| `static/{es,fr,de}/*.html` | Localized copies of the five pages (Spanish/French/German), served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
+| `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
+| `static/{es,fr,de,ja,zh,ko}/*.html` | Localized copies of the six pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -56,9 +57,10 @@ Built to demonstrate two things:
 
 ## Localization
 
-The five static pages are localized into **Spanish (`/es`), French (`/fr`), and
-German (`/de`)** alongside the English originals (served at the root). English is
-the source of truth; the translations are **generated**, not hand-written:
+The six static pages are localized into **Spanish (`/es`), French (`/fr`),
+German (`/de`), Japanese (`/ja`), Chinese (`/zh`), and Korean (`/ko`)** alongside
+the English originals (served at the root). English is the source of truth; the
+translations are **generated**, not hand-written:
 
 - `scripts/localize_static.py` holds the per-locale translation tables (chrome +
   page strings, including inline-JS UI strings) and emits `static/<locale>/*.html`
@@ -66,8 +68,9 @@ the source of truth; the translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/portal`, `/<locale>/privacy` for each locale,
-  all through `_serve_page` (so each localized file gets its own recomputed
+  `/<locale>/removals`, `/<locale>/schema`, `/<locale>/api-key`,
+  `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
+  redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
   endpoints stay locale-agnostic; localized pages call the same `/api/*`.
 - The globe **language switcher** (formerly a cross-site link to
@@ -266,13 +269,13 @@ every endpoint (query/explore/ask) gets composites through the same boundary.
   request middleware — `X-Content-Type-Options: nosniff`, `Referrer-Policy:
   no-referrer` (so the HMAC in a signed download URL never leaks via `Referer`),
   `X-Frame-Options: DENY`, `Permissions-Policy` (geolocation/camera/mic/payment
-  off), and `Strict-Transport-Security` (HSTS). The two HTML pages (`/`, `/portal`) get a per-page
+  off), and `Strict-Transport-Security` (HSTS). Every served HTML page gets a per-page
   **Content-Security-Policy** (`_serve_page`/`_page_csp`) — `script-src 'self'` +
   the page's inline-`<script>` **sha256 hash** (computed from the file, never
   stale); the dashboard needs no third-party script origin because **Chart.js is
   vendored same-origin** (`static/vendor/chart.umd.js`, served by the
   `/static/vendor/{filename}` route with a name allowlist + immutable caching),
-  and the portal only allows `accounts.google.com` for Google sign-in. No
+  and the api-key page only allows `accounts.google.com` for Google sign-in. No
   `'unsafe-inline'` for scripts, `frame-ancestors 'none'`. DB values are
   HTML-escaped in the dashboard JS (`esc()`). If Chart.js is unavailable, the
   dashboard panels **fall back to data tables** instead of blank canvases
@@ -306,7 +309,7 @@ code-review comments** (`gemini-code-assist[bot]`) using the GitHub MCP tools:
 
 Combined-site layout: the **dashboard is served at `/`** and the JSON API lives
 under **`/api/*`** on the same origin (no CORS). Operational endpoints
-(`/healthz`, `/readyz`, `/metrics`, `/version`) and the `/portal` page stay at the
+(`/healthz`, `/readyz`, `/metrics`, `/version`) and the `/schema` + `/api-key` pages stay at the
 root. The API endpoints are registered on an `APIRouter` included with
 `prefix=API_PREFIX` (`/api`); link builders (`status_url`/`result_url`/signed
 `download_urls`/`Location`) are prefixed via `API_PREFIX`.
@@ -319,7 +322,8 @@ root. The API endpoints are registered on an `APIRouter` included with
 | POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited, ≤`EXPLORE_MAX_LEGS` composite legs) |
 | POST | `/api/ask` | — | Public: NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; off unless `ANTHROPIC_API_KEY` set |
 | GET | `/api` | — | API service info |
-| GET | `/portal` | — | Researcher portal web UI (schema shown to everyone; sign in → key) |
+| GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |
+| GET | `/api-key` | — | API-key sign-in page (web UI: sign in → key). `/portal` 308-redirects here |
 | POST | `/api/auth/google` | — | Verify a Google ID token → session key (any verified account) |
 | POST | `/api/portal/register` | — | Demo: issue a key without auth (`ALLOW_DEMO_KEYS`) |
 | DELETE | `/api/portal/key` | key | Revoke your own session / portal-issued key |

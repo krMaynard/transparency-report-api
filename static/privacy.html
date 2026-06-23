@@ -288,11 +288,19 @@ display: flex; align-items: center; justify-content: space-between;
     <hr class="nav-hr">
     <div class="nav-section">Tools</div>
 
-    <a href="/portal" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Researcher Portal
+      Schema
+    </a>
+
+    <a href="/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API key
     </a>
 
     <a href="/docs" class="nav-item">
@@ -358,7 +366,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>Two options are available:</p>
   <ul>
     <li><strong>Google Sign-In.</strong> Signing in with a Google account creates a session key automatically. Your Google-provided email address is stored as an account identifier and used only to enforce rate limits and allow access to be revoked if needed. Your Google password is never seen by this service — authentication is handled entirely by Google Identity Services.</li>
-    <li><strong>Demo registration</strong> (when enabled). Submitting an email address on the portal issues a short-lived demo key. The email is stored as an identifier for that key.</li>
+    <li><strong>Demo registration</strong> (when enabled). Submitting an email address on the API key page issues a short-lived demo key. The email is stored as an identifier for that key.</li>
   </ul>
 
   <h2>Data collected</h2>
@@ -433,7 +441,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p><a href="/">Home</a> · <a href="/portal">Researcher Portal</a> · <a href="/api">API</a> · <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+  <p><a href="/">Home</a> · <a href="/api-key">API key</a> · <a href="/api">API</a> · <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">GitHub</a></p>
 </footer>
 
 </div>

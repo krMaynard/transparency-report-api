@@ -367,11 +367,19 @@
     <hr class="nav-hr">
     <div class="nav-section">ツール</div>
 
-    <a href="/ja/portal" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/ja/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      研究者ポータル
+      スキーマ
+    </a>
+
+    <a href="/ja/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API キー
     </a>
 
     <a href="/docs" class="nav-item">
@@ -434,7 +442,7 @@
       <button id="ask-run" type="button">質問</button>
     </div>
     <div class="chips" id="ask-chips"></div>
-    <div class="ask-gate hidden" id="ask-gate">自然言語での質問には API キーが必要です — 言語モデルを実行します。<a href="/ja/portal">ポータルでサインイン →</a></div>
+    <div class="ask-gate hidden" id="ask-gate">自然言語での質問には API キーが必要です — 言語モデルを実行します。<a href="/ja/api-key">API キーを取得 →</a></div>
     <div class="error" id="ask-error" role="alert"></div>
     <p class="explain" id="ask-explain"></p>
     <canvas id="ask-chart" height="150" aria-hidden="true"></canvas>
@@ -521,7 +529,7 @@
 
   <footer>
     同一オリジンの API（<code>/api/overview</code>）による公開概要です。
-    研究者は <a href="/ja/portal">ポータル</a> + <a href="/docs">API</a> からカスタムクエリを実行できます。 · <a href="/ja/privacy">プライバシー</a>
+    研究者は <a href="/ja/api-key">API キー</a> + <a href="/docs">API</a> でカスタムクエリを実行できます。 · <a href="/ja/privacy">プライバシー</a>
   </footer>
 </div><!-- .wrap -->
 </div><!-- .main-area -->
@@ -983,7 +991,7 @@ async function runAsk() {
     });
     if (res.status === 401) {
       localStorage.removeItem("vlop_api_key"); askGate(true);
-      throw new Error("セッションの有効期限が切れました — ポータルで再度サインインしてください。");
+      throw new Error("セッションの有効期限が切れました — 再度サインインして新しいキーを取得してください。");
     }
     const d = await res.json();
     if (!res.ok) {
@@ -1018,8 +1026,8 @@ async function setupAsk() {
   $("#ask-refine").addEventListener("click", () => lastAsk && refineInBuilder(lastAsk.query));
   $("#ask-csv").addEventListener("click", () => lastAsk && downloadBlob("vlop-ask.csv", toCSV(lastAsk), "text/csv"));
   $("#ask-json-dl").addEventListener("click", () => lastAsk && downloadBlob("vlop-ask.json", JSON.stringify(lastAsk, null, 2), "application/json"));
-  // Gate the LLM Ask box behind a portal key (Google login). Re-check when the
-  // user returns from the portal (focus) or signs in in another tab (storage).
+  // Gate the LLM Ask box behind an API key (Google login). Re-check when the
+  // user returns from the API-key page (focus) or signs in in another tab (storage).
   const refreshGate = () => askGate(!localStorage.getItem("vlop_api_key"));
   window.addEventListener("storage", refreshGate);        // signed in in another tab
   window.addEventListener("focus", refreshGate);          // returned to this tab

@@ -1,13 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Research Data Portal · Transparency Report</title>
+<title>데이터셋 스키마 · Transparency Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async></script>
 <script>
   // Match the main site: set the theme before first paint to avoid a flash.
   (function () {
@@ -178,47 +177,19 @@ display: flex; align-items: center;
   }
   .card h2 { margin: 0 0 4px; font-size: 18px; }
   .card .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
-  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
-  input {
-    width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
-    background: var(--panel2); color: var(--fg); font-size: 15px;
-  }
-  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(42,157,143,.2); }
-  button {
-    margin-top: 20px; width: 100%; padding: 12px 16px; border: 0; border-radius: 9px;
-    background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 650; cursor: pointer;
-  }
-  button:hover { background: var(--accent-dark); }
-  button:disabled { opacity: .6; cursor: default; }
   .hidden { display: none !important; }
   .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
   [data-theme="dark"] .error { color: #ff7b72; }
-  .keyrow { display: flex; gap: 10px; align-items: stretch; }
-  .keybox {
-    flex: 1; font-family: var(--mono); font-size: 14px; background: var(--panel2); color: var(--accent2);
-    border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; overflow-x: auto;
-    white-space: nowrap;
-  }
-  .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
   .tbl { margin: 0 0 18px; }
   .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
-  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
-  th { color: var(--muted); font-weight: 600; }
-  td.type { font-family: var(--mono); color: var(--accent2); }
-  td.flag { color: var(--muted); font-family: var(--mono); }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
   footer a { color: var(--accent); text-decoration: none; }
-  .gbtn { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 44px; }
-  .divider { display: flex; align-items: center; text-align: center; color: var(--muted); font-size: 13px; margin: 18px 0 4px; }
-  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-  .divider span { padding: 0 12px; }
   /* Keyboard focus visibility — a clear ring on every interactive control. */
   a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
   [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
@@ -241,35 +212,35 @@ display: flex; align-items: center;
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
+<a class="skip-link" href="#main">본문 바로가기</a>
 <div class="page-header">
-<nav class="site-nav" aria-label="Site">
+<nav class="site-nav" aria-label="사이트">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Work</a>
-      <a href="https://kieranmaynard.com/transparency.html">Products</a>
-      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
-      <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+      <a href="https://kieranmaynard.com/work.html">경력</a>
+      <a href="https://kieranmaynard.com/transparency.html">제품</a>
+      <a href="https://kieranmaynard.com/consulting.html">컨설팅</a>
+      <a href="https://kieranmaynard.com/blog.html">블로그</a>
+      <a href="https://kieranmaynard.com/contact.html">문의하기</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="Language" title="Language">
+      <summary class="lang-current" aria-label="언어" title="언어">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>English</span>
+        <span>한국어</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt is-current" href="/portal" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/es/portal"><span>Español</span></a></li>
-        <li><a class="lang-opt" href="/fr/portal"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/portal"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/ja/portal"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/portal"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/portal"><span>한국어</span></a></li>
+        <li><a class="lang-opt" href="/schema"><span>English</span></a></li>
+        <li><a class="lang-opt" href="/es/schema"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/schema"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/schema"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/ja/schema"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/schema"><span>中文</span></a></li>
+        <li><a class="lang-opt is-current" href="/ko/schema" aria-current="page"><span>한국어</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
       </ul>
     </details>
-    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="다크 모드 전환" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
     </button>
@@ -280,12 +251,12 @@ display: flex; align-items: center;
 <header class="topbar">
   <div class="topbar-left">
     <button type="button" class="hamburger" id="hamburger"
-            aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
+            aria-label="내비게이션 전환" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/" class="topbar-brand">Transparency Report API</a>
+    <a href="/ko/" class="topbar-brand">Transparency Report API</a>
   </div>
 </header>
 </div>
@@ -293,49 +264,57 @@ display: flex; align-items: center;
 <div class="app-body">
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
-<aside class="sidebar" id="sidebar" aria-label="Application navigation">
+<aside class="sidebar" id="sidebar" aria-label="애플리케이션 내비게이션">
   <nav>
-    <div class="nav-section">Datasets</div>
+    <div class="nav-section">데이터셋</div>
 
-    <a href="/reports" class="nav-item">
+    <a href="/ko/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
-      DSA Reports
+      DSA 보고서
     </a>
 
-    <a href="/removals" class="nav-item">
+    <a href="/ko/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Government Removals
+      정부 삭제 요청
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">Tools</div>
+    <div class="nav-section">도구</div>
 
-    <a href="/portal" class="nav-item is-active">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/ko/schema" class="nav-item is-active">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Researcher Portal
+      스키마
+    </a>
+
+    <a href="/ko/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API 키
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      API Reference
+      API 레퍼런스
     </a>
 
-    <a href="/privacy" class="nav-item">
+    <a href="/ko/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
-      Privacy
+      개인정보
     </a>
 
     <hr class="nav-hr">
@@ -354,7 +333,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
+  <div class="sidebar-footer">제작: <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/ko/privacy">개인정보</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -362,74 +341,32 @@ display: flex; align-items: center;
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">Researcher portal</span>
-    <h1>Research Data Portal</h1>
-    <p>EU DSA VLOP content-moderation transparency — request access and explore the schema.</p>
+    <span class="badge">참조</span>
+    <h1>데이터셋 스키마</h1>
+    <p>쿼리할 수 있는 모든 항목 — 로그인 불필요.</p>
   </header>
 
  <main id="main" tabindex="-1">
-  <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
-    <h2>Request API access</h2>
-    <p class="sub" id="login-sub">Sign in to be issued an API key.</p>
-
-    <!-- Google sign-in (shown when GOOGLE_CLIENT_ID is configured) -->
-    <div id="google-block" class="hidden">
-      <div class="gbtn" id="google-btn"></div>
-      <p class="hint">Sign in with any Google account — your API key is issued immediately.</p>
-    </div>
-
-    <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>or sign in with your details</span></div>
-
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
-    <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">Full name</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">Work email</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">Request API key</button>
-    </form>
-    <div class="error" id="error" role="alert"></div>
-  </section>
-
-  <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
-    <h2>Welcome, <span id="who">researcher</span> 👋</h2>
-    <p class="sub">Your API key has been issued. Keep it secret.</p>
-    <div class="keyrow">
-      <div class="keybox" id="apikey"></div>
-      <button class="copy" id="copy" type="button">Copy</button>
-    </div>
-    <p class="hint">Send it on every request as the <code>X-API-Key</code> header. Try it in the
-      <a href="/docs" target="_blank" rel="noopener">interactive API docs</a>.</p>
-    <p class="hint" id="expires"></p>
-  </section>
-
-  <!-- Step 3: schema -->
-  <section class="card hidden" id="schema-card">
-    <h2>Dataset schema</h2>
-    <p class="sub">Everything you can query — no sign-in required.</p>
-    <p class="hint" id="dataset-meta"></p>
-
-    <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">Report tables</h3>
+  <section class="card">
+    <p class="hint" id="dataset-meta" aria-busy="true">불러오는 중…</p>
+    <div class="error hidden" id="error" role="alert"></div>
+    <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">보고서 테이블</h3>
     <div id="tables"></div>
   </section>
  </main>
 
-  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/privacy">Privacy</a></footer>
+  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/ko/privacy">개인정보</a></footer>
 </div><!-- /.wrap -->
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
 
 <script>
 const $ = (sel) => document.querySelector(sel);
-let apiKey = null;
 
 function show(el) { el.classList.remove("hidden"); }
 
-async function api(path, key) {
-  const res = await fetch(path, { headers: key ? { "X-API-Key": key } : {} });
+async function api(path) {
+  const res = await fetch(path);
   if (!res.ok) throw new Error(`${path} → ${res.status}`);
   return res.json();
 }
@@ -442,130 +379,27 @@ function renderTable(t) {
   return `<div class="tbl">
     <div class="name">${t.table}</div>
     <p class="hint">${t.description || ""}</p>
-    <div class="field-cat"><h3>Dimensions <span class="dim">· filter / group / sort</span></h3>${pillsHTML(t.dimensions.fields)}</div>
-    <div class="field-cat"><h3>Measures <span class="dim">· filter / aggregate</span></h3>${pillsHTML(t.measures.fields)}</div>
+    <div class="field-cat"><h3>차원 <span class="dim">· 필터 / 그룹 / 정렬</span></h3>${pillsHTML(t.dimensions.fields)}</div>
+    <div class="field-cat"><h3>측정값 <span class="dim">· 필터 / 집계</span></h3>${pillsHTML(t.measures.fields)}</div>
   </div>`;
 }
 
+// The dataset schema is public — no API key needed for /api/tables or /api/schema/*.
 async function loadSchema() {
-  const meta = await api("/api/tables", apiKey);
-  $("#dataset-meta").textContent = `${meta.dataset} · period ${meta.period} · ${meta.tables.length} report tables`;
+  const meta = await api("/api/tables");
+  const m = $("#dataset-meta");
+  m.textContent = `${meta.dataset} · 기간 ${meta.period} · 보고서 테이블 ${meta.tables.length}개`;
+  m.removeAttribute("aria-busy");
   // Fetch every table's field registry in parallel rather than one roundtrip at a time.
-  const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`, apiKey)));
+  const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`)));
   $("#tables").innerHTML = details.map(renderTable).join("");
-  show($("#schema-card"));
 }
 
-// Common success path for both Google sign-in and detail-based registration:
-// reveal the issued key. The schema is public and already shown on load.
-async function onAuthSuccess(data) {
-  apiKey = data.api_key;
-  // Share the key with the dashboard's Ask box (same origin, picked up on focus).
-  try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
-  $("#apikey").textContent = apiKey;
-  if (data.expires_at) {
-    const d = new Date(data.expires_at);
-    $("#expires").textContent = "Expires " + d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) + ".";
-  }
-  $("#login-card").classList.add("hidden");
-  show($("#key-card"));
-  // Schema normally loads on page open; retry here only if that initial
-  // (public) load failed — e.g. a transient network error.
-  if ($("#schema-card").classList.contains("hidden")) loadSchema().catch(() => {});
-}
-
-// ── Google sign-in ──────────────────────────────────────────────────────────
-// The GSI client library (FedCM-backed) hands us an ID token; we POST it to
-// /auth/google, which verifies it and mints a session for any verified account.
-async function onGoogleCredential(resp) {
-  $("#error").textContent = "";
-  try {
-    const r = await fetch("/api/auth/google", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential: resp.credential }),
-    });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "Sign-in failed");
-    await onAuthSuccess(data);
-  } catch (err) {
-    $("#error").textContent = err.message;
-  }
-}
-
-function setupGoogle(clientId) {
-  const render = () => {
-    if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: onGoogleCredential,
-      use_fedcm_for_prompt: true,
-    });
-    google.accounts.id.renderButton($("#google-btn"), {
-      theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left",
-    });
-    show($("#google-block"));
-    return true;
-  };
-  // The library loads async — poll briefly until it's ready.
-  if (!render()) {
-    let tries = 0;
-    const iv = setInterval(() => { if (render() || ++tries > 50) clearInterval(iv); }, 100);
-  }
-}
-
-$("#login-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  $("#error").textContent = "";
-  const name = $("#name").value.trim();
-  const email = $("#email").value.trim();
-  if (!name || !email) { $("#error").textContent = "Please fill in both fields."; return; }
-
-  const btn = $("#submit");
-  btn.disabled = true; btn.textContent = "Issuing key…";
-  try {
-    const res = await fetch("/api/portal/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Registration failed");
-    await onAuthSuccess(data);
-  } catch (err) {
-    $("#error").textContent = err.message;
-  } finally {
-    btn.disabled = false; btn.textContent = "Request API key";
-  }
-});
-
-// Decide which sign-in methods to offer based on server config.
-async function init() {
-  // The dataset schema is public — load and show it for everyone, no sign-in needed.
-  loadSchema().catch(() => {});
-  let cfg = {};
-  try { cfg = (await (await fetch("/api")).json()).auth_config || {}; } catch (_) {}
-  const googleOn = !!(cfg.google_signin && cfg.google_client_id);
-  const demoOn = !!cfg.demo_keys;
-
-  if (googleOn) setupGoogle(cfg.google_client_id);
-  if (demoOn) show($("#login-form"));
-  if (googleOn && demoOn) show($("#auth-divider"));
-
-  $("#login-sub").textContent = googleOn
-    ? "Sign in with your Google account to request access."
-    : "Sign in with your details to be issued an API key.";
-  if (!googleOn && !demoOn) {
-    $("#login-sub").textContent = "No sign-in method is enabled on this server.";
-  }
-}
-init();
-
-$("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "Copied!";
-  setTimeout(() => (b.textContent = t), 1200);
+loadSchema().catch((err) => {
+  $("#dataset-meta").classList.add("hidden");
+  const e = $("#error");
+  e.textContent = "스키마를 불러올 수 없습니다: " + err.message;
+  show(e);
 });
 </script>
 <script>

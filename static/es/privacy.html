@@ -288,11 +288,19 @@ display: flex; align-items: center; justify-content: space-between;
     <hr class="nav-hr">
     <div class="nav-section">Herramientas</div>
 
-    <a href="/es/portal" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M8 1a3.5 3.5 0 1 0 0 7A3.5 3.5 0 0 0 8 1zM8 9C4.5 9 1.5 10.6 1.5 12.5v1a.5.5 0 0 0 .5.5h12a.5.5 0 0 0 .5-.5v-1C14.5 10.6 11.5 9 8 9z"/>
+    <a href="/es/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Portal de investigadores
+      Esquema
+    </a>
+
+    <a href="/es/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      Clave de API
     </a>
 
     <a href="/docs" class="nav-item">
@@ -358,7 +366,7 @@ display: flex; align-items: center; justify-content: space-between;
   <p>Hay dos opciones disponibles:</p>
   <ul>
     <li><strong>Inicio de sesión con Google.</strong> Iniciar sesión con una cuenta de Google crea automáticamente una clave de sesión. Tu dirección de correo proporcionada por Google se almacena como identificador de cuenta y se utiliza únicamente para aplicar los límites de frecuencia y permitir revocar el acceso si fuera necesario. Este servicio nunca ve tu contraseña de Google: la autenticación la gestiona por completo Google Identity Services.</li>
-    <li><strong>Registro de demostración</strong> (cuando está habilitado). Enviar una dirección de correo en el portal emite una clave de demostración de corta duración. El correo se almacena como identificador de esa clave.</li>
+    <li><strong>Registro de demostración</strong> (cuando está habilitado). Enviar una dirección de correo en la página de clave de API emite una clave de demostración de corta duración. El correo se almacena como identificador de esa clave.</li>
   </ul>
 
   <h2>Datos recopilados</h2>
@@ -433,7 +441,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p><a href="/es/">Inicio</a> · <a href="/es/portal">Portal de investigadores</a> · <a href="/api">API</a> · <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+  <p><a href="/es/">Inicio</a> · <a href="/es/api-key">Clave de API</a> · <a href="/api">API</a> · <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">GitHub</a></p>
 </footer>
 
 </div>
