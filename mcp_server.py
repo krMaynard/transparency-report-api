@@ -100,7 +100,7 @@ def _request(method: str, path: str, **kwargs: Any) -> Any:
         ) from exc
 
 
-# ── Tool implementations ─────────────────────────────────────────────────────
+# ── Tool implementations ─────────────────────────────────────────────
 #
 # Plain functions (no MCP dependency) so they can be unit-tested directly against
 # the app via an httpx ASGI transport. build_server() registers them as tools.
@@ -181,7 +181,80 @@ def ask(question: str) -> dict[str, Any]:
     return _request("POST", "/api/ask", json={"question": question})
 
 
-# ── MCP server wiring ────────────────────────────────────────────────────────
+def register(name: str, email: str) -> dict[str, Any]:
+    """Register for a demo API key via the researcher portal (no sign-in needed).
+
+    Calls POST /api/portal/register (public endpoint; gated by ALLOW_DEMO_KEYS on
+    the server, which defaults to on). Returns {"api_key": "...", "expires_at": "..."}.
+    Once you have the key, set TRANSPARENCY_API_KEY in the MCP server config to
+    unlock `submit_query`, `poll_job`, `ask`, and the full `describe_table`."""
+    return _request("POST", "/api/portal/register", json={"name": name, "email": email})
+
+
+def submit_query(query: dict[str, Any]) -> dict[str, Any]:
+    """Submit a structured (no-SQL) query to the async job queue.
+
+    Returns immediately with a job_id — use `poll_job` to wait for the result.
+    This is the full, unrestricted query path (POST /api/query): no row cap,
+    up to 4 composite legs, and CSV export available. Requires TRANSPARENCY_API_KEY
+    (call `register` first if you don't have one).
+
+    `query` is the same structured object accepted by `run_query`. Example:
+        {
+          "table": "t4_notices",
+          "query": {"and": [{"operation": "EQ", "field_name": "platform",
+                             "field_values": ["Meta"]}]},
+          "group_by": ["service_name"],
+          "aggregates": [{"function": "SUM", "field_name": "notices",
+                          "alias": "total_notices"}],
+          "sort": [{"field_name": "total_notices", "order": "desc"}],
+          "max_count": 1000
+        }
+    Returns {job_id, status, status_url, …}. Pass job_id to `poll_job`."""
+    if not API_KEY:
+        raise ApiError(
+            "submit_query requires TRANSPARENCY_API_KEY — POST /api/query is "
+            "authenticated. Call register() to get a demo key, or use run_query "
+            "for the public bounded query path."
+        )
+    return _request("POST", "/api/query", json=query)
+
+
+def poll_job(job_id: str, timeout: float = 60.0) -> dict[str, Any]:
+    """Poll a submitted job until it completes, then return its result rows.
+
+    `job_id` is the value returned by `submit_query`. `timeout` is the maximum
+    number of seconds to wait (default 60). On success returns
+    {columns, rows, row_count, truncated}. Raises ApiError if the job fails or
+    the timeout expires. Requires TRANSPARENCY_API_KEY."""
+    import time
+
+    if not API_KEY:
+        raise ApiError(
+            "poll_job requires TRANSPARENCY_API_KEY — /api/jobs/* is authenticated."
+        )
+    deadline = time.monotonic() + timeout
+    delay = 0.5
+    while True:
+        status = _request("GET", f"/api/jobs/{job_id}")
+        job_status = status.get("status")
+        if job_status == "done":
+            return _request("GET", f"/api/jobs/{job_id}/result")
+        if job_status == "failed":
+            raise ApiError(
+                f"Job {job_id} failed: {status.get('error', 'unknown error')}"
+            )
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise ApiError(
+                f"Timed out waiting for job {job_id} after {timeout:.0f}s "
+                f"(current status: {job_status!r})"
+            )
+        time.sleep(min(delay, remaining))
+        delay = min(delay * 1.5, 5.0)
+
+
+# ── MCP server wiring ────────────────────────────────────────────
 
 
 def build_server() -> Any:
@@ -191,7 +264,10 @@ def build_server() -> Any:
     from mcp.server.fastmcp import FastMCP
 
     server = FastMCP(SERVER_NAME)
-    for fn in (list_tables, describe_table, dataset_overview, run_query, ask):
+    for fn in (
+        list_tables, describe_table, dataset_overview, run_query, ask,
+        register, submit_query, poll_job,
+    ):
         server.add_tool(fn)
     return server
 
