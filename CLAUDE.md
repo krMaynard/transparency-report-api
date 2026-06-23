@@ -137,7 +137,7 @@ Two mechanisms, both presented as `X-API-Key` to the rest of the app:
   an admin revoke kills live sessions at once. Durable account state lives in
   `_registrations` (Redis-backed when configured, else in-memory — same pattern
   as `_key_store`).
-- **Demo keys (dev).** Hard-coded `alice`/`bob` + the open `/portal/register`.
+- **Demo keys (dev).** Hard-coded `momo`/`honggildong` + the open `/portal/register`.
   Gated by `ALLOW_DEMO_KEYS` (default on); set `ALLOW_DEMO_KEYS=0` in production.
 
 Jobs are scoped per key — each principal only sees their own jobs (foreign IDs

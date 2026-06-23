@@ -76,7 +76,7 @@ you'll skip the GCP-specific steps but still do everything else below.
 
 In `service.yaml` (or your host's env):
 
-- `ALLOW_DEMO_KEYS=0` — disables the hard-coded `alice`/`bob` keys and the open
+- `ALLOW_DEMO_KEYS=0` — disables the hard-coded `momo`/`honggildong` keys and the open
   `/api/portal/register` endpoint, so **only Google sign-in works**.
 - `LOG_FORMAT=json`.
 - `PUBLIC_BASE_URL=https://<your-domain>` — makes callback/download links

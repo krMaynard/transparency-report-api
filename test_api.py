@@ -674,7 +674,7 @@ class TestQueryRateLimit:
         try:
             assert client.post("/api/query", json=COUNT_ALL, headers=MOMO).status_code == 202
             assert client.post("/api/query", json=COUNT_ALL, headers=MOMO).status_code == 429
-            # bob has his own bucket and is unaffected
+            # honggildong has their own bucket and is unaffected
             assert client.post("/api/query", json=COUNT_ALL, headers=HONG).status_code == 202
         finally:
             main._key_store, main.QUERY_RATE_MAX = original_store, original_max
