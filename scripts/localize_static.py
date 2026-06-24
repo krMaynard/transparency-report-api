@@ -30,12 +30,15 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC = os.path.join(ROOT, "static")
 
-PAGES_FILES = ["home.html", "index.html", "removals.html", "schema.html", "api-key.html", "privacy.html"]
+PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "mcp.html",
+               "schema.html", "api-key.html", "privacy.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
     "home.html": "",
     "index.html": "reports",
     "removals.html": "removals",
+    "catalog.html": "catalog",
+    "mcp.html": "mcp",
     "schema.html": "schema",
     "api-key.html": "api-key",
     "privacy.html": "privacy",
@@ -93,7 +96,7 @@ def build_switcher(active: str, suffix: str) -> str:
 
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
-INTERNAL_HREFS = ['/', '/reports', '/removals', '/schema', '/api-key', '/privacy']
+INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/mcp', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -119,6 +122,12 @@ COMMON = {
         ('''>Tools</div>''', '''>Herramientas</div>'''),
         ('''DSA Reports''', '''Informes DSA'''),
         ('''Government Removals''', '''Retiradas gubernamentales'''),
+        ('''      Report locations
+    </a>''', '''      Ubicaciones de informes
+    </a>'''),
+        ('''      MCP server
+    </a>''', '''      Servidor MCP
+    </a>'''),
         ('''      Schema
     </a>''', '''      Esquema
     </a>'''),
@@ -148,6 +157,12 @@ COMMON = {
         ('''>Tools</div>''', '''>Outils</div>'''),
         ('''DSA Reports''', '''Rapports DSA'''),
         ('''Government Removals''', '''Retraits gouvernementaux'''),
+        ('''      Report locations
+    </a>''', '''      Emplacements des rapports
+    </a>'''),
+        ('''      MCP server
+    </a>''', '''      Serveur MCP
+    </a>'''),
         ('''      Schema
     </a>''', '''      Schéma
     </a>'''),
@@ -177,6 +192,12 @@ COMMON = {
         ('''>Tools</div>''', '''>Werkzeuge</div>'''),
         ('''DSA Reports''', '''DSA-Berichte'''),
         ('''Government Removals''', '''Behördliche Entfernungen'''),
+        ('''      Report locations
+    </a>''', '''      Berichtsstandorte
+    </a>'''),
+        ('''      MCP server
+    </a>''', '''      MCP-Server
+    </a>'''),
         ('''      Schema
     </a>''', '''      Schema
     </a>'''),
@@ -1307,6 +1328,12 @@ COMMON["ja"] = [
      r'''DSA レポート'''),
     (r'''Government Removals''',
      r'''政府による削除要請'''),
+    (r'''      Report locations
+    </a>''', r'''      レポートの掲載先
+    </a>'''),
+    (r'''      MCP server
+    </a>''', r'''      MCP サーバー
+    </a>'''),
     (r'''SoR Analysis''',
      r'''SoR 分析'''),
     (r'''>Soon</span>''',
@@ -1914,6 +1941,12 @@ COMMON["zh"] = [
      r'''DSA 报告'''),
     (r'''Government Removals''',
      r'''政府删除请求'''),
+    (r'''      Report locations
+    </a>''', r'''      报告位置
+    </a>'''),
+    (r'''      MCP server
+    </a>''', r'''      MCP 服务器
+    </a>'''),
     (r'''SoR Analysis''',
      r'''SoR 分析'''),
     (r'''>Soon</span>''',
@@ -2520,6 +2553,12 @@ COMMON["ko"] = [
      r'''DSA 보고서'''),
     (r'''Government Removals''',
      r'''정부 삭제 요청'''),
+    (r'''      Report locations
+    </a>''', r'''      보고서 위치
+    </a>'''),
+    (r'''      MCP server
+    </a>''', r'''      MCP 서버
+    </a>'''),
     (r'''SoR Analysis''',
      r'''SoR 분석'''),
     (r'''>Soon</span>''',
@@ -3098,6 +3137,149 @@ PAGES["ko"]["privacy.html"] = [
     (r'''Privacy Policy''',
      r'''개인정보 처리방침'''),
 ]
+
+
+# ── Relocate the report-locations panel translations to catalog.html ─────────
+# The panel moved from the dashboard (index.html) to its own page (catalog.html).
+# Its translation tuples were originally appended to each index.html list; move
+# them to catalog.html, convert the panel <h2> heading into the page <h1>, and
+# prepend the catalogue page's own header (h1 + tagline) strings.
+_CATALOG_SUB = ('''A curated catalogue of where online platforms publish their DSA\n'''
+                '''      Art. 15/24 transparency reports — beyond the designated VLOPs. Served by the\n'''
+                '''      public, read-only <code>GET /api/report-locations</code>.''')
+_CATALOG_EN_KEYS = {
+    "<h2>Where platforms publish their reports</h2>",
+    _CATALOG_SUB,
+    "<label>Category <select", "<label>Confidence <select", "<label>Template <select",
+    "<label>Search <input", '<option value="">All</option>',
+    'placeholder="platform, company, URL"',
+    '<button id="rl-csv" type="button">Download CSV</button>',
+    "`Showing ${fmt(d.count)} of ${fmt(d.total)} report URLs across ${fmt(d.platform_count)} platforms.`",
+    '"<tr><th>Platform</th><th>Company</th><th>Category</th>"',
+    '"<th>Confidence</th><th>Template</th><th>Report</th></tr>"',
+    '''"<p class='sub'>No matching platforms.</p>"''',
+    '"Could not load catalogue: "',
+}
+# Catalogue page header (h1 + tagline) — the page chrome that wraps the panel.
+_CATALOG_HEADER = {
+    "es": [("<h1>Where platforms publish their reports</h1>",
+            "<h1>Dónde publican sus informes las plataformas</h1>"),
+           ("<p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>",
+            "<p>Más allá de las VLOP designadas: dónde publican las plataformas en línea sus informes de transparencia del DSA (art. 15/24).</p>")],
+    "fr": [("<h1>Where platforms publish their reports</h1>",
+            "<h1>Où les plateformes publient leurs rapports</h1>"),
+           ("<p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>",
+            "<p>Au-delà des VLOP désignées — où les plateformes en ligne publient leurs rapports de transparence DSA (art. 15/24).</p>")],
+    "de": [("<h1>Where platforms publish their reports</h1>",
+            "<h1>Wo Plattformen ihre Berichte veröffentlichen</h1>"),
+           ("<p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>",
+            "<p>Über die benannten VLOPs hinaus — wo Online-Plattformen ihre DSA-Transparenzberichte (Art. 15/24) veröffentlichen.</p>")],
+    "ja": [("<h1>Where platforms publish their reports</h1>",
+            "<h1>プラットフォームが報告書を公開している場所</h1>"),
+           ("<p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>",
+            "<p>指定 VLOP 以外を含め、オンラインプラットフォームが DSA 第15条・第24条の透明性報告書を公開している場所。</p>")],
+    "zh": [("<h1>Where platforms publish their reports</h1>",
+            "<h1>平台在何处发布报告</h1>"),
+           ("<p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>",
+            "<p>在指定 VLOP 之外，在线平台发布其 DSA 第15/24条透明度报告的位置。</p>")],
+    "ko": [("<h1>Where platforms publish their reports</h1>",
+            "<h1>플랫폼이 보고서를 게시하는 위치</h1>"),
+           ("<p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>",
+            "<p>지정된 VLOP를 넘어, 온라인 플랫폼이 DSA 제15조·제24조 투명성 보고서를 게시하는 위치.</p>")],
+}
+
+
+def _relocate_catalogue() -> None:
+    for loc in ("es", "fr", "de", "ja", "zh", "ko"):
+        src = PAGES[loc].get("index.html", [])
+        cat, keep = [], []
+        for en, xx in src:
+            (cat if en in _CATALOG_EN_KEYS else keep).append((en, xx))
+        # The panel <h2> becomes the catalogue page <h1>.
+        cat = [("<h1>Where platforms publish their reports</h1>",
+                xx.replace("<h2>", "<h1>").replace("</h2>", "</h1>"))
+               if en == "<h2>Where platforms publish their reports</h2>" else (en, xx)
+               for en, xx in cat]
+        PAGES[loc]["index.html"] = keep
+        PAGES[loc]["catalog.html"] = _CATALOG_HEADER[loc] + cat
+
+
+_relocate_catalogue()
+
+
+# ── MCP page: headings, tagline, and tool descriptions ───────────────────────
+# The longer explanatory paragraphs and the config JSON stay English by design
+# (they are largely code: tool names, env vars, the host-config snippet).
+_MCP = {
+    "es": {"Integration": "Integración", "MCP server": "Servidor MCP",
+           "What it is": "Qué es", "Tools": "Herramientas", "Connect it": "Cómo conectarlo",
+           "tag": "Consulta este conjunto de datos desde un cliente de IA compatible con MCP: Claude Desktop, Claude Code y otros.",
+           "d1": "Lista las tablas de informes del DSA y el período del conjunto de datos.",
+           "d2": "Muestra las dimensiones y medidas consultables de una tabla.",
+           "d3": "Agregados principales de todo el conjunto de datos.",
+           "d4": "Ejecuta una consulta estructurada (de una tabla o compuesta) y devuelve filas JSON.",
+           "d5": "Haz una pregunta en lenguaje natural; un LLM la traduce en una consulta estructurada validada."},
+    "fr": {"Integration": "Intégration", "MCP server": "Serveur MCP",
+           "What it is": "Présentation", "Tools": "Outils", "Connect it": "Connexion",
+           "tag": "Interrogez ce jeu de données depuis un client IA compatible MCP — Claude Desktop, Claude Code, et d’autres.",
+           "d1": "Liste les tableaux de rapports DSA et la période du jeu de données.",
+           "d2": "Affiche les dimensions et mesures interrogeables d’un tableau.",
+           "d3": "Agrégats clés pour l’ensemble du jeu de données.",
+           "d4": "Exécute une requête structurée (mono-table ou composite) et renvoie des lignes JSON.",
+           "d5": "Posez une question en langage naturel ; un LLM la traduit en requête structurée validée."},
+    "de": {"Integration": "Integration", "MCP server": "MCP-Server",
+           "What it is": "Was es ist", "Tools": "Werkzeuge", "Connect it": "Einrichten",
+           "tag": "Frage diesen Datensatz aus einem MCP-kompatiblen KI-Client ab — Claude Desktop, Claude Code und andere.",
+           "d1": "Listet die DSA-Berichtstabellen und den Datensatzzeitraum auf.",
+           "d2": "Zeigt die abfragbaren Dimensionen und Kennzahlen einer Tabelle.",
+           "d3": "Wichtigste Aggregate für den gesamten Datensatz.",
+           "d4": "Führt eine strukturierte (Einzeltabellen- oder zusammengesetzte) Abfrage aus und gibt JSON-Zeilen zurück.",
+           "d5": "Stelle eine Frage in natürlicher Sprache; ein LLM übersetzt sie in eine validierte strukturierte Abfrage."},
+    "ja": {"Integration": "連携", "MCP server": "MCP サーバー",
+           "What it is": "概要", "Tools": "ツール", "Connect it": "接続方法",
+           "tag": "MCP 対応の AI クライアント（Claude Desktop、Claude Code など）からこのデータセットを照会できます。",
+           "d1": "DSA レポートテーブルとデータセットの期間を一覧表示します。",
+           "d2": "テーブルの照会可能なディメンションと指標を表示します。",
+           "d3": "データセット全体の主要な集計値。",
+           "d4": "構造化クエリ（単一テーブルまたは複合）を実行し、JSON 行を返します。",
+           "d5": "自然言語で質問すると、LLM が検証済みの構造化クエリに変換します。"},
+    "zh": {"Integration": "集成", "MCP server": "MCP 服务器",
+           "What it is": "简介", "Tools": "工具", "Connect it": "连接方式",
+           "tag": "从兼容 MCP 的 AI 客户端（Claude Desktop、Claude Code 等）查询此数据集。",
+           "d1": "列出 DSA 报告表和数据集所属期间。",
+           "d2": "显示某个表可查询的维度和度量。",
+           "d3": "整个数据集的关键汇总数据。",
+           "d4": "运行结构化查询（单表或复合）并返回 JSON 行。",
+           "d5": "用自然语言提问；LLM 会将其转换为经过验证的结构化查询。"},
+    "ko": {"Integration": "통합", "MCP server": "MCP 서버",
+           "What it is": "개요", "Tools": "도구", "Connect it": "연결하기",
+           "tag": "MCP 호환 AI 클라이언트(Claude Desktop, Claude Code 등)에서 이 데이터셋을 조회하세요.",
+           "d1": "DSA 보고서 테이블과 데이터셋 기간을 나열합니다.",
+           "d2": "테이블의 조회 가능한 차원과 측정값을 표시합니다.",
+           "d3": "전체 데이터셋의 주요 집계값.",
+           "d4": "구조화된(단일 테이블 또는 복합) 쿼리를 실행하고 JSON 행을 반환합니다.",
+           "d5": "자연어로 질문하면 LLM이 검증된 구조화 쿼리로 변환합니다."},
+}
+for _loc, _m in _MCP.items():
+    PAGES[_loc]["mcp.html"] = [
+        ('''<span class="badge">Integration</span>''', f'''<span class="badge">{_m["Integration"]}</span>'''),
+        ('''<h1>MCP server</h1>''', f'''<h1>{_m["MCP server"]}</h1>'''),
+        ('''<p>Query this dataset from an MCP-compatible AI client — Claude Desktop, Claude Code, and others.</p>''',
+         f'''<p>{_m["tag"]}</p>'''),
+        ('''<h2>What it is</h2>''', f'''<h2>{_m["What it is"]}</h2>'''),
+        ('''<h2>Tools</h2>''', f'''<h2>{_m["Tools"]}</h2>'''),
+        ('''<h2>Connect it</h2>''', f'''<h2>{_m["Connect it"]}</h2>'''),
+        ('''<div class="desc">List the DSA report tables and the dataset period.</div>''',
+         f'''<div class="desc">{_m["d1"]}</div>'''),
+        ('''<div class="desc">Show a table's queryable dimensions and measures.</div>''',
+         f'''<div class="desc">{_m["d2"]}</div>'''),
+        ('''<div class="desc">Headline aggregates for the whole dataset.</div>''',
+         f'''<div class="desc">{_m["d3"]}</div>'''),
+        ('''<div class="desc">Run a structured (single-table or composite) query and get JSON rows back.</div>''',
+         f'''<div class="desc">{_m["d4"]}</div>'''),
+        ('''<div class="desc">Ask a natural-language question; an LLM translates it into a validated structured query.</div>''',
+         f'''<div class="desc">{_m["d5"]}</div>'''),
+    ]
 
 
 def main(argv: list[str]) -> int:

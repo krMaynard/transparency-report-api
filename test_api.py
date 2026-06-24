@@ -1114,6 +1114,34 @@ class TestDashboard:
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "/api/overview" in r.text  # dashboard fetches the public overview
 
+    def test_catalog_page_served(self):
+        r = client.get("/catalog")
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+        # The report-locations panel + its data source live here now.
+        assert "/api/report-locations" in r.text and 'id="rl-category"' in r.text
+
+    def test_catalog_panel_moved_off_dashboard(self):
+        # The catalogue panel was relocated from the dashboard to /catalog.
+        assert 'id="rl-category"' not in client.get("/reports").text
+
+    def test_mcp_page_served(self):
+        r = client.get("/mcp")
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+        assert "mcp_server.py" in r.text and "Model Context Protocol" in r.text
+
+    def test_new_pages_in_sidebar_nav(self):
+        # Both new pages are linked from every page's sidebar nav.
+        for path in ("/reports", "/catalog", "/mcp", "/schema"):
+            t = client.get(path).text
+            assert 'href="/catalog"' in t and 'href="/mcp"' in t
+
+    def test_localized_catalog_and_mcp(self):
+        assert client.get("/es/catalog").status_code == 200
+        assert client.get("/ja/mcp").status_code == 200
+        # Chrome/heading is localized (catalogue h1 in Spanish; MCP heading in Japanese).
+        assert "Dónde publican" in client.get("/es/catalog").text
+        assert "概要" in client.get("/ja/mcp").text
+
     def test_dashboard_uses_vendored_chartjs(self):
         r = client.get("/reports")
         # Chart.js is self-hosted, not loaded from a CDN.
