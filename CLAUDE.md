@@ -33,11 +33,13 @@ Built to demonstrate two things:
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/report-locations.csv` | Vendored snapshot of the non-VLOP DSA report-locations catalogue (sibling `dsa-transparency-data/dsa_reports.csv`) — seeded into the read-only `report_locations` table by `seed.py` |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
-| `static/index.html` | Public VLOP dashboard (served at `/reports`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box + "Where platforms publish their reports" catalogue panel (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`, `GET /api/report-locations`) |
+| `static/index.html` | Public VLOP dashboard (served at `/reports`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
+| `static/catalog.html` | Public report-locations catalogue page (served at `/catalog`) — the "Where platforms publish their reports" filterable table over `GET /api/report-locations` |
+| `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 5 tools, and host config; static, no page JS |
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
-| `static/{es,fr,de,ja,zh,ko}/*.html` | Localized copies of the six pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/{es,fr,de,ja,zh,ko}/*.html` | Localized copies of the eight pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -58,7 +60,7 @@ Built to demonstrate two things:
 
 ## Localization
 
-The six static pages are localized into **Spanish (`/es`), French (`/fr`),
+The eight static pages are localized into **Spanish (`/es`), French (`/fr`),
 German (`/de`), Japanese (`/ja`), Chinese (`/zh`), and Korean (`/ko`)** alongside
 the English originals (served at the root). English is the source of truth; the
 translations are **generated**, not hand-written:
@@ -69,8 +71,8 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/schema`, `/<locale>/api-key`,
-  `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/mcp`, `/<locale>/schema`,
+  `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
   endpoints stay locale-agnostic; localized pages call the same `/api/*`.
@@ -331,6 +333,8 @@ root. The API endpoints are registered on an `APIRouter` included with
 | POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited, ≤`EXPLORE_MAX_LEGS` composite legs) |
 | POST | `/api/ask` | — | Public: NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; off unless `ANTHROPIC_API_KEY` set |
 | GET | `/api` | — | API service info |
+| GET | `/catalog` | — | Public report-locations catalogue page (web UI over `GET /api/report-locations`) |
+| GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |
 | GET | `/api-key` | — | API-key sign-in page (web UI: sign in → key). `/portal` 308-redirects here |
 | POST | `/api/auth/google` | — | Verify a Google ID token → session key (any verified account) |

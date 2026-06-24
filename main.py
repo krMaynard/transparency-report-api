@@ -2033,6 +2033,18 @@ def schema_page() -> FileResponse:
     return _serve_page("schema.html", "Schema page")
 
 
+@app.get("/catalog", response_class=HTMLResponse)
+def catalog_page() -> FileResponse:
+    """Serve the report-locations catalogue page (reads GET /api/report-locations)."""
+    return _serve_page("catalog.html", "Catalogue page")
+
+
+@app.get("/mcp", response_class=HTMLResponse)
+def mcp_page() -> FileResponse:
+    """Serve the MCP-server info page (static; documents mcp_server.py)."""
+    return _serve_page("mcp.html", "MCP page")
+
+
 @app.get("/portal", include_in_schema=False)
 def portal_redirect() -> RedirectResponse:
     """Permanent redirect from the old researcher-portal URL to /api-key."""
@@ -2066,6 +2078,8 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "": ("home.html", "Home page", {}),
     "reports": ("index.html", "Dashboard page", {}),
     "removals": ("removals.html", "Removals page", {}),
+    "catalog": ("catalog.html", "Catalogue page", {}),
+    "mcp": ("mcp.html", "MCP page", {}),
     "schema": ("schema.html", "Schema page", {}),
     "api-key": ("api-key.html", "API key page", _API_KEY_CSP_HOSTS),
     "privacy": ("privacy.html", "Privacy policy", {}),

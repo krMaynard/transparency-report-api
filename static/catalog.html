@@ -1,13 +1,12 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Obtener una clave de API · Transparency Report</title>
+<title>Report locations · Transparency Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://accounts.google.com/gsi/client" async></script>
 <script>
   // Match the main site: set the theme before first paint to avoid a flash.
   (function () {
@@ -178,47 +177,19 @@ display: flex; align-items: center;
   }
   .card h2 { margin: 0 0 4px; font-size: 18px; }
   .card .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
-  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
-  input {
-    width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
-    background: var(--panel2); color: var(--fg); font-size: 15px;
-  }
-  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(42,157,143,.2); }
-  button {
-    margin-top: 20px; width: 100%; padding: 12px 16px; border: 0; border-radius: 9px;
-    background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 650; cursor: pointer;
-  }
-  button:hover { background: var(--accent-dark); }
-  button:disabled { opacity: .6; cursor: default; }
   .hidden { display: none !important; }
   .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
   [data-theme="dark"] .error { color: #ff7b72; }
-  .keyrow { display: flex; gap: 10px; align-items: stretch; }
-  .keybox {
-    flex: 1; font-family: var(--mono); font-size: 14px; background: var(--panel2); color: var(--accent2);
-    border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; overflow-x: auto;
-    white-space: nowrap;
-  }
-  .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
   .tbl { margin: 0 0 18px; }
   .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
-  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
-  th { color: var(--muted); font-weight: 600; }
-  td.type { font-family: var(--mono); color: var(--accent2); }
-  td.flag { color: var(--muted); font-family: var(--mono); }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
   footer a { color: var(--accent); text-decoration: none; }
-  .gbtn { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 44px; }
-  .divider { display: flex; align-items: center; text-align: center; color: var(--muted); font-size: 13px; margin: 18px 0 4px; }
-  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
-  .divider span { padding: 0 12px; }
   /* Keyboard focus visibility — a clear ring on every interactive control. */
   a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
   [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
@@ -238,38 +209,47 @@ display: flex; align-items: center;
     .wrap { padding: 20px 1rem; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
+  .controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 4px; }
+  select, input[type=search] { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 14px; min-width: 130px; }
+  .controls button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 650; cursor: pointer; }
+  .controls button:hover { background: var(--accent-dark); }
+  .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
+  .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .restable th { color: var(--muted); font-weight: 600; }
+  .restable a { color: var(--accent); text-decoration: none; }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Saltar al contenido</a>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="page-header">
-<nav class="site-nav" aria-label="Sitio">
+<nav class="site-nav" aria-label="Site">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Trabajo</a>
-      <a href="https://kieranmaynard.com/transparency.html">Productos</a>
-      <a href="https://kieranmaynard.com/consulting.html">Consultoría</a>
+      <a href="https://kieranmaynard.com/work.html">Work</a>
+      <a href="https://kieranmaynard.com/transparency.html">Products</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
       <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contacto</a>
+      <a href="https://kieranmaynard.com/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="Idioma" title="Idioma">
+      <summary class="lang-current" aria-label="Language" title="Language">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>Español</span>
+        <span>English</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/api-key"><span>English</span></a></li>
-        <li><a class="lang-opt is-current" href="/es/api-key" aria-current="page"><span>Español</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/fr/api-key"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/api-key"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/ja/api-key"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/api-key"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/api-key"><span>한국어</span></a></li>
+        <li><a class="lang-opt is-current" href="/catalog" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/es/catalog"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/catalog"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/catalog"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/ja/catalog"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/catalog"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/catalog"><span>한국어</span></a></li>
       </ul>
     </details>
-    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Alternar modo oscuro" aria-pressed="false">
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
     </button>
@@ -280,12 +260,12 @@ display: flex; align-items: center;
 <header class="topbar">
   <div class="topbar-left">
     <button type="button" class="hamburger" id="hamburger"
-            aria-label="Alternar navegación" aria-expanded="false" aria-controls="sidebar">
+            aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/es/" class="topbar-brand">Transparency Report API</a>
+    <a href="/" class="topbar-brand">Transparency Report API</a>
   </div>
 </header>
 </div>
@@ -293,74 +273,74 @@ display: flex; align-items: center;
 <div class="app-body">
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
-<aside class="sidebar" id="sidebar" aria-label="Navegación de la aplicación">
+<aside class="sidebar" id="sidebar" aria-label="Application navigation">
   <nav>
-    <div class="nav-section">Conjuntos de datos</div>
+    <div class="nav-section">Datasets</div>
 
-    <a href="/es/reports" class="nav-item">
+    <a href="/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
-      Informes DSA
+      DSA Reports
     </a>
 
-    <a href="/es/removals" class="nav-item">
+    <a href="/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Retiradas gubernamentales
+      Government Removals
     </a>
 
-    <a href="/es/catalog" class="nav-item">
+    <a href="/catalog" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      Ubicaciones de informes
+      Report locations
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">Herramientas</div>
+    <div class="nav-section">Tools</div>
 
-    <a href="/es/schema" class="nav-item">
+    <a href="/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Esquema
+      Schema
     </a>
 
-    <a href="/es/api-key" class="nav-item is-active" aria-current="page">
+    <a href="/api-key" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
       </svg>
-      Clave de API
+      API key
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      Referencia de la API
+      API Reference
     </a>
 
-    <a href="/es/mcp" class="nav-item">
+    <a href="/mcp" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
         <rect x="2" y="9" width="12" height="4.5" rx="1"/>
         <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
       </svg>
-      Servidor MCP
+      MCP server
     </a>
 
-    <a href="/es/privacy" class="nav-item">
+    <a href="/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
-      Privacidad
+      Privacy
     </a>
 
     <hr class="nav-hr">
@@ -379,7 +359,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Por <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/es/privacy">Privacidad</a></div>
+  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -387,170 +367,122 @@ display: flex; align-items: center;
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">Acceso a la API</span>
-    <h1>Obtener una clave de API</h1>
-    <p>Transparencia de moderación de contenidos de VLOP bajo el DSA de la UE: inicia sesión para obtener una clave de API.</p>
+    <span class="badge">Catalogue</span>
+    <h1>Where platforms publish their reports</h1>
+    <p>Beyond the designated VLOPs — where online platforms publish their DSA Art. 15/24 transparency reports.</p>
   </header>
 
  <main id="main" tabindex="-1">
-  <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
-    <h2>Solicitar acceso a la API</h2>
-    <p class="sub" id="login-sub">Inicia sesión para obtener una clave de API.</p>
-    <p class="hint">Una clave de API desbloquea la <strong>API de consultas asíncrona</strong> —enviar un trabajo, sondear y exportar resultados completos en JSON/CSV— además del cuadro <strong>Ask</strong> en lenguaje natural, las devoluciones de llamada por webhook y límites de uso más altos. Explorar el <a href="/es/schema">esquema</a> y ejecutar las consultas limitadas de los paneles no requiere clave.</p>
-
-    <!-- Google sign-in (shown when GOOGLE_CLIENT_ID is configured) -->
-    <div id="google-block" class="hidden">
-      <div class="gbtn" id="google-btn"></div>
-      <p class="hint">Inicia sesión con cualquier cuenta de Google: tu clave de API se emite al instante.</p>
+  <section class="card" id="locations-card">
+    <p class="sub">A curated catalogue of where online platforms publish their DSA
+      Art. 15/24 transparency reports — beyond the designated VLOPs. Served by the
+      public, read-only <code>GET /api/report-locations</code>.</p>
+    <div class="controls">
+      <label>Category <select id="rl-category"><option value="">All</option></select></label>
+      <label>Confidence <select id="rl-confidence"><option value="">All</option></select></label>
+      <label>Template <select id="rl-template"><option value="">All</option></select></label>
+      <label>Search <input id="rl-q" type="search" placeholder="platform, company, URL" /></label>
+      <button id="rl-csv" type="button">Download CSV</button>
     </div>
-
-    <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>o inicia sesión con tus datos</span></div>
-
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
-    <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">Nombre completo</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">Correo profesional</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">Solicitar clave de API</button>
-    </form>
-    <div class="error" id="error" role="alert"></div>
-  </section>
-
-  <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
-    <h2>Bienvenido/a, <span id="who">investigador/a</span> 👋</h2>
-    <p class="sub">Tu clave de API se ha emitido. Mantenla en secreto.</p>
-    <div class="keyrow">
-      <div class="keybox" id="apikey"></div>
-      <button class="copy" id="copy" type="button">Copiar</button>
-    </div>
-    <p class="hint">Envíala en cada solicitud como cabecera <code>X-API-Key</code>. Pruébala en la
-      <a href="/docs" target="_blank" rel="noopener">documentación interactiva de la API</a>.</p>
-    <p class="hint" id="expires"></p>
-    <p class="hint">Explora lo que puedes consultar en la página de <a href="/es/schema">esquema del conjunto de datos</a>.</p>
+    <div class="error" id="rl-error" role="alert"></div>
+    <div id="rl-summary" class="sub" aria-live="polite"></div>
+    <div id="rl-out" aria-live="polite" aria-busy="true"></div>
   </section>
  </main>
 
-  <footer>Con tecnología de Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/es/privacy">Privacidad</a></footer>
+  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/privacy">Privacy</a></footer>
 </div><!-- /.wrap -->
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
 
 <script>
-const $ = (sel) => document.querySelector(sel);
-let apiKey = null;
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => (n ?? 0).toLocaleString();
+// Escape DB/registry values before they go into innerHTML (defence in depth).
+const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
 
-function show(el) { el.classList.remove("hidden"); }
-
-// Common success path for both Google sign-in and detail-based registration:
-// reveal the issued key.
-async function onAuthSuccess(data) {
-  apiKey = data.api_key;
-  // Share the key with the dashboard's Ask box (same origin, picked up on focus).
-  try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
-  $("#apikey").textContent = apiKey;
-  if (data.expires_at) {
-    const d = new Date(data.expires_at);
-    $("#expires").textContent = "Expira el " + d.toLocaleDateString('es-ES', { year: "numeric", month: "long", day: "numeric" }) + ".";
-  }
-  $("#login-card").classList.add("hidden");
-  show($("#key-card"));
+function rlParams() {
+  const p = new URLSearchParams();
+  const cat = $("#rl-category").value, conf = $("#rl-confidence").value,
+        tmpl = $("#rl-template").value, q = $("#rl-q").value.trim();
+  if (cat) p.set("category", cat);
+  if (conf) p.set("confidence", conf);
+  if (tmpl) p.set("harmonised_template", tmpl);
+  if (q) p.set("q", q);
+  return p;
 }
 
-// ── Google sign-in ──────────────────────────────────────────────────────────
-// The GSI client library (FedCM-backed) hands us an ID token; we POST it to
-// /auth/google, which verifies it and mints a session for any verified account.
-async function onGoogleCredential(resp) {
-  $("#error").textContent = "";
+let rlAbortController = null;
+
+async function runLocations() {
+  // Abort any in-flight request so a slow earlier response can't overwrite the
+  // results of a newer filter/search (rapid typing or dropdown changes).
+  if (rlAbortController) rlAbortController.abort();
+  rlAbortController = new AbortController();
+  const { signal } = rlAbortController;
+  $("#rl-error").textContent = "";
+  $("#rl-out").setAttribute("aria-busy", "true");
+  const params = rlParams();
+  let d;
   try {
-    const r = await fetch("/api/auth/google", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ credential: resp.credential }),
-    });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "Error al iniciar sesión");
-    await onAuthSuccess(data);
+    const res = await fetch("/api/report-locations?" + params.toString(), { signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
   } catch (err) {
-    $("#error").textContent = err.message;
+    if (err.name === "AbortError") return;  // superseded by a newer request
+    $("#rl-error").textContent = "Could not load catalogue: " + err.message;
+    $("#rl-out").setAttribute("aria-busy", "false");
+    return;
   }
+  $("#rl-out").setAttribute("aria-busy", "false");
+  $("#rl-summary").textContent =
+    `Showing ${fmt(d.count)} of ${fmt(d.total)} report URLs across ${fmt(d.platform_count)} platforms.`;
+  const head = "<tr><th>Platform</th><th>Company</th><th>Category</th>" +
+    "<th>Confidence</th><th>Template</th><th>Report</th></tr>";
+  const body = d.rows.map(r => {
+    const link = r.url
+      ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
+      : esc(r.url_label || "");
+    return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
+      `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
+      `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td></tr>`;
+  }).join("");
+  $("#rl-out").innerHTML = d.rows.length
+    ? `<table class="restable">${head}${body}</table>`
+    : "<p class='sub'>No matching platforms.</p>";
 }
 
-function setupGoogle(clientId) {
-  const render = () => {
-    if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: onGoogleCredential,
-      use_fedcm_for_prompt: true,
-    });
-    google.accounts.id.renderButton($("#google-btn"), {
-      theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left",
-    });
-    show($("#google-block"));
-    return true;
-  };
-  // The library loads async — poll briefly until it's ready.
-  if (!render()) {
-    let tries = 0;
-    const iv = setInterval(() => { if (render() || ++tries > 50) clearInterval(iv); }, 100);
-  }
-}
-
-$("#login-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  $("#error").textContent = "";
-  const name = $("#name").value.trim();
-  const email = $("#email").value.trim();
-  if (!name || !email) { $("#error").textContent = "Por favor, rellena ambos campos."; return; }
-
-  const btn = $("#submit");
-  btn.disabled = true; btn.textContent = "Emitiendo clave…";
+async function setupLocations() {
+  let d;
   try {
-    const res = await fetch("/api/portal/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email }),
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Error en el registro");
-    await onAuthSuccess(data);
+    const res = await fetch("/api/report-locations");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
   } catch (err) {
-    $("#error").textContent = err.message;
-  } finally {
-    btn.disabled = false; btn.textContent = "Solicitar clave de API";
+    $("#rl-error").textContent = "Could not load catalogue: " + err.message;
+    $("#rl-out").setAttribute("aria-busy", "false");
+    return;
   }
-});
-
-// Decide which sign-in methods to offer based on server config.
-async function init() {
-  let cfg = {};
-  try { cfg = (await (await fetch("/api")).json()).auth_config || {}; } catch (_) {}
-  const googleOn = !!(cfg.google_signin && cfg.google_client_id);
-  const demoOn = !!cfg.demo_keys;
-
-  if (googleOn) setupGoogle(cfg.google_client_id);
-  if (demoOn) show($("#login-form"));
-  if (googleOn && demoOn) show($("#auth-divider"));
-
-  $("#login-sub").textContent = googleOn
-    ? "Inicia sesión con tu cuenta de Google para solicitar acceso."
-    : "Inicia sesión con tus datos para obtener una clave de API.";
-  if (!googleOn && !demoOn) {
-    $("#login-sub").textContent = "No hay ningún método de inicio de sesión habilitado en este servidor.";
-  }
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  $("#rl-category").insertAdjacentHTML("beforeend", d.facets.category.map(opt).join(""));
+  $("#rl-confidence").insertAdjacentHTML("beforeend", d.facets.confidence.map(opt).join(""));
+  $("#rl-template").insertAdjacentHTML("beforeend", d.facets.harmonised_template.map(opt).join(""));
+  ["#rl-category", "#rl-confidence", "#rl-template"].forEach(s => $(s).addEventListener("change", runLocations));
+  // Debounce the free-text search so we don't fire a request per keystroke.
+  let t = null;
+  $("#rl-q").addEventListener("input", () => {
+    if (t) clearTimeout(t);
+    t = setTimeout(runLocations, 250);
+  });
+  $("#rl-csv").addEventListener("click", () => {
+    const p = rlParams(); p.set("format", "csv");
+    window.open("/api/report-locations?" + p.toString(), "_blank");
+  });
+  runLocations();
 }
-init();
 
-$("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "¡Copiado!";
-  setTimeout(() => (b.textContent = t), 1200);
-});
+document.addEventListener("DOMContentLoaded", setupLocations);
 </script>
 <script>
   // Hamburger — mobile sidebar toggle
