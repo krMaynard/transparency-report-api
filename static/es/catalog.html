@@ -401,6 +401,10 @@ const fmt = (n) => (n ?? 0).toLocaleString();
 // Escape DB/registry values before they go into innerHTML (defence in depth).
 const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
+// Only http(s) or root-relative URLs become links — never `javascript:`/`data:`
+// (defence in depth: the data is curated, but never trust a URL into an href).
+const safeHref = (u) =>
+  (typeof u === "string" && /^(https?:\/\/|\/)/i.test(u)) ? u : "";
 
 function rlParams() {
   const p = new URLSearchParams();
@@ -441,8 +445,9 @@ async function runLocations() {
   const head = "<tr><th>Plataforma</th><th>Empresa</th><th>Categoría</th>" +
     "<th>Confianza</th><th>Plantilla</th><th>Informe</th></tr>";
   const body = d.rows.map(r => {
-    const link = r.url
-      ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
+    const href = safeHref(r.url);
+    const link = href
+      ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
       : esc(r.url_label || "");
     return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
       `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
@@ -465,9 +470,10 @@ async function setupLocations() {
     return;
   }
   const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  $("#rl-category").insertAdjacentHTML("beforeend", d.facets.category.map(opt).join(""));
-  $("#rl-confidence").insertAdjacentHTML("beforeend", d.facets.confidence.map(opt).join(""));
-  $("#rl-template").insertAdjacentHTML("beforeend", d.facets.harmonised_template.map(opt).join(""));
+  const facets = d?.facets || {};
+  $("#rl-category").insertAdjacentHTML("beforeend", (facets.category || []).map(opt).join(""));
+  $("#rl-confidence").insertAdjacentHTML("beforeend", (facets.confidence || []).map(opt).join(""));
+  $("#rl-template").insertAdjacentHTML("beforeend", (facets.harmonised_template || []).map(opt).join(""));
   ["#rl-category", "#rl-confidence", "#rl-template"].forEach(s => $(s).addEventListener("change", runLocations));
   // Debounce the free-text search so we don't fire a request per keystroke.
   let t = null;
