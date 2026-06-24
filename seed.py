@@ -31,6 +31,10 @@ _DEFAULT_GR_SOURCE = os.getenv(
     ),
 )
 _DEFAULT_DB = os.getenv("DB_PATH", os.path.join(HERE, "demo.db"))
+# Vendored in-repo catalogue (one row per non-VLOP report URL).
+_DEFAULT_RL_SOURCE = os.getenv(
+    "SEED_REPORT_LOCATIONS_CSV", os.path.join(HERE, "data", "report-locations.csv")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -192,7 +196,26 @@ CREATE TABLE gr_removals (
 
 CREATE INDEX idx_gr_period  ON gr_removals(period_id);
 CREATE INDEX idx_gr_country ON gr_removals(country_id);
+
+-- Non-VLOP DSA report-location catalogue: where other online platforms publish
+-- their Art. 15/24 transparency reports. One row per report URL.
+CREATE TABLE report_locations (
+    id                  INTEGER PRIMARY KEY,
+    platform            TEXT NOT NULL,
+    company             TEXT,
+    category            TEXT NOT NULL,
+    confidence          TEXT NOT NULL,
+    harmonised_template TEXT,
+    format_period       TEXT,
+    url_label           TEXT,
+    url                 TEXT NOT NULL
+);
+CREATE INDEX idx_rl_category   ON report_locations(category);
+CREATE INDEX idx_rl_confidence ON report_locations(confidence);
 """
+
+_RL_COLUMNS = ("platform", "company", "category", "confidence",
+               "harmonised_template", "format_period", "url_label", "url")
 
 # fact table name → (number of columns, source JSON key)
 _FACT_TABLES = {
@@ -318,12 +341,41 @@ def build_gr_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
+    """Populate the report_locations table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA, i.e. build_db()
+    must have run first). `rows` are dicts keyed by `_RL_COLUMNS`. Returns the
+    number of rows inserted.
+    """
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO report_locations "
+                "(platform, company, category, confidence, harmonised_template, "
+                "format_period, url_label, url) VALUES (?,?,?,?,?,?,?,?)",
+                [tuple((r.get(c) or None) for c in _RL_COLUMNS) for r in rows],
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
+def _load_report_locations_csv(path: str) -> list[dict[str, str]]:
+    import csv as _csv
+    with open(path, "r", encoding="utf-8-sig", newline="") as f:
+        return list(_csv.DictReader(f))
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Seed demo.db from the VLOP DSA dataset.")
     parser.add_argument("--source", default=_DEFAULT_SOURCE, help="Path to vlop-dsa.json")
     parser.add_argument("--gr-source", default=_DEFAULT_GR_SOURCE,
                         help="Path to google-government-removals.json")
     parser.add_argument("--db", default=_DEFAULT_DB, help="Output SQLite database path")
+    parser.add_argument("--report-locations", default=_DEFAULT_RL_SOURCE,
+                        help="Path to report-locations.csv (non-VLOP catalogue)")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -350,6 +402,13 @@ def main() -> None:
         )
     else:
         print(f"  (skipping Google removals — not found: {args.gr_source})")
+
+    if os.path.isfile(args.report_locations):
+        rl_rows = _load_report_locations_csv(args.report_locations)
+        n = build_report_locations(rl_rows, args.db)
+        print(f"  report_locations: {n} rows from {os.path.basename(args.report_locations)}")
+    else:
+        print(f"  (skipping report locations — not found: {args.report_locations})")
 
 
 if __name__ == "__main__":

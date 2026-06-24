@@ -525,6 +525,23 @@
     </div>
     <details><summary>요청 JSON (API로 직접 시도)</summary><pre id="cmp-json"></pre></details>
   </section>
+
+  <section class="card" id="locations-card">
+    <h2>플랫폼이 보고서를 게시하는 위치</h2>
+    <p class="sub">온라인 플랫폼이 DSA 제15조·제24조 투명성 보고서를 게시하는 위치를 정리한
+      큐레이션 카탈로그로, 지정된 VLOP를 넘어선 범위입니다. 공개 읽기 전용
+      <code>GET /api/report-locations</code>에서 제공합니다.</p>
+    <div class="controls">
+      <label>카테고리 <select id="rl-category"><option value="">전체</option></select></label>
+      <label>신뢰도 <select id="rl-confidence"><option value="">전체</option></select></label>
+      <label>템플릿 <select id="rl-template"><option value="">전체</option></select></label>
+      <label>검색 <input id="rl-q" type="search" placeholder="플랫폼, 회사, URL" /></label>
+      <button id="rl-csv" type="button">CSV 다운로드</button>
+    </div>
+    <div class="error" id="rl-error" role="alert"></div>
+    <div id="rl-summary" class="sub" aria-live="polite"></div>
+    <div id="rl-out" aria-live="polite" aria-busy="true"></div>
+  </section>
  </main>
 
   <footer>
@@ -1042,6 +1059,87 @@ function askGate(locked) {
   $("#ask-run").disabled = locked;
 }
 
+// ── Report-locations catalogue (GET /api/report-locations) ───────────────────
+function rlParams() {
+  const p = new URLSearchParams();
+  const cat = $("#rl-category").value, conf = $("#rl-confidence").value,
+        tmpl = $("#rl-template").value, q = $("#rl-q").value.trim();
+  if (cat) p.set("category", cat);
+  if (conf) p.set("confidence", conf);
+  if (tmpl) p.set("harmonised_template", tmpl);
+  if (q) p.set("q", q);
+  return p;
+}
+
+let rlAbortController = null;
+
+async function runLocations() {
+  // Abort any in-flight request so a slow earlier response can't overwrite the
+  // results of a newer filter/search (rapid typing or dropdown changes).
+  if (rlAbortController) rlAbortController.abort();
+  rlAbortController = new AbortController();
+  const { signal } = rlAbortController;
+  $("#rl-error").textContent = "";
+  $("#rl-out").setAttribute("aria-busy", "true");
+  const params = rlParams();
+  let d;
+  try {
+    const res = await fetch("/api/report-locations?" + params.toString(), { signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
+  } catch (err) {
+    if (err.name === "AbortError") return;  // superseded by a newer request
+    $("#rl-error").textContent = "카탈로그를 불러올 수 없습니다: " + err.message;
+    $("#rl-out").setAttribute("aria-busy", "false");
+    return;
+  }
+  $("#rl-out").setAttribute("aria-busy", "false");
+  $("#rl-summary").textContent =
+    `${fmt(d.platform_count)}개 플랫폼의 보고서 URL ${fmt(d.total)}개 중 ${fmt(d.count)}개 표시 중.`;
+  const head = "<tr><th>플랫폼</th><th>회사</th><th>카테고리</th>" +
+    "<th>신뢰도</th><th>템플릿</th><th>보고서</th></tr>";
+  const body = d.rows.map(r => {
+    const link = r.url
+      ? `<a href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
+      : esc(r.url_label || "");
+    return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
+      `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
+      `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td></tr>`;
+  }).join("");
+  $("#rl-out").innerHTML = d.rows.length
+    ? `<table class="restable">${head}${body}</table>`
+    : "<p class='sub'>일치하는 플랫폼이 없습니다.</p>";
+}
+
+async function setupLocations() {
+  let d;
+  try {
+    const res = await fetch("/api/report-locations");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
+  } catch (err) {
+    $("#rl-error").textContent = "카탈로그를 불러올 수 없습니다: " + err.message;
+    $("#rl-out").setAttribute("aria-busy", "false");
+    return;
+  }
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  $("#rl-category").insertAdjacentHTML("beforeend", d.facets.category.map(opt).join(""));
+  $("#rl-confidence").insertAdjacentHTML("beforeend", d.facets.confidence.map(opt).join(""));
+  $("#rl-template").insertAdjacentHTML("beforeend", d.facets.harmonised_template.map(opt).join(""));
+  ["#rl-category", "#rl-confidence", "#rl-template"].forEach(s => $(s).addEventListener("change", runLocations));
+  // Debounce the free-text search so we don't fire a request per keystroke.
+  let t = null;
+  $("#rl-q").addEventListener("input", () => {
+    if (t) clearTimeout(t);
+    t = setTimeout(runLocations, 250);
+  });
+  $("#rl-csv").addEventListener("click", () => {
+    const p = rlParams(); p.set("format", "csv");
+    window.open("/api/report-locations?" + p.toString(), "_blank");
+  });
+  runLocations();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Respect prefers-reduced-motion for Chart.js canvas animations too (the CSS
   // rule only covers CSS transitions). One global default covers every chart.
@@ -1049,7 +1147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Chart.defaults.animation = false;
   }
   // setupCompare needs the /api/explore/options payload setupExplore fetches.
-  load(); setupExplore().then(setupCompare); setupAsk();
+  load(); setupExplore().then(setupCompare); setupAsk(); setupLocations();
 });
 </script>
 <script>
