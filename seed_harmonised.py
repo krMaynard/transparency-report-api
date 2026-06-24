@@ -86,6 +86,11 @@ def _num(v: str | None):
         return None
 
 
+def _cell(row: list[str], i: int):
+    """Numeric value of column `i` (or None if absent / non-numeric)."""
+    return _num(row[i] if len(row) > i else "")
+
+
 def _rows(path: str) -> list[list[str]]:
     if not os.path.exists(path):
         return []
@@ -237,10 +242,10 @@ def _load_facts(conn, intern, rep, svc, sec, surface_all) -> int:
     for r in sec(3):
         if len(r) < 6:
             continue
-        g = lambda i: _num(r[i] if len(r) > i else "")
         conn.execute("INSERT INTO t4_notices VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-                     (rep, svc, cat(r, 3), g(5), g(6), g(7), g(8), g(9), g(10),
-                      g(11), g(12), g(13), g(14)))
+                     (rep, svc, cat(r, 3), _cell(r, 5), _cell(r, 6), _cell(r, 7),
+                      _cell(r, 8), _cell(r, 9), _cell(r, 10), _cell(r, 11), _cell(r, 12),
+                      _cell(r, 13), _cell(r, 14)))
         n += 1
     # t5 / t6 — own initiative: cat=3, measures=5, automated=6, vis 7-13,
     # monetary 14-16, service 17-18, account 19-20 (t6 + surface).
@@ -249,8 +254,8 @@ def _load_facts(conn, intern, rep, svc, sec, surface_all) -> int:
         for r in sec(si):
             if len(r) < 7:
                 continue
-            g = lambda i: _num(r[i] if len(r) > i else "")
-            vals = [rep, svc, cat(r, 3), g(5), g(6)] + [g(i) for i in range(7, 21)] + list(extra)
+            vals = ([rep, svc, cat(r, 3), _cell(r, 5), _cell(r, 6)]
+                    + [_cell(r, i) for i in range(7, 21)] + list(extra))
             conn.execute(f"INSERT INTO {tbl} VALUES ({', '.join(['?'] * len(vals))})", vals)
             n += 1
     # t7 / t8 — section=3, indicator=4, scope=5, value=6 (+ default surface)

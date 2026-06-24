@@ -2138,18 +2138,19 @@ def _compute_overview() -> dict[str, Any]:
         # to VLOP-tier reports even though non-VLOP harmonised reports now share the
         # star schema (reachable via the query/explore API). VLOP services are those
         # appearing in a vlop-tier report's facts.
-        _vlop_union = " UNION ".join(
+        _vlop_subquery = " UNION ".join(
             f"SELECT t.service_id FROM {t} t JOIN reports r ON r.id = t.report_id "
             "WHERE r.tier = 'vlop'"
             for t in ("t3_member_state_orders", "t4_notices", "t5_own_initiative_illegal",
                       "t6_own_initiative_tos", "t7_appeals_recidivism", "t8_automated_means",
                       "t9_human_resources", "t10_amar", "t11_qualitative"))
-        vlop_ids = [r[0] for r in conn.execute(_vlop_union).fetchall()]
-        ph = ",".join("?" * len(vlop_ids)) or "NULL"
+        # Resolve the VLOP service set entirely in SQLite (no Python round-trip /
+        # parameter-limit concerns) — no user input reaches the query.
         services = conn.execute(
-            f"SELECT COUNT(*) FROM services WHERE id IN ({ph})", vlop_ids).fetchone()[0]
+            f"SELECT COUNT(*) FROM services WHERE id IN ({_vlop_subquery})").fetchone()[0]
         platforms = conn.execute(
-            f"SELECT COUNT(DISTINCT platform) FROM services WHERE id IN ({ph})", vlop_ids).fetchone()[0]
+            f"SELECT COUNT(DISTINCT platform) FROM services WHERE id IN ({_vlop_subquery})"
+        ).fetchone()[0]
         total_notices = conn.execute(
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t "
             "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
