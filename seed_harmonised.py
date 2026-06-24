@@ -169,8 +169,16 @@ def _period_from_sections(sections: list[list[list[str]]]) -> tuple[str, str] | 
     if not vals:
         return None
     best = Counter(vals).most_common(1)[0][0]
-    parts = [p.strip()[:10] for p in best.split("/")]
-    return (parts[0], parts[1]) if len(parts) == 2 else None
+    parts = [p.strip() for p in best.split("/")]
+    # Canonical ISO is "start/end" (2 parts). Tolerate slash-bearing local
+    # formats too: DD/MM/YYYY/DD/MM/YYYY (6) and MM/YYYY/MM/YYYY (4).
+    if len(parts) == 2 and all(parts):
+        return parts[0][:10], parts[1][:10]
+    if len(parts) == 4 and all(parts):
+        return "/".join(parts[:2])[:10], "/".join(parts[2:])[:10]
+    if len(parts) == 6 and all(parts):
+        return "/".join(parts[:3])[:10], "/".join(parts[3:])[:10]
+    return None
 
 
 def read_extracted(extracted_dir: str = _DEFAULT_EXTRACTED) -> dict[str, list[list[list[str]]]]:
