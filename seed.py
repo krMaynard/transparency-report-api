@@ -364,7 +364,7 @@ def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
 
 def _load_report_locations_csv(path: str) -> list[dict[str, str]]:
     import csv as _csv
-    with open(path, "r", encoding="utf-8", newline="") as f:
+    with open(path, "r", encoding="utf-8-sig", newline="") as f:
         return list(_csv.DictReader(f))
 
 

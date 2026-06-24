@@ -1071,16 +1071,24 @@ function rlParams() {
   return p;
 }
 
+let rlAbortController = null;
+
 async function runLocations() {
+  // Abort any in-flight request so a slow earlier response can't overwrite the
+  // results of a newer filter/search (rapid typing or dropdown changes).
+  if (rlAbortController) rlAbortController.abort();
+  rlAbortController = new AbortController();
+  const { signal } = rlAbortController;
   $("#rl-error").textContent = "";
   $("#rl-out").setAttribute("aria-busy", "true");
   const params = rlParams();
   let d;
   try {
-    const res = await fetch("/api/report-locations?" + params.toString());
+    const res = await fetch("/api/report-locations?" + params.toString(), { signal });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     d = await res.json();
   } catch (err) {
+    if (err.name === "AbortError") return;  // superseded by a newer request
     $("#rl-error").textContent = "Could not load catalogue: " + err.message;
     $("#rl-out").setAttribute("aria-busy", "false");
     return;

@@ -2288,7 +2288,7 @@ def report_locations(
     data = _report_locations_data()
     rows = data["rows"]
 
-    needle = q.strip().lower() if q else None
+    needle = q.strip().lower() if q and q.strip() else None
     out = [
         r for r in rows
         if (category is None or r["category"] == category)
@@ -2307,7 +2307,7 @@ def report_locations(
         writer = csv.writer(buf)
         writer.writerow(_RL_OUT_COLUMNS)
         writer.writerows(
-            [[_csv_safe(r[c]) for c in _RL_OUT_COLUMNS] for r in out]
+            [[_csv_safe(r[c] or "") for c in _RL_OUT_COLUMNS] for r in out]
         )
         return PlainTextResponse(
             buf.getvalue(),

@@ -68,9 +68,11 @@ seed.build_gr_db(_GR_FIXTURE, _DB)
 
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
-    {"platform": "Reddit", "company": "Reddit, Inc.", "category": "Social, messaging, community & video",
-     "confidence": "likely", "harmonised_template": "no", "format_period": "PDF; semi-annual",
-     "url_label": "DSA info", "url": "https://support.reddithelp.com/hc/en-us/articles/dsa"},
+    # Reddit deliberately omits the optional columns (company / harmonised_template /
+    # format_period / url_label) so the suite exercises NULL handling in the API
+    # JSON projection and the CSV export.
+    {"platform": "Reddit", "category": "Social, messaging, community & video",
+     "confidence": "likely", "url": "https://support.reddithelp.com/hc/en-us/articles/dsa"},
     {"platform": "Discord", "company": "Discord Netherlands B.V.", "category": "Social, messaging, community & video",
      "confidence": "verified", "harmonised_template": "yes", "format_period": "ZIP (template); 2024 & 2025",
      "url_label": "Hub", "url": "https://discord.com/safety-transparency"},

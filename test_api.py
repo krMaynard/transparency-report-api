@@ -1149,6 +1149,9 @@ class TestReportLocations:
         assert "verified" in d["facets"]["confidence"]
         # Sorted by platform name (case-insensitive): Discord, Reddit, Vinted.
         assert [row["platform"] for row in d["rows"]] == ["Discord", "Reddit", "Vinted"]
+        # Reddit omits the optional columns — they surface as JSON null, not a crash.
+        reddit = next(row for row in d["rows"] if row["platform"] == "Reddit")
+        assert reddit["company"] is None and reddit["harmonised_template"] is None
 
     def test_filter_by_confidence(self):
         r = client.get("/api/report-locations", params={"confidence": "verified"})
