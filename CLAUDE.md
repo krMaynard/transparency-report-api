@@ -31,8 +31,9 @@ Built to demonstrate two things:
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
 | `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
+| `data/report-locations.csv` | Vendored snapshot of the non-VLOP DSA report-locations catalogue (sibling `dsa-transparency-data/dsa_reports.csv`) — seeded into the read-only `report_locations` table by `seed.py` |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
-| `static/index.html` | Public VLOP dashboard (served at `/`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
+| `static/index.html` | Public VLOP dashboard (served at `/reports`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box + "Where platforms publish their reports" catalogue panel (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`, `GET /api/report-locations`) |
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
@@ -161,6 +162,13 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
+
+A standalone **`report_locations`** table (flat, not part of the star schema) is
+also seeded — from `data/report-locations.csv` via `build_report_locations()` —
+holding the non-VLOP DSA transparency-report catalogue (`platform`, `company`,
+`category`, `confidence`, `harmonised_template`, `format_period`, `url_label`,
+`url`). It powers the public `GET /api/report-locations` endpoint and the
+dashboard's "Where platforms publish their reports" panel.
 
 ## Query model
 
@@ -318,6 +326,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 |--------|------|------|-------|
 | GET | `/` | — | Public VLOP transparency dashboard (web UI) |
 | GET | `/api/overview` | — | Public headline aggregates powering the dashboard |
+| GET | `/api/report-locations` | — | Public: non-VLOP DSA report-locations catalogue (filters: `category`/`confidence`/`harmonised_template`/`q`; `format=json\|csv`) — memoised, read-only |
 | GET | `/api/explore/options` | — | Public: tables + dimensions/measures for the query builder |
 | POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited, ≤`EXPLORE_MAX_LEGS` composite legs) |
 | POST | `/api/ask` | — | Public: NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; off unless `ANTHROPIC_API_KEY` set |

@@ -66,6 +66,20 @@ _GR_FIXTURE = {
 }
 seed.build_gr_db(_GR_FIXTURE, _DB)
 
+# A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
+_RL_FIXTURE = [
+    {"platform": "Reddit", "company": "Reddit, Inc.", "category": "Social, messaging, community & video",
+     "confidence": "likely", "harmonised_template": "no", "format_period": "PDF; semi-annual",
+     "url_label": "DSA info", "url": "https://support.reddithelp.com/hc/en-us/articles/dsa"},
+    {"platform": "Discord", "company": "Discord Netherlands B.V.", "category": "Social, messaging, community & video",
+     "confidence": "verified", "harmonised_template": "yes", "format_period": "ZIP (template); 2024 & 2025",
+     "url_label": "Hub", "url": "https://discord.com/safety-transparency"},
+    {"platform": "Vinted", "company": "Vinted UAB", "category": "E-commerce marketplaces & retail",
+     "confidence": "verified", "harmonised_template": "yes", "format_period": "XLSX; 2024 & 2025",
+     "url_label": "Safety hub", "url": "https://www.vinted.com/safety"},
+]
+seed.build_report_locations(_RL_FIXTURE, _DB)
+
 os.environ.setdefault("DB_PATH", _DB)
 os.environ.setdefault("API_KEYS_JSON", '{"momo":{"name":"momo"},"honggildong":{"name":"honggildong"}}')
 # Google sign-in config for the auth tests (token verification is monkeypatched).

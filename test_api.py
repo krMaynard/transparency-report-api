@@ -1133,6 +1133,64 @@ class TestDashboard:
         assert client.get("/static/vendor/..%2fmain.py").status_code in (404, 400)
 
 
+# ── Public report-locations catalogue (GET /api/report-locations) ────────────
+
+class TestReportLocations:
+    def test_public_and_populated(self):
+        r = client.get("/api/report-locations")  # no X-API-Key
+        assert r.status_code == 200
+        d = r.json()
+        # The conftest fixture seeds Reddit / Discord / Vinted.
+        assert d["count"] == d["total"] == 3
+        assert d["platform_count"] == 3
+        names = {row["platform"] for row in d["rows"]}
+        assert {"Reddit", "Discord", "Vinted"} <= names
+        assert set(d["facets"]) == {"category", "confidence", "harmonised_template"}
+        assert "verified" in d["facets"]["confidence"]
+        # Sorted by platform name (case-insensitive): Discord, Reddit, Vinted.
+        assert [row["platform"] for row in d["rows"]] == ["Discord", "Reddit", "Vinted"]
+
+    def test_filter_by_confidence(self):
+        r = client.get("/api/report-locations", params={"confidence": "verified"})
+        d = r.json()
+        assert d["count"] == 2 and d["total"] == 3
+        assert all(row["confidence"] == "verified" for row in d["rows"])
+
+    def test_filter_by_harmonised_template(self):
+        r = client.get("/api/report-locations", params={"harmonised_template": "yes"})
+        d = r.json()
+        assert {row["platform"] for row in d["rows"]} == {"Discord", "Vinted"}
+
+    def test_filter_by_category(self):
+        r = client.get("/api/report-locations",
+                       params={"category": "E-commerce marketplaces & retail"})
+        d = r.json()
+        assert d["count"] == 1 and d["rows"][0]["platform"] == "Vinted"
+
+    def test_free_text_search(self):
+        # Matches platform / company / url, case-insensitively.
+        assert client.get("/api/report-locations",
+                          params={"q": "reddit"}).json()["count"] == 1
+        assert client.get("/api/report-locations",
+                          params={"q": "discord.com"}).json()["count"] == 1
+        assert client.get("/api/report-locations",
+                          params={"q": "nomatch-xyz"}).json()["count"] == 0
+
+    def test_combined_filters(self):
+        r = client.get("/api/report-locations",
+                       params={"confidence": "verified", "q": "reddit"})
+        assert r.json()["count"] == 0  # Reddit is "likely", not "verified"
+
+    def test_csv_export(self):
+        r = client.get("/api/report-locations", params={"format": "csv"})
+        assert r.status_code == 200
+        assert "text/csv" in r.headers["content-type"]
+        assert "attachment" in r.headers.get("content-disposition", "")
+        lines = r.text.splitlines()
+        assert lines[0] == "platform,company,category,confidence,harmonised_template,format_period,url_label,url"
+        assert len(lines) == 4  # header + 3 rows
+
+
 # ── Public interactive query (POST /api/explore) ─────────────────────────────
 
 class TestExplore:

@@ -2218,6 +2218,112 @@ def overview_removals() -> dict[str, Any]:
     return _gr_overview_cache
 
 
+# --- Report-locations catalogue (non-VLOP DSA transparency reports) -----------
+# A static, curated catalogue of where online platforms publish their DSA
+# Art. 15/24 transparency reports (seeded from data/report-locations.csv into the
+# read-only `report_locations` table). Like /overview, the table never changes at
+# runtime, so we load every row + the facet value lists once and serve filtered
+# slices from memory — no user input reaches SQL.
+_RL_OUT_COLUMNS = (
+    "platform", "company", "category", "confidence",
+    "harmonised_template", "format_period", "url_label", "url",
+)
+_report_locations_cache: dict[str, Any] | None = None
+_report_locations_cache_lock = threading.Lock()
+
+
+def _compute_report_locations() -> dict[str, Any]:
+    conn = _connect_ro()
+    try:
+        rows = [
+            dict(zip(_RL_OUT_COLUMNS, r))
+            for r in conn.execute(
+                "SELECT platform, company, category, confidence, "
+                "harmonised_template, format_period, url_label, url "
+                "FROM report_locations "
+                "ORDER BY platform COLLATE NOCASE, id"
+            ).fetchall()
+        ]
+    finally:
+        conn.close()
+
+    def _facet(key: str) -> list[str]:
+        return sorted({r[key] for r in rows if r.get(key)}, key=str.lower)
+
+    return {
+        "rows": rows,
+        "total": len(rows),
+        "platform_count": len({r["platform"] for r in rows}),
+        "facets": {
+            "category": _facet("category"),
+            "confidence": _facet("confidence"),
+            "harmonised_template": _facet("harmonised_template"),
+        },
+    }
+
+
+def _report_locations_data() -> dict[str, Any]:
+    global _report_locations_cache
+    if _report_locations_cache is None:
+        with _report_locations_cache_lock:
+            if _report_locations_cache is None:
+                _report_locations_cache = _compute_report_locations()
+    return _report_locations_cache
+
+
+@api_router.get("/report-locations", response_model=None)
+def report_locations(
+    category: str | None = None,
+    confidence: str | None = None,
+    harmonised_template: str | None = None,
+    q: str | None = Query(None, max_length=200),
+    format: Literal["json", "csv"] = "json",
+) -> JSONResponse | PlainTextResponse:
+    """Public catalogue of where online platforms publish their DSA Art. 15/24
+    transparency reports — no auth. Filter by `category`, `confidence`,
+    `harmonised_template`, and a free-text `q` (matches platform/company/url).
+    Returns JSON (`{count, total, facets, rows}`) or `format=csv`. Memoised:
+    the read-only table is static, so rows are loaded once and filtered in
+    memory (no user input reaches SQL)."""
+    data = _report_locations_data()
+    rows = data["rows"]
+
+    needle = q.strip().lower() if q else None
+    out = [
+        r for r in rows
+        if (category is None or r["category"] == category)
+        and (confidence is None or r["confidence"] == confidence)
+        and (harmonised_template is None or r["harmonised_template"] == harmonised_template)
+        and (
+            needle is None
+            or needle in (r["platform"] or "").lower()
+            or needle in (r["company"] or "").lower()
+            or needle in (r["url"] or "").lower()
+        )
+    ]
+
+    if format == "csv":
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(_RL_OUT_COLUMNS)
+        writer.writerows(
+            [[_csv_safe(r[c]) for c in _RL_OUT_COLUMNS] for r in out]
+        )
+        return PlainTextResponse(
+            buf.getvalue(),
+            media_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="report-locations.csv"'},
+        )
+
+    return JSONResponse({
+        "count": len(out),
+        "total": data["total"],
+        "platform_count": data["platform_count"],
+        "facets": data["facets"],
+        "rows": out,
+    })
+
+
 @api_router.get("/explore/options")
 def explore_options() -> dict[str, Any]:
     """Public metadata for the dashboard's query builder: each table's queryable
