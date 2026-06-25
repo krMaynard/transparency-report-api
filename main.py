@@ -2932,15 +2932,30 @@ def ready() -> dict[str, str]:
     return {"status": "ok"}
 
 
+_meta_cache: dict[str, str] | None = None
+_meta_cache_lock = threading.Lock()
+
+
 def _dataset_meta() -> dict[str, str]:
-    try:
-        conn = _connect_ro()
-        try:
-            return {k: v for k, v in conn.execute("SELECT key, value FROM meta").fetchall()}
-        finally:
-            conn.close()
-    except Exception:
-        return {}
+    # The DB is opened mode=ro and is static at runtime, so the meta table never
+    # changes — memoise it (like the overview caches) instead of opening a fresh
+    # connection on every result render/download. Failures aren't cached, so a
+    # transient error still retries on the next call.
+    global _meta_cache
+    if _meta_cache is None:
+        with _meta_cache_lock:
+            if _meta_cache is None:
+                try:
+                    conn = _connect_ro()
+                    try:
+                        _meta_cache = {
+                            k: v for k, v in conn.execute("SELECT key, value FROM meta").fetchall()
+                        }
+                    finally:
+                        conn.close()
+                except Exception:
+                    return {}
+    return _meta_cache
 
 
 def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
