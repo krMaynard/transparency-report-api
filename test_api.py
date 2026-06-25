@@ -1583,7 +1583,7 @@ class TestAccessibility:
         assert 'id="main"' in html                                     # main landmark
         assert 'role="alert"' in html                                  # error live region
         # Canvases carry an accessible table alternative, so hide them from AT.
-        assert 'id="chart-platforms" height="150" aria-hidden="true"' in html
+        assert 'id="tab-chart" height="150" aria-hidden="true"' in html
 
     def test_api_key_a11y_landmarks(self):
         html = client.get("/api-key").text
