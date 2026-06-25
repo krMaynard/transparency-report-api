@@ -2138,7 +2138,9 @@ def _compute_overview() -> dict[str, Any]:
         # to VLOP-tier reports even though non-VLOP harmonised reports now share the
         # star schema (reachable via the query/explore API). VLOP services are those
         # appearing in a vlop-tier report's facts.
-        _vlop_subquery = " UNION ".join(
+        # UNION ALL (not UNION): the outer `id IN (...)` dedupes, so eliminating
+        # duplicate service ids across the 9 fact tables here is wasted work.
+        _vlop_subquery = " UNION ALL ".join(
             f"SELECT t.service_id FROM {t} t JOIN reports r ON r.id = t.report_id "
             "WHERE r.tier = 'vlop'"
             for t in ("t3_member_state_orders", "t4_notices", "t5_own_initiative_illegal",
@@ -2157,7 +2159,7 @@ def _compute_overview() -> dict[str, Any]:
         # Count of distinct non-VLOP platforms whose harmonised reports also live in
         # the star schema — surfaced so the dashboard can show the dataset's breadth
         # without folding these into the VLOP-scoped headline figures above.
-        _nonvlop_subquery = " UNION ".join(
+        _nonvlop_subquery = " UNION ALL ".join(  # see note above: outer IN dedupes
             f"SELECT t.service_id FROM {t} t JOIN reports r ON r.id = t.report_id "
             "WHERE r.tier != 'vlop'"
             for t in ("t3_member_state_orders", "t4_notices", "t5_own_initiative_illegal",
