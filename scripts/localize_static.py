@@ -109,6 +109,8 @@ def prefix_links(text: str, locale: str) -> str:
 COMMON = {
     "es": [
         ('''>Skip to content</a>''', '''>Saltar al contenido</a>'''),
+        ('''>Snapshot:</span>''', '''>Instantánea:</span>'''),
+        ('''>Cite as:</span>''', '''>Citar como:</span>'''),
         ('''aria-label="Site"''', '''aria-label="Sitio"'''),
         ('''aria-label="Application navigation"''', '''aria-label="Navegación de la aplicación"'''),
         ('''aria-label="Toggle navigation"''', '''aria-label="Alternar navegación"'''),
@@ -144,6 +146,8 @@ COMMON = {
     ],
     "fr": [
         ('''>Skip to content</a>''', '''>Aller au contenu</a>'''),
+        ('''>Snapshot:</span>''', '''>Instantané :</span>'''),
+        ('''>Cite as:</span>''', '''>Citer comme :</span>'''),
         ('''aria-label="Site"''', '''aria-label="Site"'''),
         ('''aria-label="Application navigation"''', '''aria-label="Navigation de l’application"'''),
         ('''aria-label="Toggle navigation"''', '''aria-label="Basculer la navigation"'''),
@@ -179,6 +183,8 @@ COMMON = {
     ],
     "de": [
         ('''>Skip to content</a>''', '''>Zum Inhalt springen</a>'''),
+        ('''>Snapshot:</span>''', '''>Momentaufnahme:</span>'''),
+        ('''>Cite as:</span>''', '''>Zitieren als:</span>'''),
         ('''aria-label="Site"''', '''aria-label="Seite"'''),
         ('''aria-label="Application navigation"''', '''aria-label="Anwendungsnavigation"'''),
         ('''aria-label="Toggle navigation"''', '''aria-label="Navigation umschalten"'''),
@@ -1470,6 +1476,8 @@ def localize(text: str, locale: str, page: str) -> str:
 COMMON["ja"] = [
     (r'''>Skip to content</a>''',
      r'''>本文へスキップ</a>'''),
+    (r'''>Snapshot:</span>''', r'''>スナップショット：</span>'''),
+    (r'''>Cite as:</span>''', r'''>引用方法：</span>'''),
     (r'''aria-label="Site"''',
      r'''aria-label="サイト"'''),
     (r'''aria-label="Application navigation"''',
@@ -2142,6 +2150,8 @@ PAGES["ja"]["privacy.html"] = [
 COMMON["zh"] = [
     (r'''>Skip to content</a>''',
      r'''>跳到主要内容</a>'''),
+    (r'''>Snapshot:</span>''', r'''>快照：</span>'''),
+    (r'''>Cite as:</span>''', r'''>引用格式：</span>'''),
     (r'''aria-label="Site"''',
      r'''aria-label="网站"'''),
     (r'''aria-label="Application navigation"''',
@@ -2813,6 +2823,8 @@ PAGES["zh"]["privacy.html"] = [
 COMMON["ko"] = [
     (r'''>Skip to content</a>''',
      r'''>본문 바로가기</a>'''),
+    (r'''>Snapshot:</span>''', r'''>스냅샷:</span>'''),
+    (r'''>Cite as:</span>''', r'''>인용 방법:</span>'''),
     (r'''aria-label="Site"''',
      r'''aria-label="사이트"'''),
     (r'''aria-label="Application navigation"''',

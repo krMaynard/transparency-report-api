@@ -251,6 +251,8 @@
   .restable td.num { font-family: var(--mono); color: var(--accent2); text-align: right; }
   footer { color: var(--muted); font-size: 13px; margin-top: 8px; padding-bottom: 2rem; }
   footer a { color: var(--accent); text-decoration: none; }
+  .provenance { font-size: 12px; margin-top: 6px; }
+  .provenance .prov-label { font-weight: 600; }
   footer code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
 
   /* ── Keyboard focus ─────────────────────────────────────────── */
@@ -605,6 +607,7 @@
   <footer>
     Aperçu public depuis l’API de même origine sur <code>/api/overview</code>.
     Les chercheurs peuvent exécuter des requêtes personnalisées avec une <a href="/fr/api-key">clé d’API</a> + l’<a href="/docs">API</a>. · <a href="/fr/privacy">Confidentialité</a>
+    <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
   </footer>
 </div><!-- .wrap -->
 </div><!-- .main-area -->
@@ -687,6 +690,11 @@ async function load() {
   $("#stats").setAttribute("aria-busy", "false");
 
   if (d.period) $("#period").textContent = `Période de référence ${fmtPeriod(d.period)} · ${d.services} VLOP et VLOSE désignés, plus ${d.nonvlop_filers} plateformes non-VLOP utilisant le modèle harmonisé de l’UE.`;
+  if (d.generated) {
+    $("#prov-snap").textContent = d.generated + (d.period ? ` (${fmtPeriod(d.period)})` : "");
+    $("#prov-cite").textContent = `“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot).”`;
+    $("#provenance").hidden = false;
+  }
   $("#stats").innerHTML =
     stat(fmt(d.services), "Services désignés") +
     stat(fmt(d.platforms), "Sociétés mères") +

@@ -251,6 +251,8 @@
   .restable td.num { font-family: var(--mono); color: var(--accent2); text-align: right; }
   footer { color: var(--muted); font-size: 13px; margin-top: 8px; padding-bottom: 2rem; }
   footer a { color: var(--accent); text-decoration: none; }
+  .provenance { font-size: 12px; margin-top: 6px; }
+  .provenance .prov-label { font-weight: 600; }
   footer code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
 
   /* ── Keyboard focus ─────────────────────────────────────────── */
@@ -605,6 +607,7 @@
   <footer>
     <code>/api/overview</code>의 동일 출처 API에서 제공하는 공개 개요.
     연구자는 <a href="/ko/api-key">API 키</a> + <a href="/docs">API</a>로 사용자 지정 쿼리를 실행할 수 있습니다. · <a href="/ko/privacy">개인정보</a>
+    <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
   </footer>
 </div><!-- .wrap -->
 </div><!-- .main-area -->
@@ -687,6 +690,11 @@ async function load() {
   $("#stats").setAttribute("aria-busy", "false");
 
   if (d.period) $("#period").textContent = `보고 기간 ${fmtPeriod(d.period)} · 지정된 VLOP 및 VLOSE ${d.services}곳에 더해 EU 표준 템플릿을 제출하는 비VLOP 플랫폼 ${d.nonvlop_filers}곳.`;
+  if (d.generated) {
+    $("#prov-snap").textContent = d.generated + (d.period ? ` (${fmtPeriod(d.period)})` : "");
+    $("#prov-cite").textContent = `“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot).”`;
+    $("#provenance").hidden = false;
+  }
   $("#stats").innerHTML =
     stat(fmt(d.services), "지정 서비스") +
     stat(fmt(d.platforms), "모기업") +

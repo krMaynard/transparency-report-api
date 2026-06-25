@@ -189,6 +189,8 @@ display: flex; align-items: center;
   .tbl { margin: 0 0 18px; }
   .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .provenance { font-size: 12px; margin-top: 6px; }
+  .provenance .prov-label { font-weight: 600; }
   footer a { color: var(--accent); text-decoration: none; }
   /* Keyboard focus visibility — a clear ring on every interactive control. */
   a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
@@ -373,7 +375,9 @@ display: flex; align-items: center;
   </section>
  </main>
 
-  <footer>Propulsé par Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/fr/privacy">Confidentialité</a></footer>
+  <footer>Propulsé par Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/fr/privacy">Confidentialité</a>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
+  </footer>
 </div><!-- /.wrap -->
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
@@ -408,6 +412,11 @@ async function loadSchema() {
   const m = $("#dataset-meta");
   m.textContent = `${meta.dataset} · période ${meta.period} · ${meta.tables.length} tables de rapport`;
   m.removeAttribute("aria-busy");
+  if (meta.generated) {
+    $("#prov-snap").textContent = meta.generated + (meta.period ? ` (${meta.period})` : "");
+    $("#prov-cite").textContent = `“${meta.dataset}, via the Transparency Report API (${meta.generated} snapshot).”`;
+    $("#provenance").hidden = false;
+  }
   // Fetch every table's field registry in parallel rather than one roundtrip at a time.
   const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`)));
   $("#tables").innerHTML = details.map(renderTable).join("");
