@@ -111,6 +111,9 @@ COMMON = {
         ('''>Skip to content</a>''', '''>Saltar al contenido</a>'''),
         ('''>Snapshot:</span>''', '''>Instantánea:</span>'''),
         ('''>Cite as:</span>''', '''>Citar como:</span>'''),
+        ('''      Home
+    </a>''', '''      Inicio
+    </a>'''),
         ('''aria-label="Site"''', '''aria-label="Sitio"'''),
         ('''aria-label="Application navigation"''', '''aria-label="Navegación de la aplicación"'''),
         ('''aria-label="Toggle navigation"''', '''aria-label="Alternar navegación"'''),
@@ -148,6 +151,9 @@ COMMON = {
         ('''>Skip to content</a>''', '''>Aller au contenu</a>'''),
         ('''>Snapshot:</span>''', '''>Instantané :</span>'''),
         ('''>Cite as:</span>''', '''>Citer comme :</span>'''),
+        ('''      Home
+    </a>''', '''      Accueil
+    </a>'''),
         ('''aria-label="Site"''', '''aria-label="Site"'''),
         ('''aria-label="Application navigation"''', '''aria-label="Navigation de l’application"'''),
         ('''aria-label="Toggle navigation"''', '''aria-label="Basculer la navigation"'''),
@@ -185,6 +191,9 @@ COMMON = {
         ('''>Skip to content</a>''', '''>Zum Inhalt springen</a>'''),
         ('''>Snapshot:</span>''', '''>Momentaufnahme:</span>'''),
         ('''>Cite as:</span>''', '''>Zitieren als:</span>'''),
+        ('''      Home
+    </a>''', '''      Startseite
+    </a>'''),
         ('''aria-label="Site"''', '''aria-label="Seite"'''),
         ('''aria-label="Application navigation"''', '''aria-label="Anwendungsnavigation"'''),
         ('''aria-label="Toggle navigation"''', '''aria-label="Navigation umschalten"'''),
@@ -1478,6 +1487,9 @@ COMMON["ja"] = [
      r'''>本文へスキップ</a>'''),
     (r'''>Snapshot:</span>''', r'''>スナップショット：</span>'''),
     (r'''>Cite as:</span>''', r'''>引用方法：</span>'''),
+    (r'''      Home
+    </a>''', r'''      ホーム
+    </a>'''),
     (r'''aria-label="Site"''',
      r'''aria-label="サイト"'''),
     (r'''aria-label="Application navigation"''',
@@ -2152,6 +2164,9 @@ COMMON["zh"] = [
      r'''>跳到主要内容</a>'''),
     (r'''>Snapshot:</span>''', r'''>快照：</span>'''),
     (r'''>Cite as:</span>''', r'''>引用格式：</span>'''),
+    (r'''      Home
+    </a>''', r'''      首页
+    </a>'''),
     (r'''aria-label="Site"''',
      r'''aria-label="网站"'''),
     (r'''aria-label="Application navigation"''',
@@ -2825,6 +2840,9 @@ COMMON["ko"] = [
      r'''>본문 바로가기</a>'''),
     (r'''>Snapshot:</span>''', r'''>스냅샷:</span>'''),
     (r'''>Cite as:</span>''', r'''>인용 방법:</span>'''),
+    (r'''      Home
+    </a>''', r'''      홈
+    </a>'''),
     (r'''aria-label="Site"''',
      r'''aria-label="사이트"'''),
     (r'''aria-label="Application navigation"''',

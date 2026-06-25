@@ -2958,6 +2958,80 @@ def _dataset_meta() -> dict[str, str]:
     return _meta_cache
 
 
+# Short, plain-language help for each queryable field — what it means, its unit,
+# and any aggregation gotcha. Surfaced by /api/schema and the schema browser so
+# bare field names aren't a guessing game. English by design (field names are too).
+FIELD_HELP: dict[str, str] = {
+    # ── shared dimensions ──
+    "service_name": "The platform/service that filed the report (e.g. YouTube, TikTok).",
+    "platform": "Parent company of the service (e.g. Alphabet for YouTube).",
+    "period": "Reporting period covered by the report.",
+    "report_period": "Reporting period covered by the report.",
+    "report_period_start": "Start date of the reporting period (YYYY-MM-DD).",
+    "report_period_end": "End date of the reporting period (YYYY-MM-DD).",
+    "report_tier": "'vlop' = designated Very Large platform; other tiers are non-VLOP filers using the harmonised template.",
+    # ── DSA t4 categories (two overlapping taxonomies + a total) ──
+    "category_code": "DSA category code. STATEMENT_CATEGORY_* are the primary categories; KEYWORD_* are a parallel, finer taxonomy that overlaps them — do not sum both. 'TOTAL' is the reported grand total.",
+    "category_label": "Human-readable label for category_code. 'All the entries' is the reported grand-total row.",
+    "category_is_total": "1 = the reported grand-total row ('All the entries'); 0 = a breakdown category. Pin one (=1 for the headline, =0 for the breakdown) so a SUM never adds the total to its own parts.",
+    # ── t7–t10 breakdown dims ──
+    "section": "The DSA report section the row belongs to (Tables 7–9).",
+    "indicator": "The specific metric reported within a section.",
+    "scope": "A mixed breakdown dimension: depending on the indicator it may be a member-state code, an outcome ('Decisions upheld'/'reversed'), 'Total number', or 'Median time'. These are NOT mutually exclusive — pin a single value (or scope_is_total=1) before aggregating.",
+    "scope_is_total": "1 = the reported total row of the scope dimension; 0 = a breakdown row. Pin one to avoid double-counting.",
+    "surface": "The platform surface/area the figure applies to (e.g. by language).",
+    "section_key": "Language-neutral canonical label for `section`, so a filter spans reports filed in other EU languages.",
+    "indicator_key": "Language-neutral canonical label for `indicator`.",
+    "scope_key": "Language-neutral canonical label for `scope`.",
+    "qualitative_text": "Free-text description (Table 11). Request it via `fields`; this table has no numeric measures.",
+    # ── Google removals dims ──
+    "country_code": "Requesting country's ISO code (Google government removals).",
+    "country_name": "Requesting country (Google government removals).",
+    "requestor": "Type of government body making the removal request.",
+    "product": "Google product the request targets (Web Search, YouTube, …).",
+    "reason": "Government's stated reason for the removal request.",
+    # ── measures: DSA ──
+    "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
+    "tf_notices": "Of those notices, the count submitted by trusted flaggers.",
+    "median_time": "Median time to act on notices (units as reported). A median — do NOT SUM or AVG it across rows.",
+    "tf_median_time": "Median time to act on trusted-flagger notices. A median — do NOT SUM or AVG it.",
+    "orders_to_act": "Member-state orders to act against content (Table 3, Art. 9).",
+    "orders_to_provide_info": "Member-state orders to provide information (Table 3, Art. 10).",
+    "measures": "Count of own-initiative moderation actions (Tables 5/6).",
+    "actions_law": "Own-initiative actions taken on legal grounds.",
+    "actions_tos": "Own-initiative actions taken on terms-of-service grounds.",
+    "tf_actions_law": "Trusted-flagger-driven actions on legal grounds.",
+    "tf_actions_tos": "Trusted-flagger-driven actions on ToS grounds.",
+    "automated": "Of those actions, the count taken by automated means.",
+    "value": "The reported numeric value for this section × indicator × scope row (Tables 7–10); its meaning depends on the indicator.",
+    "account_suspension": "Restriction applied: account suspension.",
+    "account_termination": "Restriction applied: account termination.",
+    "service_suspension": "Restriction applied: service suspension.",
+    "service_termination": "Restriction applied: service termination.",
+    "monetary_suspension": "Restriction applied: suspension of monetary payments.",
+    "monetary_termination": "Restriction applied: termination of monetary payments.",
+    "monetary_other": "Restriction applied: other monetary restriction.",
+    "vis_removal": "Visibility restriction: content removal.",
+    "vis_demoted": "Visibility restriction: content demoted/down-ranked.",
+    "vis_disable": "Visibility restriction: content disabled.",
+    "vis_labelled": "Visibility restriction: content labelled.",
+    "vis_age_restricted": "Visibility restriction: age-restricted.",
+    "vis_interaction_restricted": "Visibility restriction: interaction restricted.",
+    "vis_other": "Visibility restriction: other.",
+    # ── measures: Google removals ──
+    "num_requests": "Number of government removal requests.",
+    "items_requested": "Items governments asked Google to remove (what was requested, not necessarily removed).",
+    "items": "Item count.",
+    "tf_items": "Trusted-flagger item count.",
+    "removed_legal": "Items removed on legal grounds.",
+    "removed_policy": "Items removed on content-policy grounds.",
+    "already_removed": "Items already removed before Google acted.",
+    "not_found": "Requests where the content was not found.",
+    "not_enough_info": "Requests with insufficient information to act.",
+    "no_action": "Requests where no action was taken.",
+}
+
+
 def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
     """A runnable example query for a table — aggregate its first measure, or
     (for the text-only t11) fetch the qualitative field for one service."""
@@ -2979,6 +3053,8 @@ def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
 
 
 def _table_fields_doc(table: str, spec: TableSpec) -> dict[str, Any]:
+    fields = set(spec.dimensions) | set(spec.measures)
+    help_for = {f: FIELD_HELP[f] for f in fields if f in FIELD_HELP}
     return {
         "table": table,
         "description": spec.description,
@@ -2995,6 +3071,9 @@ def _table_fields_doc(table: str, spec: TableSpec) -> dict[str, Any]:
             "note": "Numeric measure columns on the fact table.",
         },
         "aggregate_functions": ["SUM", "COUNT", "AVG", "MIN", "MAX"],
+        # Per-field help (what it means / units / gotchas) for the fields this table
+        # actually has — lets the schema browser explain bare field names.
+        "field_help": help_for,
         "example": _example_for(table, spec),
     }
 

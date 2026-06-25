@@ -267,6 +267,15 @@ class TestFields:
     def test_unknown_table_is_404(self):
         assert client.get("/api/fields?table=nope", headers=MOMO).status_code == 404
 
+    def test_schema_includes_field_help(self):
+        # The schema browser needs per-field descriptions, not bare names.
+        d = client.get("/api/schema/t4_notices").json()
+        help = d["field_help"]
+        assert "category_is_total" in help and "total" in help["category_is_total"].lower()
+        assert "notices" in help and help["notices"]
+        # Only fields the table actually has are documented.
+        assert set(help) <= (set(d["dimensions"]["fields"]) | set(d["measures"]["fields"]))
+
     def test_schema_endpoints_are_public(self):
         # Schema discovery needs no API key — the same structure is already public
         # via /api/explore/options, /docs and /openapi.json.
