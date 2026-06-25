@@ -1126,7 +1126,7 @@ class TestDashboard:
         reported_total = con.execute(
             "SELECT COALESCE(SUM(t.notices),0) FROM t4_notices t "
             "JOIN categories cat ON cat.id=t.category_id JOIN reports r ON r.id=t.report_id "
-            "WHERE r.tier='vlop' AND cat.code='TOTAL'").fetchone()[0]
+            "WHERE r.tier='vlop' AND cat.is_total=1").fetchone()[0]
         sum_all = con.execute(
             "SELECT COALESCE(SUM(t.notices),0) FROM t4_notices t "
             "JOIN reports r ON r.id=t.report_id WHERE r.tier='vlop'").fetchone()[0]
@@ -1365,6 +1365,28 @@ class TestCompositeQueries:
         rows = {row[0]: row for row in r.json()["rows"]}
         assert rows["Facebook"][2] == 500
         assert rows["YouTube"][2] is None  # filtered out of the appeals leg only
+
+    def test_leg_can_filter_on_is_total_dimension(self):
+        # The Compare panel pins each leg's published total row (category_is_total /
+        # scope_is_total) so a SUM is the headline figure, not the aggregate
+        # double-counted with its own breakdown. Filtering a leg on those flags must
+        # compile cleanly (regression: it once 500'd against a stale schema).
+        q = {
+            "legs": {
+                "n": {"table": "t4_notices",
+                      "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "av"}],
+                      "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]}},
+                "u": {"table": "t10_amar",
+                      "aggregates": [{"function": "SUM", "field_name": "value", "alias": "bv"}],
+                      "query": {"and": [{"operation": "EQ", "field_name": "scope_is_total", "field_values": ["1"]}]}},
+            },
+            "join_on": ["service_name"],
+            "derived": [{"alias": "result", "expr": "1000 * n.av / u.bv"}],
+            "max_count": 5,
+        }
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200, r.text
+        assert "result" in r.json()["columns"]
 
     def test_multi_dim_join(self):
         q = _ratio_query(join_on=["service_name", "platform"])

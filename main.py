@@ -2181,7 +2181,7 @@ def _compute_overview() -> dict[str, Any]:
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t "
             "JOIN categories cat ON cat.id = t.category_id "
             "JOIN reports r ON r.id = t.report_id "
-            "WHERE r.tier = 'vlop' AND cat.code = 'TOTAL'").fetchone()[0]
+            "WHERE r.tier = 'vlop' AND cat.is_total = 1").fetchone()[0]
         # Count of distinct non-VLOP platforms whose harmonised reports also live in
         # the star schema — surfaced so the dashboard can show the dataset's breadth
         # without folding these into the VLOP-scoped headline figures above.
@@ -2200,7 +2200,7 @@ def _compute_overview() -> dict[str, Any]:
                 "FROM t4_notices t JOIN services s ON s.id = t.service_id "
                 "JOIN categories cat ON cat.id = t.category_id "
                 "JOIN reports r ON r.id = t.report_id "
-                "WHERE r.tier = 'vlop' AND cat.code = 'TOTAL' "
+                "WHERE r.tier = 'vlop' AND cat.is_total = 1 "
                 "GROUP BY s.platform ORDER BY n DESC LIMIT 10"
             ).fetchall()
         ]
