@@ -1124,6 +1124,12 @@ class QueryRequest(BaseModel):
       and `derived` columns compute arithmetic (e.g. ratios) across them.
     """
 
+    # Reject unknown keys instead of silently ignoring them — a caller that sends
+    # e.g. `conditions` instead of `query` should get a loud 422, not an
+    # unfiltered result. (This caught a real bug where the removals dashboard's
+    # filters were being dropped.)
+    model_config = ConfigDict(extra="forbid")
+
     table: str | None = Field(
         default=None, description="Which DSA report table to query (see GET /tables)."
     )
@@ -2165,9 +2171,17 @@ def _compute_overview() -> dict[str, Any]:
         platforms = conn.execute(
             f"SELECT COUNT(DISTINCT platform) FROM services WHERE id IN ({_vlop_subquery})"
         ).fetchone()[0]
+        # t4 carries two overlapping taxonomies (DSA "statement categories"
+        # STATEMENT_CATEGORY_* and finer "keyword" KEYWORD_* rows) plus a reported
+        # grand-total row (code 'TOTAL', label "All the entries"). Summing across
+        # them double/triple-counts. The authoritative platform/headline figure is
+        # the reported TOTAL; the by-category breakdown uses the primary statement
+        # categories only (they sum to ~TOTAL), never the keyword or TOTAL rows.
         total_notices = conn.execute(
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t "
-            "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
+            "JOIN categories cat ON cat.id = t.category_id "
+            "JOIN reports r ON r.id = t.report_id "
+            "WHERE r.tier = 'vlop' AND cat.is_total = 1").fetchone()[0]
         # Count of distinct non-VLOP platforms whose harmonised reports also live in
         # the star schema — surfaced so the dashboard can show the dataset's breadth
         # without folding these into the VLOP-scoped headline figures above.
@@ -2184,7 +2198,9 @@ def _compute_overview() -> dict[str, Any]:
             for p, n in conn.execute(
                 "SELECT s.platform, COALESCE(SUM(t.notices), 0) AS n "
                 "FROM t4_notices t JOIN services s ON s.id = t.service_id "
-                "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop' "
+                "JOIN categories cat ON cat.id = t.category_id "
+                "JOIN reports r ON r.id = t.report_id "
+                "WHERE r.tier = 'vlop' AND cat.is_total = 1 "
                 "GROUP BY s.platform ORDER BY n DESC LIMIT 10"
             ).fetchall()
         ]
@@ -2194,6 +2210,7 @@ def _compute_overview() -> dict[str, Any]:
                 "SELECT cat.label, COALESCE(SUM(t.notices), 0) AS n "
                 "FROM t4_notices t JOIN categories cat ON cat.id = t.category_id "
                 "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop' "
+                "AND cat.code LIKE 'STATEMENT_CATEGORY_%' "
                 "GROUP BY cat.label ORDER BY n DESC LIMIT 8"
             ).fetchall()
         ]
@@ -2255,6 +2272,10 @@ def _compute_gr_overview() -> dict[str, Any]:
             "country_count": country_count,
             "period_count": len(periods),
             "periods": periods,
+            # Provenance: the snapshot build date (shared with the DSA dataset) and
+            # the covered reporting window, so the dashboard can cite both.
+            "generated": _dataset_meta().get("generated"),
+            "coverage": (periods[0] + " – " + periods[-1]) if periods else None,
             "countries": countries,
             "requestors": requestors,
             "products": products,
@@ -2642,15 +2663,21 @@ def _run_query_bounded(body: QueryRequest) -> dict[str, Any]:
     no webhook — the shared trust boundary for /api/explore and /api/ask. Raises
     QueryCompileError if any field/operation is invalid for the table."""
     capped = min(body.max_count, EXPLORE_MAX_ROWS)
-    safe = body.model_copy(update={"max_count": capped, "callback_url": None})
+    # Fetch one extra row past the cap so we can tell "exactly N results" apart
+    # from "more existed and were cut": a genuine top-N is no longer mislabelled
+    # truncated just because it happens to have exactly `capped` rows.
+    safe = body.model_copy(update={"max_count": capped + 1, "callback_url": None})
     sql, params, columns = compile_query(safe)  # validates against the registry
     conn = _connect_ro()
     try:
         rows = [list(r) for r in conn.execute(sql, params).fetchall()]
     finally:
         conn.close()
-    # `truncated` lets the UI flag that the public row cap was hit.
-    return {"columns": columns, "rows": rows, "row_count": len(rows), "truncated": len(rows) >= capped}
+    truncated = len(rows) > capped
+    if truncated:
+        rows = rows[:capped]
+    # `truncated` lets the UI flag that the public row cap actually cut results.
+    return {"columns": columns, "rows": rows, "row_count": len(rows), "truncated": truncated}
 
 
 @api_router.post("/explore")
@@ -2905,15 +2932,104 @@ def ready() -> dict[str, str]:
     return {"status": "ok"}
 
 
+_meta_cache: dict[str, str] | None = None
+_meta_cache_lock = threading.Lock()
+
+
 def _dataset_meta() -> dict[str, str]:
-    try:
-        conn = _connect_ro()
-        try:
-            return {k: v for k, v in conn.execute("SELECT key, value FROM meta").fetchall()}
-        finally:
-            conn.close()
-    except Exception:
-        return {}
+    # The DB is opened mode=ro and is static at runtime, so the meta table never
+    # changes — memoise it (like the overview caches) instead of opening a fresh
+    # connection on every result render/download. Failures aren't cached, so a
+    # transient error still retries on the next call.
+    global _meta_cache
+    if _meta_cache is None:
+        with _meta_cache_lock:
+            if _meta_cache is None:
+                try:
+                    conn = _connect_ro()
+                    try:
+                        _meta_cache = {
+                            k: v for k, v in conn.execute("SELECT key, value FROM meta").fetchall()
+                        }
+                    finally:
+                        conn.close()
+                except Exception:
+                    return {}
+    return _meta_cache
+
+
+# Short, plain-language help for each queryable field — what it means, its unit,
+# and any aggregation gotcha. Surfaced by /api/schema and the schema browser so
+# bare field names aren't a guessing game. English by design (field names are too).
+FIELD_HELP: dict[str, str] = {
+    # ── shared dimensions ──
+    "service_name": "The platform/service that filed the report (e.g. YouTube, TikTok).",
+    "platform": "Parent company of the service (e.g. Alphabet for YouTube).",
+    "period": "Reporting period covered by the report.",
+    "report_period": "Reporting period covered by the report.",
+    "report_period_start": "Start date of the reporting period (YYYY-MM-DD).",
+    "report_period_end": "End date of the reporting period (YYYY-MM-DD).",
+    "report_tier": "'vlop' = designated Very Large platform; other tiers are non-VLOP filers using the harmonised template.",
+    # ── DSA t4 categories (two overlapping taxonomies + a total) ──
+    "category_code": "DSA category code. STATEMENT_CATEGORY_* are the primary categories; KEYWORD_* are a parallel, finer taxonomy that overlaps them — do not sum both. 'TOTAL' is the reported grand total.",
+    "category_label": "Human-readable label for category_code. 'All the entries' is the reported grand-total row.",
+    "category_is_total": "1 = the reported grand-total row ('All the entries'); 0 = a breakdown category. Pin one (=1 for the headline, =0 for the breakdown) so a SUM never adds the total to its own parts.",
+    # ── t7–t10 breakdown dims ──
+    "section": "The DSA report section the row belongs to (Tables 7–9).",
+    "indicator": "The specific metric reported within a section.",
+    "scope": "A mixed breakdown dimension: depending on the indicator it may be a member-state code, an outcome ('Decisions upheld'/'reversed'), 'Total number', or 'Median time'. These are NOT mutually exclusive — pin a single value (or scope_is_total=1) before aggregating.",
+    "scope_is_total": "1 = the reported total row of the scope dimension; 0 = a breakdown row. Pin one to avoid double-counting.",
+    "surface": "The platform surface/area the figure applies to (e.g. by language).",
+    "section_key": "Language-neutral canonical label for `section`, so a filter spans reports filed in other EU languages.",
+    "indicator_key": "Language-neutral canonical label for `indicator`.",
+    "scope_key": "Language-neutral canonical label for `scope`.",
+    "qualitative_text": "Free-text description (Table 11). Request it via `fields`; this table has no numeric measures.",
+    # ── Google removals dims ──
+    "country_code": "Requesting country's ISO code (Google government removals).",
+    "country_name": "Requesting country (Google government removals).",
+    "requestor": "Type of government body making the removal request.",
+    "product": "Google product the request targets (Web Search, YouTube, …).",
+    "reason": "Government's stated reason for the removal request.",
+    # ── measures: DSA ──
+    "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
+    "tf_notices": "Of those notices, the count submitted by trusted flaggers.",
+    "median_time": "Median time to act on notices (units as reported). A median — do NOT SUM or AVG it across rows.",
+    "tf_median_time": "Median time to act on trusted-flagger notices. A median — do NOT SUM or AVG it.",
+    "orders_to_act": "Member-state orders to act against content (Table 3, Art. 9).",
+    "orders_to_provide_info": "Member-state orders to provide information (Table 3, Art. 10).",
+    "measures": "Count of own-initiative moderation actions (Tables 5/6).",
+    "actions_law": "Own-initiative actions taken on legal grounds.",
+    "actions_tos": "Own-initiative actions taken on terms-of-service grounds.",
+    "tf_actions_law": "Trusted-flagger-driven actions on legal grounds.",
+    "tf_actions_tos": "Trusted-flagger-driven actions on ToS grounds.",
+    "automated": "Of those actions, the count taken by automated means.",
+    "value": "The reported numeric value for this section × indicator × scope row (Tables 7–10); its meaning depends on the indicator.",
+    "account_suspension": "Restriction applied: account suspension.",
+    "account_termination": "Restriction applied: account termination.",
+    "service_suspension": "Restriction applied: service suspension.",
+    "service_termination": "Restriction applied: service termination.",
+    "monetary_suspension": "Restriction applied: suspension of monetary payments.",
+    "monetary_termination": "Restriction applied: termination of monetary payments.",
+    "monetary_other": "Restriction applied: other monetary restriction.",
+    "vis_removal": "Visibility restriction: content removal.",
+    "vis_demoted": "Visibility restriction: content demoted/down-ranked.",
+    "vis_disable": "Visibility restriction: content disabled.",
+    "vis_labelled": "Visibility restriction: content labelled.",
+    "vis_age_restricted": "Visibility restriction: age-restricted.",
+    "vis_interaction_restricted": "Visibility restriction: interaction restricted.",
+    "vis_other": "Visibility restriction: other.",
+    # ── measures: Google removals ──
+    "num_requests": "Number of government removal requests.",
+    "items_requested": "Items governments asked Google to remove (what was requested, not necessarily removed).",
+    "items": "Item count.",
+    "tf_items": "Trusted-flagger item count.",
+    "removed_legal": "Items removed on legal grounds.",
+    "removed_policy": "Items removed on content-policy grounds.",
+    "already_removed": "Items already removed before Google acted.",
+    "not_found": "Requests where the content was not found.",
+    "not_enough_info": "Requests with insufficient information to act.",
+    "no_action": "Requests where no action was taken.",
+}
 
 
 def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
@@ -2937,6 +3053,8 @@ def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
 
 
 def _table_fields_doc(table: str, spec: TableSpec) -> dict[str, Any]:
+    fields = set(spec.dimensions) | set(spec.measures)
+    help_for = {f: FIELD_HELP[f] for f in fields if f in FIELD_HELP}
     return {
         "table": table,
         "description": spec.description,
@@ -2953,6 +3071,9 @@ def _table_fields_doc(table: str, spec: TableSpec) -> dict[str, Any]:
             "note": "Numeric measure columns on the fact table.",
         },
         "aggregate_functions": ["SUM", "COUNT", "AVG", "MIN", "MAX"],
+        # Per-field help (what it means / units / gotchas) for the fields this table
+        # actually has — lets the schema browser explain bare field names.
+        "field_help": help_for,
         "example": _example_for(table, spec),
     }
 
@@ -3086,8 +3207,22 @@ def _render_result(
     headers = (
         {"Content-Disposition": f'attachment; filename="{job_id}.json"'} if as_attachment else None
     )
+    # Stamp the result with dataset provenance so an exported JSON is self-describing
+    # and citable (snapshot period + generation date + build) without a separate lookup.
+    meta = _dataset_meta()
     return JSONResponse(
-        {"columns": cols, "rows": rows, "row_count": len(rows)}, headers=headers
+        {
+            "columns": cols,
+            "rows": rows,
+            "row_count": len(rows),
+            "dataset": {
+                "period": meta.get("period"),
+                "generated": meta.get("generated"),
+                "app_version": APP_VERSION,
+                "source": "https://github.com/krMaynard/transparency-report-api",
+            },
+        },
+        headers=headers,
     )
 
 

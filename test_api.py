@@ -267,6 +267,15 @@ class TestFields:
     def test_unknown_table_is_404(self):
         assert client.get("/api/fields?table=nope", headers=MOMO).status_code == 404
 
+    def test_schema_includes_field_help(self):
+        # The schema browser needs per-field descriptions, not bare names.
+        d = client.get("/api/schema/t4_notices").json()
+        help = d["field_help"]
+        assert "category_is_total" in help and "total" in help["category_is_total"].lower()
+        assert "notices" in help and help["notices"]
+        # Only fields the table actually has are documented.
+        assert set(help) <= (set(d["dimensions"]["fields"]) | set(d["measures"]["fields"]))
+
     def test_schema_endpoints_are_public(self):
         # Schema discovery needs no API key — the same structure is already public
         # via /api/explore/options, /docs and /openapi.json.
@@ -554,13 +563,24 @@ class TestSafety:
         )
         assert r.status_code == 400
 
-    def test_extra_sql_field_ignored(self):
-        # The model has no free-form `sql` field; an extra one is ignored, and the
-        # query runs the validated default SELECT for the named table.
+    def test_extra_field_rejected(self):
+        # The model has no free-form `sql` field, and unknown keys are now rejected
+        # outright (extra="forbid") rather than silently ignored — so an injection
+        # attempt via an `sql` field is a loud 422 and no query ever runs. (This
+        # also guards the class of bug where a misnamed `conditions`/`filters` key
+        # would have been dropped, returning unfiltered data.)
         r = client.post("/api/query", json={"table": "t4_notices", "sql": "DROP TABLE services"}, headers=MOMO)
-        assert r.status_code == 202
-        job = _wait_for_job(r.json()["job_id"], MOMO)
-        assert job["status"] == "done"  # ran the default SELECT, not the DROP
+        assert r.status_code == 422
+
+    def test_misnamed_filter_key_rejected(self):
+        # Regression: the removals dashboard once sent `conditions` instead of
+        # `query`, which was silently ignored → unfiltered results. Now it 422s.
+        r = client.post(
+            "/api/query",
+            json={"table": "t4_notices", "conditions": {"and": []}},
+            headers=MOMO,
+        )
+        assert r.status_code == 422
 
     def test_unknown_job_is_404(self):
         assert client.get("/api/jobs/doesnotexist", headers=MOMO).status_code == 404
@@ -1102,7 +1122,31 @@ class TestDashboard:
         assert isinstance(d["top_platforms"], list) and d["top_platforms"]
         assert {"platform", "notices"} <= set(d["top_platforms"][0])
         assert isinstance(d["by_category"], list)
-        assert "period" in d
+        assert "period" in d and "generated" in d
+
+    def test_overview_notices_not_double_counted(self):
+        # Regression: t4 carries a reported grand-total row (code 'TOTAL') plus two
+        # overlapping taxonomies (STATEMENT_CATEGORY_* and KEYWORD_*). The headline
+        # must be the reported TOTAL, and the by-category breakdown must use the
+        # statement categories only — never summed together (which double/triple-counts).
+        import sqlite3, os
+        d = client.get("/api/overview").json()
+        con = sqlite3.connect(os.environ["DB_PATH"]); con.row_factory = sqlite3.Row
+        reported_total = con.execute(
+            "SELECT COALESCE(SUM(t.notices),0) FROM t4_notices t "
+            "JOIN categories cat ON cat.id=t.category_id JOIN reports r ON r.id=t.report_id "
+            "WHERE r.tier='vlop' AND cat.is_total=1").fetchone()[0]
+        sum_all = con.execute(
+            "SELECT COALESCE(SUM(t.notices),0) FROM t4_notices t "
+            "JOIN reports r ON r.id=t.report_id WHERE r.tier='vlop'").fetchone()[0]
+        con.close()
+        # Headline equals the reported total, not the inflated sum-of-everything.
+        assert d["total_notices"] == reported_total
+        assert d["total_notices"] < sum_all
+        # No category bar is the "All the entries" grand-total row.
+        assert all("All the entries" != c["category"] for c in d["by_category"])
+        # The statement-category bars never exceed the reported total.
+        assert sum(c["notices"] for c in d["by_category"]) <= reported_total + 1
 
     def test_home_page_served_at_root(self):
         r = client.get("/")
@@ -1335,6 +1379,28 @@ class TestCompositeQueries:
         rows = {row[0]: row for row in r.json()["rows"]}
         assert rows["Facebook"][2] == 500
         assert rows["YouTube"][2] is None  # filtered out of the appeals leg only
+
+    def test_leg_can_filter_on_is_total_dimension(self):
+        # The Compare panel pins each leg's published total row (category_is_total /
+        # scope_is_total) so a SUM is the headline figure, not the aggregate
+        # double-counted with its own breakdown. Filtering a leg on those flags must
+        # compile cleanly (regression: it once 500'd against a stale schema).
+        q = {
+            "legs": {
+                "n": {"table": "t4_notices",
+                      "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "av"}],
+                      "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]}},
+                "u": {"table": "t10_amar",
+                      "aggregates": [{"function": "SUM", "field_name": "value", "alias": "bv"}],
+                      "query": {"and": [{"operation": "EQ", "field_name": "scope_is_total", "field_values": ["1"]}]}},
+            },
+            "join_on": ["service_name"],
+            "derived": [{"alias": "result", "expr": "1000 * n.av / u.bv"}],
+            "max_count": 5,
+        }
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200, r.text
+        assert "result" in r.json()["columns"]
 
     def test_multi_dim_join(self):
         q = _ratio_query(join_on=["service_name", "platform"])

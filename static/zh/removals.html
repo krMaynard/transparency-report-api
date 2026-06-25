@@ -237,6 +237,8 @@ display: flex; align-items: center; justify-content: space-between;
   .skip-link:focus { top: 8px; }
   footer { color: var(--muted); font-size: 13px; margin-top: 8px; padding-bottom: 2rem; }
   footer a { color: var(--accent); text-decoration: none; }
+  .provenance { font-size: 12px; margin-top: 6px; }
+  .provenance .prov-label { font-weight: 600; }
 
   @media (max-width: 720px) {
     .hamburger { display: flex; }
@@ -305,6 +307,13 @@ display: flex; align-items: center; justify-content: space-between;
 
 <aside class="sidebar" id="sidebar" aria-label="应用导航">
   <nav>
+    <a href="/zh/" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
+      </svg>
+      首页
+    </a>
+
     <div class="nav-section">数据集</div>
 
     <a href="/zh/reports" class="nav-item">
@@ -468,7 +477,7 @@ display: flex; align-items: center; justify-content: space-between;
         </div>
         <div class="chart-loading" id="ts-loading">正在加载…</div>
         <canvas id="chart-ts" height="160" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-ts-table" class="hidden sr-only"></div>
+        <div id="chart-ts-table" class="sr-only"></div>
       </div>
 
       <div class="chart-card wide">
@@ -476,30 +485,35 @@ display: flex; align-items: center; justify-content: space-between;
         <p class="chart-sub">Google 实际删除的被要求项目所占比例（法律 + 政策 + 已删除）。</p>
         <div class="chart-loading" id="rate-loading">正在加载…</div>
         <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-rate-table" class="sr-only"></div>
       </div>
 
       <div class="chart-card">
         <h3>按被要求项目排名前 10 的国家</h3>
         <div class="chart-loading" id="cty-loading">正在加载…</div>
         <canvas id="chart-countries" height="200" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-countries-table" class="sr-only"></div>
       </div>
 
       <div class="chart-card">
         <h3>引用最多的理由</h3>
         <div class="chart-loading" id="rsn-loading">正在加载…</div>
         <canvas id="chart-reasons" height="200" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-reasons-table" class="sr-only"></div>
       </div>
 
       <div class="chart-card">
         <h3>被要求最多的 Google 产品</h3>
         <div class="chart-loading" id="prd-loading">正在加载…</div>
         <canvas id="chart-products" height="200" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-products-table" class="sr-only"></div>
       </div>
 
       <div class="chart-card">
         <h3>Google 如何回应</h3>
         <div class="chart-loading" id="cmp-loading">正在加载…</div>
         <canvas id="chart-compliance" height="200" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-compliance-table" class="sr-only"></div>
       </div>
 
     </div>
@@ -529,6 +543,7 @@ display: flex; align-items: center; justify-content: space-between;
 
 <footer>
   <p>来源：<a href="https://transparencyreport.google.com/government-removals/overview" target="_blank" rel="noopener noreferrer">Google Transparency Report</a> ——详细的政府删除请求（2019 年至 2025 年上半年）。数据来自 <a href="/api">Transparency Report API</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">快照：</span> <span id="prov-snap"></span> · <span class="prov-label">引用格式：</span> <span id="prov-cite"></span></p>
 </footer>
 
 </div>
@@ -627,7 +642,7 @@ display: flex; align-items: center; justify-content: space-between;
     if (sort)      body.sort = sort;
     if (max_count) body.max_count = max_count;
     var cond = buildConditions();
-    if (cond) body.conditions = cond;
+    if (cond) body.query = cond;   // API field is `query` (a BooleanQuery), not `conditions`
     return body;
   }
 
@@ -637,6 +652,21 @@ display: flex; align-items: center; justify-content: space-between;
   function showChart(canvasId, loadingId) {
     document.getElementById(loadingId).classList.add('hidden');
     document.getElementById(canvasId).classList.remove('hidden');
+  }
+
+  // Accessible data-table mirror of a chart, written into a visually-hidden
+  // (.sr-only) container so screen-reader users get the numbers even though the
+  // canvas is aria-hidden (and even if Chart.js fails to load).
+  function srTable(tableId, caption, headers, rows) {
+    var el = document.getElementById(tableId);
+    if (!el) return;
+    el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
+      + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
   }
 
   function barChart(id, loadId, labels, values, label) {
@@ -719,6 +749,8 @@ display: flex; align-items: center; justify-content: space-between;
       var labels = rows.map(function(r){ return r[0]; });
       var values = rows.map(function(r){ return r[1]; });
       lineChart('chart-ts', 'ts-loading', labels, [{ label: '被要求项目', data: values }]);
+      srTable('chart-ts-table', 'Items targeted for removal, by period',
+        ['报告期', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
     } else {
       // rows = [period, breakdown_val, items] — pivot into per-breakdown datasets
       var periodSet = [], seriesMap = {};
@@ -737,6 +769,11 @@ display: flex; align-items: center; justify-content: space-between;
         return { label: entry.key, data: periodSet.map(function(p){ return seriesMap[entry.key][p] || 0; }) };
       });
       lineChart('chart-ts', 'ts-loading', periodSet, datasets);
+      srTable('chart-ts-table', 'Items targeted for removal, by period',
+        ['报告期'].concat(totals.map(function(e){ return e.key; })),
+        periodSet.map(function(p){
+          return [p].concat(totals.map(function(e){ return fmt(seriesMap[e.key][p] || 0); }));
+        }));
     }
   }
 
@@ -748,24 +785,32 @@ display: flex; align-items: center; justify-content: space-between;
       return items > 0 ? removed / items : null;
     });
     pctLineChart('chart-rate', 'rate-loading', labels, rates);
+    srTable('chart-rate-table', 'Removal rate over time', ['报告期', '删除率'],
+      rows.map(function(r, i){ return [r[0], rates[i] == null ? '—' : (rates[i] * 100).toFixed(1) + '%']; }));
   }
 
   function renderTopCountries(rows) {
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-countries', 'cty-loading', labels, values, '被要求项目');
+    srTable('chart-countries-table', 'Top 10 countries by items targeted',
+      ['国家/地区', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
   function renderTopReasons(rows) {
     var labels = rows.map(function(r){ return r[0]; });
     var values = rows.map(function(r){ return r[1]; });
     doughnutChart('chart-reasons', 'rsn-loading', labels, values);
+    srTable('chart-reasons-table', 'Top reasons cited',
+      ['原因', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
   function renderTopProducts(rows) {
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-products', 'prd-loading', labels, values, '被要求项目');
+    srTable('chart-products-table', 'Top Google products targeted',
+      ['Google 产品', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
   function renderCompliance(rows) {
@@ -773,6 +818,8 @@ display: flex; align-items: center; justify-content: space-between;
       destroyChart('chart-compliance');
       var loadingEl = document.getElementById('cmp-loading');
       if (loadingEl) loadingEl.classList.add('hidden');
+      var tEl = document.getElementById('chart-compliance-table');
+      if (tEl) tEl.innerHTML = '';
       return;
     }
     var r = rows[0];
@@ -780,6 +827,8 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = ['已删除（法律）', '已删除（政策）', '已删除', '未找到', '信息不足', '未处理'];
     var values = [r[0]||0, r[1]||0, r[2]||0, r[3]||0, r[4]||0, r[5]||0];
     doughnutChart('chart-compliance', 'cmp-loading', labels, values);
+    srTable('chart-compliance-table', 'How Google responded',
+      ['处理结果', '条目数'], labels.map(function(l, i){ return [l, fmt(values[i])]; }));
   }
 
   function renderTable(rows) {
@@ -836,13 +885,32 @@ display: flex; align-items: center; justify-content: space-between;
       var el = document.getElementById(id); if (el) el.classList.add('hidden');
     });
 
-    var grp = breakdown ? ['period', breakdown] : ['period'];
     var tsAggs = [{ function: 'SUM', field_name: 'items_requested', alias: 'items' }];
-    var tsSort = [{ field_name: 'period', order: 'asc' }];
 
     try {
+      // Time-series query. When broken down, first find the top-8 breakdown
+      // values (by total over the *current filters*), then fetch only
+      // period × those-8 rows. This keeps the grid well under the explore row
+      // cap (8×13 ≪ 500) so no periods are silently dropped — the old single
+      // query asked for period×country (1000+ rows) capped at 200 and lost most
+      // of the timeline. Chronological ordering is fixed client-side below.
+      var tsQuery;
+      if (breakdown) {
+        var topRes = await explore(q('gr_removals', [breakdown], tsAggs, [{ field_name: 'items', order: 'desc' }], 8));
+        var topVals = topRes.rows.map(function (r) { return r[0]; });
+        var tsBody = q('gr_removals', ['period', breakdown], tsAggs, null, 500);
+        if (topVals.length) {
+          var inCond = { operation: 'IN', field_name: breakdown, field_values: topVals };
+          tsBody.query = tsBody.query
+            ? { and: tsBody.query.and.concat([inCond]) }
+            : { and: [inCond] };
+        }
+        tsQuery = explore(tsBody);
+      } else {
+        tsQuery = explore(q('gr_removals', ['period'], tsAggs, null, 50));
+      }
       var results = await Promise.all([
-        explore(q('gr_removals', grp, tsAggs, tsSort, 200)),
+        tsQuery,
         explore(q('gr_removals', ['period'], [
           { function: 'SUM', field_name: 'items_requested', alias: 'items' },
           { function: 'SUM', field_name: 'removed_legal',   alias: 'legal' },
@@ -907,6 +975,15 @@ display: flex; align-items: center; justify-content: space-between;
       document.getElementById('stat-countries').textContent = d.country_count;
       document.getElementById('stat-periods').textContent  = d.period_count;
       document.getElementById('stats').removeAttribute('aria-busy');
+
+      // Provenance + citation line (dataset snapshot date + covered window).
+      if (d.generated) {
+        document.getElementById('prov-snap').textContent =
+          d.generated + (d.coverage ? ' (' + d.coverage + ')' : '');
+        document.getElementById('prov-cite').textContent =
+          '“Google government content-removal requests, via the Transparency Report API (' + d.generated + ' snapshot).”';
+        document.getElementById('provenance').hidden = false;
+      }
 
       allPeriods = d.periods;
       fromIdx = 0; toIdx = allPeriods.length - 1;
