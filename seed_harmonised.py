@@ -247,19 +247,21 @@ def build_harmonised_facts(db_path: str, snapshot_path: str = _DEFAULT_SNAPSHOT,
             period = f"{start}/{end}" if start or end else ""
             rep_id = next_report
             next_report += 1
-            # An additional reporting period for an existing platform attaches a
-            # new `reports` row to that platform's existing service (no duplicate
-            # service); otherwise create a fresh service.
-            base = EXTRA_PERIODS.get(slug)
+            # Resolve the service by its target name (the base name for an extra
+            # period, else this platform's name) and reuse-or-create — so an
+            # additional reporting period attaches a new `reports` row to the
+            # existing service rather than duplicating it, independent of the
+            # order slugs happen to be processed in.
+            search_name = EXTRA_PERIODS.get(slug) or name
             existing = conn.execute("SELECT id FROM services WHERE name = ?",
-                                    (base,)).fetchone() if base else None
+                                    (search_name,)).fetchone()
             if existing:
                 svc_id = existing[0]
             else:
                 svc_id = next_service
                 next_service += 1
                 conn.execute("INSERT INTO services (id, name, platform) VALUES (?, ?, ?)",
-                             (svc_id, base or name, base or name))
+                             (svc_id, search_name, search_name))
                 counts["services"] += 1
             conn.execute(
                 "INSERT INTO reports (id, period, period_start, period_end, tier, generated) "
