@@ -441,7 +441,7 @@
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">欧盟 DSA · VLOP 透明度</span>
+    <span class="badge">欧盟 DSA · 透明度报告</span>
     <h1>DSA 透明度报告</h1>
     <p id="period">来自欧盟《数字服务法》透明度报告的内容审核统计数据。</p>
   </header>
@@ -632,11 +632,12 @@ async function load() {
   }
   $("#stats").setAttribute("aria-busy", "false");
 
-  if (d.period) $("#period").textContent = `报告期 ${fmtPeriod(d.period)} · ${d.services} 项服务，分属 ${d.platforms} 家母公司。`;
+  if (d.period) $("#period").textContent = `报告期 ${fmtPeriod(d.period)} · ${d.services} 个指定的 VLOP 和 VLOSE，外加 ${d.nonvlop_filers} 个提交欧盟统一模板的非 VLOP 平台。`;
   $("#stats").innerHTML =
     stat(fmt(d.services), "被指定的服务") +
     stat(fmt(d.platforms), "母公司") +
-    stat(fmt(d.total_notices), "第 16 条通知");
+    stat(fmt(d.total_notices), "第 16 条通知") +
+    stat(fmt(d.nonvlop_filers), "非 VLOP 报告方");
 
   const tp = d.top_platforms || [];
   barChart("#chart-platforms", "#chart-platforms-fallback",

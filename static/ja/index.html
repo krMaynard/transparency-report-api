@@ -441,7 +441,7 @@
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">EU DSA · VLOP の透明性</span>
+    <span class="badge">EU DSA · 透明性レポート</span>
     <h1>DSA 透明性レポート</h1>
     <p id="period">EU デジタルサービス法の透明性レポートに基づくコンテンツモデレーション統計。</p>
   </header>
@@ -632,11 +632,12 @@ async function load() {
   }
   $("#stats").setAttribute("aria-busy", "false");
 
-  if (d.period) $("#period").textContent = `報告期間 ${fmtPeriod(d.period)} · ${d.platforms} の親会社にまたがる ${d.services} 件のサービス。`;
+  if (d.period) $("#period").textContent = `報告対象期間 ${fmtPeriod(d.period)} · 指定された VLOP・VLOSE ${d.services} 件に加え、EU調和テンプレートを提出する非VLOPプラットフォーム ${d.nonvlop_filers} 件。`;
   $("#stats").innerHTML =
     stat(fmt(d.services), "指定サービス") +
     stat(fmt(d.platforms), "親会社") +
-    stat(fmt(d.total_notices), "第 16 条通知");
+    stat(fmt(d.total_notices), "第 16 条通知") +
+    stat(fmt(d.nonvlop_filers), "非VLOP提出者");
 
   const tp = d.top_platforms || [];
   barChart("#chart-platforms", "#chart-platforms-fallback",

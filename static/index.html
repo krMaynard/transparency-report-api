@@ -441,7 +441,7 @@
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">EU DSA · VLOP transparency</span>
+    <span class="badge">EU DSA · transparency reports</span>
     <h1>DSA Transparency Reports</h1>
     <p id="period">Content-moderation statistics from the EU Digital Services Act transparency reports.</p>
   </header>
@@ -632,11 +632,12 @@ async function load() {
   }
   $("#stats").setAttribute("aria-busy", "false");
 
-  if (d.period) $("#period").textContent = `Reporting period ${fmtPeriod(d.period)} · ${d.services} services across ${d.platforms} parent companies.`;
+  if (d.period) $("#period").textContent = `Reporting period ${fmtPeriod(d.period)} · ${d.services} designated VLOPs & VLOSEs, plus ${d.nonvlop_filers} non-VLOP platforms filing the EU harmonised template.`;
   $("#stats").innerHTML =
     stat(fmt(d.services), "Designated services") +
     stat(fmt(d.platforms), "Parent companies") +
-    stat(fmt(d.total_notices), "Art. 16 notices");
+    stat(fmt(d.total_notices), "Art. 16 notices") +
+    stat(fmt(d.nonvlop_filers), "Non-VLOP filers");
 
   const tp = d.top_platforms || [];
   barChart("#chart-platforms", "#chart-platforms-fallback",

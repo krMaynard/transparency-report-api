@@ -441,7 +441,7 @@
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">EU DSA · VLOP 투명성</span>
+    <span class="badge">EU DSA · 투명성 보고서</span>
     <h1>DSA 투명성 보고서</h1>
     <p id="period">EU 디지털 서비스법 투명성 보고서의 콘텐츠 조정 통계.</p>
   </header>
@@ -632,11 +632,12 @@ async function load() {
   }
   $("#stats").setAttribute("aria-busy", "false");
 
-  if (d.period) $("#period").textContent = `보고 기간 ${fmtPeriod(d.period)} · ${d.platforms}개 모기업에 걸친 ${d.services}개 서비스.`;
+  if (d.period) $("#period").textContent = `보고 기간 ${fmtPeriod(d.period)} · 지정된 VLOP 및 VLOSE ${d.services}곳에 더해 EU 표준 템플릿을 제출하는 비VLOP 플랫폼 ${d.nonvlop_filers}곳.`;
   $("#stats").innerHTML =
     stat(fmt(d.services), "지정 서비스") +
     stat(fmt(d.platforms), "모기업") +
-    stat(fmt(d.total_notices), "제16조 통지");
+    stat(fmt(d.total_notices), "제16조 통지") +
+    stat(fmt(d.nonvlop_filers), "비VLOP 제출자");
 
   const tp = d.top_platforms || [];
   barChart("#chart-platforms", "#chart-platforms-fallback",
