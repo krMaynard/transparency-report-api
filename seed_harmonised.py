@@ -270,6 +270,11 @@ def build_harmonised_facts(db_path: str, snapshot_path: str = _DEFAULT_SNAPSHOT,
             n = _load_facts(conn, intern, rep_id, svc_id, sec, surface_all)
             counts["facts"] += n
         conn.commit()
+        # Re-run the shared cleanup so the appended non-VLOP rows get the same
+        # is_total flags and junk-row removal as the VLOP load (idempotent).
+        import seed
+        counts["junk_facts_deleted"] = seed.normalize_dimensions(conn)["junk_facts_deleted"]
+        counts["facts"] -= counts["junk_facts_deleted"]
         return counts
     finally:
         conn.close()

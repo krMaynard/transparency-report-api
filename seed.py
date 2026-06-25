@@ -62,10 +62,10 @@ CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
 
 -- Shared dimension tables. id = position in the source lookup array.
 CREATE TABLE services   (id INTEGER PRIMARY KEY, name TEXT NOT NULL, platform TEXT NOT NULL);
-CREATE TABLE categories (id INTEGER PRIMARY KEY, code TEXT NOT NULL, label TEXT NOT NULL);
+CREATE TABLE categories (id INTEGER PRIMARY KEY, code TEXT NOT NULL, label TEXT NOT NULL, is_total INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE sections   (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
 CREATE TABLE indicators (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
-CREATE TABLE scopes     (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+CREATE TABLE scopes     (id INTEGER PRIMARY KEY, name TEXT NOT NULL, is_total INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE surfaces   (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
 
 -- Report dimension: one row per submitted transparency report (one dataset = one report).
@@ -231,6 +231,78 @@ _FACT_TABLES = {
 }
 
 
+# ── Dimension normalization ──────────────────────────────────────────────────
+# The DSA template embeds an aggregate "total" row alongside the breakdown rows
+# (AMAR's EU TOTAL next to per-member-state rows; the "All the entries" category
+# next to per-category rows; the "Total number" scope next to the upheld/reversed
+# outcomes). Summing a measure across those rows double-counts. We flag the
+# aggregate rows (is_total) so queries can pick a single grain, and we drop the
+# mis-parsed header/placeholder cells that some non-VLOP extracts leak in as data.
+
+# Labels (stripped, casefolded) that denote an aggregate/total row.
+_TOTAL_LABELS = {
+    "total", "totals", "total number", "all the entries", "all entries",
+    "gesamt", "gesamtzahl", "nombre total", "número total", "numero total",
+    "totale", "totaal", "ogółem", "totalt", "yhteensä", "celkem", "σύνολο",
+}
+# Labels that are mis-parsed header/placeholder cells, not real dimension values.
+_JUNK_LABELS = {
+    "", "scope", "category", "champ d’application", "champ d'application",
+    "geltungsbereich", "categoría", "catégorie", "kategorie", "[...]", "...",
+    "n/a", "na", "-",
+}
+# Fact tables by the dimension FK columns they carry (for junk-row deletion).
+_SCOPE_FACTS = ("t3_member_state_orders", "t7_appeals_recidivism",
+                "t8_automated_means", "t9_human_resources", "t10_amar")
+_CATEGORY_FACTS = ("t3_member_state_orders", "t4_notices",
+                   "t5_own_initiative_illegal", "t6_own_initiative_tos")
+
+
+def _is_total_label(label: str) -> bool:
+    return (label or "").strip().casefold() in _TOTAL_LABELS
+
+
+def _is_junk_label(label: str) -> bool:
+    s = (label or "").strip()
+    if s.casefold() in _JUNK_LABELS:
+        return True
+    # Stray spreadsheet cells: nothing but digits/punctuation (e.g. "168", "[...]").
+    return bool(s) and not any(ch.isalpha() for ch in s)
+
+
+def normalize_dimensions(conn: sqlite3.Connection) -> dict[str, int]:
+    """Post-load cleanup (idempotent). Flags aggregate 'total' scope/category
+    rows via ``is_total`` and deletes fact rows that reference mis-parsed junk
+    dimension labels. Safe to run repeatedly (e.g. after appending non-VLOP
+    reports). Returns a small {what: count} summary."""
+    flagged = 0
+    for dim, col in (("scopes", "name"), ("categories", "label")):
+        ids = [rid for rid, lab in conn.execute(f"SELECT id, {col} FROM {dim}")
+               if _is_total_label(lab)]
+        if ids:
+            conn.executemany(f"UPDATE {dim} SET is_total = 1 WHERE id = ?",
+                             [(i,) for i in ids])
+            flagged += len(ids)
+
+    deleted = 0
+    junk_scopes = [rid for rid, n in conn.execute("SELECT id, name FROM scopes")
+                   if _is_junk_label(n)]
+    junk_cats = [rid for rid, l in conn.execute("SELECT id, label FROM categories")
+                 if _is_junk_label(l)]
+    if junk_scopes:
+        ph = ",".join("?" * len(junk_scopes))
+        for t in _SCOPE_FACTS:
+            deleted += conn.execute(
+                f"DELETE FROM {t} WHERE scope_id IN ({ph})", junk_scopes).rowcount
+    if junk_cats:
+        ph = ",".join("?" * len(junk_cats))
+        for t in _CATEGORY_FACTS:
+            deleted += conn.execute(
+                f"DELETE FROM {t} WHERE category_id IN ({ph})", junk_cats).rowcount
+    conn.commit()
+    return {"totals_flagged": flagged, "junk_facts_deleted": deleted}
+
+
 def build_db(data: dict[str, Any], db_path: str) -> dict[str, int]:
     """Build the VLOP star schema at db_path from a parsed vlop-dsa.json dict.
 
@@ -291,6 +363,7 @@ def build_db(data: dict[str, Any], db_path: str) -> dict[str, int]:
             summary[table] = len(rows)
 
         conn.commit()
+        normalize_dimensions(conn)
         return summary
     finally:
         conn.close()
