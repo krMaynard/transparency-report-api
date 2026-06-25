@@ -1807,12 +1807,27 @@ class TestHarmonisedFacts:
         snap_path = os.path.join(os.path.dirname(_sh.__file__), "data", "harmonised-reports.json")
         with open(snap_path, encoding="utf-8") as f:
             snap = _json.load(f)
-        expected = len([s for s in snap if s not in _sh.SKIP_SLUGS])
-        assert counts["services"] == expected and counts["reports"] == expected
+        # One report per non-VLOP slug; one service per slug, except extra-period
+        # slugs (e.g. aboutyou2) attach to an existing service.
+        loaded = [s for s in snap if s not in _sh.SKIP_SLUGS]
+        assert counts["reports"] == len(loaded)
+        assert counts["services"] == len([s for s in loaded if s not in _sh.EXTRA_PERIODS])
         names = {r[0] for r in conn.execute("SELECT name FROM services")}
         assert {"ManoMano", "Roblox", "Web.de", "Skroutz"} <= names
         # The three already-VLOP platforms are skipped (not re-added).
         assert sum(1 for n in names if n == "Wikipedia") == 0
+
+    def test_extra_period_attaches_to_existing_service(self, tmp_path):
+        # AboutYou ships two consecutive periods (aboutyou + aboutyou2); the second
+        # must be a new report on the same service, not a duplicate service.
+        db, counts, conn = self._build(tmp_path)
+        svc = conn.execute("SELECT id FROM services WHERE name = 'AboutYou'").fetchall()
+        assert len(svc) == 1
+        periods = conn.execute(
+            "SELECT DISTINCT r.period_start, r.period_end FROM reports r "
+            "JOIN t4_notices t ON t.report_id = r.id WHERE t.service_id = ? "
+            "ORDER BY r.period_start", (svc[0][0],)).fetchall()
+        assert len(periods) == 2 and periods[0] != periods[1]
 
     def test_non_vlop_facts_queryable(self, tmp_path):
         db, counts, conn = self._build(tmp_path)

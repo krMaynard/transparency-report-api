@@ -4,9 +4,9 @@
 The DSA harmonised template is the same 11-section layout as the VLOP dataset, so
 each platform's extracted per-section CSVs map straight onto the t3–t11 fact
 tables. This appends them to an existing demo.db (after build_db has populated
-the VLOP data + dimensions): one new `reports` row per platform (tier !=
-'vlop'), one new `services` row, and fact rows that reuse/extend the shared
-dimension tables.
+the VLOP data + dimensions): one new `reports` row per submitted report (tier !=
+'vlop'; a platform that files several periods gets one report each), a `services`
+row per platform, and fact rows that reuse/extend the shared dimension tables.
 
 Columns are addressed by fixed template position (not header text) so localised
 reports (DE/FR/EL) load the same way. Dimension values are interned by string —
@@ -35,6 +35,12 @@ _DEFAULT_EXTRACTED = os.getenv(
 # These three extracted platforms are already VLOP services in vlop-dsa.json —
 # skip them so the official aggregated figures aren't double-counted.
 SKIP_SLUGS = {"linkedin", "pinterest", "wikipedia"}
+
+# Extracted slugs that are an *additional reporting period* of a platform already
+# loaded under another slug. Their facts attach to that platform's existing
+# `services` row (a new `reports` row per period), instead of a duplicate service.
+# slug -> the display name of the base service to attach to.
+EXTRA_PERIODS = {"aboutyou2": "AboutYou"}  # AboutYou's consecutive Dec-2025 period
 
 # slug -> (display service name, tier). Tier is informational (online-platform /
 # hosting / intermediary); none of these are VLOPs.
@@ -239,15 +245,27 @@ def build_harmonised_facts(db_path: str, snapshot_path: str = _DEFAULT_SNAPSHOT,
             # against publisher typos / unfilled template placeholders in sheet 1.
             start, end = _period_from_sections(sections) or _ident(sec(0))
             period = f"{start}/{end}" if start or end else ""
-            svc_id, rep_id = next_service, next_report
-            next_service += 1
+            rep_id = next_report
             next_report += 1
-            conn.execute("INSERT INTO services (id, name, platform) VALUES (?, ?, ?)",
-                         (svc_id, name, name))
+            # Resolve the service by its target name (the base name for an extra
+            # period, else this platform's name) and reuse-or-create — so an
+            # additional reporting period attaches a new `reports` row to the
+            # existing service rather than duplicating it, independent of the
+            # order slugs happen to be processed in.
+            search_name = EXTRA_PERIODS.get(slug) or name
+            existing = conn.execute("SELECT id FROM services WHERE name = ?",
+                                    (search_name,)).fetchone()
+            if existing:
+                svc_id = existing[0]
+            else:
+                svc_id = next_service
+                next_service += 1
+                conn.execute("INSERT INTO services (id, name, platform) VALUES (?, ?, ?)",
+                             (svc_id, search_name, search_name))
+                counts["services"] += 1
             conn.execute(
                 "INSERT INTO reports (id, period, period_start, period_end, tier, generated) "
                 "VALUES (?, ?, ?, ?, ?, NULL)", (rep_id, period, start, end, tier))
-            counts["services"] += 1
             counts["reports"] += 1
             n = _load_facts(conn, intern, rep_id, svc_id, sec, surface_all)
             counts["facts"] += n
