@@ -831,6 +831,14 @@ PAGES["de"]["index.html"] = [
 ]
 
 PAGES["es"]["removals.html"] = [
+    # Screen-reader chart-table header literals (sr-only JS strings).
+    ("""'Period'""", """'Período'"""),
+    ("""'Removal rate'""", """'Tasa de retirada'"""),
+    ("""'Country'""", """'País'"""),
+    ("""'Reason'""", """'Motivo'"""),
+    ("""'Google product'""", """'Producto de Google'"""),
+    ("""'Outcome'""", """'Resultado'"""),
+    ("""'Items'""", """'Elementos'"""),
     ('''Government requests to remove content from Google products — 160 countries, 13 reporting periods, 42 products, 22 reasons.''',
      '''Solicitudes gubernamentales de retirada de contenido en los productos de Google: 160 países, 13 períodos de referencia, 42 productos, 22 motivos.'''),
     ('''<h1>Government Requests to Remove Content</h1>''', '''<h1>Solicitudes gubernamentales de retirada de contenido</h1>'''),
@@ -901,6 +909,14 @@ PAGES["es"]["removals.html"] = [
 ]
 
 PAGES["fr"]["removals.html"] = [
+    # Screen-reader chart-table header literals (sr-only JS strings).
+    ("""'Period'""", """'Période'"""),
+    ("""'Removal rate'""", """'Taux de retrait'"""),
+    ("""'Country'""", """'Pays'"""),
+    ("""'Reason'""", """'Motif'"""),
+    ("""'Google product'""", """'Produit Google'"""),
+    ("""'Outcome'""", """'Résultat'"""),
+    ("""'Items'""", """'Éléments'"""),
     ('''Government requests to remove content from Google products — 160 countries, 13 reporting periods, 42 products, 22 reasons.''',
      '''Demandes gouvernementales de retrait de contenu sur les produits Google — 160 pays, 13 périodes de référence, 42 produits, 22 motifs.'''),
     ('''<h1>Government Requests to Remove Content</h1>''', '''<h1>Demandes gouvernementales de retrait de contenu</h1>'''),
@@ -970,6 +986,14 @@ PAGES["fr"]["removals.html"] = [
 ]
 
 PAGES["de"]["removals.html"] = [
+    # Screen-reader chart-table header literals (sr-only JS strings).
+    ("""'Period'""", """'Zeitraum'"""),
+    ("""'Removal rate'""", """'Entfernungsrate'"""),
+    ("""'Country'""", """'Land'"""),
+    ("""'Reason'""", """'Grund'"""),
+    ("""'Google product'""", """'Google-Produkt'"""),
+    ("""'Outcome'""", """'Ergebnis'"""),
+    ("""'Items'""", """'Elemente'"""),
     ('''Government requests to remove content from Google products — 160 countries, 13 reporting periods, 42 products, 22 reasons.''',
      '''Behördliche Anfragen zur Entfernung von Inhalten aus Google-Produkten – 160 Länder, 13 Berichtszeiträume, 42 Produkte, 22 Gründe.'''),
     ('''<h1>Government Requests to Remove Content</h1>''', '''<h1>Behördliche Anfragen zur Entfernung von Inhalten</h1>'''),
@@ -1841,6 +1865,14 @@ PAGES["ja"]["index.html"] = [
      r'''v.toLocaleString('ja-JP', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["ja"]["removals.html"] = [
+    # Screen-reader chart-table header literals (sr-only JS strings).
+    (r"""'Period'""", r"""'期間'"""),
+    (r"""'Removal rate'""", r"""'削除率'"""),
+    (r"""'Country'""", r"""'国'"""),
+    (r"""'Reason'""", r"""'理由'"""),
+    (r"""'Google product'""", r"""'Google プロダクト'"""),
+    (r"""'Outcome'""", r"""'結果'"""),
+    (r"""'Items'""", r"""'件数'"""),
     (r'''Government requests to remove content from Google products — 160 countries, 13 reporting periods, 42 products, 22 reasons.''',
      r'''Google の各種プロダクトからのコンテンツ削除を求める政府要請 — 160 か国、13 の報告期間、42 のプロダクト、22 の理由。'''),
     (r'''<h1>Government Requests to Remove Content</h1>''',
@@ -2517,6 +2549,14 @@ PAGES["zh"]["index.html"] = [
      r'''v.toLocaleString('zh-CN', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["zh"]["removals.html"] = [
+    # Screen-reader chart-table header literals (sr-only JS strings).
+    (r"""'Period'""", r"""'报告期'"""),
+    (r"""'Removal rate'""", r"""'删除率'"""),
+    (r"""'Country'""", r"""'国家/地区'"""),
+    (r"""'Reason'""", r"""'原因'"""),
+    (r"""'Google product'""", r"""'Google 产品'"""),
+    (r"""'Outcome'""", r"""'处理结果'"""),
+    (r"""'Items'""", r"""'条目数'"""),
     (r'''Government requests to remove content from Google products — 160 countries, 13 reporting periods, 42 products, 22 reasons.''',
      r'''要求从 Google 产品中删除内容的政府请求——涵盖 160 个国家、13 个报告期、42 种产品、22 种理由。'''),
     (r'''<h1>Government Requests to Remove Content</h1>''',
@@ -3194,6 +3234,14 @@ PAGES["ko"]["index.html"] = [
      r'''v.toLocaleString('ko-KR', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["ko"]["removals.html"] = [
+    # Screen-reader chart-table header literals (sr-only JS strings).
+    (r"""'Period'""", r"""'기간'"""),
+    (r"""'Removal rate'""", r"""'삭제율'"""),
+    (r"""'Country'""", r"""'국가'"""),
+    (r"""'Reason'""", r"""'사유'"""),
+    (r"""'Google product'""", r"""'Google 제품'"""),
+    (r"""'Outcome'""", r"""'결과'"""),
+    (r"""'Items'""", r"""'항목 수'"""),
     (r'''Government requests to remove content from Google products — 160 countries, 13 reporting periods, 42 products, 22 reasons.''',
      r'''Google 제품에서 콘텐츠를 삭제하려는 정부 요청 — 160개국, 13개 보고 기간, 42개 제품, 22개 사유.'''),
     (r'''<h1>Government Requests to Remove Content</h1>''',

@@ -750,7 +750,7 @@ display: flex; align-items: center; justify-content: space-between;
       var values = rows.map(function(r){ return r[1]; });
       lineChart('chart-ts', 'ts-loading', labels, [{ label: '대상 항목', data: values }]);
       srTable('chart-ts-table', 'Items targeted for removal, by period',
-        ['Period', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
+        ['기간', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
     } else {
       // rows = [period, breakdown_val, items] — pivot into per-breakdown datasets
       var periodSet = [], seriesMap = {};
@@ -770,7 +770,7 @@ display: flex; align-items: center; justify-content: space-between;
       });
       lineChart('chart-ts', 'ts-loading', periodSet, datasets);
       srTable('chart-ts-table', 'Items targeted for removal, by period',
-        ['Period'].concat(totals.map(function(e){ return e.key; })),
+        ['기간'].concat(totals.map(function(e){ return e.key; })),
         periodSet.map(function(p){
           return [p].concat(totals.map(function(e){ return fmt(seriesMap[e.key][p] || 0); }));
         }));
@@ -785,7 +785,7 @@ display: flex; align-items: center; justify-content: space-between;
       return items > 0 ? removed / items : null;
     });
     pctLineChart('chart-rate', 'rate-loading', labels, rates);
-    srTable('chart-rate-table', 'Removal rate over time', ['Period', 'Removal rate'],
+    srTable('chart-rate-table', 'Removal rate over time', ['기간', '삭제율'],
       rows.map(function(r, i){ return [r[0], rates[i] == null ? '—' : (rates[i] * 100).toFixed(1) + '%']; }));
   }
 
@@ -794,7 +794,7 @@ display: flex; align-items: center; justify-content: space-between;
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-countries', 'cty-loading', labels, values, '대상 항목');
     srTable('chart-countries-table', 'Top 10 countries by items targeted',
-      ['Country', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
+      ['국가', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
   function renderTopReasons(rows) {
@@ -802,7 +802,7 @@ display: flex; align-items: center; justify-content: space-between;
     var values = rows.map(function(r){ return r[1]; });
     doughnutChart('chart-reasons', 'rsn-loading', labels, values);
     srTable('chart-reasons-table', 'Top reasons cited',
-      ['Reason', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
+      ['사유', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
   function renderTopProducts(rows) {
@@ -810,7 +810,7 @@ display: flex; align-items: center; justify-content: space-between;
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-products', 'prd-loading', labels, values, '대상 항목');
     srTable('chart-products-table', 'Top Google products targeted',
-      ['Google product', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
+      ['Google 제품', '대상 항목'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
   function renderCompliance(rows) {
@@ -828,7 +828,7 @@ display: flex; align-items: center; justify-content: space-between;
     var values = [r[0]||0, r[1]||0, r[2]||0, r[3]||0, r[4]||0, r[5]||0];
     doughnutChart('chart-compliance', 'cmp-loading', labels, values);
     srTable('chart-compliance-table', 'How Google responded',
-      ['Outcome', 'Items'], labels.map(function(l, i){ return [l, fmt(values[i])]; }));
+      ['결과', '항목 수'], labels.map(function(l, i){ return [l, fmt(values[i])]; }));
   }
 
   function renderTable(rows) {
