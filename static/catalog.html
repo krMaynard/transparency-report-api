@@ -449,11 +449,12 @@ async function runLocations() {
     const link = href
       ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
       : esc(r.url_label || "");
-    // `archived` is a GitHub URL to the file(s) mirrored in this project's data repo.
-    const arch = safeHref(r.archived);
-    const archLink = arch
-      ? `<a href="${esc(arch)}" target="_blank" rel="noopener noreferrer">GitHub</a>`
-      : "";
+    // `archived` is one or more (semicolon-separated) GitHub URLs to the file(s)
+    // mirrored in this project's data repo — sanitise + link each separately.
+    const archLink = (r.archived || "").split(";").map(part => {
+      const href = safeHref(part.trim());
+      return href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">GitHub</a>` : "";
+    }).filter(Boolean).join(", ");
     return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
       `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
       `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td><td>${archLink}</td></tr>`;
