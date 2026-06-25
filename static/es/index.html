@@ -549,6 +549,11 @@
       <label>Agrupar por <select id="ex-dim"></select></label>
       <label>Agregación <select id="ex-agg"></select></label>
       <label>Medida <select id="ex-measure"></select></label>
+      <label>Filas <select id="ex-grain">
+        <option value="total" selected>Solo totales</option>
+        <option value="leaf">Solo desglose</option>
+        <option value="all">Todas las filas</option>
+      </select></label>
       <label id="ex-scope-wrap" class="hidden">Ámbito <select id="ex-scope"></select></label>
       <label>Mostrar top <select id="ex-top">
         <option>5</option><option selected>10</option><option>20</option><option>50</option>
@@ -694,7 +699,12 @@ async function load() {
 // pin a single scope/indicator so a value is never summed across non-comparable
 // rows — the curated counterpart to the Advanced builders below.
 const VLOP_TIER   = { operation: "EQ", field_name: "report_tier", field_values: ["vlop"] };
-const SCOPE_TOTAL = { operation: "EQ", field_name: "scope", field_values: ["Total number"] };
+// is_total = 1 selects the published aggregate row along a dimension (AMAR's EU
+// TOTAL, the "All the entries" category, the "Total number" scope) — so a SUM is
+// the headline figure, never the total double-counted with its own breakdown.
+const SCOPE_TOTAL = { operation: "EQ", field_name: "scope_is_total", field_values: ["1"] };
+const CAT_TOTAL   = { operation: "EQ", field_name: "category_is_total", field_values: ["1"] };
+const CAT_LEAF    = { operation: "EQ", field_name: "category_is_total", field_values: ["0"] };
 const APPEALS_IND = { operation: "EQ", field_name: "indicator",
   field_values: ["Number of complaints submitted to the internal-complaints mechanism"] };
 const WARN_SVG = '<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="#d29922" stroke-width="1.4" stroke-linecap="round"><path d="M8 1.7l6.5 12H1.5L8 1.7z"/><path d="M8 6.3v3.4M8 11.8v.05"/></svg>';
@@ -703,13 +713,16 @@ const TABS = [
   { tab: "Notificaciones", title: "Notificaciones del artículo 16 por plataforma",
     sub: "Total de notificaciones de contenido presuntamente ilícito recibidas (tabla 4 del DSA).",
     table: "t4_notices", measure: "notices", valueLabel: "Notificaciones", color: "blue",
-    secondary: { group: "category_label", measure: "notices", label: "Por categoría de contenido" } },
+    filters: [CAT_TOTAL],
+    secondary: { group: "category_label", measure: "notices", label: "Por categoría de contenido", filters: [CAT_LEAF] } },
   { tab: "Por iniciativa propia", title: "Acciones de moderación por iniciativa propia",
     sub: "Medidas proactivas adoptadas sin una notificación — contenido ilícito (tabla 5 del DSA).",
-    table: "t5_own_initiative_illegal", measure: "measures", valueLabel: "Acciones", color: "green" },
+    table: "t5_own_initiative_illegal", measure: "measures", valueLabel: "Acciones", color: "green",
+    filters: [CAT_TOTAL] },
   { tab: "Órdenes gubernamentales", title: "Órdenes de actuación de los Estados miembros",
     sub: "Órdenes de los Estados miembros de la UE para actuar contra contenidos (tabla 3 del DSA, art. 9).",
-    table: "t3_member_state_orders", measure: "orders_to_act", valueLabel: "Órdenes", color: "green" },
+    table: "t3_member_state_orders", measure: "orders_to_act", valueLabel: "Órdenes", color: "green",
+    filters: [CAT_TOTAL, SCOPE_TOTAL] },
   { tab: "Reclamaciones", title: "Reclamaciones internas presentadas",
     sub: "Reclamaciones al mecanismo interno de tramitación de reclamaciones de la plataforma (tabla 7 del DSA).",
     note: "Un solo indicador en el ámbito “Número total” — sin sumar los resultados (confirmados / revocados), de modo que la cifra no se cuenta dos veces.",
@@ -726,7 +739,8 @@ const TABS = [
     filters: [SCOPE_TOTAL] },
   { tab: "Alcance de usuarios", title: "Destinatarios activos mensuales medios (AMAR)",
     sub: "Destinatarios activos mensuales medios en toda la UE por servicio (tabla 10 del DSA).",
-    table: "t10_amar", measure: "value", agg: "MAX", valueLabel: "AMAR (UE)", color: "blue" },
+    table: "t10_amar", measure: "value", valueLabel: "AMAR (UE)", color: "blue",
+    filters: [SCOPE_TOTAL] },
   { tab: "Cualitativo", title: "Descripciones cualitativas",
     sub: "Descripciones de texto libre sobre gobernanza, automatización y recursos humanos (tabla 11 del DSA).",
     qual: { table: "t11_qualitative", fields: ["service_name", "indicator", "qualitative_text"] } },
@@ -822,7 +836,7 @@ function renderQual(d) {
 }
 
 async function renderSecondary(tab) {
-  const and = tabFilters(null);
+  const and = tabFilters(tab.secondary.filters || null);
   const q = { table: tab.table, group_by: [tab.secondary.group],
     aggregates: [{ function: "SUM", field_name: tab.secondary.measure, alias: "value" }],
     sort: [{ field_name: "value", order: "desc" }], max_count: 8,
@@ -932,19 +946,34 @@ async function setupScope(table, breakdown) {
 function buildQuery() {
   const agg = $("#ex-agg").value;
   const field_name = (agg === "COUNT" || $("#ex-measure").disabled) ? "*" : $("#ex-measure").value;
+  const table = $("#ex-table").value;
+  const t = exOptions.tables.find(x => x.table === table);
+  // /api/explore/options sends dimensions as an array, but tolerate an object too.
+  const dims = (t && t.dimensions) || [];
+  const hasDim = (d) => Array.isArray(dims) ? dims.includes(d) : (d in dims);
   const q = {
-    table: $("#ex-table").value,
+    table,
     group_by: [$("#ex-dim").value],
     aggregates: [{ function: agg, field_name, alias: "value" }],
     sort: [{ field_name: "value", order: "desc" }],
     max_count: Number($("#ex-top").value),
   };
-  // Pin the chosen scope on the breakdown tables so the measure isn't summed
-  // across non-comparable scope rows (Total / upheld / reversed / median-time…).
-  const scopeWrap = $("#ex-scope-wrap");
-  if (!scopeWrap.classList.contains("hidden") && $("#ex-scope").value) {
-    q.query = { and: [{ operation: "EQ", field_name: "scope", field_values: [$("#ex-scope").value] }] };
+  const and = [];
+  // "Rows" grain: pick the published total row (is_total=1) or the breakdown
+  // parts (is_total=0) so a SUM never double-counts the aggregate with its own
+  // breakdown (e.g. AMAR's EU total alongside per-member-state rows).
+  const grain = $("#ex-grain").value;            // total | leaf | all
+  const scopePinned = !$("#ex-scope-wrap").classList.contains("hidden") && $("#ex-scope").value;
+  if (grain !== "all") {
+    const v = grain === "total" ? "1" : "0";
+    if (hasDim("category_is_total")) and.push({ operation: "EQ", field_name: "category_is_total", field_values: [v] });
+    // Scope grain only when the user hasn't pinned a specific scope below.
+    if (hasDim("scope_is_total") && !scopePinned) and.push({ operation: "EQ", field_name: "scope_is_total", field_values: [v] });
   }
+  // Pin a specific scope (the breakdown-table picker) — takes precedence over the
+  // scope grain so an explicit choice like "Decisions upheld" still works.
+  if (scopePinned) and.push({ operation: "EQ", field_name: "scope", field_values: [$("#ex-scope").value] });
+  if (and.length) q.query = { and };
   return q;
 }
 
@@ -1010,6 +1039,7 @@ async function setupExplore() {
   await onTableChange();
   $("#ex-table").addEventListener("change", () => { onTableChange().then(runExplore); });
   $("#ex-scope").addEventListener("change", runExplore);
+  $("#ex-grain").addEventListener("change", runExplore);
   $("#ex-run").addEventListener("click", runExplore);
   $("#ex-csv").addEventListener("click", () => lastExplore && downloadBlob("vlop-explore.csv", toCSV(lastExplore), "text/csv"));
   $("#ex-json-dl").addEventListener("click", () => lastExplore && downloadBlob("vlop-explore.json", JSON.stringify(lastExplore, null, 2), "application/json"));

@@ -167,6 +167,19 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
+**Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
+`build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an
+aggregate **total** row next to its breakdown rows (AMAR's EU `TOTAL` beside the
+per-member-state rows; the `All the entries` category beside per-category rows;
+the `Total number` scope beside upheld/reversed outcomes), so a naive `SUM`
+double-counts. The pass sets **`is_total`** on the `scopes`/`categories` rows
+whose label is an aggregate (TOTAL/GESAMT/"All the entries"/…) and **deletes fact
+rows** that reference mis-parsed junk labels (`[...]`, header cells, blanks,
+numeric strays) leaked by some non-VLOP extracts. `compile_query` exposes
+`scope_is_total`/`category_is_total` as filterable dimensions so the curated tabs
+and the Explore "Rows" selector pick a single grain (totals only / breakdown
+only) instead of summing a total together with its own parts.
+
 **Multi-tier reports.** The `reports` table (one row per submitted report, with a
 `tier`) lets the same `t3`–`t11` schema hold more than the VLOP set. After the
 VLOP load, `seed_harmonised.build_harmonised_facts()` appends the **non-VLOP

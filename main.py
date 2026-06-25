@@ -922,7 +922,14 @@ _J_SEC = "JOIN sections se ON se.id = f.section_id"
 _J_IND = "JOIN indicators i ON i.id = f.indicator_id"
 _J_SCOPE = "JOIN scopes sc ON sc.id = f.scope_id"
 _J_SURF = "JOIN surfaces su ON su.id = f.surface_id"
-_CAT_DIMS = {"category_code": "c.code", "category_label": "c.label"}
+_CAT_DIMS = {"category_code": "c.code", "category_label": "c.label",
+             # 1 for the aggregate "All the entries"/"Total" category, else 0 —
+             # filter on it to avoid double-counting the total alongside the parts.
+             "category_is_total": "c.is_total"}
+# Scope dims, incl. the is_total flag (1 for AMAR's EU TOTAL, the "Total number"
+# headline scope, etc.) so a query can pick a single grain instead of summing
+# the aggregate row together with its breakdown.
+_SCOPE_DIMS = {"scope": "sc.name", "scope_is_total": "sc.is_total"}
 
 _J_RPT = "JOIN reports r ON r.id = f.report_id"
 _RPT_DIMS = {
@@ -942,7 +949,7 @@ TABLES: dict[str, TableSpec] = {
     "t3_member_state_orders": TableSpec(
         "Member-State orders to act on illegal content / to provide information (Art. 9 & 10), by category and scope.",
         f"FROM t3_member_state_orders f {_J_RPT} {_J_SVC} {_J_CAT} {_J_SCOPE}",
-        {**_RPT_DIMS, **_SVC, **_CAT_DIMS, "scope": "sc.name"},
+        {**_RPT_DIMS, **_SVC, **_CAT_DIMS, **_SCOPE_DIMS},
         {"orders_to_act": "f.orders_to_act", "items": "f.items",
          "orders_to_provide_info": "f.orders_to_provide_info"},
     ),
@@ -970,25 +977,25 @@ TABLES: dict[str, TableSpec] = {
     "t7_appeals_recidivism": TableSpec(
         "Appeals & recidivism (internal complaints, out-of-court disputes, repeat-offender suspensions), by section × indicator × scope × surface.",
         f"FROM t7_appeals_recidivism f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
-        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", **_SCOPE_DIMS, "surface": "su.name"},
         {"value": "f.value"},
     ),
     "t8_automated_means": TableSpec(
         "Use of automated means for content moderation, by section × indicator × scope × surface.",
         f"FROM t8_automated_means f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE} {_J_SURF}",
-        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name", "surface": "su.name"},
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", **_SCOPE_DIMS, "surface": "su.name"},
         {"value": "f.value"},
     ),
     "t9_human_resources": TableSpec(
         "Human resources dedicated to content moderation, by section × indicator × scope.",
         f"FROM t9_human_resources f {_J_RPT} {_J_SVC} {_J_SEC} {_J_IND} {_J_SCOPE}",
-        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", "scope": "sc.name"},
+        {**_RPT_DIMS, **_SVC, "section": "se.name", "indicator": "i.name", **_SCOPE_DIMS},
         {"value": "f.value"},
     ),
     "t10_amar": TableSpec(
         "Average Monthly Active Recipients (AMAR) in the EU, by scope.",
         f"FROM t10_amar f {_J_RPT} {_J_SVC} {_J_SCOPE}",
-        {**_RPT_DIMS, **_SVC, "scope": "sc.name"},
+        {**_RPT_DIMS, **_SVC, **_SCOPE_DIMS},
         {"value": "f.value"},
     ),
     "t11_qualitative": TableSpec(

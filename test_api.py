@@ -1848,3 +1848,57 @@ class TestHarmonisedFacts:
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t JOIN reports r "
             "ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
         assert vlop_notices == 100
+
+
+class TestDimensionNormalization:
+    """seed.normalize_dimensions flags aggregate rows and drops junk facts so a
+    naive SUM never double-counts a total with its own breakdown."""
+
+    def _build(self, tmp_path):
+        import sqlite3
+        import seed
+        db = str(tmp_path / "norm.db")
+        seed.build_db({
+            "meta": {"period": "2025-07-01/2025-12-31", "tier": "vlop"},
+            "services": ["S"], "service_platforms": ["P"],
+            "categories": ["TOTAL", "X"],
+            "category_labels": {"TOTAL": "All the entries", "X": "Other"},
+            "sections": ["s"], "indicators": ["i"],
+            # 0 = EU total (aggregate), 1 = member state (leaf), 2 = junk header,
+            # 3 = a legitimate numeric range that must NOT be treated as junk.
+            "scopes": ["TOTAL", "DE", "[...]", "9 & 10"], "surfaces": ["All"],
+            # t10: [svc, scope, value] — total + member state + junk + numeric-range.
+            "t10": [[0, 0, 100], [0, 1, 100], [0, 2, 999], [0, 3, 42]],
+        }, db)
+        return sqlite3.connect(db)
+
+    def test_total_rows_flagged(self, tmp_path):
+        conn = self._build(tmp_path)
+        assert conn.execute("SELECT is_total FROM scopes WHERE name = 'TOTAL'").fetchone()[0] == 1
+        assert conn.execute("SELECT is_total FROM scopes WHERE name = 'DE'").fetchone()[0] == 0
+        assert conn.execute(
+            "SELECT is_total FROM categories WHERE label = 'All the entries'").fetchone()[0] == 1
+
+    def test_junk_fact_rows_dropped(self, tmp_path):
+        conn = self._build(tmp_path)
+        # The '[...]' header cell was mis-parsed as a scope; its fact row AND the
+        # now-orphaned dimension row are both gone.
+        assert conn.execute(
+            "SELECT COUNT(*) FROM t10_amar t JOIN scopes s ON s.id = t.scope_id "
+            "WHERE s.name = '[...]'").fetchone()[0] == 0
+        assert conn.execute("SELECT COUNT(*) FROM scopes WHERE name = '[...]'").fetchone()[0] == 0
+        # Total + leaf + the legitimate "9 & 10" range remain (3 rows, not 4) —
+        # a numeric label with a separator is NOT treated as a stray cell.
+        assert conn.execute("SELECT COUNT(*) FROM t10_amar").fetchone()[0] == 3
+        assert conn.execute("SELECT COUNT(*) FROM scopes WHERE name = '9 & 10'").fetchone()[0] == 1
+
+    def test_total_grain_avoids_double_count(self, tmp_path):
+        conn = self._build(tmp_path)
+        # Summing the total row alone (is_total=1) gives 100, not 200 (total+leaf).
+        only_total = conn.execute(
+            "SELECT SUM(t.value) FROM t10_amar t JOIN scopes s ON s.id = t.scope_id "
+            "WHERE s.is_total = 1").fetchone()[0]
+        all_rows = conn.execute("SELECT SUM(value) FROM t10_amar").fetchone()[0]
+        # is_total=1 → 100 (the EU total); all-rows mixes total + leaves (100 + 100
+        # + 42) and over-counts.
+        assert only_total == 100 and all_rows == 242

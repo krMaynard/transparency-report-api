@@ -549,6 +549,11 @@
       <label>分组依据 <select id="ex-dim"></select></label>
       <label>聚合 <select id="ex-agg"></select></label>
       <label>度量 <select id="ex-measure"></select></label>
+      <label>行 <select id="ex-grain">
+        <option value="total" selected>仅总计</option>
+        <option value="leaf">仅明细</option>
+        <option value="all">所有行</option>
+      </select></label>
       <label id="ex-scope-wrap" class="hidden">范围 <select id="ex-scope"></select></label>
       <label>显示前 <select id="ex-top">
         <option>5</option><option selected>10</option><option>20</option><option>50</option>
@@ -694,7 +699,12 @@ async function load() {
 // pin a single scope/indicator so a value is never summed across non-comparable
 // rows — the curated counterpart to the Advanced builders below.
 const VLOP_TIER   = { operation: "EQ", field_name: "report_tier", field_values: ["vlop"] };
-const SCOPE_TOTAL = { operation: "EQ", field_name: "scope", field_values: ["Total number"] };
+// is_total = 1 selects the published aggregate row along a dimension (AMAR's EU
+// TOTAL, the "All the entries" category, the "Total number" scope) — so a SUM is
+// the headline figure, never the total double-counted with its own breakdown.
+const SCOPE_TOTAL = { operation: "EQ", field_name: "scope_is_total", field_values: ["1"] };
+const CAT_TOTAL   = { operation: "EQ", field_name: "category_is_total", field_values: ["1"] };
+const CAT_LEAF    = { operation: "EQ", field_name: "category_is_total", field_values: ["0"] };
 const APPEALS_IND = { operation: "EQ", field_name: "indicator",
   field_values: ["Number of complaints submitted to the internal-complaints mechanism"] };
 const WARN_SVG = '<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="#d29922" stroke-width="1.4" stroke-linecap="round"><path d="M8 1.7l6.5 12H1.5L8 1.7z"/><path d="M8 6.3v3.4M8 11.8v.05"/></svg>';
@@ -703,13 +713,16 @@ const TABS = [
   { tab: "通知", title: "按平台划分的第16条通知",
     sub: "收到的涉嫌非法内容通知总数（DSA 表4）。",
     table: "t4_notices", measure: "notices", valueLabel: "通知", color: "blue",
-    secondary: { group: "category_label", measure: "notices", label: "按内容类别" } },
+    filters: [CAT_TOTAL],
+    secondary: { group: "category_label", measure: "notices", label: "按内容类别", filters: [CAT_LEAF] } },
   { tab: "主动措施", title: "主动审核措施",
     sub: "无通知情况下主动采取的措施 — 非法内容（DSA 表5）。",
-    table: "t5_own_initiative_illegal", measure: "measures", valueLabel: "措施数", color: "green" },
+    table: "t5_own_initiative_illegal", measure: "measures", valueLabel: "措施数", color: "green",
+    filters: [CAT_TOTAL] },
   { tab: "政府命令", title: "成员国的处置命令",
     sub: "欧盟成员国要求处置内容的命令（DSA 表3，第9条）。",
-    table: "t3_member_state_orders", measure: "orders_to_act", valueLabel: "命令", color: "green" },
+    table: "t3_member_state_orders", measure: "orders_to_act", valueLabel: "命令", color: "green",
+    filters: [CAT_TOTAL, SCOPE_TOTAL] },
   { tab: "申诉", title: "提交的内部投诉",
     sub: "向平台内部投诉处理机制提交的投诉（DSA 表7）。",
     note: "“总数”范围下的单一指标 — 不对结果（维持／撤销）求和，因此数字不会重复计算。",
@@ -726,7 +739,8 @@ const TABS = [
     filters: [SCOPE_TOTAL] },
   { tab: "用户覆盖", title: "平均每月活跃接收者（AMAR）",
     sub: "每项服务在欧盟范围内的平均每月活跃接收者（DSA 表10）。",
-    table: "t10_amar", measure: "value", agg: "MAX", valueLabel: "AMAR（欧盟）", color: "blue" },
+    table: "t10_amar", measure: "value", valueLabel: "AMAR（欧盟）", color: "blue",
+    filters: [SCOPE_TOTAL] },
   { tab: "定性信息", title: "定性说明",
     sub: "关于治理、自动化和人力资源的自由文本说明（DSA 表11）。",
     qual: { table: "t11_qualitative", fields: ["service_name", "indicator", "qualitative_text"] } },
@@ -822,7 +836,7 @@ function renderQual(d) {
 }
 
 async function renderSecondary(tab) {
-  const and = tabFilters(null);
+  const and = tabFilters(tab.secondary.filters || null);
   const q = { table: tab.table, group_by: [tab.secondary.group],
     aggregates: [{ function: "SUM", field_name: tab.secondary.measure, alias: "value" }],
     sort: [{ field_name: "value", order: "desc" }], max_count: 8,
@@ -932,19 +946,34 @@ async function setupScope(table, breakdown) {
 function buildQuery() {
   const agg = $("#ex-agg").value;
   const field_name = (agg === "COUNT" || $("#ex-measure").disabled) ? "*" : $("#ex-measure").value;
+  const table = $("#ex-table").value;
+  const t = exOptions.tables.find(x => x.table === table);
+  // /api/explore/options sends dimensions as an array, but tolerate an object too.
+  const dims = (t && t.dimensions) || [];
+  const hasDim = (d) => Array.isArray(dims) ? dims.includes(d) : (d in dims);
   const q = {
-    table: $("#ex-table").value,
+    table,
     group_by: [$("#ex-dim").value],
     aggregates: [{ function: agg, field_name, alias: "value" }],
     sort: [{ field_name: "value", order: "desc" }],
     max_count: Number($("#ex-top").value),
   };
-  // Pin the chosen scope on the breakdown tables so the measure isn't summed
-  // across non-comparable scope rows (Total / upheld / reversed / median-time…).
-  const scopeWrap = $("#ex-scope-wrap");
-  if (!scopeWrap.classList.contains("hidden") && $("#ex-scope").value) {
-    q.query = { and: [{ operation: "EQ", field_name: "scope", field_values: [$("#ex-scope").value] }] };
+  const and = [];
+  // "Rows" grain: pick the published total row (is_total=1) or the breakdown
+  // parts (is_total=0) so a SUM never double-counts the aggregate with its own
+  // breakdown (e.g. AMAR's EU total alongside per-member-state rows).
+  const grain = $("#ex-grain").value;            // total | leaf | all
+  const scopePinned = !$("#ex-scope-wrap").classList.contains("hidden") && $("#ex-scope").value;
+  if (grain !== "all") {
+    const v = grain === "total" ? "1" : "0";
+    if (hasDim("category_is_total")) and.push({ operation: "EQ", field_name: "category_is_total", field_values: [v] });
+    // Scope grain only when the user hasn't pinned a specific scope below.
+    if (hasDim("scope_is_total") && !scopePinned) and.push({ operation: "EQ", field_name: "scope_is_total", field_values: [v] });
   }
+  // Pin a specific scope (the breakdown-table picker) — takes precedence over the
+  // scope grain so an explicit choice like "Decisions upheld" still works.
+  if (scopePinned) and.push({ operation: "EQ", field_name: "scope", field_values: [$("#ex-scope").value] });
+  if (and.length) q.query = { and };
   return q;
 }
 
@@ -1010,6 +1039,7 @@ async function setupExplore() {
   await onTableChange();
   $("#ex-table").addEventListener("change", () => { onTableChange().then(runExplore); });
   $("#ex-scope").addEventListener("change", runExplore);
+  $("#ex-grain").addEventListener("change", runExplore);
   $("#ex-run").addEventListener("click", runExplore);
   $("#ex-csv").addEventListener("click", () => lastExplore && downloadBlob("vlop-explore.csv", toCSV(lastExplore), "text/csv"));
   $("#ex-json-dl").addEventListener("click", () => lastExplore && downloadBlob("vlop-explore.json", JSON.stringify(lastExplore, null, 2), "application/json"));
