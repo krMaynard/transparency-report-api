@@ -443,15 +443,20 @@ async function runLocations() {
   $("#rl-summary").textContent =
     `${fmt(d.platform_count)} 個のプラットフォームの報告書 URL ${fmt(d.total)} 件のうち ${fmt(d.count)} 件を表示しています。`;
   const head = "<tr><th>プラットフォーム</th><th>会社</th><th>カテゴリ</th>" +
-    "<th>信頼度</th><th>テンプレート</th><th>報告書</th></tr>";
+    "<th>信頼度</th><th>テンプレート</th><th>報告書</th><th>アーカイブ</th></tr>";
   const body = d.rows.map(r => {
     const href = safeHref(r.url);
     const link = href
       ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
       : esc(r.url_label || "");
+    // `archived` is a GitHub URL to the file(s) mirrored in this project's data repo.
+    const arch = safeHref(r.archived);
+    const archLink = arch
+      ? `<a href="${esc(arch)}" target="_blank" rel="noopener noreferrer">GitHub</a>`
+      : "";
     return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
       `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
-      `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td></tr>`;
+      `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td><td>${archLink}</td></tr>`;
   }).join("");
   $("#rl-out").innerHTML = d.rows.length
     ? `<table class="restable">${head}${body}</table>`

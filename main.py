@@ -2285,7 +2285,7 @@ def overview_removals() -> dict[str, Any]:
 # slices from memory — no user input reaches SQL.
 _RL_OUT_COLUMNS = (
     "platform", "company", "category", "confidence",
-    "harmonised_template", "format_period", "url_label", "url",
+    "harmonised_template", "format_period", "url_label", "url", "archived",
 )
 _report_locations_cache: dict[str, Any] | None = None
 _report_locations_cache_lock = threading.Lock()
@@ -2298,7 +2298,7 @@ def _compute_report_locations() -> dict[str, Any]:
             dict(zip(_RL_OUT_COLUMNS, r))
             for r in conn.execute(
                 "SELECT platform, company, category, confidence, "
-                "harmonised_template, format_period, url_label, url "
+                "harmonised_template, format_period, url_label, url, archived "
                 "FROM report_locations "
                 "ORDER BY platform COLLATE NOCASE, id"
             ).fetchall()

@@ -212,8 +212,11 @@ A standalone **`report_locations`** table (flat, not part of the star schema) is
 also seeded — from `data/report-locations.csv` via `build_report_locations()` —
 holding the non-VLOP DSA transparency-report catalogue (`platform`, `company`,
 `category`, `confidence`, `harmonised_template`, `format_period`, `url_label`,
-`url`). It powers the public `GET /api/report-locations` endpoint and the
-dashboard's "Where platforms publish their reports" panel.
+`url`, `archived`). `archived` is a GitHub URL to the report file(s) mirrored in
+the sibling `dsa-transparency-data` repo (set in its catalogue by
+`link_archives.py`) — surfaced as the catalogue page's "Archived" column. It
+powers the public `GET /api/report-locations` endpoint and the dashboard's
+"Where platforms publish their reports" panel.
 
 ## Query model
 
