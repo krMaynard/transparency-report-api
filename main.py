@@ -2138,7 +2138,9 @@ def _compute_overview() -> dict[str, Any]:
         # to VLOP-tier reports even though non-VLOP harmonised reports now share the
         # star schema (reachable via the query/explore API). VLOP services are those
         # appearing in a vlop-tier report's facts.
-        _vlop_subquery = " UNION ".join(
+        # UNION ALL (not UNION): the outer `id IN (...)` dedupes, so eliminating
+        # duplicate service ids across the 9 fact tables here is wasted work.
+        _vlop_subquery = " UNION ALL ".join(
             f"SELECT t.service_id FROM {t} t JOIN reports r ON r.id = t.report_id "
             "WHERE r.tier = 'vlop'"
             for t in ("t3_member_state_orders", "t4_notices", "t5_own_initiative_illegal",
@@ -2154,6 +2156,17 @@ def _compute_overview() -> dict[str, Any]:
         total_notices = conn.execute(
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t "
             "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
+        # Count of distinct non-VLOP platforms whose harmonised reports also live in
+        # the star schema — surfaced so the dashboard can show the dataset's breadth
+        # without folding these into the VLOP-scoped headline figures above.
+        _nonvlop_subquery = " UNION ALL ".join(  # see note above: outer IN dedupes
+            f"SELECT t.service_id FROM {t} t JOIN reports r ON r.id = t.report_id "
+            "WHERE r.tier != 'vlop'"
+            for t in ("t3_member_state_orders", "t4_notices", "t5_own_initiative_illegal",
+                      "t6_own_initiative_tos", "t7_appeals_recidivism", "t8_automated_means",
+                      "t9_human_resources", "t10_amar", "t11_qualitative"))
+        nonvlop_filers = conn.execute(
+            f"SELECT COUNT(*) FROM services WHERE id IN ({_nonvlop_subquery})").fetchone()[0]
         top_platforms = [
             {"platform": p, "notices": n}
             for p, n in conn.execute(
@@ -2178,6 +2191,7 @@ def _compute_overview() -> dict[str, Any]:
             "services": services,
             "platforms": platforms,
             "total_notices": total_notices,
+            "nonvlop_filers": nonvlop_filers,
             "top_platforms": top_platforms,
             "by_category": by_category,
         }

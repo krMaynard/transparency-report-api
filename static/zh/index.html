@@ -270,6 +270,44 @@
   .skip-link:focus { top: 8px; }
   .loading { color: var(--muted); font-size: 14px; margin: 14px 0 0; }
 
+  /* ── Curated tabs ───────────────────────────────────────────── */
+  .tabs-head { display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    justify-content: space-between; margin-bottom: 12px; }
+  .tabs-eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--muted); margin: 0; }
+  .scope-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px;
+    overflow: hidden; background: var(--panel2); }
+  .scope-seg button { all: unset; cursor: pointer; padding: 6px 14px; font-size: 12.5px;
+    color: var(--muted); white-space: nowrap; }
+  .scope-seg button:hover { color: var(--fg); }
+  .scope-seg button.on { background: var(--accent); color: var(--on-accent); font-weight: 600; }
+  .scope-seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .tabstrip { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--border);
+    margin-bottom: 16px; }
+  .tabstrip button { all: unset; cursor: pointer; white-space: nowrap; padding: 9px 13px;
+    font-size: 13.5px; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .tabstrip button:hover { color: var(--fg); }
+  .tabstrip button.on { color: var(--fg); border-bottom-color: var(--accent); font-weight: 600; }
+  .tabstrip button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+  .note { display: flex; gap: 7px; align-items: flex-start; font-size: 12.5px;
+    color: var(--fg); background: color-mix(in srgb, #d29922 14%, transparent);
+    border: 1px solid color-mix(in srgb, #d29922 45%, transparent);
+    border-radius: 8px; padding: 8px 12px; margin: 4px 0 14px; }
+  .note svg { flex: none; margin-top: 1px; }
+  .ql-card { border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px;
+    margin: 10px 0; background: var(--panel2); }
+  .ql-card .who { font-size: 12.5px; color: var(--accent2); margin-bottom: 4px; font-weight: 600; }
+  .ql-card .txt { font-size: 13px; color: var(--muted); }
+  .secondary-h { font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
+    color: var(--muted); margin: 20px 0 8px; }
+  details.advanced { background: var(--panel); border: 1px solid var(--border);
+    border-radius: 12px; padding: 4px 4px; margin-bottom: 18px; }
+  details.advanced > summary { cursor: pointer; padding: 14px 18px; font-weight: 700; font-size: 15px; }
+  details.advanced[open] > summary { border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  details.advanced .adv-intro { padding: 0 18px; }
+  details.advanced > .card { box-shadow: none; }
+  .qjson summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+
   /* ── Mobile ─────────────────────────────────────────────────── */
   @media (max-width: 720px) {
     .hamburger { display: flex; }
@@ -441,7 +479,7 @@
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">欧盟 DSA · VLOP 透明度</span>
+    <span class="badge">欧盟 DSA · 透明度报告</span>
     <h1>DSA 透明度报告</h1>
     <p id="period">来自欧盟《数字服务法》透明度报告的内容审核统计数据。</p>
   </header>
@@ -474,21 +512,32 @@
 
   <div class="stats" id="stats" aria-busy="true"><p class="loading">正在加载关键数据…</p></div>
 
-  <section class="card">
-    <h2>按平台划分的第 16 条通知</h2>
-    <p class="sub">按收到的通知总数排名靠前的平台（DSA 表 4）。</p>
-    <canvas id="chart-platforms" height="150" aria-hidden="true"></canvas>
-    <div id="chart-platforms-fallback"><p class="loading">正在加载图表…</p></div>
-  </section>
-
-  <section class="card">
-    <h2>按类别划分的第 16 条通知</h2>
-    <p class="sub">按所称违法内容的类别分组的通知。</p>
-    <canvas id="chart-categories" height="150" aria-hidden="true"></canvas>
-    <div id="chart-categories-fallback"><p class="loading">正在加载图表…</p></div>
+  <section class="card" id="tabs-card" aria-label="Browse DSA report tables">
+    <div class="tabs-head">
+      <p class="tabs-eyebrow">按 DSA 报告表浏览</p>
+      <div class="scope-seg" id="scope-seg" role="group" aria-label="Data scope">
+        <button type="button" class="on" data-scope="vlop">仅 VLOP</button>
+        <button type="button" data-scope="all">包含非 VLOP 报告方</button>
+      </div>
+    </div>
+    <div class="tabstrip" id="tabstrip" role="tablist"></div>
+    <div id="tab-panel">
+      <h2 id="tab-title"></h2>
+      <p class="sub" id="tab-sub"></p>
+      <p class="note hidden" id="tab-note"></p>
+      <div class="error" id="tab-error" role="alert"></div>
+      <canvas id="tab-chart" height="150" aria-hidden="true"></canvas>
+      <div id="tab-fallback" aria-live="polite"><p class="loading">加载中…</p></div>
+      <div id="tab-secondary"></div>
+      <details class="qjson"><summary>查询 JSON（通过 API 运行）</summary><pre id="tab-json"></pre></details>
+    </div>
   </section>
 
   <div class="error" id="error" role="alert"></div>
+
+  <details class="advanced" id="advanced">
+    <summary>高级查询工具</summary>
+    <p class="sub adv-intro">基于同一经过验证的 <code>POST /api/explore</code> 路径的自由构建器 — 用于上述精选标签页之外的自定义跨表分析。</p>
 
   <section class="card" id="explore-card">
     <h2>探索数据</h2>
@@ -545,6 +594,7 @@
     </div>
     <details><summary>请求 JSON（通过 API 试用）</summary><pre id="cmp-json"></pre></details>
   </section>
+  </details>
  </main>
 
   <footer>
@@ -627,23 +677,182 @@ async function load() {
     $("#error").textContent = "无法加载概览：" + err.message;
     $("#stats").setAttribute("aria-busy", "false");
     $("#stats").innerHTML = "";
-    ["#chart-platforms-fallback", "#chart-categories-fallback"].forEach(s => $(s).innerHTML = "");
     return;
   }
   $("#stats").setAttribute("aria-busy", "false");
 
-  if (d.period) $("#period").textContent = `报告期 ${fmtPeriod(d.period)} · ${d.services} 项服务，分属 ${d.platforms} 家母公司。`;
+  if (d.period) $("#period").textContent = `报告期 ${fmtPeriod(d.period)} · ${d.services} 个指定的 VLOP 和 VLOSE，外加 ${d.nonvlop_filers} 个提交欧盟统一模板的非 VLOP 平台。`;
   $("#stats").innerHTML =
     stat(fmt(d.services), "被指定的服务") +
     stat(fmt(d.platforms), "母公司") +
-    stat(fmt(d.total_notices), "第 16 条通知");
+    stat(fmt(d.total_notices), "第 16 条通知") +
+    stat(fmt(d.nonvlop_filers), "非 VLOP 报告方");
+}
 
-  const tp = d.top_platforms || [];
-  barChart("#chart-platforms", "#chart-platforms-fallback",
-           tp.map(x => x.platform), tp.map(x => x.notices), "平台", "通知数");
-  const bc = d.by_category || [];
-  barChart("#chart-categories", "#chart-categories-fallback",
-           bc.map(x => x.category), bc.map(x => x.notices), "类别", "通知数");
+// ── Curated per-table tabs (POST /api/explore, one pre-shaped query each) ────
+// Each tab is a finished, correct view. The breakdown tables (appeals/automated)
+// pin a single scope/indicator so a value is never summed across non-comparable
+// rows — the curated counterpart to the Advanced builders below.
+const VLOP_TIER   = { operation: "EQ", field_name: "report_tier", field_values: ["vlop"] };
+const SCOPE_TOTAL = { operation: "EQ", field_name: "scope", field_values: ["Total number"] };
+const APPEALS_IND = { operation: "EQ", field_name: "indicator",
+  field_values: ["Number of complaints submitted to the internal-complaints mechanism"] };
+const WARN_SVG = '<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="#d29922" stroke-width="1.4" stroke-linecap="round"><path d="M8 1.7l6.5 12H1.5L8 1.7z"/><path d="M8 6.3v3.4M8 11.8v.05"/></svg>';
+
+const TABS = [
+  { tab: "通知", title: "按平台划分的第16条通知",
+    sub: "收到的涉嫌非法内容通知总数（DSA 表4）。",
+    table: "t4_notices", measure: "notices", valueLabel: "通知", color: "blue",
+    secondary: { group: "category_label", measure: "notices", label: "按内容类别" } },
+  { tab: "主动措施", title: "主动审核措施",
+    sub: "无通知情况下主动采取的措施 — 非法内容（DSA 表5）。",
+    table: "t5_own_initiative_illegal", measure: "measures", valueLabel: "措施数", color: "green" },
+  { tab: "政府命令", title: "成员国的处置命令",
+    sub: "欧盟成员国要求处置内容的命令（DSA 表3，第9条）。",
+    table: "t3_member_state_orders", measure: "orders_to_act", valueLabel: "命令", color: "green" },
+  { tab: "申诉", title: "提交的内部投诉",
+    sub: "向平台内部投诉处理机制提交的投诉（DSA 表7）。",
+    note: "“总数”范围下的单一指标 — 不对结果（维持／撤销）求和，因此数字不会重复计算。",
+    table: "t7_appeals_recidivism", measure: "value", valueLabel: "投诉数", color: "blue",
+    filters: [SCOPE_TOTAL, APPEALS_IND] },
+  { tab: "自动化", title: "通过自动化手段采取的措施",
+    sub: "通过自动化手段采取的审核措施，“总数”范围（DSA 表8）。",
+    note: "每次仅显示一个范围；准确率／精确率／召回率为单独指标，绝不计入求和。",
+    table: "t8_automated_means", measure: "value", valueLabel: "措施数", color: "amber",
+    filters: [SCOPE_TOTAL] },
+  { tab: "人力资源", title: "内容审核人员",
+    sub: "雇用的内部和外部内容审核人员，“总数”范围（DSA 表9）。",
+    table: "t9_human_resources", measure: "value", valueLabel: "审核人员", color: "amber",
+    filters: [SCOPE_TOTAL] },
+  { tab: "用户覆盖", title: "平均每月活跃接收者（AMAR）",
+    sub: "每项服务在欧盟范围内的平均每月活跃接收者（DSA 表10）。",
+    table: "t10_amar", measure: "value", agg: "MAX", valueLabel: "AMAR（欧盟）", color: "blue" },
+  { tab: "定性信息", title: "定性说明",
+    sub: "关于治理、自动化和人力资源的自由文本说明（DSA 表11）。",
+    qual: { table: "t11_qualitative", fields: ["service_name", "indicator", "qualitative_text"] } },
+];
+
+const TAB_COLORS = { blue: "#58a6ff", green: "#3fb950", amber: "#d29922" };
+let tabChart = null, currentTab = null, currentScope = "vlop";
+
+function tabFilters(extra) {
+  const and = [];
+  if (currentScope === "vlop") and.push(VLOP_TIER);
+  (extra || []).forEach(f => and.push(f));
+  return and;
+}
+
+function buildTabQuery(tab) {
+  const and = tabFilters(tab.filters);
+  if (tab.qual) {
+    return { table: tab.qual.table, fields: tab.qual.fields, max_count: 6,
+             ...(and.length ? { query: { and } } : {}) };
+  }
+  return {
+    table: tab.table, group_by: ["service_name"],
+    aggregates: [{ function: tab.agg || "SUM", field_name: tab.measure, alias: "value" }],
+    sort: [{ field_name: "value", order: "desc" }], max_count: 10,
+    ...(and.length ? { query: { and } } : {}),
+  };
+}
+
+function drawTabChart(labels, data, nameLabel, valueLabel, colorKey) {
+  const canvas = $("#tab-chart"), fb = $("#tab-fallback");
+  fb.innerHTML = miniTable(labels, data, nameLabel, valueLabel);
+  if (tabChart) { tabChart.destroy(); tabChart = null; }
+  if (!chartReady() || !labels.length) {
+    canvas.style.display = "none"; fb.classList.remove("sr-only"); return;
+  }
+  canvas.style.display = ""; fb.classList.add("sr-only");
+  tabChart = new Chart(canvas, {
+    type: "bar",
+    data: { labels, datasets: [{ label: valueLabel, data, backgroundColor: TAB_COLORS[colorKey] || TAB_COLORS.blue, borderRadius: 4 }] },
+    options: { indexAxis: "y", plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
+                y: { ticks: { color: "#e6edf3" }, grid: { display: false } } } },
+  });
+}
+
+async function explore(q) {
+  const res = await fetch("/api/explore", {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(q) });
+  const d = await res.json();
+  if (!res.ok) throw new Error(d.detail || `HTTP ${res.status}`);
+  return d;
+}
+
+async function renderTab(tab) {
+  $("#tab-title").textContent = tab.title;
+  $("#tab-sub").textContent = tab.sub;
+  const noteEl = $("#tab-note");
+  if (tab.note) { noteEl.innerHTML = WARN_SVG + "<span>" + esc(tab.note) + "</span>"; noteEl.classList.remove("hidden"); }
+  else noteEl.classList.add("hidden");
+  $("#tab-error").textContent = "";
+  $("#tab-secondary").innerHTML = "";
+  $("#tab-fallback").classList.remove("sr-only");
+  $("#tab-fallback").innerHTML = "<p class='loading'>加载中…</p>";
+  const q = buildTabQuery(tab);
+  $("#tab-json").textContent = JSON.stringify(q, null, 2);
+  let d;
+  try {
+    d = await explore(q);
+  } catch (err) {
+    if (tabChart) { tabChart.destroy(); tabChart = null; }
+    $("#tab-chart").style.display = "none";
+    $("#tab-fallback").innerHTML = "";
+    $("#tab-error").textContent = "无法加载此表：" + err.message;
+    return;
+  }
+  if (currentTab !== tab) return;  // a newer tab/scope click superseded this fetch
+  if (tab.qual) { renderQual(d); return; }
+  drawTabChart(d.rows.map(r => r[0]), d.rows.map(r => r[1]), "平台", tab.valueLabel, tab.color);
+  if (tab.secondary) renderSecondary(tab);
+}
+
+function renderQual(d) {
+  if (tabChart) { tabChart.destroy(); tabChart = null; }
+  $("#tab-chart").style.display = "none";
+  const rows = d.rows || [];
+  const fb = $("#tab-fallback");
+  fb.classList.remove("sr-only");
+  fb.innerHTML = rows.length
+    ? rows.map(r => `<div class="ql-card"><div class="who">${esc(r[0])} · ${esc(r[1])}</div>` +
+        `<div class="txt">${esc(String(r[2] || "").slice(0, 280))}…</div></div>`).join("")
+    : "<p class='sub'>此范围没有定性条目。</p>";
+}
+
+async function renderSecondary(tab) {
+  const and = tabFilters(null);
+  const q = { table: tab.table, group_by: [tab.secondary.group],
+    aggregates: [{ function: "SUM", field_name: tab.secondary.measure, alias: "value" }],
+    sort: [{ field_name: "value", order: "desc" }], max_count: 8,
+    ...(and.length ? { query: { and } } : {}) };
+  try {
+    const d = await explore(q);
+    if (currentTab !== tab) return;
+    $("#tab-secondary").innerHTML = `<p class="secondary-h">${esc(tab.secondary.label)}</p>` +
+      miniTable(d.rows.map(r => r[0]), d.rows.map(r => r[1]), "类别", tab.valueLabel);
+  } catch (_) { /* secondary is best-effort */ }
+}
+
+function setupTabs() {
+  const strip = $("#tabstrip");
+  TABS.forEach((t, i) => {
+    const b = document.createElement("button");
+    b.textContent = t.tab; b.setAttribute("role", "tab");
+    if (i === 0) b.classList.add("on");
+    b.addEventListener("click", () => {
+      [...strip.children].forEach(c => c.classList.remove("on"));
+      b.classList.add("on"); currentTab = t; renderTab(t);
+    });
+    strip.appendChild(b);
+  });
+  $("#scope-seg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    $("#scope-seg").querySelectorAll("button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on"); currentScope = b.dataset.scope;
+    if (currentTab) renderTab(currentTab);
+  }));
+  currentTab = TABS[0]; renderTab(TABS[0]);
 }
 
 // ── Interactive query builder (POST /api/explore) ────────────────────────────
@@ -1125,7 +1334,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Chart.defaults.animation = false;
   }
   // setupCompare needs the /api/explore/options payload setupExplore fetches.
-  load(); setupExplore().then(setupCompare); setupAsk();
+  load(); setupTabs(); setupExplore().then(setupCompare); setupAsk();
 });
 </script>
 <script>
