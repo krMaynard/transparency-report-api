@@ -50,7 +50,7 @@ _SHEETS = {
 }
 
 def _rows(path: str) -> list[list[str]]:
-    with open(path, encoding="utf-8") as f:
+    with open(path, encoding="utf-8-sig") as f:   # -sig strips a leading BOM
         return [r for r in csv.reader(f)]
 
 
@@ -58,44 +58,52 @@ def _cell(row: list[str], i: int) -> str:
     return row[i].strip() if len(row) > i and row[i] else ""
 
 
-def _is_english(rows: list[list[str]]) -> bool:
-    return any(_cell(r, 3) in _EN_SECTIONS for r in rows)
+def _is_greek(rows: list[list[str]]) -> bool:
+    # Greek extracts have a column shift in the source data, so their rows can't
+    # be aligned by position — a consistent shift produces *unanimous but wrong*
+    # votes that slip past the conflict check. Skip them entirely (EL labels stay
+    # in their original language rather than risk a mis-mapping).
+    return any(any(0x370 <= ord(c) <= 0x3FF for c in cell) for row in rows for cell in row)
 
 
 def main() -> None:
     reports = sorted(p for p in os.listdir(EXTRACTED)
                      if os.path.isdir(os.path.join(EXTRACTED, p)))
 
+    # English reports, detected once from the section-bearing sheets (sheet 11 has
+    # no section column, so per-sheet detection would silently skip it).
+    english: set[str] = set()
+    for rep in reports:
+        for s in ("07_appeals_and_recidivism", "08_automated_means", "09_human_resources"):
+            fp = os.path.join(EXTRACTED, rep, s + ".csv")
+            if os.path.exists(fp) and any(_cell(r, 3) in _EN_SECTIONS for r in _rows(fp)):
+                english.add(rep)
+                break
+
     # crosswalk[dim][raw_label] -> Counter of english_label votes
     votes: dict[str, dict[str, Counter]] = {d: defaultdict(Counter)
                                              for d in ("section", "indicator", "scope")}
 
     for sheet, cols in _SHEETS.items():
-        # 1. Canonical English structure = modal row count among English reports.
-        en_by_count: dict[int, list[list[str]]] = {}
+        # Read each report's sheet once; drop Greek up front.
+        sheet_rows: dict[str, list[list[str]]] = {}
         for rep in reports:
             fp = os.path.join(EXTRACTED, rep, sheet + ".csv")
-            if not os.path.exists(fp):
-                continue
-            rows = _rows(fp)
-            if _is_english(rows):
-                en_by_count.setdefault(len(rows), rows)
-        if not en_by_count:
+            if os.path.exists(fp):
+                rows = _rows(fp)
+                if not _is_greek(rows):
+                    sheet_rows[rep] = rows
+
+        # 1. Canonical English structure = modal row count among English reports.
+        en_counts = Counter(len(rows) for rep, rows in sheet_rows.items() if rep in english)
+        if not en_counts:
             continue
-        canon_n = Counter(
-            len(_rows(os.path.join(EXTRACTED, rep, sheet + ".csv")))
-            for rep in reports
-            if os.path.exists(os.path.join(EXTRACTED, rep, sheet + ".csv"))
-            and _is_english(_rows(os.path.join(EXTRACTED, rep, sheet + ".csv")))
-        ).most_common(1)[0][0]
-        canon = en_by_count[canon_n]
+        canon_n = en_counts.most_common(1)[0][0]
+        canon = next(rows for rep, rows in sheet_rows.items()
+                     if rep in english and len(rows) == canon_n)
 
         # 2. Align every same-structure report (any language) to the canonical.
-        for rep in reports:
-            fp = os.path.join(EXTRACTED, rep, sheet + ".csv")
-            if not os.path.exists(fp):
-                continue
-            rows = _rows(fp)
+        for rep, rows in sheet_rows.items():
             if len(rows) != canon_n:
                 continue
             # Skip the header row (row 0: "Section"/"Indicator"/"Scope").
