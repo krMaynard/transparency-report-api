@@ -1180,6 +1180,11 @@ class TestReportLocations:
         # Reddit omits the optional columns — they surface as JSON null, not a crash.
         reddit = next(row for row in d["rows"] if row["platform"] == "Reddit")
         assert reddit["company"] is None and reddit["harmonised_template"] is None
+        # The `archived` column links to the file mirrored in the data repo (Discord
+        # has one; Reddit doesn't).
+        discord = next(row for row in d["rows"] if row["platform"] == "Discord")
+        assert discord["archived"].startswith("https://github.com/")
+        assert reddit["archived"] is None
 
     def test_filter_by_confidence(self):
         r = client.get("/api/report-locations", params={"confidence": "verified"})
@@ -1218,7 +1223,7 @@ class TestReportLocations:
         assert "text/csv" in r.headers["content-type"]
         assert "attachment" in r.headers.get("content-disposition", "")
         lines = r.text.splitlines()
-        assert lines[0] == "platform,company,category,confidence,harmonised_template,format_period,url_label,url"
+        assert lines[0] == "platform,company,category,confidence,harmonised_template,format_period,url_label,url,archived"
         assert len(lines) == 4  # header + 3 rows
 
 

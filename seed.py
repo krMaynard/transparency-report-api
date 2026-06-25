@@ -208,14 +208,15 @@ CREATE TABLE report_locations (
     harmonised_template TEXT,
     format_period       TEXT,
     url_label           TEXT,
-    url                 TEXT NOT NULL
+    url                 TEXT NOT NULL,
+    archived            TEXT
 );
 CREATE INDEX idx_rl_category   ON report_locations(category);
 CREATE INDEX idx_rl_confidence ON report_locations(confidence);
 """
 
 _RL_COLUMNS = ("platform", "company", "category", "confidence",
-               "harmonised_template", "format_period", "url_label", "url")
+               "harmonised_template", "format_period", "url_label", "url", "archived")
 
 # fact table name → (number of columns, source JSON key)
 _FACT_TABLES = {
@@ -474,7 +475,7 @@ def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
             conn.executemany(
                 "INSERT INTO report_locations "
                 "(platform, company, category, confidence, harmonised_template, "
-                "format_period, url_label, url) VALUES (?,?,?,?,?,?,?,?)",
+                "format_period, url_label, url, archived) VALUES (?,?,?,?,?,?,?,?,?)",
                 [tuple((r.get(c) or None) for c in _RL_COLUMNS) for r in rows],
             )
         return len(rows)
