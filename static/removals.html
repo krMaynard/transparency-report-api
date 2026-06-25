@@ -627,7 +627,7 @@ display: flex; align-items: center; justify-content: space-between;
     if (sort)      body.sort = sort;
     if (max_count) body.max_count = max_count;
     var cond = buildConditions();
-    if (cond) body.conditions = cond;
+    if (cond) body.query = cond;   // API field is `query` (a BooleanQuery), not `conditions`
     return body;
   }
 
@@ -836,13 +836,32 @@ display: flex; align-items: center; justify-content: space-between;
       var el = document.getElementById(id); if (el) el.classList.add('hidden');
     });
 
-    var grp = breakdown ? ['period', breakdown] : ['period'];
     var tsAggs = [{ function: 'SUM', field_name: 'items_requested', alias: 'items' }];
-    var tsSort = [{ field_name: 'period', order: 'asc' }];
 
     try {
+      // Time-series query. When broken down, first find the top-8 breakdown
+      // values (by total over the *current filters*), then fetch only
+      // period × those-8 rows. This keeps the grid well under the explore row
+      // cap (8×13 ≪ 500) so no periods are silently dropped — the old single
+      // query asked for period×country (1000+ rows) capped at 200 and lost most
+      // of the timeline. Chronological ordering is fixed client-side below.
+      var tsQuery;
+      if (breakdown) {
+        var topRes = await explore(q('gr_removals', [breakdown], tsAggs, [{ field_name: 'items', order: 'desc' }], 8));
+        var topVals = topRes.rows.map(function (r) { return r[0]; });
+        var tsBody = q('gr_removals', ['period', breakdown], tsAggs, null, 500);
+        if (topVals.length) {
+          var inCond = { operation: 'IN', field_name: breakdown, field_values: topVals };
+          tsBody.query = tsBody.query
+            ? { and: tsBody.query.and.concat([inCond]) }
+            : { and: [inCond] };
+        }
+        tsQuery = explore(tsBody);
+      } else {
+        tsQuery = explore(q('gr_removals', ['period'], tsAggs, null, 50));
+      }
       var results = await Promise.all([
-        explore(q('gr_removals', grp, tsAggs, tsSort, 200)),
+        tsQuery,
         explore(q('gr_removals', ['period'], [
           { function: 'SUM', field_name: 'items_requested', alias: 'items' },
           { function: 'SUM', field_name: 'removed_legal',   alias: 'legal' },

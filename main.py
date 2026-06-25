@@ -1124,6 +1124,12 @@ class QueryRequest(BaseModel):
       and `derived` columns compute arithmetic (e.g. ratios) across them.
     """
 
+    # Reject unknown keys instead of silently ignoring them — a caller that sends
+    # e.g. `conditions` instead of `query` should get a loud 422, not an
+    # unfiltered result. (This caught a real bug where the removals dashboard's
+    # filters were being dropped.)
+    model_config = ConfigDict(extra="forbid")
+
     table: str | None = Field(
         default=None, description="Which DSA report table to query (see GET /tables)."
     )
@@ -2165,9 +2171,17 @@ def _compute_overview() -> dict[str, Any]:
         platforms = conn.execute(
             f"SELECT COUNT(DISTINCT platform) FROM services WHERE id IN ({_vlop_subquery})"
         ).fetchone()[0]
+        # t4 carries two overlapping taxonomies (DSA "statement categories"
+        # STATEMENT_CATEGORY_* and finer "keyword" KEYWORD_* rows) plus a reported
+        # grand-total row (code 'TOTAL', label "All the entries"). Summing across
+        # them double/triple-counts. The authoritative platform/headline figure is
+        # the reported TOTAL; the by-category breakdown uses the primary statement
+        # categories only (they sum to ~TOTAL), never the keyword or TOTAL rows.
         total_notices = conn.execute(
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t "
-            "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
+            "JOIN categories cat ON cat.id = t.category_id "
+            "JOIN reports r ON r.id = t.report_id "
+            "WHERE r.tier = 'vlop' AND cat.code = 'TOTAL'").fetchone()[0]
         # Count of distinct non-VLOP platforms whose harmonised reports also live in
         # the star schema — surfaced so the dashboard can show the dataset's breadth
         # without folding these into the VLOP-scoped headline figures above.
@@ -2184,7 +2198,9 @@ def _compute_overview() -> dict[str, Any]:
             for p, n in conn.execute(
                 "SELECT s.platform, COALESCE(SUM(t.notices), 0) AS n "
                 "FROM t4_notices t JOIN services s ON s.id = t.service_id "
-                "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop' "
+                "JOIN categories cat ON cat.id = t.category_id "
+                "JOIN reports r ON r.id = t.report_id "
+                "WHERE r.tier = 'vlop' AND cat.code = 'TOTAL' "
                 "GROUP BY s.platform ORDER BY n DESC LIMIT 10"
             ).fetchall()
         ]
@@ -2194,6 +2210,7 @@ def _compute_overview() -> dict[str, Any]:
                 "SELECT cat.label, COALESCE(SUM(t.notices), 0) AS n "
                 "FROM t4_notices t JOIN categories cat ON cat.id = t.category_id "
                 "JOIN reports r ON r.id = t.report_id WHERE r.tier = 'vlop' "
+                "AND cat.code LIKE 'STATEMENT_CATEGORY_%' "
                 "GROUP BY cat.label ORDER BY n DESC LIMIT 8"
             ).fetchall()
         ]
@@ -2642,15 +2659,21 @@ def _run_query_bounded(body: QueryRequest) -> dict[str, Any]:
     no webhook — the shared trust boundary for /api/explore and /api/ask. Raises
     QueryCompileError if any field/operation is invalid for the table."""
     capped = min(body.max_count, EXPLORE_MAX_ROWS)
-    safe = body.model_copy(update={"max_count": capped, "callback_url": None})
+    # Fetch one extra row past the cap so we can tell "exactly N results" apart
+    # from "more existed and were cut": a genuine top-N is no longer mislabelled
+    # truncated just because it happens to have exactly `capped` rows.
+    safe = body.model_copy(update={"max_count": capped + 1, "callback_url": None})
     sql, params, columns = compile_query(safe)  # validates against the registry
     conn = _connect_ro()
     try:
         rows = [list(r) for r in conn.execute(sql, params).fetchall()]
     finally:
         conn.close()
-    # `truncated` lets the UI flag that the public row cap was hit.
-    return {"columns": columns, "rows": rows, "row_count": len(rows), "truncated": len(rows) >= capped}
+    truncated = len(rows) > capped
+    if truncated:
+        rows = rows[:capped]
+    # `truncated` lets the UI flag that the public row cap actually cut results.
+    return {"columns": columns, "rows": rows, "row_count": len(rows), "truncated": truncated}
 
 
 @api_router.post("/explore")
