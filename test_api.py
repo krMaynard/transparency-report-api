@@ -319,6 +319,21 @@ class TestQueryLifecycle:
         assert lines[0] == "service_name"
         assert "YouTube" in lines
         assert "Facebook" in lines
+        # CSV provenance rides on response headers (the body's header row is sacred).
+        assert r.headers.get("X-Dataset-Period") and r.headers.get("X-App-Version")
+        assert "transparency-" in r.headers.get("content-disposition", "")
+
+    def test_submit_surfaces_double_count_warning(self):
+        # The async path advises on submit too, so a scripted caller sees it before
+        # polling — aggregating t4 by service without pinning the total grain.
+        r = client.post(
+            "/api/query",
+            json={"table": "t4_notices", "group_by": ["service_name"],
+                  "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]},
+            headers=MOMO,
+        )
+        assert r.status_code == 202
+        assert any("category_is_total" in w for w in r.json().get("warnings", []))
 
     def test_filter_group_and_aggregate(self):
         # Notices per service, YouTube only — exercises filter + group + agg + sort.
@@ -1281,6 +1296,38 @@ class TestExplore:
         assert d["max_rows"] > 0 and "SUM" in d["aggregates"]
         t4 = next(t for t in d["tables"] if t["table"] == "t4_notices")
         assert "platform" in t4["dimensions"] and "notices" in t4["measures"]
+
+    def test_explore_csv_format(self):
+        q = {"table": "t4_notices", "group_by": ["platform"],
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "value"}],
+             "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]}}
+        r = client.post("/api/explore?format=csv", json=q)
+        assert r.status_code == 200
+        assert "text/csv" in r.headers["content-type"]
+        assert r.text.strip().splitlines()[0] == "platform,value"
+        # CSV can't carry a metadata block, so provenance rides on headers.
+        assert r.headers.get("X-Dataset-Period") and r.headers.get("X-App-Version")
+
+    def test_explore_warns_on_double_count_grain(self):
+        # Aggregating t4 without pinning category_is_total may double-count the
+        # reported total with its breakdown — the API should advise (not block).
+        q = {"table": "t4_notices", "group_by": ["service_name"],
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("category_is_total" in w for w in d.get("warnings", []))
+
+    def test_explore_warns_on_median_aggregation(self):
+        q = {"table": "t4_notices", "group_by": ["service_name"],
+             "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]},
+             "aggregates": [{"function": "SUM", "field_name": "median_time", "alias": "m"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("median" in w.lower() for w in d.get("warnings", []))
+
+    def test_explore_no_warning_when_grain_pinned(self):
+        q = {"table": "t4_notices", "group_by": ["service_name"],
+             "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]},
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
+        assert "warnings" not in client.post("/api/explore", json=q).json()
 
     def test_explore_aggregated_query_public(self):
         q = {"table": "t4_notices", "group_by": ["platform"],
