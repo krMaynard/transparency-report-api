@@ -402,6 +402,9 @@ display: flex; align-items: center;
 
 <script>
 const $ = (sel) => document.querySelector(sel);
+// Escape DB/schema values before they go into innerHTML (defence in depth).
+const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
 
 function show(el) { el.classList.remove("hidden"); }
 
