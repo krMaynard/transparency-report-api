@@ -77,6 +77,18 @@ SLUG_META = {
     "whatnot": ("Whatnot", "online-platform"),
     "depop": ("Depop", "online-platform"),
     "nexon": ("Nexon", "online-platform"),
+    "nintendo": ("Nintendo eShop", "online-platform"),
+    "squareenix": ("Square Enix", "online-platform"),
+    "alibabacloud": ("Alibaba Cloud", "hosting"),
+    # Miniclip ships one harmonised report per game in a single zip.
+    "miniclip-8-ball-pool": ("8 Ball Pool (Miniclip)", "online-platform"),
+    "miniclip-agar-io": ("Agar.io (Miniclip)", "online-platform"),
+    "miniclip-baseball-clash": ("Baseball Clash (Miniclip)", "online-platform"),
+    "miniclip-mini-football": ("Mini Football (Miniclip)", "online-platform"),
+    "miniclip-mini-tennis": ("Mini Tennis (Miniclip)", "online-platform"),
+    "miniclip-paint-brawl": ("Paint Brawl (Miniclip)", "online-platform"),
+    "miniclip-speed-stars": ("Speed Stars (Miniclip)", "online-platform"),
+    "miniclip-ultimate-golf": ("Ultimate Golf (Miniclip)", "online-platform"),
 }
 
 SECTIONS = [
