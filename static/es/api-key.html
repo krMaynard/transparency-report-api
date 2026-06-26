@@ -202,6 +202,12 @@ display: flex; align-items: center;
   .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .curl { margin: 8px 0 4px; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; color: var(--fg); white-space: pre; }
+  .linkbtn { width: auto; margin: 0; padding: 0; background: none; border: none; color: var(--accent);
+    font: inherit; cursor: pointer; text-decoration: underline; }
+  .linkbtn:hover { color: var(--accent2); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
@@ -421,31 +427,35 @@ display: flex; align-items: center;
     </div>
 
     <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>o inicia sesión con tus datos</span></div>
+    <div class="divider hidden" id="auth-divider"><span>o consigue una clave de demostración</span></div>
 
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
+    <!-- Demo-key registration (shown when ALLOW_DEMO_KEYS is on). This path is
+         NOT verified — any name/email mints a temporary key for trying the API. -->
     <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">Nombre completo</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">Correo profesional</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">Solicitar clave de API</button>
+      <p class="hint">Sin verificación: esto emite una <strong>clave de demostración</strong> temporal para probar la API. Usa cualquier nombre y correo.</p>
+      <label for="name">Nombre</label>
+      <input id="name" name="name" placeholder="Ada Lovelace" />
+      <label for="email">Correo (cualquier dirección)</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@example.org" />
+      <button id="submit" type="submit">Obtener clave de demostración</button>
     </form>
     <div class="error" id="error" role="alert"></div>
   </section>
 
   <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
+  <section class="card hidden" id="key-card" aria-live="polite" tabindex="-1">
     <h2>Bienvenido/a, <span id="who">investigador/a</span> 👋</h2>
-    <p class="sub">Tu clave de API se ha emitido. Mantenla en secreto.</p>
+    <p class="sub">Tu clave de API se ha emitido. Mantenla en secreto: trátala como una contraseña.</p>
     <div class="keyrow">
       <div class="keybox" id="apikey"></div>
       <button class="copy" id="copy" type="button">Copiar</button>
     </div>
-    <p class="hint">Envíala en cada solicitud como cabecera <code>X-API-Key</code>. Pruébala en la
-      <a href="/docs" target="_blank" rel="noopener">documentación interactiva de la API</a>.</p>
     <p class="hint" id="expires"></p>
-    <p class="hint">Explora lo que puedes consultar en la página de <a href="/es/schema">esquema del conjunto de datos</a>.</p>
+    <p class="hint">Envíala en cada solicitud como cabecera <code>X-API-Key</code>:</p>
+    <pre class="curl" id="curl-example"></pre>
+    <p class="hint">Pruébala en la <a href="/docs" target="_blank" rel="noopener">documentación interactiva de la API</a>, explora el <a href="/es/schema">esquema del conjunto de datos</a> o abre los <a href="/es/reports">paneles</a>.</p>
+    <p class="hint"><button type="button" class="linkbtn" id="revoke">Revocar esta clave</button> — al iniciar sesión de nuevo se emite una nueva.</p>
+    <p class="sr-only" id="copied-status" role="status" aria-live="polite"></p>
   </section>
  </main>
 
@@ -466,14 +476,26 @@ async function onAuthSuccess(data) {
   apiKey = data.api_key;
   // Share the key with the dashboard's Ask box (same origin, picked up on focus).
   try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
+  $("#who").textContent = data.name || "researcher";
   $("#apikey").textContent = apiKey;
+  // A concrete, copy-pasteable request using the issued key (set via textContent
+  // so the key is never interpolated into HTML).
+  $("#curl-example").textContent = 'curl -H "X-API-Key: ' + apiKey + '" ' + location.origin + '/api/jobs';
   if (data.expires_at) {
     const d = new Date(data.expires_at);
-    $("#expires").textContent = "Expira el " + d.toLocaleDateString('es-ES', { year: "numeric", month: "long", day: "numeric" }) + ".";
+    $("#expires").textContent = "Válida hasta el " + d.toLocaleDateString('es-ES', { year: "numeric", month: "long", day: "numeric" }) + ".";
   }
   $("#login-card").classList.add("hidden");
   show($("#key-card"));
+  // Move focus to the result so screen-reader + keyboard users land on the key.
+  $("#key-card").focus();
+}
+
+// Friendly message for a failed fetch (network error vs. server detail).
+function authError(err) {
+  return (err && err.name === "TypeError")
+    ? "No se pudo contactar con el servidor. Inténtalo de nuevo."
+    : (err && err.message) || "Algo salió mal.";
 }
 
 // ── Google sign-in ──────────────────────────────────────────────────────────
@@ -481,17 +503,20 @@ async function onAuthSuccess(data) {
 // /auth/google, which verifies it and mints a session for any verified account.
 async function onGoogleCredential(resp) {
   $("#error").textContent = "";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const r = await fetch("/api/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json();
+    const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.detail || "Error al iniciar sesión");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
+  } finally {
+    $("#login-card").removeAttribute("aria-busy");
   }
 }
 
@@ -525,20 +550,38 @@ $("#login-form").addEventListener("submit", async (e) => {
 
   const btn = $("#submit");
   btn.disabled = true; btn.textContent = "Emitiendo clave…";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const res = await fetch("/api/portal/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || "Error en el registro");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
   } finally {
-    btn.disabled = false; btn.textContent = "Solicitar clave de API";
+    btn.disabled = false; btn.textContent = "Obtener clave de demostración";
+    $("#login-card").removeAttribute("aria-busy");
   }
+});
+
+// Self-revoke the issued key (session or demo key) via DELETE /portal/key.
+$("#revoke").addEventListener("click", async () => {
+  if (!apiKey) return;
+  const b = $("#revoke");
+  b.disabled = true;
+  try {
+    await fetch("/api/portal/key", { method: "DELETE", headers: { "X-API-Key": apiKey } });
+  } catch (_) {}
+  try { localStorage.removeItem("vlop_api_key"); } catch (_) {}
+  apiKey = null;
+  $("#key-card").classList.add("hidden");
+  show($("#login-card"));
+  $("#error").textContent = "Clave revocada. Inicia sesión de nuevo para obtener una nueva.";
+  $("#main").focus();
 });
 
 // Decide which sign-in methods to offer based on server config.
@@ -554,7 +597,7 @@ async function init() {
 
   $("#login-sub").textContent = googleOn
     ? "Inicia sesión con tu cuenta de Google para solicitar acceso."
-    : "Inicia sesión con tus datos para obtener una clave de API.";
+    : "Introduce cualquier nombre y correo para obtener una clave de demostración temporal.";
   if (!googleOn && !demoOn) {
     $("#login-sub").textContent = "No hay ningún método de inicio de sesión habilitado en este servidor.";
   }
@@ -562,9 +605,13 @@ async function init() {
 init();
 
 $("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "¡Copiado!";
-  setTimeout(() => (b.textContent = t), 1200);
+  const b = $("#copy"); const t = b.textContent;
+  let ok = true;
+  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) { ok = false; }
+  const msg = ok ? "Copied!" : "Pulsa Ctrl-C para copiar";
+  b.textContent = msg;
+  $("#copied-status").textContent = msg;   // announce to screen readers
+  setTimeout(() => (b.textContent = t), 1500);
 });
 </script>
 <script>

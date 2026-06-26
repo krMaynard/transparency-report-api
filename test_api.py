@@ -66,6 +66,18 @@ class TestPortal:
         assert r.status_code == 200
         assert "text/html" in r.headers["content-type"]
         assert "Get an API key" in r.text
+        # The unverified demo path is labelled as such, not as real registration.
+        assert "demo key" in r.text
+        # A self-revoke control + a copy-pasteable curl example are present.
+        assert 'id="revoke"' in r.text and 'id="curl-example"' in r.text
+
+    def test_api_key_page_localized_no_english_leak(self):
+        for loc, needle in [("es", "clave de demostración"), ("zh", "演示密钥")]:
+            r = client.get(f"/{loc}/api-key")
+            assert r.status_code == 200
+            assert "or get a demo key" not in r.text
+            assert "Revoke this key" not in r.text
+            assert needle in r.text
 
     def test_schema_page_served(self):
         r = client.get("/schema")

@@ -202,6 +202,12 @@ display: flex; align-items: center;
   .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .curl { margin: 8px 0 4px; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; color: var(--fg); white-space: pre; }
+  .linkbtn { width: auto; margin: 0; padding: 0; background: none; border: none; color: var(--accent);
+    font: inherit; cursor: pointer; text-decoration: underline; }
+  .linkbtn:hover { color: var(--accent2); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
@@ -421,31 +427,35 @@ display: flex; align-items: center;
     </div>
 
     <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>또는 정보를 입력하여 로그인</span></div>
+    <div class="divider hidden" id="auth-divider"><span>또는 데모 키 받기</span></div>
 
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
+    <!-- Demo-key registration (shown when ALLOW_DEMO_KEYS is on). This path is
+         NOT verified — any name/email mints a temporary key for trying the API. -->
     <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">전체 이름</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">업무용 이메일</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">API 키 요청</button>
+      <p class="hint">검증 없음 — API를 사용해 보기 위한 임시 <strong>데모 키</strong>를 발급합니다. 아무 이름과 이메일이나 사용하세요.</p>
+      <label for="name">이름</label>
+      <input id="name" name="name" placeholder="Ada Lovelace" />
+      <label for="email">이메일 (아무 주소나)</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@example.org" />
+      <button id="submit" type="submit">데모 키 받기</button>
     </form>
     <div class="error" id="error" role="alert"></div>
   </section>
 
   <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
+  <section class="card hidden" id="key-card" aria-live="polite" tabindex="-1">
     <h2>환영합니다, <span id="who">연구자</span>님 👋</h2>
-    <p class="sub">API 키가 발급되었습니다. 비밀로 유지하세요.</p>
+    <p class="sub">API 키가 발급되었습니다. 비밀번호처럼 비밀로 유지하세요.</p>
     <div class="keyrow">
       <div class="keybox" id="apikey"></div>
       <button class="copy" id="copy" type="button">복사</button>
     </div>
-    <p class="hint">모든 요청에 <code>X-API-Key</code> 헤더로 전송하세요.
-      <a href="/docs" target="_blank" rel="noopener">대화형 API 문서</a>에서 시도해 보세요.</p>
     <p class="hint" id="expires"></p>
-    <p class="hint"><a href="/ko/schema">데이터셋 스키마</a> 페이지에서 쿼리할 수 있는 항목을 확인하세요.</p>
+    <p class="hint">모든 요청에 <code>X-API-Key</code> 헤더로 전송하세요:</p>
+    <pre class="curl" id="curl-example"></pre>
+    <p class="hint"><a href="/docs" target="_blank" rel="noopener">대화형 API 문서</a>에서 사용해 보거나, <a href="/ko/schema">데이터셋 스키마</a>를 살펴보거나, <a href="/ko/reports">대시보드</a>를 열어 보세요.</p>
+    <p class="hint"><button type="button" class="linkbtn" id="revoke">이 키 취소</button> — 다시 로그인하면 새 키가 발급됩니다.</p>
+    <p class="sr-only" id="copied-status" role="status" aria-live="polite"></p>
   </section>
  </main>
 
@@ -466,14 +476,26 @@ async function onAuthSuccess(data) {
   apiKey = data.api_key;
   // Share the key with the dashboard's Ask box (same origin, picked up on focus).
   try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
+  $("#who").textContent = data.name || "researcher";
   $("#apikey").textContent = apiKey;
+  // A concrete, copy-pasteable request using the issued key (set via textContent
+  // so the key is never interpolated into HTML).
+  $("#curl-example").textContent = 'curl -H "X-API-Key: ' + apiKey + '" ' + location.origin + '/api/jobs';
   if (data.expires_at) {
     const d = new Date(data.expires_at);
-    $("#expires").textContent = "만료일 " + d.toLocaleDateString('ko-KR', { year: "numeric", month: "long", day: "numeric" }) + ".";
+    $("#expires").textContent = "유효 기간: " + d.toLocaleDateString('ko-KR', { year: "numeric", month: "long", day: "numeric" }) + ".";
   }
   $("#login-card").classList.add("hidden");
   show($("#key-card"));
+  // Move focus to the result so screen-reader + keyboard users land on the key.
+  $("#key-card").focus();
+}
+
+// Friendly message for a failed fetch (network error vs. server detail).
+function authError(err) {
+  return (err && err.name === "TypeError")
+    ? "서버에 연결할 수 없습니다. 다시 시도해 주세요."
+    : (err && err.message) || "문제가 발생했습니다.";
 }
 
 // ── Google sign-in ──────────────────────────────────────────────────────────
@@ -481,17 +503,20 @@ async function onAuthSuccess(data) {
 // /auth/google, which verifies it and mints a session for any verified account.
 async function onGoogleCredential(resp) {
   $("#error").textContent = "";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const r = await fetch("/api/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json();
+    const data = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(data.detail || "로그인 실패");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
+  } finally {
+    $("#login-card").removeAttribute("aria-busy");
   }
 }
 
@@ -525,20 +550,38 @@ $("#login-form").addEventListener("submit", async (e) => {
 
   const btn = $("#submit");
   btn.disabled = true; btn.textContent = "키 발급 중…";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const res = await fetch("/api/portal/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json();
+    const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.detail || "등록 실패");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
   } finally {
-    btn.disabled = false; btn.textContent = "API 키 요청";
+    btn.disabled = false; btn.textContent = "데모 키 받기";
+    $("#login-card").removeAttribute("aria-busy");
   }
+});
+
+// Self-revoke the issued key (session or demo key) via DELETE /portal/key.
+$("#revoke").addEventListener("click", async () => {
+  if (!apiKey) return;
+  const b = $("#revoke");
+  b.disabled = true;
+  try {
+    await fetch("/api/portal/key", { method: "DELETE", headers: { "X-API-Key": apiKey } });
+  } catch (_) {}
+  try { localStorage.removeItem("vlop_api_key"); } catch (_) {}
+  apiKey = null;
+  $("#key-card").classList.add("hidden");
+  show($("#login-card"));
+  $("#error").textContent = "키가 취소되었습니다. 새 키를 받으려면 다시 로그인하세요.";
+  $("#main").focus();
 });
 
 // Decide which sign-in methods to offer based on server config.
@@ -554,7 +597,7 @@ async function init() {
 
   $("#login-sub").textContent = googleOn
     ? "Google 계정으로 로그인하여 접근을 요청하세요."
-    : "정보를 입력하여 로그인하면 API 키가 발급됩니다.";
+    : "아무 이름과 이메일을 입력하면 임시 데모 키를 받을 수 있습니다.";
   if (!googleOn && !demoOn) {
     $("#login-sub").textContent = "이 서버에는 활성화된 로그인 방법이 없습니다.";
   }
@@ -562,9 +605,13 @@ async function init() {
 init();
 
 $("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "복사됨!";
-  setTimeout(() => (b.textContent = t), 1200);
+  const b = $("#copy"); const t = b.textContent;
+  let ok = true;
+  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) { ok = false; }
+  const msg = ok ? "Copied!" : "Ctrl-C를 눌러 복사";
+  b.textContent = msg;
+  $("#copied-status").textContent = msg;   // announce to screen readers
+  setTimeout(() => (b.textContent = t), 1500);
 });
 </script>
 <script>
