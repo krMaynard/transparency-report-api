@@ -202,6 +202,12 @@ display: flex; align-items: center;
   .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .curl { margin: 8px 0 4px; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; color: var(--fg); white-space: pre; }
+  .linkbtn { width: auto; margin: 0; padding: 0; background: none; border: none; color: var(--accent);
+    font: inherit; cursor: pointer; text-decoration: underline; }
+  .linkbtn:hover { color: var(--accent2); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
@@ -409,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>API アクセスを申請</h2>
     <p class="sub" id="login-sub">サインインすると API キーが発行されます。</p>
     <p class="hint">API キーを使うと、<strong>非同期クエリ API</strong>（ジョブの送信・ポーリング・JSON/CSV での全件エクスポート）に加え、自然言語の <strong>Ask</strong> ボックス、Webhook コールバック、より高いレート上限が利用できます。<a href="/ja/schema">スキーマ</a>の閲覧やダッシュボードの制限付きクエリの実行にキーは不要です。</p>
@@ -421,31 +427,35 @@ display: flex; align-items: center;
     </div>
 
     <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>または情報を入力してサインイン</span></div>
+    <div class="divider hidden" id="auth-divider"><span>またはデモキーを取得</span></div>
 
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
+    <!-- Demo-key registration (shown when ALLOW_DEMO_KEYS is on). This path is
+         NOT verified — any name/email mints a temporary key for trying the API. -->
     <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">氏名</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">勤務先メールアドレス</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">API キーを申請</button>
+      <p class="hint">検証なし — API を試すための一時的な<strong>デモキー</strong>を発行します。任意の名前とメールを使用してください。</p>
+      <label for="name">名前</label>
+      <input id="name" name="name" placeholder="Ada Lovelace" />
+      <label for="email">メール（任意のアドレス）</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@example.org" />
+      <button id="submit" type="submit">デモキーを取得</button>
     </form>
     <div class="error" id="error" role="alert"></div>
   </section>
 
   <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
+  <section class="card hidden" id="key-card" aria-live="polite" tabindex="-1">
     <h2>ようこそ、<span id="who">研究者</span>さん 👋</h2>
-    <p class="sub">API キーが発行されました。他人に知られないよう保管してください。</p>
+    <p class="sub">API キーが発行されました。パスワードと同様に秘密にしてください。</p>
     <div class="keyrow">
       <div class="keybox" id="apikey"></div>
       <button class="copy" id="copy" type="button">コピー</button>
     </div>
-    <p class="hint">リクエストごとに <code>X-API-Key</code> ヘッダーとして送信してください。
-      <a href="/docs" target="_blank" rel="noopener">対話型の API ドキュメント</a>でお試しください。</p>
     <p class="hint" id="expires"></p>
-    <p class="hint">クエリできる項目は<a href="/ja/schema">データセットのスキーマ</a>ページで確認できます。</p>
+    <p class="hint">すべてのリクエストで <code>X-API-Key</code> ヘッダーとして送信してください：</p>
+    <pre class="curl" id="curl-example"></pre>
+    <p class="hint"><a href="/docs" target="_blank" rel="noopener">インタラクティブ API ドキュメント</a>で試したり、<a href="/ja/schema">データセットスキーマ</a>を閲覧したり、<a href="/ja/reports">ダッシュボード</a>を開いたりできます。</p>
+    <p class="hint"><button type="button" class="linkbtn" id="revoke">このキーを失効</button> — 再度サインインすると新しいキーが発行されます。</p>
+    <p class="sr-only" id="copied-status" role="status" aria-live="polite"></p>
   </section>
  </main>
 
@@ -466,14 +476,26 @@ async function onAuthSuccess(data) {
   apiKey = data.api_key;
   // Share the key with the dashboard's Ask box (same origin, picked up on focus).
   try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
+  $("#who").textContent = data.name || "researcher";
   $("#apikey").textContent = apiKey;
+  // A concrete, copy-pasteable request using the issued key (set via textContent
+  // so the key is never interpolated into HTML).
+  $("#curl-example").textContent = 'curl -H "X-API-Key: ' + apiKey + '" ' + location.origin + '/api/jobs';
   if (data.expires_at) {
     const d = new Date(data.expires_at);
-    $("#expires").textContent = "有効期限：" + d.toLocaleDateString('ja-JP', { year: "numeric", month: "long", day: "numeric" }) + ".";
+    $("#expires").textContent = "有効期限： " + d.toLocaleDateString('ja-JP', { year: "numeric", month: "long", day: "numeric" }) + ".";
   }
   $("#login-card").classList.add("hidden");
   show($("#key-card"));
+  // Move focus to the result so screen-reader + keyboard users land on the key.
+  $("#key-card").focus();
+}
+
+// Friendly message for a failed fetch (network error vs. server detail).
+function authError(err) {
+  return (err && err.name === "TypeError")
+    ? "サーバーに接続できませんでした。もう一度お試しください。"
+    : (err && err.message) || "問題が発生しました。";
 }
 
 // ── Google sign-in ──────────────────────────────────────────────────────────
@@ -481,17 +503,23 @@ async function onAuthSuccess(data) {
 // /auth/google, which verifies it and mints a session for any verified account.
 async function onGoogleCredential(resp) {
   $("#error").textContent = "";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const r = await fetch("/api/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "サインインに失敗しました");
+    }
     const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "サインインに失敗しました");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
+  } finally {
+    $("#login-card").removeAttribute("aria-busy");
   }
 }
 
@@ -525,20 +553,41 @@ $("#login-form").addEventListener("submit", async (e) => {
 
   const btn = $("#submit");
   btn.disabled = true; btn.textContent = "キーを発行中…";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const res = await fetch("/api/portal/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "登録に失敗しました");
+    }
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "登録に失敗しました");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
   } finally {
-    btn.disabled = false; btn.textContent = "API キーを申請";
+    btn.disabled = false; btn.textContent = "デモキーを取得";
+    $("#login-card").removeAttribute("aria-busy");
   }
+});
+
+// Self-revoke the issued key (session or demo key) via DELETE /portal/key.
+$("#revoke").addEventListener("click", async () => {
+  if (!apiKey) return;
+  const b = $("#revoke");
+  b.disabled = true;
+  try {
+    await fetch("/api/portal/key", { method: "DELETE", headers: { "X-API-Key": apiKey } });
+  } catch (_) {}
+  try { localStorage.removeItem("vlop_api_key"); } catch (_) {}
+  apiKey = null;
+  $("#key-card").classList.add("hidden");
+  show($("#login-card"));
+  $("#error").textContent = "キーを失効しました。新しいキーを取得するには再度サインインしてください。";
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.
@@ -554,7 +603,7 @@ async function init() {
 
   $("#login-sub").textContent = googleOn
     ? "Google アカウントでサインインしてアクセスを申請してください。"
-    : "情報を入力してサインインすると API キーが発行されます。";
+    : "任意の名前とメールを入力すると、一時的なデモキーを取得できます。";
   if (!googleOn && !demoOn) {
     $("#login-sub").textContent = "このサーバーでは有効なサインイン方法がありません。";
   }
@@ -562,9 +611,13 @@ async function init() {
 init();
 
 $("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "コピーしました！";
-  setTimeout(() => (b.textContent = t), 1200);
+  const b = $("#copy"); const t = b.textContent;
+  let ok = true;
+  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) { ok = false; }
+  const msg = ok ? "Copied!" : "Ctrl-C を押してコピー";
+  b.textContent = msg;
+  $("#copied-status").textContent = msg;   // announce to screen readers
+  setTimeout(() => (b.textContent = t), 1500);
 });
 </script>
 <script>

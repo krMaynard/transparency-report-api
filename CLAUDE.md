@@ -415,7 +415,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/api/report-locations` | — | Public: non-VLOP DSA report-locations catalogue (filters: `category`/`confidence`/`harmonised_template`/`q`; `format=json\|csv`) — memoised, read-only |
 | GET | `/api/explore/options` | — | Public: tables + dimensions/measures for the query builder |
 | POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited, ≤`EXPLORE_MAX_LEGS` composite legs) |
-| POST | `/api/ask` | — | Public: NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; off unless `ANTHROPIC_API_KEY` set |
+| POST | `/api/ask` | key | NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; requires an API key, IP-rate-limited; off unless `ANTHROPIC_API_KEY` set |
 | GET | `/api` | — | API service info |
 | GET | `/catalog` | — | Public report-locations catalogue page (web UI over `GET /api/report-locations`) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |

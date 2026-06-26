@@ -202,6 +202,12 @@ display: flex; align-items: center;
   .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .curl { margin: 8px 0 4px; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; color: var(--fg); white-space: pre; }
+  .linkbtn { width: auto; margin: 0; padding: 0; background: none; border: none; color: var(--accent);
+    font: inherit; cursor: pointer; text-decoration: underline; }
+  .linkbtn:hover { color: var(--accent2); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
@@ -409,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>Request API access</h2>
     <p class="sub" id="login-sub">Sign in to be issued an API key.</p>
     <p class="hint">An API key unlocks the <strong>async query API</strong> — submit a job, poll, and export full results as JSON/CSV — plus the natural-language <strong>Ask</strong> box, webhook callbacks, and higher rate limits. Browsing the <a href="/schema">schema</a> and running the dashboards' bounded queries need no key.</p>
@@ -421,31 +427,35 @@ display: flex; align-items: center;
     </div>
 
     <!-- Divider, shown only when both Google and key-based sign-in are available -->
-    <div class="divider hidden" id="auth-divider"><span>or sign in with your details</span></div>
+    <div class="divider hidden" id="auth-divider"><span>or get a demo key</span></div>
 
-    <!-- Detail-based registration (shown when ALLOW_DEMO_KEYS is on) -->
+    <!-- Demo-key registration (shown when ALLOW_DEMO_KEYS is on). This path is
+         NOT verified — any name/email mints a temporary key for trying the API. -->
     <form id="login-form" autocomplete="off" class="hidden">
-      <label for="name">Full name</label>
-      <input id="name" name="name" placeholder="Dr. Ada Lovelace" />
-      <label for="email">Work email</label>
-      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@royalsociety.org" />
-      <button id="submit" type="submit">Request API key</button>
+      <p class="hint">No verification — this issues a temporary <strong>demo key</strong> for trying the API. Use any name and email.</p>
+      <label for="name">Name</label>
+      <input id="name" name="name" placeholder="Ada Lovelace" />
+      <label for="email">Email (any address)</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@example.org" />
+      <button id="submit" type="submit">Get demo key</button>
     </form>
     <div class="error" id="error" role="alert"></div>
   </section>
 
   <!-- Step 2: issued key -->
-  <section class="card hidden" id="key-card">
+  <section class="card hidden" id="key-card" aria-live="polite" tabindex="-1">
     <h2>Welcome, <span id="who">researcher</span> 👋</h2>
-    <p class="sub">Your API key has been issued. Keep it secret.</p>
+    <p class="sub">Your API key has been issued. Keep it secret — treat it like a password.</p>
     <div class="keyrow">
       <div class="keybox" id="apikey"></div>
       <button class="copy" id="copy" type="button">Copy</button>
     </div>
-    <p class="hint">Send it on every request as the <code>X-API-Key</code> header. Try it in the
-      <a href="/docs" target="_blank" rel="noopener">interactive API docs</a>.</p>
     <p class="hint" id="expires"></p>
-    <p class="hint">Explore what you can query on the <a href="/schema">dataset schema</a> page.</p>
+    <p class="hint">Send it on every request as the <code>X-API-Key</code> header:</p>
+    <pre class="curl" id="curl-example"></pre>
+    <p class="hint">Try it in the <a href="/docs" target="_blank" rel="noopener">interactive API docs</a>, browse the <a href="/schema">dataset schema</a>, or open the <a href="/reports">dashboards</a>.</p>
+    <p class="hint"><button type="button" class="linkbtn" id="revoke">Revoke this key</button> — signing in again issues a fresh one.</p>
+    <p class="sr-only" id="copied-status" role="status" aria-live="polite"></p>
   </section>
  </main>
 
@@ -466,14 +476,26 @@ async function onAuthSuccess(data) {
   apiKey = data.api_key;
   // Share the key with the dashboard's Ask box (same origin, picked up on focus).
   try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
-  $("#who").textContent = data.name;
+  $("#who").textContent = data.name || "researcher";
   $("#apikey").textContent = apiKey;
+  // A concrete, copy-pasteable request using the issued key (set via textContent
+  // so the key is never interpolated into HTML).
+  $("#curl-example").textContent = 'curl -H "X-API-Key: ' + apiKey + '" ' + location.origin + '/api/jobs';
   if (data.expires_at) {
     const d = new Date(data.expires_at);
-    $("#expires").textContent = "Expires " + d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) + ".";
+    $("#expires").textContent = "Valid until " + d.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" }) + ".";
   }
   $("#login-card").classList.add("hidden");
   show($("#key-card"));
+  // Move focus to the result so screen-reader + keyboard users land on the key.
+  $("#key-card").focus();
+}
+
+// Friendly message for a failed fetch (network error vs. server detail).
+function authError(err) {
+  return (err && err.name === "TypeError")
+    ? "Couldn't reach the server. Please try again."
+    : (err && err.message) || "Something went wrong.";
 }
 
 // ── Google sign-in ──────────────────────────────────────────────────────────
@@ -481,17 +503,23 @@ async function onAuthSuccess(data) {
 // /auth/google, which verifies it and mints a session for any verified account.
 async function onGoogleCredential(resp) {
   $("#error").textContent = "";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const r = await fetch("/api/auth/google", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "Sign-in failed");
+    }
     const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "Sign-in failed");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
+  } finally {
+    $("#login-card").removeAttribute("aria-busy");
   }
 }
 
@@ -525,20 +553,41 @@ $("#login-form").addEventListener("submit", async (e) => {
 
   const btn = $("#submit");
   btn.disabled = true; btn.textContent = "Issuing key…";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
     const res = await fetch("/api/portal/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Registration failed");
+    }
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || "Registration failed");
     await onAuthSuccess(data);
   } catch (err) {
-    $("#error").textContent = err.message;
+    $("#error").textContent = authError(err);
   } finally {
-    btn.disabled = false; btn.textContent = "Request API key";
+    btn.disabled = false; btn.textContent = "Get demo key";
+    $("#login-card").removeAttribute("aria-busy");
   }
+});
+
+// Self-revoke the issued key (session or demo key) via DELETE /portal/key.
+$("#revoke").addEventListener("click", async () => {
+  if (!apiKey) return;
+  const b = $("#revoke");
+  b.disabled = true;
+  try {
+    await fetch("/api/portal/key", { method: "DELETE", headers: { "X-API-Key": apiKey } });
+  } catch (_) {}
+  try { localStorage.removeItem("vlop_api_key"); } catch (_) {}
+  apiKey = null;
+  $("#key-card").classList.add("hidden");
+  show($("#login-card"));
+  $("#error").textContent = "Key revoked. Sign in again to get a new one.";
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.
@@ -554,7 +603,7 @@ async function init() {
 
   $("#login-sub").textContent = googleOn
     ? "Sign in with your Google account to request access."
-    : "Sign in with your details to be issued an API key.";
+    : "Enter any name and email to get a temporary demo key.";
   if (!googleOn && !demoOn) {
     $("#login-sub").textContent = "No sign-in method is enabled on this server.";
   }
@@ -562,9 +611,13 @@ async function init() {
 init();
 
 $("#copy").addEventListener("click", async () => {
-  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) {}
-  const b = $("#copy"); const t = b.textContent; b.textContent = "Copied!";
-  setTimeout(() => (b.textContent = t), 1200);
+  const b = $("#copy"); const t = b.textContent;
+  let ok = true;
+  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) { ok = false; }
+  const msg = ok ? "Copied!" : "Press Ctrl-C to copy";
+  b.textContent = msg;
+  $("#copied-status").textContent = msg;   // announce to screen readers
+  setTimeout(() => (b.textContent = t), 1500);
 });
 </script>
 <script>
