@@ -1213,6 +1213,16 @@ class TestDashboard:
         not_modified = client.get("/api/overview", headers={"If-None-Match": etag})
         assert not_modified.status_code == 304
 
+    def test_dataset_version_is_db_content_fingerprint(self):
+        # The version token is a digest of the served DB file, so it changes iff
+        # the data changes (not on a code-only redeploy).
+        import hashlib, os, main
+        h = hashlib.sha256()
+        with open(os.environ["DB_PATH"], "rb") as f:
+            for chunk in iter(lambda: f.read(1 << 20), b""):
+                h.update(chunk)
+        assert main._dataset_version() == h.hexdigest()[:12]
+
     def test_removals_overview_carries_version_and_etag(self):
         r = client.get("/api/overview/removals")
         assert r.status_code == 200 and r.json().get("version")
