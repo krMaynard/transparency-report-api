@@ -183,6 +183,19 @@ display: flex; align-items: center;
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+  .cta { display: inline-block; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px;
+    background: var(--accent); color: var(--on-accent); text-decoration: none; border: 1px solid var(--accent); }
+  .cta:hover { opacity: .9; }
+  .cta-ghost { background: transparent; color: var(--accent); }
+  .cta-ghost:hover { background: var(--panel2); opacity: 1; }
+  .example { margin: 10px 0 2px; }
+  .example summary { cursor: pointer; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .example pre { margin: 8px 0 0; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.5; }
+  .ops { margin: 2px 0 8px; }
+  .ops .pill { font-size: 11px; padding: 1px 7px; }
+  .ops .ops-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-right: 6px; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
@@ -385,8 +398,13 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card">
+    <p class="hint"><a href="/ko/reports">보고서</a> 및 <a href="/ko/removals">삭제 요청</a> 대시보드의 기반이 되는 테이블입니다. 필드를 살펴본 뒤 Explore 빌더, 자연어 Ask 상자 또는 API로 조회하세요. 데이터 출처와 중복 집계를 피하는 방법은 <a href="/ko/methodology">방법론</a>을 참조하세요.</p>
+    <p class="cta-row">
+      <a class="cta" href="/ko/reports">쿼리 빌더 열기 →</a>
+      <a class="cta cta-ghost" href="/docs">API 참조 (Swagger)</a>
+    </p>
     <p class="hint">필드 레지스트리는 공개되어 있으며 대시보드의 제한된 쿼리도 마찬가지입니다. <a href="/ko/api-key">API 키</a>는 비동기 쿼리 API, 대량 JSON/CSV 내보내기, 자연어 Ask 상자에만 필요합니다.</p>
-    <p class="hint" id="dataset-meta" aria-busy="true">불러오는 중…</p>
+    <p class="hint" id="dataset-meta" aria-busy="true" aria-live="polite">불러오는 중…</p>
     <div class="error hidden" id="error" role="alert"></div>
     <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">보고서 테이블</h3>
     <div id="tables"></div>
@@ -414,20 +432,36 @@ async function api(path) {
   return res.json();
 }
 
-function fieldDefs(names, help) {
-  if (!names.length) return '<p class="dim">—</p>';
+function fieldDefs(names, help, emptyNote) {
+  if (!names.length) return '<p class="dim">' + esc(emptyNote || "—") + '</p>';
   return '<dl class="fielddefs">' + names.map(function (n) {
     var desc = help && help[n] ? '<dd>' + esc(help[n]) + '</dd>' : '<dd class="dim">—</dd>';
     return '<dt><code>' + esc(n) + '</code></dt>' + desc;
   }).join('') + '</dl>';
 }
 
+// Render an operations/aggregate vocabulary as labelled pills.
+function opsPills(label, ops) {
+  if (!ops || !ops.length) return '';
+  return '<div class="ops"><span class="ops-label">' + esc(label) + '</span>'
+    + ops.map(function (o) { return '<span class="pill">' + esc(o) + '</span>'; }).join('') + '</div>';
+}
+
 function renderTable(t) {
+  var dims = t.dimensions || {}, meas = t.measures || {};
+  var example = t.example
+    ? `<details class="example"><summary>예시 쿼리 — Explore 빌더나 <code>POST /api/query</code>에 복사</summary><pre>${esc(JSON.stringify(t.example, null, 2))}</pre></details>`
+    : "";
+  var aggLine = (meas.fields && meas.fields.length)
+    ? opsPills("집계", t.aggregate_functions) : "";
   return `<div class="tbl">
     <div class="name">${esc(t.table)}</div>
     <p class="hint">${esc(t.description || "")}</p>
-    <div class="field-cat"><h3>차원 <span class="dim">· 필터 / 그룹 / 정렬</span></h3>${fieldDefs(t.dimensions.fields, t.field_help)}</div>
-    <div class="field-cat"><h3>측정값 <span class="dim">· 필터 / 집계</span></h3>${fieldDefs(t.measures.fields, t.field_help)}</div>
+    <div class="field-cat"><h3>차원 <span class="dim">· 필터 / 그룹 / 정렬</span></h3>
+      ${opsPills("연산자", dims.operations)}${fieldDefs(dims.fields, t.field_help)}</div>
+    <div class="field-cat"><h3>측정값 <span class="dim">· 필터 / 집계</span></h3>
+      ${opsPills("연산자", meas.operations)}${aggLine}${fieldDefs(meas.fields, t.field_help, "숫자 측정값이 없습니다 — 자유 텍스트 테이블입니다. fields로 차원을 요청하세요.")}</div>
+    ${example}
   </div>`;
 }
 
@@ -435,20 +469,24 @@ function renderTable(t) {
 async function loadSchema() {
   const meta = await api("/api/tables");
   const m = $("#dataset-meta");
-  m.textContent = `${meta.dataset} · 기간 ${meta.period} · 보고서 테이블 ${meta.tables.length}개`;
+  m.textContent = `${meta.dataset} · DSA 기간 ${meta.period} · 조회 가능한 테이블 ${meta.tables.length}개`;
   m.removeAttribute("aria-busy");
   if (meta.generated) {
     $("#prov-snap").textContent = meta.generated + (meta.period ? ` (${meta.period})` : "");
-    $("#prov-cite").textContent = `“${meta.dataset}, via the Transparency Report API (${meta.generated} snapshot).”`;
+    $("#prov-cite").textContent = `“${meta.dataset}, Transparency Report API 경유 (${meta.generated} 스냅샷).”`;
     $("#provenance").hidden = false;
   }
   // Fetch every table's field registry in parallel rather than one roundtrip at a time.
   const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`)));
-  $("#tables").innerHTML = details.map(renderTable).join("");
+  $("#tables").innerHTML = details.length
+    ? details.map(renderTable).join("")
+    : '<p class="hint">조회 가능한 테이블이 없습니다.</p>';
 }
 
 loadSchema().catch((err) => {
-  $("#dataset-meta").classList.add("hidden");
+  const m = $("#dataset-meta");
+  m.classList.add("hidden");
+  m.removeAttribute("aria-busy");
   const e = $("#error");
   e.textContent = "스키마를 불러올 수 없습니다: " + err.message;
   show(e);

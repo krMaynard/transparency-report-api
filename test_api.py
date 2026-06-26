@@ -72,6 +72,18 @@ class TestPortal:
         assert r.status_code == 200
         assert "text/html" in r.headers["content-type"]
         assert "Dataset schema" in r.text
+        # A path from the reference page to actually running a query.
+        assert "Open the query builder" in r.text and 'href="/reports"' in r.text
+        # The page renders the per-table example query the API returns.
+        assert "Example query" in r.text
+
+    def test_schema_localized_cite_as_not_in_english(self):
+        for loc, needle in [("es", "vía la Transparency Report API"),
+                            ("zh", "经由 Transparency Report API")]:
+            r = client.get(f"/{loc}/schema")
+            assert r.status_code == 200
+            assert ", via the Transparency Report API (${meta.generated} snapshot)" not in r.text
+            assert needle in r.text
 
     def test_old_portal_url_redirects(self):
         r = client.get("/portal", follow_redirects=False)
@@ -220,6 +232,11 @@ class TestSchema:
         body = r.json()
         assert "service_name" in body["dimensions"]["fields"]
         assert "notices" in body["measures"]["fields"]
+        # The schema page surfaces these — a runnable example + operation vocab.
+        assert body["example"]["table"] == "t4_notices"
+        assert body["measures"]["operations"] == ["EQ", "IN", "GT", "GTE", "LT", "LTE"]
+        # `items` help is DSA-accurate, not the old vague "Item count."
+        assert "Tables 3 & 4" in body["field_help"]["items"]
 
     def test_missing_table_is_404(self):
         assert client.get("/api/schema/nonexistent", headers=MOMO).status_code == 404

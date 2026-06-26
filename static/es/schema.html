@@ -183,6 +183,19 @@ display: flex; align-items: center;
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+  .cta { display: inline-block; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px;
+    background: var(--accent); color: var(--on-accent); text-decoration: none; border: 1px solid var(--accent); }
+  .cta:hover { opacity: .9; }
+  .cta-ghost { background: transparent; color: var(--accent); }
+  .cta-ghost:hover { background: var(--panel2); opacity: 1; }
+  .example { margin: 10px 0 2px; }
+  .example summary { cursor: pointer; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .example pre { margin: 8px 0 0; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.5; }
+  .ops { margin: 2px 0 8px; }
+  .ops .pill { font-size: 11px; padding: 1px 7px; }
+  .ops .ops-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-right: 6px; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
@@ -385,8 +398,13 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card">
+    <p class="hint">Estas son las tablas que respaldan los paneles de <a href="/es/reports">Informes</a> y <a href="/es/removals">Retiradas</a>: explora los campos y luego consúltalos con el generador Explorar, el cuadro de preguntas en lenguaje natural o la API. Consulta <a href="/es/methodology">Metodología</a> para saber cómo se obtienen los datos y cómo evitar el doble recuento.</p>
+    <p class="cta-row">
+      <a class="cta" href="/es/reports">Abrir el generador de consultas →</a>
+      <a class="cta cta-ghost" href="/docs">Referencia de la API (Swagger)</a>
+    </p>
     <p class="hint">Los registros de campos son públicos, al igual que las consultas limitadas de los paneles. Solo se necesita una <a href="/es/api-key">clave de API</a> para la API de consultas asíncrona, las exportaciones masivas en JSON/CSV y el cuadro Ask en lenguaje natural.</p>
-    <p class="hint" id="dataset-meta" aria-busy="true">Cargando…</p>
+    <p class="hint" id="dataset-meta" aria-busy="true" aria-live="polite">Cargando…</p>
     <div class="error hidden" id="error" role="alert"></div>
     <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">Tablas de informes</h3>
     <div id="tables"></div>
@@ -414,20 +432,36 @@ async function api(path) {
   return res.json();
 }
 
-function fieldDefs(names, help) {
-  if (!names.length) return '<p class="dim">—</p>';
+function fieldDefs(names, help, emptyNote) {
+  if (!names.length) return '<p class="dim">' + esc(emptyNote || "—") + '</p>';
   return '<dl class="fielddefs">' + names.map(function (n) {
     var desc = help && help[n] ? '<dd>' + esc(help[n]) + '</dd>' : '<dd class="dim">—</dd>';
     return '<dt><code>' + esc(n) + '</code></dt>' + desc;
   }).join('') + '</dl>';
 }
 
+// Render an operations/aggregate vocabulary as labelled pills.
+function opsPills(label, ops) {
+  if (!ops || !ops.length) return '';
+  return '<div class="ops"><span class="ops-label">' + esc(label) + '</span>'
+    + ops.map(function (o) { return '<span class="pill">' + esc(o) + '</span>'; }).join('') + '</div>';
+}
+
 function renderTable(t) {
+  var dims = t.dimensions || {}, meas = t.measures || {};
+  var example = t.example
+    ? `<details class="example"><summary>Consulta de ejemplo: cópiala en el generador Explorar o en <code>POST /api/query</code></summary><pre>${esc(JSON.stringify(t.example, null, 2))}</pre></details>`
+    : "";
+  var aggLine = (meas.fields && meas.fields.length)
+    ? opsPills("Agregación", t.aggregate_functions) : "";
   return `<div class="tbl">
     <div class="name">${esc(t.table)}</div>
     <p class="hint">${esc(t.description || "")}</p>
-    <div class="field-cat"><h3>Dimensiones <span class="dim">· filtrar / agrupar / ordenar</span></h3>${fieldDefs(t.dimensions.fields, t.field_help)}</div>
-    <div class="field-cat"><h3>Medidas <span class="dim">· filtrar / agregar</span></h3>${fieldDefs(t.measures.fields, t.field_help)}</div>
+    <div class="field-cat"><h3>Dimensiones <span class="dim">· filtrar / agrupar / ordenar</span></h3>
+      ${opsPills("Operaciones", dims.operations)}${fieldDefs(dims.fields, t.field_help)}</div>
+    <div class="field-cat"><h3>Medidas <span class="dim">· filtrar / agregar</span></h3>
+      ${opsPills("Operaciones", meas.operations)}${aggLine}${fieldDefs(meas.fields, t.field_help, "Sin medidas numéricas: es una tabla de texto libre; solicita una dimensión mediante fields.")}</div>
+    ${example}
   </div>`;
 }
 
@@ -435,20 +469,24 @@ function renderTable(t) {
 async function loadSchema() {
   const meta = await api("/api/tables");
   const m = $("#dataset-meta");
-  m.textContent = `${meta.dataset} · período ${meta.period} · ${meta.tables.length} tablas de informes`;
+  m.textContent = `${meta.dataset} · período DSA ${meta.period} · ${meta.tables.length} tablas consultables`;
   m.removeAttribute("aria-busy");
   if (meta.generated) {
     $("#prov-snap").textContent = meta.generated + (meta.period ? ` (${meta.period})` : "");
-    $("#prov-cite").textContent = `“${meta.dataset}, via the Transparency Report API (${meta.generated} snapshot).”`;
+    $("#prov-cite").textContent = `“${meta.dataset}, vía la Transparency Report API (instantánea de ${meta.generated}).”`;
     $("#provenance").hidden = false;
   }
   // Fetch every table's field registry in parallel rather than one roundtrip at a time.
   const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`)));
-  $("#tables").innerHTML = details.map(renderTable).join("");
+  $("#tables").innerHTML = details.length
+    ? details.map(renderTable).join("")
+    : '<p class="hint">No hay tablas consultables disponibles.</p>';
 }
 
 loadSchema().catch((err) => {
-  $("#dataset-meta").classList.add("hidden");
+  const m = $("#dataset-meta");
+  m.classList.add("hidden");
+  m.removeAttribute("aria-busy");
   const e = $("#error");
   e.textContent = "No se pudo cargar el esquema: " + err.message;
   show(e);
