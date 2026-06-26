@@ -2686,6 +2686,15 @@ def _leg_warnings(
                 f"{flag}; this aggregate pins neither, so it may double-count. Filter "
                 f"{flag}=1 for the headline total or {flag}=0 for the breakdown."
             )
+    # Cross-tier comparability: VLOPs report H2-2025; non-VLOP harmonised filers
+    # often report full-year or offset windows. Summing across tiers compares
+    # different reporting periods.
+    if "report_tier" in spec.dimensions and "report_tier" not in pinned:
+        out.append(
+            f"'{table}' spans both VLOP and non-VLOP filers, which report over different "
+            f"windows (VLOPs: H2-2025; others often full-year). Raw totals across tiers "
+            f"aren't directly comparable — filter report_tier, or group by report_period."
+        )
     for agg in aggregates:
         if agg.function in ("SUM", "AVG") and agg.field_name in NON_ADDITIVE_MEASURES:
             out.append(

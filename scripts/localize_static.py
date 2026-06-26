@@ -299,6 +299,8 @@ PAGES["de"]["home.html"] = [
 ]
 
 PAGES["es"]["index.html"] = [
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     '''Los declarantes no VLOP informan sobre periodos distintos (a menudo el año completo) que las VLOP (S2 2025); los totales brutos entre niveles no son directamente comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de la UE · informes de transparencia'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Informes de transparencia del DSA</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -477,6 +479,8 @@ PAGES["es"]["index.html"] = [
 ]
 
 PAGES["fr"]["index.html"] = [
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     '''Les déclarants non-VLOP couvrent des périodes différentes (souvent l’année entière) de celles des VLOP (S2 2025) ; les totaux bruts entre catégories ne sont pas directement comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de l’UE · rapports de transparence'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Rapports de transparence du DSA</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -654,6 +658,8 @@ PAGES["fr"]["index.html"] = [
 ]
 
 PAGES["de"]["index.html"] = [
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     '''Nicht-VLOP-Meldende berichten über andere Zeiträume (oft das ganze Jahr) als VLOPs (H2 2025); Rohsummen über Stufen hinweg sind nicht direkt vergleichbar.'''),
     ('''EU DSA · transparency reports''', '''EU-DSA · Transparenzberichte'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>DSA-Transparenzberichte</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -831,6 +837,9 @@ PAGES["de"]["index.html"] = [
 ]
 
 PAGES["es"]["removals.html"] = [
+    ('''>Download CSV</button>''', '''>Descargar CSV</button>'''),
+    ("""'Preparing…'""", """'Preparando…'"""),
+    ("""'CSV export failed: '""", """'Error al exportar CSV: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     ("""'Period'""", """'Período'"""),
     ("""'Removal rate'""", """'Tasa de retirada'"""),
@@ -909,6 +918,9 @@ PAGES["es"]["removals.html"] = [
 ]
 
 PAGES["fr"]["removals.html"] = [
+    ('''>Download CSV</button>''', '''>Télécharger le CSV</button>'''),
+    ("""'Preparing…'""", """'Préparation…'"""),
+    ("""'CSV export failed: '""", """'Échec de l’export CSV : '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     ("""'Period'""", """'Période'"""),
     ("""'Removal rate'""", """'Taux de retrait'"""),
@@ -986,6 +998,9 @@ PAGES["fr"]["removals.html"] = [
 ]
 
 PAGES["de"]["removals.html"] = [
+    ('''>Download CSV</button>''', '''>CSV herunterladen</button>'''),
+    ("""'Preparing…'""", """'Wird vorbereitet…'"""),
+    ("""'CSV export failed: '""", """'CSV-Export fehlgeschlagen: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     ("""'Period'""", """'Zeitraum'"""),
     ("""'Removal rate'""", """'Entfernungsrate'"""),
@@ -1612,6 +1627,8 @@ PAGES["ja"]["home.html"] = [
      r'''· データ：<a'''),
 ]
 PAGES["ja"]["index.html"] = [
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     r'''非 VLOP の提出者は VLOP（2025 年下半期）とは異なる期間（多くは通年）で報告しているため、階層をまたいだ総計は直接比較できません。'''),
     (r'''EU DSA · transparency reports''',
      r'''EU DSA · 透明性レポート'''),
     (r'''<h1>DSA Transparency Reports</h1>''',
@@ -1865,6 +1882,9 @@ PAGES["ja"]["index.html"] = [
      r'''v.toLocaleString('ja-JP', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["ja"]["removals.html"] = [
+    (r'''>Download CSV</button>''', r'''>CSV をダウンロード</button>'''),
+    (r"""'Preparing…'""", r"""'準備中…'"""),
+    (r"""'CSV export failed: '""", r"""'CSV エクスポートに失敗しました: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     (r"""'Period'""", r"""'期間'"""),
     (r"""'Removal rate'""", r"""'削除率'"""),
@@ -2297,6 +2317,8 @@ PAGES["zh"]["home.html"] = [
      r'''· 数据：<a'''),
 ]
 PAGES["zh"]["index.html"] = [
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     r'''非 VLOP 报告方的报告周期与 VLOP（2025 下半年）不同（通常为整年），跨层级的原始总计不可直接比较。'''),
     (r'''EU DSA · transparency reports''',
      r'''欧盟 DSA · 透明度报告'''),
     (r'''<h1>DSA Transparency Reports</h1>''',
@@ -2549,6 +2571,9 @@ PAGES["zh"]["index.html"] = [
      r'''v.toLocaleString('zh-CN', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["zh"]["removals.html"] = [
+    (r'''>Download CSV</button>''', r'''>下载 CSV</button>'''),
+    (r"""'Preparing…'""", r"""'正在准备…'"""),
+    (r"""'CSV export failed: '""", r"""'CSV 导出失败：'"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     (r"""'Period'""", r"""'报告期'"""),
     (r"""'Removal rate'""", r"""'删除率'"""),
@@ -2981,6 +3006,8 @@ PAGES["ko"]["home.html"] = [
      r'''· 데이터: <a'''),
 ]
 PAGES["ko"]["index.html"] = [
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     r'''비 VLOP 제출자는 VLOP(2025 하반기)와 다른 기간(대개 연간)을 보고하므로, 계층 간 원시 합계는 직접 비교할 수 없습니다.'''),
     (r'''EU DSA · transparency reports''',
      r'''EU DSA · 투명성 보고서'''),
     (r'''<h1>DSA Transparency Reports</h1>''',
@@ -3234,6 +3261,9 @@ PAGES["ko"]["index.html"] = [
      r'''v.toLocaleString('ko-KR', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["ko"]["removals.html"] = [
+    (r'''>Download CSV</button>''', r'''>CSV 다운로드</button>'''),
+    (r"""'Preparing…'""", r"""'준비 중…'"""),
+    (r"""'CSV export failed: '""", r"""'CSV 내보내기 실패: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     (r"""'Period'""", r"""'기간'"""),
     (r"""'Removal rate'""", r"""'삭제율'"""),

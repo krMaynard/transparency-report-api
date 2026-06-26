@@ -279,6 +279,8 @@
     color: var(--muted); margin: 0; }
   .scope-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px;
     overflow: hidden; background: var(--panel2); }
+  .scope-warn { font-size: 12px; color: #8a6d00; margin: 6px 0 0; max-width: 60ch; }
+  [data-theme="dark"] .scope-warn { color: #d29922; }
   .scope-seg button { all: unset; cursor: pointer; padding: 6px 14px; font-size: 12.5px;
     color: var(--muted); white-space: nowrap; }
   .scope-seg button:hover { color: var(--fg); }
@@ -528,6 +530,7 @@
         <button type="button" class="on" data-scope="vlop">Solo VLOP</button>
         <button type="button" data-scope="all">Incluir declarantes no VLOP</button>
       </div>
+      <p class="scope-warn" id="scope-warn" role="status" hidden>Los declarantes no VLOP informan sobre periodos distintos (a menudo el año completo) que las VLOP (S2 2025); los totales brutos entre niveles no son directamente comparables.</p>
     </div>
     <div class="tabstrip" id="tabstrip" role="tablist"></div>
     <div id="tab-panel">
@@ -941,6 +944,7 @@ function setupTabs() {
   $("#scope-seg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     $("#scope-seg").querySelectorAll("button").forEach(x => x.classList.remove("on"));
     b.classList.add("on"); currentScope = b.dataset.scope;
+    $("#scope-warn").hidden = currentScope !== "all";
     if (currentTab) renderTab(currentTab);
   }));
   currentTab = TABS[0]; renderTab(TABS[0]);

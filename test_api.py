@@ -1324,10 +1324,22 @@ class TestExplore:
         assert any("median" in w.lower() for w in d.get("warnings", []))
 
     def test_explore_no_warning_when_grain_pinned(self):
+        # Pinning both the category total grain and the report tier → no advisories.
+        q = {"table": "t4_notices", "group_by": ["service_name"],
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]},
+                 {"operation": "EQ", "field_name": "report_tier", "field_values": ["vlop"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
+        assert "warnings" not in client.post("/api/explore", json=q).json()
+
+    def test_explore_warns_on_cross_tier_mix(self):
+        # Not pinning report_tier mixes VLOP (H2-2025) with non-VLOP (often full-year).
         q = {"table": "t4_notices", "group_by": ["service_name"],
              "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]},
              "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
-        assert "warnings" not in client.post("/api/explore", json=q).json()
+        d = client.post("/api/explore", json=q).json()
+        assert any("report_tier" in w for w in d.get("warnings", []))
 
     def test_explore_aggregated_query_public(self):
         q = {"table": "t4_notices", "group_by": ["platform"],
