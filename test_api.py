@@ -1323,10 +1323,17 @@ class TestDashboard:
         r = client.get("/mcp")
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "mcp_server.py" in r.text and "Model Context Protocol" in r.text
-        # The page must document every tool the server actually registers.
-        import mcp_server
-        for tool in ("list_tables", "describe_table", "dataset_overview", "run_query",
-                     "ask", "register", "submit_query", "poll_job"):
+        # The page must document every tool the server actually registers. Parse
+        # mcp_server.py as text (don't import it — its httpx dep isn't in the app
+        # env) so this can't drift from build_server()'s registration list.
+        import re
+        import pathlib
+        src = pathlib.Path(__file__).with_name("mcp_server.py").read_text()
+        reg = re.search(r"for fn in \(([^)]*)\):", src, re.S)
+        assert reg, "could not find the tool-registration tuple in mcp_server.py"
+        tools = re.findall(r"[A-Za-z_]\w+", reg.group(1))
+        assert len(tools) >= 8
+        for tool in tools:
             assert f"<code>{tool}</code>" in r.text, f"{tool} missing from /mcp"
         # Host-config snippet matches the example file (server name + valid demo key).
         assert '"transparency-report-api"' in r.text and '"momo"' in r.text
