@@ -415,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>Demander l’accès à l’API</h2>
     <p class="sub" id="login-sub">Connectez-vous pour obtenir une clé d’API.</p>
     <p class="hint">Une clé d’API débloque l’<strong>API de requêtes asynchrone</strong> — soumettre une tâche, l’interroger et exporter les résultats complets en JSON/CSV — ainsi que la boîte <strong>Ask</strong> en langage naturel, les rappels par webhook et des limites plus élevées. Parcourir le <a href="/fr/schema">schéma</a> et exécuter les requêtes bornées des tableaux de bord ne nécessite aucune clé.</p>
@@ -510,8 +510,11 @@ async function onGoogleCredential(resp) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.detail || "Échec de la connexion");
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "Échec de la connexion");
+    }
+    const data = await r.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -557,8 +560,11 @@ $("#login-form").addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || "Échec de l’inscription");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Échec de l’inscription");
+    }
+    const data = await res.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -581,7 +587,7 @@ $("#revoke").addEventListener("click", async () => {
   $("#key-card").classList.add("hidden");
   show($("#login-card"));
   $("#error").textContent = "Clé révoquée. Reconnectez-vous pour en obtenir une nouvelle.";
-  $("#main").focus();
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.

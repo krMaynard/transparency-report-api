@@ -415,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>Solicitar acceso a la API</h2>
     <p class="sub" id="login-sub">Inicia sesión para obtener una clave de API.</p>
     <p class="hint">Una clave de API desbloquea la <strong>API de consultas asíncrona</strong> —enviar un trabajo, sondear y exportar resultados completos en JSON/CSV— además del cuadro <strong>Ask</strong> en lenguaje natural, las devoluciones de llamada por webhook y límites de uso más altos. Explorar el <a href="/es/schema">esquema</a> y ejecutar las consultas limitadas de los paneles no requiere clave.</p>
@@ -510,8 +510,11 @@ async function onGoogleCredential(resp) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.detail || "Error al iniciar sesión");
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "Error al iniciar sesión");
+    }
+    const data = await r.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -557,8 +560,11 @@ $("#login-form").addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || "Error en el registro");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Error en el registro");
+    }
+    const data = await res.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -581,7 +587,7 @@ $("#revoke").addEventListener("click", async () => {
   $("#key-card").classList.add("hidden");
   show($("#login-card"));
   $("#error").textContent = "Clave revocada. Inicia sesión de nuevo para obtener una nueva.";
-  $("#main").focus();
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.

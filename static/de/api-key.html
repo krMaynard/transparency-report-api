@@ -415,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>API-Zugang anfordern</h2>
     <p class="sub" id="login-sub">Melde dich an, um einen API-Schlüssel zu erhalten.</p>
     <p class="hint">Ein API-Schlüssel schaltet die <strong>asynchrone Abfrage-API</strong> frei — einen Job einreichen, abfragen und vollständige Ergebnisse als JSON/CSV exportieren — sowie die <strong>Ask</strong>-Box in natürlicher Sprache, Webhook-Callbacks und höhere Limits. Das Durchsuchen des <a href="/de/schema">Schemas</a> und die begrenzten Abfragen der Dashboards benötigen keinen Schlüssel.</p>
@@ -510,8 +510,11 @@ async function onGoogleCredential(resp) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.detail || "Anmeldung fehlgeschlagen");
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "Anmeldung fehlgeschlagen");
+    }
+    const data = await r.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -557,8 +560,11 @@ $("#login-form").addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || "Registrierung fehlgeschlagen");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Registrierung fehlgeschlagen");
+    }
+    const data = await res.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -581,7 +587,7 @@ $("#revoke").addEventListener("click", async () => {
   $("#key-card").classList.add("hidden");
   show($("#login-card"));
   $("#error").textContent = "Schlüssel widerrufen. Melden Sie sich erneut an, um einen neuen zu erhalten.";
-  $("#main").focus();
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.

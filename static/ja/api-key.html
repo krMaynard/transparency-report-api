@@ -415,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>API アクセスを申請</h2>
     <p class="sub" id="login-sub">サインインすると API キーが発行されます。</p>
     <p class="hint">API キーを使うと、<strong>非同期クエリ API</strong>（ジョブの送信・ポーリング・JSON/CSV での全件エクスポート）に加え、自然言語の <strong>Ask</strong> ボックス、Webhook コールバック、より高いレート上限が利用できます。<a href="/ja/schema">スキーマ</a>の閲覧やダッシュボードの制限付きクエリの実行にキーは不要です。</p>
@@ -510,8 +510,11 @@ async function onGoogleCredential(resp) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.detail || "サインインに失敗しました");
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "サインインに失敗しました");
+    }
+    const data = await r.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -557,8 +560,11 @@ $("#login-form").addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || "登録に失敗しました");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "登録に失敗しました");
+    }
+    const data = await res.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -581,7 +587,7 @@ $("#revoke").addEventListener("click", async () => {
   $("#key-card").classList.add("hidden");
   show($("#login-card"));
   $("#error").textContent = "キーを失効しました。新しいキーを取得するには再度サインインしてください。";
-  $("#main").focus();
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.

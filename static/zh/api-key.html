@@ -415,7 +415,7 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <!-- Step 1: sign in -->
-  <section class="card" id="login-card">
+  <section class="card" id="login-card" tabindex="-1">
     <h2>申请 API 访问权限</h2>
     <p class="sub" id="login-sub">登录以获取 API 密钥。</p>
     <p class="hint">API 密钥可解锁<strong>异步查询 API</strong>——提交任务、轮询并以 JSON/CSV 导出完整结果——以及自然语言 <strong>Ask</strong> 框、Webhook 回调和更高的速率上限。浏览<a href="/zh/schema">数据架构</a>和运行仪表板的受限查询无需密钥。</p>
@@ -510,8 +510,11 @@ async function onGoogleCredential(resp) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ credential: resp.credential }),
     });
-    const data = await r.json().catch(() => ({}));
-    if (!r.ok) throw new Error(data.detail || "登录失败");
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "登录失败");
+    }
+    const data = await r.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -557,8 +560,11 @@ $("#login-form").addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email }),
     });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.detail || "注册失败");
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "注册失败");
+    }
+    const data = await res.json();
     await onAuthSuccess(data);
   } catch (err) {
     $("#error").textContent = authError(err);
@@ -581,7 +587,7 @@ $("#revoke").addEventListener("click", async () => {
   $("#key-card").classList.add("hidden");
   show($("#login-card"));
   $("#error").textContent = "密钥已吊销。请重新登录以获取新密钥。";
-  $("#main").focus();
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
 });
 
 // Decide which sign-in methods to offer based on server config.
