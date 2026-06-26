@@ -245,6 +245,12 @@ display: flex; align-items: center; justify-content: space-between;
   .provenance { font-size: 12px; margin-top: 6px; }
   .provenance .prov-label { font-weight: 600; }
 
+  /* ── Column legend ───────────────────────────────────────────── */
+  .legend { margin: 0 0 16px; font-size: 13px; }
+  .legend > summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .legend p { color: var(--muted); margin: 8px 0 0; }
+  .legend strong { color: var(--fg); font-weight: 600; }
+
   @media (max-width: 720px) {
     .hamburger { display: flex; }
     .sidebar { position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 210; transform: translateX(calc(-1 * var(--sidebar-w))); }
@@ -252,6 +258,31 @@ display: flex; align-items: center; justify-content: space-between;
     .wrap { padding: 20px 1rem; }
     .chart-grid { grid-template-columns: 1fr; }
     .chart-card.wide { grid-column: 1; }
+  }
+  /* On phones the 8-column records table stacks into labelled cards (matching the
+     catalogue page): the header row is hidden but kept in the accessibility tree
+     (sr-only) so screen-reader column context survives, and each cell carries its
+     column name via data-label. */
+  @media (max-width: 620px) {
+    .table-scroll { overflow-x: visible; }
+    .recordtable { font-size: 14px; }
+    .recordtable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    .recordtable, .recordtable tbody, .recordtable tr, .recordtable td { display: block; width: 100%; }
+    .recordtable tr {
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--panel2); padding: 4px 14px; margin: 0 0 12px;
+    }
+    .recordtable td {
+      border: none; border-bottom: 1px solid var(--border); padding: 9px 0;
+      text-align: left; word-break: break-word;
+    }
+    .recordtable td.num { text-align: left; }
+    .recordtable tr td:last-child { border-bottom: none; }
+    .recordtable td::before {
+      content: attr(data-label); display: block; margin-bottom: 2px;
+      font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--muted);
+    }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -300,7 +331,7 @@ display: flex; align-items: center; justify-content: space-between;
     <a href="/ja/" class="topbar-brand">Transparency Report API</a>
   </div>
   <div class="topbar-right">
-    <button type="button" class="theme-toggle" aria-label="ダークモードの切り替え" data-theme-toggle>
+    <button type="button" class="theme-toggle" aria-label="ダークモードの切り替え" aria-pressed="false" data-theme-toggle>
       <svg class="theme-icon-dark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
     </button>
@@ -422,9 +453,9 @@ display: flex; align-items: center; justify-content: space-between;
 <main id="main" tabindex="-1">
 
   <header>
-    <span class="badge">Google · 2019–2025</span>
+    <span class="badge">Google · 2019 – H1 2025</span>
     <h1>コンテンツ削除を求める政府要請</h1>
-    <p>Google の各種プロダクトからのコンテンツ削除を求める政府要請を、13 の報告期間、160 か国、42 のプロダクト、22 の申告理由にわたって収録。複数期間のトレンドを中心に設計され、すべてのフィルターが時系列になります。</p>
+    <p>Google の各種プロダクトからのコンテンツ削除を求める政府要請を、13 の報告期間、160 か国、42 のプロダクト、22 の申告理由にわたって収録。複数期間のトレンドを中心に設計され、すべてのフィルターが時系列になります。数値は Google 自身による報告です。「要請」は裁判所命令から行政機関や警察による要求まで幅があり、削除を求められた件数を数えたもので、違法と判断された件数ではありません。</p>
   </header>
 
   <!-- Headline stats -->
@@ -495,7 +526,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>削除率の推移</h3>
-        <p class="chart-sub">対象項目のうち Google が法的理由またはポリシーに基づいて削除した割合（Google の対応前にすでに削除されていた項目は除く）。</p>
+        <p class="chart-sub">対象項目全体のうち、Google が法的理由またはポリシーに基づいて削除した割合。Google の対応前にすでに削除されていた項目は合計には含まれますが、削除としては数えません。</p>
         <div class="chart-loading" id="rate-loading">読み込み中…</div>
         <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rate-table" class="sr-only"></div>
@@ -540,12 +571,17 @@ display: flex; align-items: center; justify-content: space-between;
           <button type="button" id="dl-csv" class="dl-csv">CSV をダウンロード</button>
         </div>
       </div>
+      <details class="legend">
+        <summary>各列の意味</summary>
+        <p><strong>要請数</strong> — 政府による削除要請の件数。複数の製品や理由を挙げる1件の要請はそれぞれで1回ずつ数えるため、この列は要請の延べ件数を合計したもので、ユニークな要請数ではありません。<strong>対象項目数</strong> — 政府が Google に削除を求めた個々の項目（URL、アカウント、投稿）。<strong>削除項目数</strong> — Google が法的理由またはポリシーに基づいて削除した項目。Google の対応前にすでに削除されていた項目は含みません（「Google の対応」の「既に削除済み」に表示されます）。</p>
+      </details>
       <div class="table-scroll">
-        <table>
+        <table class="recordtable">
+          <caption class="sr-only">政府による削除要請、対象項目数の上位50件（有効なフィルターを反映）。</caption>
           <thead>
             <tr>
-              <th>期間</th><th>国</th><th>要請者</th><th>プロダクト</th><th>理由</th>
-              <th class="num">要請数</th><th class="num">対象項目数</th><th class="num">削除項目数</th>
+              <th scope="col">期間</th><th scope="col">国</th><th scope="col">要請者</th><th scope="col">プロダクト</th><th scope="col">理由</th>
+              <th scope="col" class="num">要請数</th><th scope="col" class="num">対象項目数</th><th scope="col" class="num">削除項目数</th>
             </tr>
           </thead>
           <tbody id="table-body"></tbody>
@@ -558,7 +594,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>出典：<a href="https://transparencyreport.google.com/government-removals/overview" target="_blank" rel="noopener noreferrer">Google Transparency Report</a> — 政府による削除要請の詳細（2019 年〜2025 年上半期）。データ提供：<a href="/api">Transparency Report API</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p>出典：<a href="https://transparencyreport.google.com/government-removals/overview" target="_blank" rel="noopener noreferrer">Google Transparency Report</a> — 政府による削除要請の詳細（2019 年〜2025 年上半期）。データ提供：<a href="/api">Transparency Report API</a> · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -573,10 +609,15 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Dark mode + hamburger ─────────────────────────────────────────────────
   var themeBtn = document.querySelector('[data-theme-toggle]');
   if (themeBtn) {
+    var syncThemeBtn = function () {
+      themeBtn.setAttribute('aria-pressed', String(document.documentElement.getAttribute('data-theme') === 'dark'));
+    };
+    syncThemeBtn();
     themeBtn.addEventListener('click', function () {
       var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       try { localStorage.setItem('theme', next); } catch (e) {}
+      syncThemeBtn();
     });
   }
     // Keep --header-h in sync with the actual rendered height of the site
@@ -610,7 +651,7 @@ display: flex; align-items: center; justify-content: space-between;
   }
   function fmtPct(n) { return n == null ? '—' : (n * 100).toLocaleString('ja-JP', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%'; }
   function esc(s) {
-    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
   function chartReady() { return typeof Chart !== 'undefined'; }
 
@@ -685,6 +726,17 @@ display: flex; align-items: center; justify-content: space-between;
   function showChart(canvasId, loadingId) {
     document.getElementById(loadingId).classList.add('hidden');
     document.getElementById(canvasId).classList.remove('hidden');
+  }
+
+  // No-results state for a chart: keep the canvas hidden and reuse its loading
+  // slot to show a "no data" message (so the user can tell empty from loading
+  // from broken), and clear the sr-only mirror table.
+  function emptyChart(canvasId, loadingId, tableId) {
+    destroyChart(canvasId);
+    var c = document.getElementById(canvasId); if (c) c.classList.add('hidden');
+    var l = document.getElementById(loadingId);
+    if (l) { l.classList.remove('hidden'); l.textContent = '現在のフィルターに該当するデータがありません。'; }
+    var t = document.getElementById(tableId); if (t) t.innerHTML = '';
   }
 
   // Accessible data-table mirror of a chart, written into a visually-hidden
@@ -783,6 +835,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   // ── Render functions ──────────────────────────────────────────────────────
   function renderTimeSeries(rows, breakdown) {
+    if (!rows.length) { emptyChart('chart-ts', 'ts-loading', 'chart-ts-table'); return; }
     if (!breakdown) {
       var labels = rows.map(function(r){ return r[0]; });
       var values = rows.map(function(r){ return r[1]; });
@@ -816,6 +869,7 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   function renderRate(rows) {
+    if (!rows.length) { emptyChart('chart-rate', 'rate-loading', 'chart-rate-table'); return; }
     // rows = [period, items, legal, policy, already]
     // Numerator is legal + policy grounds only — items "already removed" were gone
     // before Google acted, so counting them as Google removals overstates compliance.
@@ -826,10 +880,11 @@ display: flex; align-items: center; justify-content: space-between;
     });
     pctLineChart('chart-rate', 'rate-loading', labels, rates);
     srTable('chart-rate-table', ['期間', '削除率'],
-      rows.map(function(r, i){ return [r[0], rates[i] == null ? '—' : (rates[i] * 100).toFixed(1) + '%']; }));
+      rows.map(function(r, i){ return [r[0], fmtPct(rates[i])]; }));
   }
 
   function renderTopCountries(rows) {
+    if (!rows.length) { emptyChart('chart-countries', 'cty-loading', 'chart-countries-table'); return; }
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-countries', 'cty-loading', labels, values, '対象項目数');
@@ -838,6 +893,7 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   function renderTopReasons(rows) {
+    if (!rows.length) { emptyChart('chart-reasons', 'rsn-loading', 'chart-reasons-table'); return; }
     var labels = rows.map(function(r){ return r[0]; });
     var values = rows.map(function(r){ return r[1]; });
     doughnutChart('chart-reasons', 'rsn-loading', labels, values);
@@ -846,6 +902,7 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   function renderTopProducts(rows) {
+    if (!rows.length) { emptyChart('chart-products', 'prd-loading', 'chart-products-table'); return; }
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-products', 'prd-loading', labels, values, '対象項目数');
@@ -854,14 +911,7 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   function renderCompliance(rows) {
-    if (!rows.length) {
-      destroyChart('chart-compliance');
-      var loadingEl = document.getElementById('cmp-loading');
-      if (loadingEl) loadingEl.classList.add('hidden');
-      var tEl = document.getElementById('chart-compliance-table');
-      if (tEl) tEl.innerHTML = '';
-      return;
-    }
+    if (!rows.length) { emptyChart('chart-compliance', 'cmp-loading', 'chart-compliance-table'); return; }
     var r = rows[0];
     // cols: removed_legal, removed_policy, already_removed, not_found, not_enough_info, no_action
     var labels = ['削除（法的理由）', '削除（ポリシー）', '既に削除済み', '見つからず', '情報不足', '対応なし'];
@@ -880,18 +930,25 @@ display: flex; align-items: center; justify-content: space-between;
       return;
     }
     count.textContent = rows.length + ' 行';
+    // Column labels mirror the <th> text so the mobile card view (data-label) stays
+    // localized from one source.
+    var ths = document.querySelectorAll('.recordtable thead th');
+    var lbl = function(i) { return ths[i] ? ths[i].textContent : ''; };
     tbody.innerHTML = rows.map(function(r) {
       // cols: period, country, requestor, product, reason, reqs(5), items(6), legal(7), policy(8), already(9)
-      var removed = (r[7]||0) + (r[8]||0) + (r[9]||0);
+      // "Items removed" = legal + policy grounds only; items "already removed" were
+      // gone before Google acted, so they are NOT counted as Google removals (this
+      // matches the "Removal rate" chart's numerator).
+      var removed = (r[7]||0) + (r[8]||0);
       return '<tr>'
-        + '<td>' + esc(r[0]) + '</td>'
-        + '<td>' + esc(r[1]) + '</td>'
-        + '<td>' + esc(r[2]) + '</td>'
-        + '<td>' + esc(r[3]) + '</td>'
-        + '<td>' + esc(r[4]) + '</td>'
-        + '<td class="num">' + fmt(r[5]) + '</td>'
-        + '<td class="num">' + fmt(r[6]) + '</td>'
-        + '<td class="num">' + fmt(removed) + '</td>'
+        + '<td data-label="' + esc(lbl(0)) + '">' + esc(r[0]) + '</td>'
+        + '<td data-label="' + esc(lbl(1)) + '">' + esc(r[1]) + '</td>'
+        + '<td data-label="' + esc(lbl(2)) + '">' + esc(r[2]) + '</td>'
+        + '<td data-label="' + esc(lbl(3)) + '">' + esc(r[3]) + '</td>'
+        + '<td data-label="' + esc(lbl(4)) + '">' + esc(r[4]) + '</td>'
+        + '<td class="num" data-label="' + esc(lbl(5)) + '">' + fmt(r[5]) + '</td>'
+        + '<td class="num" data-label="' + esc(lbl(6)) + '">' + fmt(r[6]) + '</td>'
+        + '<td class="num" data-label="' + esc(lbl(7)) + '">' + fmt(removed) + '</td>'
         + '</tr>';
     }).join('');
   }
@@ -1012,11 +1069,22 @@ display: flex; align-items: center; justify-content: space-between;
         document.getElementById('prov-snap').textContent =
           d.generated + (d.coverage ? ' (' + d.coverage + ')' : '');
         document.getElementById('prov-cite').textContent =
-          '“Google government content-removal requests, via the Transparency Report API (' + d.generated + ' snapshot' + (d.version ? ', dataset version ' + d.version : '') + ').”';
+          `“Google への政府によるコンテンツ削除要請（Transparency Report API 経由、${d.generated} のスナップショット${d.version ? `、データセットバージョン ${d.version}` : ""}）。”`;
         document.getElementById('provenance').hidden = false;
       }
 
-      allPeriods = d.periods;
+      // Defend against a malformed/empty overview payload: default every list so
+      // the dashboard degrades to a clean message instead of throwing.
+      allPeriods   = d.periods    || [];
+      d.countries  = d.countries  || [];
+      d.requestors = d.requestors || [];
+      d.products   = d.products   || [];
+      d.reasons    = d.reasons    || [];
+      if (!allPeriods.length) {
+        errEl.textContent = '削除データがありません。';
+        errEl.classList.remove('hidden');
+        return;
+      }
       fromIdx = 0; toIdx = allPeriods.length - 1;
 
       // Populate period selects

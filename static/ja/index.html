@@ -725,7 +725,7 @@ async function load() {
   if (d.period) $("#period").textContent = `報告対象期間 ${fmtPeriod(d.period)} · 指定された VLOP・VLOSE ${d.services} 件に加え、EU調和テンプレートを提出する非VLOPプラットフォーム ${d.nonvlop_filers} 件。`;
   if (d.generated) {
     $("#prov-snap").textContent = d.generated + (d.period ? ` (${fmtPeriod(d.period)})` : "");
-    $("#prov-cite").textContent = `“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`;
+    $("#prov-cite").textContent = `“EU DSA VLOP 透明性報告書（Transparency Report API 経由、${d.generated} のスナップショット${d.version ? `、データセットバージョン ${d.version}` : ""}）。”`;
     $("#provenance").hidden = false;
   }
   $("#stats").innerHTML =

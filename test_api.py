@@ -2029,6 +2029,27 @@ class TestGRTable:
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "/api/overview/removals" in r.text
         assert "Government Requests" in r.text
+        # Column legend + honest framing of the "Items removed" column.
+        assert "What the columns mean" in r.text
+        # "Items removed" must NOT fold in already-removed items (matches the
+        # removal-rate chart's numerator: legal + policy only).
+        assert "var removed = (r[7]||0) + (r[8]||0);" in r.text
+        # The records table exposes column scope + a localizable caption for AT.
+        assert 'th scope="col">Period' in r.text
+
+    def test_removals_localized_cite_as_not_in_english(self):
+        # The provenance "Cite as" citation is built in JS; it must be translated
+        # on the localized pages (regression: it used to leak English).
+        for loc, needle in [("es", "vía la Transparency Report API"),
+                            ("ja", "Transparency Report API 経由"),
+                            ("zh", "经由 Transparency Report API")]:
+            r = client.get(f"/{loc}/removals")
+            assert r.status_code == 200
+            assert "Google government content-removal requests, via" not in r.text
+            assert needle in r.text
+            # The scope="col" a11y attribute must survive localization (regression:
+            # the two-line ja/zh/ko th tuples once stripped it).
+            assert 'th scope="col"' in r.text
 
 
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────

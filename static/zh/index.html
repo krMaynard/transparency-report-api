@@ -725,7 +725,7 @@ async function load() {
   if (d.period) $("#period").textContent = `报告期 ${fmtPeriod(d.period)} · ${d.services} 个指定的 VLOP 和 VLOSE，外加 ${d.nonvlop_filers} 个提交欧盟统一模板的非 VLOP 平台。`;
   if (d.generated) {
     $("#prov-snap").textContent = d.generated + (d.period ? ` (${fmtPeriod(d.period)})` : "");
-    $("#prov-cite").textContent = `“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`;
+    $("#prov-cite").textContent = `“欧盟 DSA VLOP 透明度报告，经由 Transparency Report API（${d.generated} 快照${d.version ? `，数据集版本 ${d.version}` : ""}）。”`;
     $("#provenance").hidden = false;
   }
   $("#stats").innerHTML =
