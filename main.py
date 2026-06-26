@@ -3101,6 +3101,9 @@ def _dataset_version() -> str:
                         for chunk in iter(lambda: f.read(1 << 20), b""):
                             h.update(chunk)
                 except Exception:
+                    # Re-initialise so a partially-read DB file can't corrupt the
+                    # fallback digest with stray chunk bytes.
+                    h = hashlib.sha256()
                     meta = _dataset_meta()
                     h.update(f"{meta.get('period', '')}|{meta.get('generated', '')}".encode("utf-8"))
                 _dataset_version_cache = h.hexdigest()[:12]
