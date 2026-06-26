@@ -503,9 +503,9 @@ async function runLocations() {
     `${fmt(d.platform_count)} 個のプラットフォームの報告書 URL ${fmt(d.total)} 件のうち ${fmt(d.count)} 件を表示しています。`;
   // Provenance / cite-as line for the catalogue snapshot (version + build date).
   if (d.version) {
-    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "version " + d.version;
+    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "バージョン " + d.version;
     $("#rl-cite").textContent =
-      `“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”`;
+      `“DSA透明性報告書の掲載先（Transparency Report API 経由、カタログバージョン ${d.version}）。”`;
     $("#rl-prov").hidden = false;
   }
   const head = '<tr><th scope="col">プラットフォーム</th><th scope="col">企業</th><th scope="col">カテゴリ</th>' +

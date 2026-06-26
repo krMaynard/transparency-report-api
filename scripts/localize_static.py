@@ -3747,6 +3747,8 @@ _CATALOG_EXTRA = {
         (" (opens in new tab)", " (se abre en una pestaña nueva)"),
         ("|| \"Report\"", "|| \"Informe\""),
         (">not archived</span>", ">no archivado</span>"),
+        ("\"version \" + d.version", "\"versión \" + d.version"),
+        ("“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”", "“Ubicaciones de los informes de transparencia de la DSA, vía la Transparency Report API (versión del catálogo ${d.version}).”"),
     ],
     "fr": [
         ("<p class=\"sub\">A curated catalogue of where online platforms publish their DSA Art. 15/24 transparency reports. It centres on the many platforms beyond the designated VLOPs, but also lists publication locations for some VLOPs. Served by the public, read-only <code>GET /api/report-locations</code>.</p>", "<p class=\"sub\">Un catalogue organisé indiquant où les plateformes en ligne publient leurs rapports de transparence au titre des Art. 15/24 de la DSA. Il se concentre sur les nombreuses plateformes au-delà des VLOP désignées, mais répertorie aussi les lieux de publication de certaines VLOP. Fourni par l’endpoint public en lecture seule <code>GET /api/report-locations</code>.</p>"),
@@ -3767,6 +3769,8 @@ _CATALOG_EXTRA = {
         (" (opens in new tab)", " (s’ouvre dans un nouvel onglet)"),
         ("|| \"Report\"", "|| \"Rapport\""),
         (">not archived</span>", ">non archivé</span>"),
+        ("\"version \" + d.version", "\"version \" + d.version"),
+        ("“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”", "“Emplacements des rapports de transparence DSA, via la Transparency Report API (version du catalogue ${d.version}).”"),
     ],
     "de": [
         ("<p class=\"sub\">A curated catalogue of where online platforms publish their DSA Art. 15/24 transparency reports. It centres on the many platforms beyond the designated VLOPs, but also lists publication locations for some VLOPs. Served by the public, read-only <code>GET /api/report-locations</code>.</p>", "<p class=\"sub\">Ein kuratierter Katalog dazu, wo Online-Plattformen ihre DSA-Transparenzberichte nach Art. 15/24 veröffentlichen. Er konzentriert sich auf die zahlreichen Plattformen jenseits der benannten VLOPs, führt aber auch die Veröffentlichungsorte einiger VLOPs auf. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/report-locations</code>.</p>"),
@@ -3787,6 +3791,8 @@ _CATALOG_EXTRA = {
         (" (opens in new tab)", " (öffnet in neuem Tab)"),
         ("|| \"Report\"", "|| \"Bericht\""),
         (">not archived</span>", ">nicht archiviert</span>"),
+        ("\"version \" + d.version", "\"Version \" + d.version"),
+        ("“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”", "“DSA-Transparenzbericht-Standorte, über die Transparency Report API (Katalogversion ${d.version}).”"),
     ],
     "ja": [
         ("<p class=\"sub\">A curated catalogue of where online platforms publish their DSA Art. 15/24 transparency reports. It centres on the many platforms beyond the designated VLOPs, but also lists publication locations for some VLOPs. Served by the public, read-only <code>GET /api/report-locations</code>.</p>", "<p class=\"sub\">オンラインプラットフォームがDSA第15/24条の透明性報告書を公開している場所をまとめたカタログ。指定VLOP以外の多数のプラットフォームを中心に扱いつつ、一部のVLOPの公開場所も掲載しています。公開・読み取り専用の<code>GET /api/report-locations</code>が提供します。</p>"),
@@ -3807,6 +3813,8 @@ _CATALOG_EXTRA = {
         (" (opens in new tab)", "（新しいタブで開く）"),
         ("|| \"Report\"", "|| \"報告書\""),
         (">not archived</span>", ">アーカイブなし</span>"),
+        ("\"version \" + d.version", "\"バージョン \" + d.version"),
+        ("“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”", "“DSA透明性報告書の掲載先（Transparency Report API 経由、カタログバージョン ${d.version}）。”"),
     ],
     "zh": [
         ("<p class=\"sub\">A curated catalogue of where online platforms publish their DSA Art. 15/24 transparency reports. It centres on the many platforms beyond the designated VLOPs, but also lists publication locations for some VLOPs. Served by the public, read-only <code>GET /api/report-locations</code>.</p>", "<p class=\"sub\">一份精选目录，汇总在线平台发布其DSA第15/24条透明度报告的位置。重点收录指定VLOP之外的众多平台，同时也列出部分VLOP的发布位置。由公开、只读的<code>GET /api/report-locations</code>提供支持。</p>"),
@@ -3827,6 +3835,8 @@ _CATALOG_EXTRA = {
         (" (opens in new tab)", "（在新标签页中打开）"),
         ("|| \"Report\"", "|| \"报告\""),
         (">not archived</span>", ">未存档</span>"),
+        ("\"version \" + d.version", "\"版本 \" + d.version"),
+        ("“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”", "“DSA透明度报告发布位置，经由 Transparency Report API（目录版本 ${d.version}）。”"),
     ],
     "ko": [
         ("<p class=\"sub\">A curated catalogue of where online platforms publish their DSA Art. 15/24 transparency reports. It centres on the many platforms beyond the designated VLOPs, but also lists publication locations for some VLOPs. Served by the public, read-only <code>GET /api/report-locations</code>.</p>", "<p class=\"sub\">온라인 플랫폼이 DSA 제15/24조 투명성 보고서를 게시하는 위치를 정리한 큐레이션 목록입니다. 지정된 VLOP 외의 수많은 플랫폼을 중심으로 다루면서, 일부 VLOP의 게시 위치도 함께 수록합니다. 공개·읽기 전용 <code>GET /api/report-locations</code>가 제공합니다.</p>"),
@@ -3847,6 +3857,8 @@ _CATALOG_EXTRA = {
         (" (opens in new tab)", " (새 탭에서 열림)"),
         ("|| \"Report\"", "|| \"보고서\""),
         (">not archived</span>", ">아카이브 없음</span>"),
+        ("\"version \" + d.version", "\"버전 \" + d.version"),
+        ("“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”", "“DSA 투명성 보고서 위치, Transparency Report API 경유 (카탈로그 버전 ${d.version}).”"),
     ],
 }
 

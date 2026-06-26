@@ -503,9 +503,9 @@ async function runLocations() {
     `正在显示 ${fmt(d.platform_count)} 个平台的 ${fmt(d.total)} 个报告 URL 中的 ${fmt(d.count)} 个。`;
   // Provenance / cite-as line for the catalogue snapshot (version + build date).
   if (d.version) {
-    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "version " + d.version;
+    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "版本 " + d.version;
     $("#rl-cite").textContent =
-      `“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”`;
+      `“DSA透明度报告发布位置，经由 Transparency Report API（目录版本 ${d.version}）。”`;
     $("#rl-prov").hidden = false;
   }
   const head = '<tr><th scope="col">平台</th><th scope="col">公司</th><th scope="col">类别</th>' +

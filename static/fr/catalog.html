@@ -505,7 +505,7 @@ async function runLocations() {
   if (d.version) {
     $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "version " + d.version;
     $("#rl-cite").textContent =
-      `“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”`;
+      `“Emplacements des rapports de transparence DSA, via la Transparency Report API (version du catalogue ${d.version}).”`;
     $("#rl-prov").hidden = false;
   }
   const head = '<tr><th scope="col">Plateforme</th><th scope="col">Entreprise</th><th scope="col">Catégorie</th>' +

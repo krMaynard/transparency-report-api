@@ -503,9 +503,9 @@ async function runLocations() {
     `Mostrando ${fmt(d.count)} de ${fmt(d.total)} URL de informes en ${fmt(d.platform_count)} plataformas.`;
   // Provenance / cite-as line for the catalogue snapshot (version + build date).
   if (d.version) {
-    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "version " + d.version;
+    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "versión " + d.version;
     $("#rl-cite").textContent =
-      `“DSA transparency-report locations, via the Transparency Report API (catalogue version ${d.version}).”`;
+      `“Ubicaciones de los informes de transparencia de la DSA, vía la Transparency Report API (versión del catálogo ${d.version}).”`;
     $("#rl-prov").hidden = false;
   }
   const head = '<tr><th scope="col">Plataforma</th><th scope="col">Empresa</th><th scope="col">Categoría</th>' +
