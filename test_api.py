@@ -316,6 +316,31 @@ class TestQueryLifecycle:
         r = client.get(f"/api/jobs/{job['job_id']}/result", headers=MOMO)
         assert any("double-count" in w for w in r.json().get("warnings", []))
 
+    def test_offset_pagination(self):
+        base = {"table": "t4_notices", "group_by": ["service_name"],
+                "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+                "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]},
+                "max_count": 1}
+        p0 = client.post("/api/explore", json={**base, "offset": 0}).json()["rows"]
+        p1 = client.post("/api/explore", json={**base, "offset": 1}).json()["rows"]
+        assert p0 and p1 and p0[0][0] != p1[0][0]  # distinct rows under a stable order
+
+    def test_results_are_deterministic_without_sort(self):
+        # No user sort → the tie-break makes repeated pulls byte-identical (snapshot diffing).
+        q = {"table": "t4_notices", "group_by": ["service_name", "category_label"],
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
+        a = client.post("/api/explore", json=q).json()["rows"]
+        b = client.post("/api/explore", json=q).json()["rows"]
+        assert a == b
+
+    def test_gr_period_ord_sorts_chronologically(self):
+        r = client.post("/api/explore", json={
+            "table": "gr_removals", "group_by": ["period_ord", "period"],
+            "aggregates": [{"function": "COUNT", "field_name": "*", "alias": "c"}],
+            "sort": [{"field_name": "period_ord", "order": "asc"}]}).json()
+        ords = [row[0] for row in r["rows"]]
+        assert ords == sorted(ords)
+
     def test_happy_path_csv(self):
         job = _submit_and_wait(
             {

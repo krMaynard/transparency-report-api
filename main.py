@@ -1016,6 +1016,7 @@ TABLES: dict[str, TableSpec] = {
         f"FROM gr_removals f {_J_GR_PER} {_J_GR_CTY} {_J_GR_REQ} {_J_GR_PRD} {_J_GR_RSN}",
         {
             "period":       "per.name",
+            "period_ord":   "per.id",   # chronological ordinal — sort by this, not the text label
             "country_code": "cty.code",
             "country_name": "cty.name",
             "requestor":    "req.name",
@@ -1154,6 +1155,7 @@ class QueryRequest(BaseModel):
         description="Result ordering.",
     )
     max_count: int = Field(default=100, ge=1, description="Row limit (capped at ROW_LIMIT).")
+    offset: int = Field(default=0, ge=0, description="Rows to skip — for paging past the cap with a stable sort.")
     callback_url: str | None = Field(
         default=None,
         max_length=2048,
@@ -1643,12 +1645,20 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
             col_expr[f] = expr
 
     order_parts = []
+    sorted_cols: set[str] = set()
     for s in req.sort:
         if s.field_name not in col_expr:
             raise QueryCompileError(
                 f"Cannot sort by '{s.field_name}'; it is not a selected output column."
             )
         order_parts.append(f"{col_expr[s.field_name]} {'DESC' if s.order == 'desc' else 'ASC'}")
+        sorted_cols.add(s.field_name)
+    # Deterministic tie-break: append every remaining output column so the row order
+    # is a total order. Without this, a capped/paginated pull isn't byte-reproducible
+    # across runs (SQLite may return ties in any order) — fatal for snapshot diffing.
+    for c in columns:
+        if c not in sorted_cols:
+            order_parts.append(f"{col_expr[c]} ASC")
 
     limit = min(req.max_count, ROW_LIMIT)
 
@@ -1660,6 +1670,8 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
     if order_parts:
         sql += " ORDER BY " + ", ".join(order_parts)
     sql += f" LIMIT {limit}"
+    if req.offset:
+        sql += f" OFFSET {int(req.offset)}"
 
     return sql, params, columns
 
@@ -3066,6 +3078,7 @@ FIELD_HELP: dict[str, str] = {
     "scope_key": "Language-neutral canonical label for `scope`.",
     "qualitative_text": "Free-text description (Table 11). Request it via `fields`; this table has no numeric measures.",
     # ── Google removals dims ──
+    "period_ord": "Chronological ordinal of the reporting period (1 = earliest). Sort by this for a correct timeline — the text `period` sorts alphabetically.",
     "country_code": "Requesting country's ISO code (Google government removals).",
     "country_name": "Requesting country (Google government removals).",
     "requestor": "Type of government body making the removal request.",
