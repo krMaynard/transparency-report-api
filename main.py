@@ -942,6 +942,7 @@ _IND_DIMS = {"indicator": "i.name", "indicator_key": "i.key"}
 
 _J_RPT = "JOIN reports r ON r.id = f.report_id"
 _RPT_DIMS = {
+    "report_id":           "r.id",   # source-report identifier (traceability)
     "report_period":       "r.period",
     "report_period_start": "r.period_start",
     "report_period_end":   "r.period_end",
@@ -3090,6 +3091,7 @@ FIELD_HELP: dict[str, str] = {
     "service_name": "The platform/service that filed the report (e.g. YouTube, TikTok).",
     "platform": "Parent company of the service (e.g. Alphabet for YouTube).",
     "period": "Reporting period covered by the report.",
+    "report_id": "Identifier of the source report row this fact came from. Stable within a dataset version, so (dataset version, report_id) pins an exact source for traceable citation. Group or filter by it (EQ/IN on the stringified id) to scope to one filing.",
     "report_period": "Reporting period covered by the report.",
     "report_period_start": "Start date of the reporting period (YYYY-MM-DD).",
     "report_period_end": "End date of the reporting period (YYYY-MM-DD).",

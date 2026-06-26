@@ -339,6 +339,21 @@ class TestQueryLifecycle:
         page2 = client.post("/api/explore", json={**q, "offset": 5}).json()["rows"]
         assert not ({tuple(r) for r in a} & {tuple(r) for r in page2})
 
+    def test_report_id_is_traceable_dimension(self):
+        # Each fact row exposes its source report_id, so (dataset version, report_id)
+        # pins an exact source for citation. It's groupable and filterable.
+        r = client.post("/api/explore", json={
+            "table": "t4_notices", "group_by": ["report_id"],
+            "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+            "sort": [{"field_name": "report_id", "order": "asc"}]}).json()
+        assert r["rows"], r
+        first_id = str(r["rows"][0][0])
+        scoped = client.post("/api/explore", json={
+            "table": "t4_notices", "group_by": ["report_id", "service_name"],
+            "query": {"and": [{"operation": "EQ", "field_name": "report_id",
+                               "field_values": [first_id]}]}}).json()
+        assert scoped["rows"] and all(str(row[0]) == first_id for row in scoped["rows"])
+
     def test_gr_period_ord_sorts_chronologically(self):
         r = client.post("/api/explore", json={
             "table": "gr_removals", "group_by": ["period_ord", "period"],
