@@ -2047,6 +2047,9 @@ class TestGRTable:
             assert r.status_code == 200
             assert "Google government content-removal requests, via" not in r.text
             assert needle in r.text
+            # The scope="col" a11y attribute must survive localization (regression:
+            # the two-line ja/zh/ko th tuples once stripped it).
+            assert 'th scope="col"' in r.text
 
 
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
