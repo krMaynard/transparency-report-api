@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Report locations · Transparency Report</title>
+<title>Methodology · Transparency Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -209,47 +209,46 @@ display: flex; align-items: center;
     .wrap { padding: 20px 1rem; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
-  .controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 4px; }
-  select, input[type=search] { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 14px; min-width: 130px; }
-  .controls button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 650; cursor: pointer; }
-  .controls button:hover { background: var(--accent-dark); }
-  .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
-  .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
-  .restable th { color: var(--muted); font-weight: 600; }
-  .restable a { color: var(--accent); text-decoration: none; }
+  pre { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px; color: var(--fg); line-height: 1.5; }
+  .toollist { list-style: none; padding: 0; margin: 8px 0 0; }
+  .toollist li { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .toollist li:last-child { border-bottom: 0; }
+  .toollist code { font-family: var(--mono); color: var(--accent); font-size: 14px; }
+  .toollist .desc { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+  .card h2 { margin: 22px 0 4px; }
+  .card h2:first-child { margin-top: 0; }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Aller au contenu</a>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="page-header">
 <nav class="site-nav" aria-label="Site">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Travaux</a>
-      <a href="https://kieranmaynard.com/transparency.html">Produits</a>
-      <a href="https://kieranmaynard.com/consulting.html">Conseil</a>
+      <a href="https://kieranmaynard.com/work.html">Work</a>
+      <a href="https://kieranmaynard.com/transparency.html">Products</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
       <a href="https://kieranmaynard.com/blog.html">Blog</a>
       <a href="https://kieranmaynard.com/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="Langue" title="Langue">
+      <summary class="lang-current" aria-label="Language" title="Language">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>Français</span>
+        <span>English</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/catalog"><span>English</span></a></li>
-        <li><a class="lang-opt" href="/es/catalog"><span>Español</span></a></li>
-        <li><a class="lang-opt is-current" href="/fr/catalog" aria-current="page"><span>Français</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/de/catalog"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/ja/catalog"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/catalog"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/catalog"><span>한국어</span></a></li>
+        <li><a class="lang-opt is-current" href="/methodology" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/es/methodology"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/methodology"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/methodology"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/ja/methodology"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/methodology"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/methodology"><span>한국어</span></a></li>
       </ul>
     </details>
-    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Basculer le mode sombre" aria-pressed="false">
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
     </button>
@@ -260,12 +259,12 @@ display: flex; align-items: center;
 <header class="topbar">
   <div class="topbar-left">
     <button type="button" class="hamburger" id="hamburger"
-            aria-label="Basculer la navigation" aria-expanded="false" aria-controls="sidebar">
+            aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/fr/" class="topbar-brand">Transparency Report API</a>
+    <a href="/" class="topbar-brand">Transparency Report API</a>
   </div>
 </header>
 </div>
@@ -273,82 +272,82 @@ display: flex; align-items: center;
 <div class="app-body">
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
-<aside class="sidebar" id="sidebar" aria-label="Navigation de l’application">
+<aside class="sidebar" id="sidebar" aria-label="Application navigation">
   <nav>
-    <div class="nav-section">Jeux de données</div>
+    <div class="nav-section">Datasets</div>
 
-    <a href="/fr/reports" class="nav-item">
+    <a href="/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
-      Rapports DSA
+      DSA Reports
     </a>
 
-    <a href="/fr/removals" class="nav-item">
+    <a href="/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Retraits gouvernementaux
+      Government Removals
     </a>
 
-    <a href="/fr/catalog" class="nav-item is-active" aria-current="page">
+    <a href="/catalog" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      Emplacements des rapports
+      Report locations
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">Outils</div>
+    <div class="nav-section">Tools</div>
 
-    <a href="/fr/schema" class="nav-item">
+    <a href="/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Schéma
+      Schema
     </a>
 
-    <a href="/fr/methodology" class="nav-item">
+    <a href="/methodology" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
         <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
       </svg>
-      Méthodologie
+      Methodology
     </a>
 
-    <a href="/fr/api-key" class="nav-item">
+    <a href="/api-key" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
       </svg>
-      Clé d’API
+      API key
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      Référence API
+      API Reference
     </a>
 
-    <a href="/fr/mcp" class="nav-item">
+    <a href="/mcp" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
         <rect x="2" y="9" width="12" height="4.5" rx="1"/>
         <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
       </svg>
-      Serveur MCP
+      MCP server
     </a>
 
-    <a href="/fr/privacy" class="nav-item">
+    <a href="/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
-      Confidentialité
+      Privacy
     </a>
 
     <hr class="nav-hr">
@@ -367,7 +366,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Par <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/fr/privacy">Confidentialité</a></div>
+  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -375,135 +374,57 @@ display: flex; align-items: center;
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">Catalogue</span>
-    <h1>Où les plateformes publient leurs rapports</h1>
-    <p>Au-delà des VLOP désignées — où les plateformes en ligne publient leurs rapports de transparence DSA (art. 15/24).</p>
+    <span class="badge">Documentation</span>
+    <h1>Methodology</h1>
+    <p>How this dataset is sourced, processed, and made safe to query — and where its limits are.</p>
   </header>
 
  <main id="main" tabindex="-1">
-  <section class="card" id="locations-card">
-    <p class="sub">Un catalogue organisé indiquant où les plateformes en ligne publient leurs rapports
-      de transparence DSA (art. 15/24) — au-delà des VLOP désignées. Fourni par l'API
-      publique en lecture seule <code>GET /api/report-locations</code>.</p>
-    <div class="controls">
-      <label>Catégorie <select id="rl-category"><option value="">Toutes</option></select></label>
-      <label>Confiance <select id="rl-confidence"><option value="">Toutes</option></select></label>
-      <label>Modèle <select id="rl-template"><option value="">Toutes</option></select></label>
-      <label>Rechercher <input id="rl-q" type="search" placeholder="plateforme, entreprise, URL" /></label>
-      <button id="rl-csv" type="button">Télécharger le CSV</button>
-    </div>
-    <div class="error" id="rl-error" role="alert"></div>
-    <div id="rl-summary" class="sub" aria-live="polite"></div>
-    <div id="rl-out" aria-live="polite" aria-busy="true"></div>
+  <section class="card">
+    <h2>What this is</h2>
+    <p class="sub">This is an <strong>independent, unofficial</strong> aggregation of public transparency-reporting data, not affiliated with any platform, company, or government. It brings two bodies of reporting into one queryable schema:</p>
+    <ul class="toollist">
+      <li><code>EU DSA transparency reports</code><div class="desc">Content-moderation statistics that online platforms publish under the EU Digital Services Act (DSA), following tables 3–11 of the DSA Implementing Regulation template. Covers the designated Very Large Online Platforms &amp; Search Engines (VLOPs / VLOSEs) plus dozens of smaller platforms filing the harmonised template. See the <a href="/reports">DSA Reports</a> dashboard for live counts and the covered period.</div></li>
+      <li><code>Google government removal requests</code><div class="desc">Google's reported counts of government requests to remove content, by country, product, reason, and reporting period. Explore it on the <a href="/removals">Government Removals</a> dashboard.</div></li>
+    </ul>
+    <p class="hint">Where each platform publishes its underlying report is catalogued on the <a href="/catalog">Report locations</a> page, with links to archived copies of the source files.</p>
+
+    <h2>Where the data comes from</h2>
+    <p class="sub">Every figure originates with the platform or company that published it — these are <em>their</em> reported numbers, re-published here verbatim, not estimates produced by this project. The contribution here is <strong>aggregation and structuring</strong>: collecting the individually-published reports, extracting their tables, and normalising them into one schema so they can be compared and queried. Nothing is editorially adjusted; the only transformations are the mechanical extraction and normalisation steps described below.</p>
+
+    <h2>How a report becomes queryable</h2>
+    <p class="sub">Each source report's tables are extracted and loaded into a read-only SQLite <strong>star schema</strong> — one fact table per DSA report table (t3–t11), surrounded by shared dimension tables (services, categories, sections, indicators, scopes, surfaces, reporting periods). Repeated labels are interned to small integer ids, so the same category or platform name is stored once and referenced everywhere. Browse the resulting tables and every queryable field on the <a href="/schema">Schema</a> page.</p>
+
+    <h2>Avoiding double-counting</h2>
+    <p class="sub">The DSA template places an aggregate <strong>total</strong> row right next to the breakdown rows it sums (for example a grand-total “All the entries” category beside the per-category counts, or a “Total number” scope beside the upheld/reversed outcomes). A naïve <code>SUM</code> over such a column counts the parts <em>and</em> their own total, inflating the figure. The loader flags every aggregate row with an <code>is_total</code> marker and exposes it as a filterable dimension, so a query can deliberately pick a single grain — totals only, or breakdown only — and never sum a total together with its components. The dashboard's headline numbers use the reported totals; its breakdown charts use the component rows. Where a figure still carries a caveat, the API returns a <code>warnings</code> note that the dashboard surfaces alongside the result.</p>
+
+    <h2>Reading across languages</h2>
+    <p class="sub">Non-VLOP platforms file the harmonised template in any official EU language, so the same template row arrives as different text (<code>Decisions upheld</code> / <code>Décisions confirmées</code> / <code>Bestätigte Entscheidungen</code>). Each row keeps its original-language label for display, but is also stamped with a language-neutral <strong>canonical key</strong> learned from a crosswalk that aligns same-structure reports to an English reference and <em>drops anything ambiguous</em>. Queries can group or filter on the canonical key to compare like-for-like across languages, while the original text is still shown.</p>
+
+    <h2>How you query it</h2>
+    <p class="sub">There is no SQL interface. A query is a <strong>structured request</strong> — it names a table, a boolean filter of field/operation/value conditions, and optional grouping, aggregates, sorting, and limits. The server validates every field and operation against that table's fixed registry and compiles it into a single parameterised <code>SELECT</code>; user values are always bound, never interpolated. Cross-table “composite” queries join two or more tables on shared dimensions through the same validated boundary. Even the natural-language “Ask” box only <em>proposes</em> a structured query — it is then validated like any other before it runs. Try it on the <a href="/reports">DSA Reports</a> dashboard, or read the <a href="/docs">API reference</a>.</p>
+
+    <h2>Reproducibility &amp; citation</h2>
+    <p class="sub">The database is a static, read-only <strong>snapshot</strong>. Each snapshot carries an immutable <strong>dataset version</strong> token (also sent as an <code>ETag</code> and an <code>X-Dataset-Version</code> header), and every fact row exposes the <code>report_id</code> of its source filing. Citing both — <em>dataset version + report_id</em> — pins the exact rows behind a figure so they can be re-fetched. Query results are emitted in a deterministic order when sorted or paginated, so a saved pull is byte-reproducible. The snapshot's build date and covered period appear in the “Cite as” line on each dashboard and in the headers of every export.</p>
+
+    <h2>Known limitations</h2>
+    <ul class="toollist">
+      <li><code>Snapshot, not live</code><div class="desc">Figures reflect the reports available when the snapshot was built; later corrections or newly-filed reports appear only in a subsequent snapshot (with a new dataset version).</div></li>
+      <li><code>Source quality varies</code><div class="desc">Platforms file with differing rigour and formatting. Mis-parsed junk rows (header cells, blanks, stray values leaked by some extracts) are dropped during loading rather than guessed at.</div></li>
+      <li><code>Some labels stay un-normalised</code><div class="desc">Greek extracts have a column-shift in the source data, so most Greek indicator/scope labels are left correct-but-unmapped rather than risk a wrong mapping; category labels are not crosswalked across languages yet.</div></li>
+      <li><code>Demonstration service</code><div class="desc">This is a portfolio/demo project. It is accurate to its sources, but it is not an official record — always confirm against the platform's own published report (linked from <a href="/catalog">Report locations</a>) for anything consequential.</div></li>
+    </ul>
+
+    <h2>Sources &amp; code</h2>
+    <p class="hint">Built entirely from public reporting. The full pipeline — extraction, normalisation, the crosswalk, and the query layer — is open source at <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">github.com/krMaynard/transparency-report-api</a>. Start exploring: <a href="/reports">DSA Reports</a> · <a href="/removals">Government Removals</a> · <a href="/schema">Schema</a>.</p>
   </section>
  </main>
 
-  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/fr/privacy">Confidentialité</a></footer>
+  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/privacy">Privacy</a></footer>
 </div><!-- /.wrap -->
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
 
-<script>
-const $ = (s) => document.querySelector(s);
-const fmt = (n) => (n ?? 0).toLocaleString();
-// Escape DB/registry values before they go into innerHTML (defence in depth).
-const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
-// Only http(s) or root-relative URLs become links — never `javascript:`/`data:`
-// (defence in depth: the data is curated, but never trust a URL into an href).
-const safeHref = (u) =>
-  (typeof u === "string" && /^(https?:\/\/|\/)/i.test(u)) ? u : "";
-
-function rlParams() {
-  const p = new URLSearchParams();
-  const cat = $("#rl-category").value, conf = $("#rl-confidence").value,
-        tmpl = $("#rl-template").value, q = $("#rl-q").value.trim();
-  if (cat) p.set("category", cat);
-  if (conf) p.set("confidence", conf);
-  if (tmpl) p.set("harmonised_template", tmpl);
-  if (q) p.set("q", q);
-  return p;
-}
-
-let rlAbortController = null;
-
-async function runLocations() {
-  // Abort any in-flight request so a slow earlier response can't overwrite the
-  // results of a newer filter/search (rapid typing or dropdown changes).
-  if (rlAbortController) rlAbortController.abort();
-  rlAbortController = new AbortController();
-  const { signal } = rlAbortController;
-  $("#rl-error").textContent = "";
-  $("#rl-out").setAttribute("aria-busy", "true");
-  const params = rlParams();
-  let d;
-  try {
-    const res = await fetch("/api/report-locations?" + params.toString(), { signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    d = await res.json();
-  } catch (err) {
-    if (err.name === "AbortError") return;  // superseded by a newer request
-    $("#rl-error").textContent = "Impossible de charger le catalogue : " + err.message;
-    $("#rl-out").setAttribute("aria-busy", "false");
-    return;
-  }
-  $("#rl-out").setAttribute("aria-busy", "false");
-  $("#rl-summary").textContent =
-    `Affichage de ${fmt(d.count)} sur ${fmt(d.total)} URL de rapports pour ${fmt(d.platform_count)} plateformes.`;
-  const head = "<tr><th>Plateforme</th><th>Entreprise</th><th>Catégorie</th>" +
-    "<th>Confiance</th><th>Modèle</th><th>Rapport</th><th>Archivé</th></tr>";
-  const body = d.rows.map(r => {
-    const href = safeHref(r.url);
-    const link = href
-      ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
-      : esc(r.url_label || "");
-    // `archived` is one or more (semicolon-separated) GitHub URLs to the file(s)
-    // mirrored in this project's data repo — sanitise + link each separately.
-    const archLink = (r.archived || "").split(";").map(part => {
-      const href = safeHref(part.trim());
-      return href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">GitHub</a>` : "";
-    }).filter(Boolean).join(", ");
-    return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
-      `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
-      `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td><td>${archLink}</td></tr>`;
-  }).join("");
-  $("#rl-out").innerHTML = d.rows.length
-    ? `<table class="restable">${head}${body}</table>`
-    : "<p class='sub'>Aucune plateforme correspondante.</p>";
-}
-
-async function setupLocations() {
-  let d;
-  try {
-    const res = await fetch("/api/report-locations");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    d = await res.json();
-  } catch (err) {
-    $("#rl-error").textContent = "Impossible de charger le catalogue : " + err.message;
-    $("#rl-out").setAttribute("aria-busy", "false");
-    return;
-  }
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  const facets = d?.facets || {};
-  $("#rl-category").insertAdjacentHTML("beforeend", (facets.category || []).map(opt).join(""));
-  $("#rl-confidence").insertAdjacentHTML("beforeend", (facets.confidence || []).map(opt).join(""));
-  $("#rl-template").insertAdjacentHTML("beforeend", (facets.harmonised_template || []).map(opt).join(""));
-  ["#rl-category", "#rl-confidence", "#rl-template"].forEach(s => $(s).addEventListener("change", runLocations));
-  // Debounce the free-text search so we don't fire a request per keystroke.
-  let t = null;
-  $("#rl-q").addEventListener("input", () => {
-    if (t) clearTimeout(t);
-    t = setTimeout(runLocations, 250);
-  });
-  $("#rl-csv").addEventListener("click", () => {
-    const p = rlParams(); p.set("format", "csv");
-    window.open("/api/report-locations?" + p.toString(), "_blank");
-  });
-  runLocations();
-}
-
-document.addEventListener("DOMContentLoaded", setupLocations);
-</script>
 <script>
   // Hamburger — mobile sidebar toggle
   (function () {

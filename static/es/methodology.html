@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="fr">
+<html lang="es">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Report locations · Transparency Report</title>
+<title>Methodology · Transparency Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -209,47 +209,46 @@ display: flex; align-items: center;
     .wrap { padding: 20px 1rem; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
-  .controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--muted); gap: 4px; }
-  select, input[type=search] { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 14px; min-width: 130px; }
-  .controls button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 650; cursor: pointer; }
-  .controls button:hover { background: var(--accent-dark); }
-  .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
-  .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
-  .restable th { color: var(--muted); font-weight: 600; }
-  .restable a { color: var(--accent); text-decoration: none; }
+  pre { background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; overflow-x: auto; font-family: var(--mono); font-size: 13px; color: var(--fg); line-height: 1.5; }
+  .toollist { list-style: none; padding: 0; margin: 8px 0 0; }
+  .toollist li { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .toollist li:last-child { border-bottom: 0; }
+  .toollist code { font-family: var(--mono); color: var(--accent); font-size: 14px; }
+  .toollist .desc { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+  .card h2 { margin: 22px 0 4px; }
+  .card h2:first-child { margin-top: 0; }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Aller au contenu</a>
+<a class="skip-link" href="#main">Saltar al contenido</a>
 <div class="page-header">
-<nav class="site-nav" aria-label="Site">
+<nav class="site-nav" aria-label="Sitio">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Travaux</a>
-      <a href="https://kieranmaynard.com/transparency.html">Produits</a>
-      <a href="https://kieranmaynard.com/consulting.html">Conseil</a>
+      <a href="https://kieranmaynard.com/work.html">Trabajo</a>
+      <a href="https://kieranmaynard.com/transparency.html">Productos</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consultoría</a>
       <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+      <a href="https://kieranmaynard.com/contact.html">Contacto</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="Langue" title="Langue">
+      <summary class="lang-current" aria-label="Idioma" title="Idioma">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>Français</span>
+        <span>Español</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/catalog"><span>English</span></a></li>
-        <li><a class="lang-opt" href="/es/catalog"><span>Español</span></a></li>
-        <li><a class="lang-opt is-current" href="/fr/catalog" aria-current="page"><span>Français</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/de/catalog"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/ja/catalog"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/catalog"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/catalog"><span>한국어</span></a></li>
+        <li><a class="lang-opt" href="/methodology"><span>English</span></a></li>
+        <li><a class="lang-opt is-current" href="/es/methodology" aria-current="page"><span>Español</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/fr/methodology"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/methodology"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/ja/methodology"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/methodology"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/methodology"><span>한국어</span></a></li>
       </ul>
     </details>
-    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Basculer le mode sombre" aria-pressed="false">
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Alternar modo oscuro" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
     </button>
@@ -260,12 +259,12 @@ display: flex; align-items: center;
 <header class="topbar">
   <div class="topbar-left">
     <button type="button" class="hamburger" id="hamburger"
-            aria-label="Basculer la navigation" aria-expanded="false" aria-controls="sidebar">
+            aria-label="Alternar navegación" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/fr/" class="topbar-brand">Transparency Report API</a>
+    <a href="/es/" class="topbar-brand">Transparency Report API</a>
   </div>
 </header>
 </div>
@@ -273,82 +272,82 @@ display: flex; align-items: center;
 <div class="app-body">
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
-<aside class="sidebar" id="sidebar" aria-label="Navigation de l’application">
+<aside class="sidebar" id="sidebar" aria-label="Navegación de la aplicación">
   <nav>
-    <div class="nav-section">Jeux de données</div>
+    <div class="nav-section">Conjuntos de datos</div>
 
-    <a href="/fr/reports" class="nav-item">
+    <a href="/es/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
-      Rapports DSA
+      Informes DSA
     </a>
 
-    <a href="/fr/removals" class="nav-item">
+    <a href="/es/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Retraits gouvernementaux
+      Retiradas gubernamentales
     </a>
 
-    <a href="/fr/catalog" class="nav-item is-active" aria-current="page">
+    <a href="/es/catalog" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      Emplacements des rapports
+      Ubicaciones de informes
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">Outils</div>
+    <div class="nav-section">Herramientas</div>
 
-    <a href="/fr/schema" class="nav-item">
+    <a href="/es/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      Schéma
+      Esquema
     </a>
 
-    <a href="/fr/methodology" class="nav-item">
+    <a href="/es/methodology" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
         <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
       </svg>
-      Méthodologie
+      Metodología
     </a>
 
-    <a href="/fr/api-key" class="nav-item">
+    <a href="/es/api-key" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
       </svg>
-      Clé d’API
+      Clave de API
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      Référence API
+      Referencia de la API
     </a>
 
-    <a href="/fr/mcp" class="nav-item">
+    <a href="/es/mcp" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
         <rect x="2" y="9" width="12" height="4.5" rx="1"/>
         <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
       </svg>
-      Serveur MCP
+      Servidor MCP
     </a>
 
-    <a href="/fr/privacy" class="nav-item">
+    <a href="/es/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
-      Confidentialité
+      Privacidad
     </a>
 
     <hr class="nav-hr">
@@ -367,7 +366,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Par <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/fr/privacy">Confidentialité</a></div>
+  <div class="sidebar-footer">Por <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/es/privacy">Privacidad</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -375,135 +374,57 @@ display: flex; align-items: center;
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">Catalogue</span>
-    <h1>Où les plateformes publient leurs rapports</h1>
-    <p>Au-delà des VLOP désignées — où les plateformes en ligne publient leurs rapports de transparence DSA (art. 15/24).</p>
+    <span class="badge">Documentación</span>
+    <h1>Metodología</h1>
+    <p>Cómo se obtiene, se procesa y se hace seguro para consultar este conjunto de datos, y dónde están sus límites.</p>
   </header>
 
  <main id="main" tabindex="-1">
-  <section class="card" id="locations-card">
-    <p class="sub">Un catalogue organisé indiquant où les plateformes en ligne publient leurs rapports
-      de transparence DSA (art. 15/24) — au-delà des VLOP désignées. Fourni par l'API
-      publique en lecture seule <code>GET /api/report-locations</code>.</p>
-    <div class="controls">
-      <label>Catégorie <select id="rl-category"><option value="">Toutes</option></select></label>
-      <label>Confiance <select id="rl-confidence"><option value="">Toutes</option></select></label>
-      <label>Modèle <select id="rl-template"><option value="">Toutes</option></select></label>
-      <label>Rechercher <input id="rl-q" type="search" placeholder="plateforme, entreprise, URL" /></label>
-      <button id="rl-csv" type="button">Télécharger le CSV</button>
-    </div>
-    <div class="error" id="rl-error" role="alert"></div>
-    <div id="rl-summary" class="sub" aria-live="polite"></div>
-    <div id="rl-out" aria-live="polite" aria-busy="true"></div>
+  <section class="card">
+    <h2>Qué es esto</h2>
+    <p class="sub">Se trata de una agregación <strong>independiente y no oficial</strong> de datos públicos de informes de transparencia, sin afiliación con ninguna plataforma, empresa ni gobierno. Reúne dos cuerpos de información en un único esquema consultable:</p>
+    <ul class="toollist">
+      <li><code>Informes de transparencia DSA de la UE</code><div class="desc">Estadísticas de moderación de contenido que las plataformas en línea publican en virtud de la Ley de Servicios Digitales (DSA) de la UE, siguiendo las tablas 3–11 de la plantilla del Reglamento de Ejecución del DSA. Abarca las Plataformas en Línea de Muy Gran Tamaño y los Motores de Búsqueda designados (VLOPs / VLOSEs), además de decenas de plataformas más pequeñas que presentan la plantilla armonizada. Consulta el panel de <a href="/es/reports">Informes DSA</a> para ver recuentos en directo y el periodo cubierto.</div></li>
+      <li><code>Solicitudes gubernamentales de retirada de Google</code><div class="desc">Los recuentos que Google declara de solicitudes gubernamentales para retirar contenido, por país, producto, motivo y periodo de informe. Explóralos en el panel de <a href="/es/removals">Retiradas gubernamentales</a>.</div></li>
+    </ul>
+    <p class="hint">El lugar donde cada plataforma publica su informe subyacente está catalogado en la página de <a href="/es/catalog">Ubicaciones de informes</a>, con enlaces a copias archivadas de los archivos de origen.</p>
+
+    <h2>De dónde proceden los datos</h2>
+    <p class="sub">Cada cifra tiene su origen en la plataforma o empresa que la publicó: son <em>sus</em> cifras declaradas, vueltas a publicar aquí de forma literal, no estimaciones generadas por este proyecto. La aportación de este proyecto es la <strong>agregación y la estructuración</strong>: recopilar los informes publicados individualmente, extraer sus tablas y normalizarlas en un único esquema para que puedan compararse y consultarse. Nada se ajusta editorialmente; las únicas transformaciones son los pasos mecánicos de extracción y normalización que se describen a continuación.</p>
+
+    <h2>Cómo un informe se vuelve consultable</h2>
+    <p class="sub">Las tablas de cada informe de origen se extraen y se cargan en un <strong>esquema en estrella</strong> SQLite de solo lectura: una tabla de hechos por cada tabla de informe DSA (t3–t11), rodeada de tablas de dimensiones compartidas (servicios, categorías, secciones, indicadores, ámbitos, superficies, periodos de informe). Las etiquetas repetidas se internan como pequeños identificadores enteros, de modo que el mismo nombre de categoría o de plataforma se almacena una vez y se referencia en todas partes. Explora las tablas resultantes y todos los campos consultables en la página de <a href="/es/schema">Esquema</a>.</p>
+
+    <h2>Cómo se evita la doble contabilización</h2>
+    <p class="sub">La plantilla del DSA coloca una fila de <strong>total</strong> agregado justo al lado de las filas de desglose que suma (por ejemplo, una categoría de total general “All the entries” junto a los recuentos por categoría, o un ámbito “Total number” junto a los resultados confirmados/revocados). Un <code>SUM</code> ingenuo sobre una columna así cuenta las partes <em>y</em> su propio total, inflando la cifra. El cargador marca cada fila agregada con un indicador <code>is_total</code> y la expone como una dimensión filtrable, de modo que una consulta puede elegir deliberadamente un único nivel de detalle —solo los totales, o solo el desglose— y nunca sumar un total junto con sus componentes. Las cifras principales del panel utilizan los totales declarados; sus gráficos de desglose utilizan las filas de los componentes. Cuando una cifra sigue llevando una salvedad, la API devuelve una nota de <code>warnings</code> que el panel muestra junto al resultado.</p>
+
+    <h2>Lectura entre distintos idiomas</h2>
+    <p class="sub">Las plataformas que no son VLOP presentan la plantilla armonizada en cualquier lengua oficial de la UE, por lo que la misma fila de la plantilla llega como un texto distinto (<code>Decisions upheld</code> / <code>Décisions confirmées</code> / <code>Bestätigte Entscheidungen</code>). Cada fila conserva su etiqueta en el idioma original para mostrarla, pero también se le estampa una <strong>clave canónica</strong> independiente del idioma, obtenida a partir de una tabla de equivalencias que alinea informes de la misma estructura con una referencia en inglés y <em>descarta todo lo que sea ambiguo</em>. Las consultas pueden agrupar o filtrar por la clave canónica para comparar elementos equivalentes entre idiomas, sin dejar de mostrar el texto original.</p>
+
+    <h2>Cómo se consulta</h2>
+    <p class="sub">No hay interfaz SQL. Una consulta es una <strong>solicitud estructurada</strong>: nombra una tabla, un filtro booleano de condiciones de campo/operación/valor y, opcionalmente, agrupación, agregados, ordenación y límites. El servidor valida cada campo y operación contra el registro fijo de esa tabla y lo compila en un único <code>SELECT</code> parametrizado; los valores del usuario siempre se vinculan, nunca se interpolan. Las consultas “compuestas” entre tablas unen dos o más tablas por dimensiones compartidas a través de esa misma frontera validada. Incluso el cuadro de “Preguntar” en lenguaje natural solo <em>propone</em> una consulta estructurada, que luego se valida como cualquier otra antes de ejecutarse. Pruébalo en el panel de <a href="/es/reports">Informes DSA</a>, o lee la <a href="/docs">Referencia de la API</a>.</p>
+
+    <h2>Reproducibilidad y citación</h2>
+    <p class="sub">La base de datos es una <strong>instantánea</strong> estática y de solo lectura. Cada instantánea lleva un token inmutable de <strong>versión del conjunto de datos</strong> (que también se envía como un <code>ETag</code> y una cabecera <code>X-Dataset-Version</code>), y cada fila de hechos expone el <code>report_id</code> del informe de origen. Citar ambos —<em>versión del conjunto de datos + report_id</em>— fija las filas exactas que respaldan una cifra para que puedan volver a obtenerse. Los resultados de las consultas se emiten en un orden determinista cuando se ordenan o se paginan, de modo que una extracción guardada es reproducible byte a byte. La fecha de compilación de la instantánea y el periodo cubierto aparecen en la línea “Cómo citar” de cada panel y en las cabeceras de cada exportación.</p>
+
+    <h2>Limitaciones conocidas</h2>
+    <ul class="toollist">
+      <li><code>Instantánea, no datos en directo</code><div class="desc">Las cifras reflejan los informes disponibles cuando se construyó la instantánea; las correcciones posteriores o los informes recién presentados solo aparecen en una instantánea posterior (con una nueva versión del conjunto de datos).</div></li>
+      <li><code>La calidad de las fuentes varía</code><div class="desc">Las plataformas presentan sus informes con distinto rigor y formato. Las filas basura mal interpretadas (celdas de encabezado, espacios en blanco, valores sueltos filtrados por algunas extracciones) se descartan durante la carga en lugar de adivinarse.</div></li>
+      <li><code>Algunas etiquetas quedan sin normalizar</code><div class="desc">Las extracciones en griego presentan un desplazamiento de columnas en los datos de origen, por lo que la mayoría de las etiquetas griegas de indicador/ámbito se dejan correctas pero sin mapear en lugar de arriesgar un mapeo erróneo; las etiquetas de categoría todavía no se han cruzado entre idiomas.</div></li>
+      <li><code>Servicio de demostración</code><div class="desc">Este es un proyecto de portafolio/demostración. Es fiel a sus fuentes, pero no es un registro oficial: confirma siempre con el informe publicado por la propia plataforma (enlazado desde <a href="/es/catalog">Ubicaciones de informes</a>) para cualquier asunto de importancia.</div></li>
+    </ul>
+
+    <h2>Fuentes y código</h2>
+    <p class="hint">Construido enteramente a partir de información pública. Todo el flujo de procesamiento —extracción, normalización, la tabla de equivalencias y la capa de consulta— es de código abierto en <a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">github.com/krMaynard/transparency-report-api</a>. Empieza a explorar: <a href="/es/reports">Informes DSA</a> · <a href="/es/removals">Retiradas gubernamentales</a> · <a href="/es/schema">Esquema</a>.</p>
   </section>
  </main>
 
-  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/fr/privacy">Confidentialité</a></footer>
+  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/es/privacy">Privacidad</a></footer>
 </div><!-- /.wrap -->
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
 
-<script>
-const $ = (s) => document.querySelector(s);
-const fmt = (n) => (n ?? 0).toLocaleString();
-// Escape DB/registry values before they go into innerHTML (defence in depth).
-const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
-// Only http(s) or root-relative URLs become links — never `javascript:`/`data:`
-// (defence in depth: the data is curated, but never trust a URL into an href).
-const safeHref = (u) =>
-  (typeof u === "string" && /^(https?:\/\/|\/)/i.test(u)) ? u : "";
-
-function rlParams() {
-  const p = new URLSearchParams();
-  const cat = $("#rl-category").value, conf = $("#rl-confidence").value,
-        tmpl = $("#rl-template").value, q = $("#rl-q").value.trim();
-  if (cat) p.set("category", cat);
-  if (conf) p.set("confidence", conf);
-  if (tmpl) p.set("harmonised_template", tmpl);
-  if (q) p.set("q", q);
-  return p;
-}
-
-let rlAbortController = null;
-
-async function runLocations() {
-  // Abort any in-flight request so a slow earlier response can't overwrite the
-  // results of a newer filter/search (rapid typing or dropdown changes).
-  if (rlAbortController) rlAbortController.abort();
-  rlAbortController = new AbortController();
-  const { signal } = rlAbortController;
-  $("#rl-error").textContent = "";
-  $("#rl-out").setAttribute("aria-busy", "true");
-  const params = rlParams();
-  let d;
-  try {
-    const res = await fetch("/api/report-locations?" + params.toString(), { signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    d = await res.json();
-  } catch (err) {
-    if (err.name === "AbortError") return;  // superseded by a newer request
-    $("#rl-error").textContent = "Impossible de charger le catalogue : " + err.message;
-    $("#rl-out").setAttribute("aria-busy", "false");
-    return;
-  }
-  $("#rl-out").setAttribute("aria-busy", "false");
-  $("#rl-summary").textContent =
-    `Affichage de ${fmt(d.count)} sur ${fmt(d.total)} URL de rapports pour ${fmt(d.platform_count)} plateformes.`;
-  const head = "<tr><th>Plateforme</th><th>Entreprise</th><th>Catégorie</th>" +
-    "<th>Confiance</th><th>Modèle</th><th>Rapport</th><th>Archivé</th></tr>";
-  const body = d.rows.map(r => {
-    const href = safeHref(r.url);
-    const link = href
-      ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">${esc(r.url_label || "Report")}</a>`
-      : esc(r.url_label || "");
-    // `archived` is one or more (semicolon-separated) GitHub URLs to the file(s)
-    // mirrored in this project's data repo — sanitise + link each separately.
-    const archLink = (r.archived || "").split(";").map(part => {
-      const href = safeHref(part.trim());
-      return href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer">GitHub</a>` : "";
-    }).filter(Boolean).join(", ");
-    return `<tr><td>${esc(r.platform)}</td><td>${esc(r.company || "")}</td>` +
-      `<td>${esc(r.category)}</td><td>${esc(r.confidence)}</td>` +
-      `<td>${esc(r.harmonised_template || "")}</td><td>${link}</td><td>${archLink}</td></tr>`;
-  }).join("");
-  $("#rl-out").innerHTML = d.rows.length
-    ? `<table class="restable">${head}${body}</table>`
-    : "<p class='sub'>Aucune plateforme correspondante.</p>";
-}
-
-async function setupLocations() {
-  let d;
-  try {
-    const res = await fetch("/api/report-locations");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    d = await res.json();
-  } catch (err) {
-    $("#rl-error").textContent = "Impossible de charger le catalogue : " + err.message;
-    $("#rl-out").setAttribute("aria-busy", "false");
-    return;
-  }
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  const facets = d?.facets || {};
-  $("#rl-category").insertAdjacentHTML("beforeend", (facets.category || []).map(opt).join(""));
-  $("#rl-confidence").insertAdjacentHTML("beforeend", (facets.confidence || []).map(opt).join(""));
-  $("#rl-template").insertAdjacentHTML("beforeend", (facets.harmonised_template || []).map(opt).join(""));
-  ["#rl-category", "#rl-confidence", "#rl-template"].forEach(s => $(s).addEventListener("change", runLocations));
-  // Debounce the free-text search so we don't fire a request per keystroke.
-  let t = null;
-  $("#rl-q").addEventListener("input", () => {
-    if (t) clearTimeout(t);
-    t = setTimeout(runLocations, 250);
-  });
-  $("#rl-csv").addEventListener("click", () => {
-    const p = rlParams(); p.set("format", "csv");
-    window.open("/api/report-locations?" + p.toString(), "_blank");
-  });
-  runLocations();
-}
-
-document.addEventListener("DOMContentLoaded", setupLocations);
-</script>
 <script>
   // Hamburger — mobile sidebar toggle
   (function () {
