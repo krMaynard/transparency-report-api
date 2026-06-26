@@ -725,7 +725,7 @@ async function load() {
   if (d.period) $("#period").textContent = `보고 기간 ${fmtPeriod(d.period)} · 지정된 VLOP 및 VLOSE ${d.services}곳에 더해 EU 표준 템플릿을 제출하는 비VLOP 플랫폼 ${d.nonvlop_filers}곳.`;
   if (d.generated) {
     $("#prov-snap").textContent = d.generated + (d.period ? ` (${fmtPeriod(d.period)})` : "");
-    $("#prov-cite").textContent = `“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`;
+    $("#prov-cite").textContent = `“EU DSA VLOP 투명성 보고서, Transparency Report API 경유 (${d.generated} 스냅샷${d.version ? `, 데이터셋 버전 ${d.version}` : ""}).”`;
     $("#provenance").hidden = false;
   }
   $("#stats").innerHTML =

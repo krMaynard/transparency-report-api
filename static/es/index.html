@@ -725,7 +725,7 @@ async function load() {
   if (d.period) $("#period").textContent = `Período de referencia ${fmtPeriod(d.period)} · ${d.services} VLOP y VLOSE designados, más ${d.nonvlop_filers} plataformas no VLOP que presentan la plantilla armonizada de la UE.`;
   if (d.generated) {
     $("#prov-snap").textContent = d.generated + (d.period ? ` (${fmtPeriod(d.period)})` : "");
-    $("#prov-cite").textContent = `“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`;
+    $("#prov-cite").textContent = `“Informes de transparencia VLOP de la DSA de la UE, vía la Transparency Report API (instantánea de ${d.generated}${d.version ? `, versión del conjunto de datos ${d.version}` : ""}).”`;
     $("#provenance").hidden = false;
   }
   $("#stats").innerHTML =
