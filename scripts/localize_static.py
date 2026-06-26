@@ -498,6 +498,7 @@ PAGES["es"]["index.html"] = [
     ('''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
      '''v.toLocaleString('es-ES', { maximumSignificantDigits: 4 })'''),
     ('`“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`', '`“Informes de transparencia VLOP de la DSA de la UE, vía la Transparency Report API (instantánea de ${d.generated}${d.version ? `, versión del conjunto de datos ${d.version}` : ""}).”`'),
+    ('<th class="num">Total</th>', '<th class="num">Total</th>'),
 ]
 
 PAGES["fr"]["index.html"] = [
@@ -689,6 +690,7 @@ PAGES["fr"]["index.html"] = [
     ('''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
      '''v.toLocaleString('fr-FR', { maximumSignificantDigits: 4 })'''),
     ('`“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`', '`“Rapports de transparence VLOP au titre du DSA de l’UE, via la Transparency Report API (instantané du ${d.generated}${d.version ? `, version du jeu de données ${d.version}` : ""}).”`'),
+    ('<th class="num">Total</th>', '<th class="num">Total</th>'),
 ]
 
 PAGES["de"]["index.html"] = [
@@ -880,6 +882,7 @@ PAGES["de"]["index.html"] = [
     ('''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
      '''v.toLocaleString('de-DE', { maximumSignificantDigits: 4 })'''),
     ('`“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`', '`“VLOP-Transparenzberichte nach EU-DSA, über die Transparency Report API (Momentaufnahme vom ${d.generated}${d.version ? `, Datensatzversion ${d.version}` : ""}).”`'),
+    ('<th class="num">Total</th>', '<th class="num">Gesamt</th>'),
 ]
 
 PAGES["es"]["removals.html"] = [
@@ -2040,6 +2043,7 @@ PAGES["ja"]["index.html"] = [
     (r'''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
      r'''v.toLocaleString('ja-JP', { maximumSignificantDigits: 4 })'''),
     ('`“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`', '`“EU DSA VLOP 透明性報告書（Transparency Report API 経由、${d.generated} のスナップショット${d.version ? `、データセットバージョン ${d.version}` : ""}）。”`'),
+    ('<th class="num">Total</th>', '<th class="num">合計</th>'),
 ]
 PAGES["ja"]["removals.html"] = [
     (r'''>Download CSV</button>''', r'''>CSV をダウンロード</button>'''),
@@ -2777,6 +2781,7 @@ PAGES["zh"]["index.html"] = [
     (r'''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
      r'''v.toLocaleString('zh-CN', { maximumSignificantDigits: 4 })'''),
     ('`“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`', '`“欧盟 DSA VLOP 透明度报告，经由 Transparency Report API（${d.generated} 快照${d.version ? `，数据集版本 ${d.version}` : ""}）。”`'),
+    ('<th class="num">Total</th>', '<th class="num">总计</th>'),
 ]
 PAGES["zh"]["removals.html"] = [
     (r'''>Download CSV</button>''', r'''>下载 CSV</button>'''),
@@ -3515,6 +3520,7 @@ PAGES["ko"]["index.html"] = [
     (r'''v.toLocaleString(undefined, { maximumSignificantDigits: 4 })''',
      r'''v.toLocaleString('ko-KR', { maximumSignificantDigits: 4 })'''),
     ('`“EU DSA VLOP transparency reports, via the Transparency Report API (${d.generated} snapshot${d.version ? `, dataset version ${d.version}` : ""}).”`', '`“EU DSA VLOP 투명성 보고서, Transparency Report API 경유 (${d.generated} 스냅샷${d.version ? `, 데이터셋 버전 ${d.version}` : ""}).”`'),
+    ('<th class="num">Total</th>', '<th class="num">합계</th>'),
 ]
 PAGES["ko"]["removals.html"] = [
     (r'''>Download CSV</button>''', r'''>CSV 다운로드</button>'''),

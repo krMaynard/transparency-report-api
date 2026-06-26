@@ -1293,6 +1293,13 @@ class TestDashboard:
         r = client.get("/reports")
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "/api/overview" in r.text  # dashboard fetches the public overview
+        # The curated tabs must pin a single grain so a SUM never mixes incompatible
+        # indicators / overlapping taxonomies (regression guard for the data fixes).
+        assert "Number of measures solely taken by automated means" in r.text  # t8 Automated
+        assert "Number of internal moderators employed by the provider" in r.text  # t9 moderators
+        assert "STATEMENT_CATEGORY_ILLEGAL_OR_HARMFUL_SPEECH" in r.text  # t4 by-category breakdown
+        # The tab strip is a complete ARIA tab pattern.
+        assert 'role="tablist"' in r.text and 'aria-selected' in r.text
 
     def test_methodology_page_served(self):
         r = client.get("/methodology")

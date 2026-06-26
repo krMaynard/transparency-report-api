@@ -245,6 +245,9 @@
     background: var(--panel2); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
     overflow-x: auto; font-family: var(--mono); font-size: 12.5px; color: var(--accent2); margin: 10px 0 0;
   }
+  /* Result tables can be wide (composite/Compare panels); let each result region
+     scroll horizontally on narrow screens instead of overflowing the page. */
+  #tab-fallback, #tab-secondary, #ex-out, #cmp-out, #ask-out { overflow-x: auto; }
   .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
   .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
   .restable th { color: var(--muted); font-weight: 600; }
@@ -550,8 +553,8 @@
     <div class="tabs-head">
       <p class="tabs-eyebrow">Browse by DSA report table</p>
       <div class="scope-seg" id="scope-seg" role="group" aria-label="Data scope">
-        <button type="button" class="on" data-scope="vlop">VLOPs only</button>
-        <button type="button" data-scope="all">Include non-VLOP filers</button>
+        <button type="button" class="on" data-scope="vlop" aria-pressed="true">VLOPs only</button>
+        <button type="button" data-scope="all" aria-pressed="false">Include non-VLOP filers</button>
       </div>
       <p class="scope-warn" id="scope-warn" role="status" hidden>Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.</p>
     </div>
@@ -564,6 +567,7 @@
       <canvas id="tab-chart" height="150" aria-hidden="true"></canvas>
       <div id="tab-fallback" aria-live="polite"><p class="loading">Loading…</p></div>
       <div id="tab-secondary"></div>
+      <div id="tab-warn"></div>
       <details class="qjson"><summary>Query JSON (run it via the API)</summary><pre id="tab-json"></pre></details>
     </div>
   </section>
@@ -751,6 +755,31 @@ const CAT_LEAF    = { operation: "EQ", field_name: "category_is_total", field_va
 // reports filed in other EU languages, not just the English string.
 const APPEALS_IND = { operation: "EQ", field_name: "indicator_key",
   field_values: ["Number of complaints submitted to the internal-complaints mechanism"] };
+// t8 mixes "solely automated", "not automated", and accuracy/precision/recall at the
+// total scope — pin the single indicator the tab claims so the SUM isn't the inverse.
+const AUTOMATED_IND = { operation: "EQ", field_name: "indicator_key",
+  field_values: ["Number of measures solely taken by automated means"] };
+// t9's total scope also carries a "linguistic expertise" indicator that overlaps the
+// headcount — pin internal + external moderators only (the two disjoint headcounts).
+const MODERATOR_IND = { operation: "IN", field_name: "indicator_key",
+  field_values: ["Number of internal moderators employed by the provider",
+                 "Number of external moderators contracted by the provider"] };
+// t4 carries two overlapping category taxonomies (STATEMENT_CATEGORY_* and the finer
+// KEYWORD_*), both with category_is_total=0 — restrict the breakdown to the primary
+// statement taxonomy so the bars don't sum a parent together with its own children
+// (mirrors _compute_overview's STATEMENT-only by_category logic).
+const STATEMENT_CATS = { operation: "IN", field_name: "category_code", field_values: [
+  "STATEMENT_CATEGORY_ANIMAL_WELFARE", "STATEMENT_CATEGORY_CONSUMER_INFORMATION",
+  "STATEMENT_CATEGORY_CYBER_VIOLENCE", "STATEMENT_CATEGORY_CYBER_VIOLENCE_AGAINST_WOMEN",
+  "STATEMENT_CATEGORY_DATA_PROTECTION_AND_PRIVACY_VIOLATIONS",
+  "STATEMENT_CATEGORY_ILLEGAL_OR_HARMFUL_SPEECH",
+  "STATEMENT_CATEGORY_INTELLECTUAL_PROPERTY_INFRINGEMENTS",
+  "STATEMENT_CATEGORY_NEGATIVE_EFFECTS_ON_CIVIC_DISCOURSE_OR_ELECTIONS",
+  "STATEMENT_CATEGORY_NOT_SPECIFIED_NOTICE", "STATEMENT_CATEGORY_NOT_SPECIFIED_ORDER",
+  "STATEMENT_CATEGORY_OTHER_ILLEGAL", "STATEMENT_CATEGORY_OTHER_VIOLATION_TC",
+  "STATEMENT_CATEGORY_PROTECTION_OF_MINORS", "STATEMENT_CATEGORY_RISK_FOR_PUBLIC_SECURITY",
+  "STATEMENT_CATEGORY_SCAMS_AND_FRAUD", "STATEMENT_CATEGORY_SELF_HARM",
+  "STATEMENT_CATEGORY_UNSAFE_AND_PROHIBITED_PRODUCTS", "STATEMENT_CATEGORY_VIOLENCE"] };
 const WARN_SVG = '<svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="#d29922" stroke-width="1.4" stroke-linecap="round"><path d="M8 1.7l6.5 12H1.5L8 1.7z"/><path d="M8 6.3v3.4M8 11.8v.05"/></svg>';
 
 const TABS = [
@@ -758,7 +787,7 @@ const TABS = [
     sub: "Total notices of allegedly illegal content received (DSA Table 4).",
     table: "t4_notices", measure: "notices", valueLabel: "Notices", color: "blue",
     filters: [CAT_TOTAL],
-    secondary: { group: "category_label", measure: "notices", label: "By content category", filters: [CAT_LEAF] } },
+    secondary: { group: "category_label", measure: "notices", label: "By content category", filters: [STATEMENT_CATS] } },
   { tab: "Own-initiative", title: "Own-initiative moderation actions",
     sub: "Proactive measures taken without a notice, split by legal basis — illegal content (DSA Table 5) and terms-of-service violations (DSA Table 6).",
     composite: { measure: "measures", legs: [
@@ -779,11 +808,11 @@ const TABS = [
     sub: "Moderation actions taken by automated means, “Total number” scope (DSA Table 8).",
     note: "Shown for one scope at a time; accuracy / precision / recall are separate indicators, never summed in.",
     table: "t8_automated_means", measure: "value", valueLabel: "Actions", color: "amber",
-    filters: [SCOPE_TOTAL] },
+    filters: [SCOPE_TOTAL, AUTOMATED_IND] },
   { tab: "Human resources", title: "Content moderators",
     sub: "Internal and external content moderators employed, “Total number” scope (DSA Table 9).",
     table: "t9_human_resources", measure: "value", valueLabel: "Moderators", color: "amber",
-    filters: [SCOPE_TOTAL] },
+    filters: [SCOPE_TOTAL, MODERATOR_IND] },
   { tab: "User reach", title: "Average monthly active recipients (AMAR)",
     sub: "EU-wide average monthly active recipients per service (DSA Table 10).",
     table: "t10_amar", measure: "value", valueLabel: "AMAR (EU)", color: "blue",
@@ -866,6 +895,7 @@ async function renderTab(tab) {
   else noteEl.classList.add("hidden");
   $("#tab-error").textContent = "";
   $("#tab-secondary").innerHTML = "";
+  $("#tab-warn").innerHTML = "";
   $("#tab-fallback").classList.remove("sr-only");
   $("#tab-fallback").innerHTML = "<p class='loading'>Loading…</p>";
   const q = buildTabQuery(tab);
@@ -881,6 +911,9 @@ async function renderTab(tab) {
     return;
   }
   if (currentTab !== tab) return;  // a newer tab/scope click superseded this fetch
+  // Surface the API's per-query advisories (cross-tier comparability, etc.) on the
+  // curated tabs too — not just in the Explore/Compare/Ask panels.
+  $("#tab-warn").innerHTML = warnNote(d);
   if (tab.qual) { renderQual(d); return; }
   if (tab.composite) {
     const idx = {};
@@ -955,19 +988,46 @@ async function renderSecondary(tab) {
 
 function setupTabs() {
   const strip = $("#tabstrip");
+  const panel = $("#tab-panel");
+  panel.setAttribute("role", "tabpanel");
+  const buttons = [];
+  // Select a tab and keep the full ARIA tab pattern in sync (aria-selected +
+  // roving tabindex + the panel's aria-labelledby).
+  function select(i, moveFocus) {
+    const t = TABS[i];
+    buttons.forEach((x, k) => {
+      const on = k === i;
+      x.classList.toggle("on", on);
+      x.setAttribute("aria-selected", on ? "true" : "false");
+      x.tabIndex = on ? 0 : -1;
+    });
+    panel.setAttribute("aria-labelledby", buttons[i].id);
+    currentTab = t; renderTab(t);
+    if (moveFocus) buttons[i].focus();
+  }
   TABS.forEach((t, i) => {
     const b = document.createElement("button");
-    b.textContent = t.tab; b.setAttribute("role", "tab");
+    b.textContent = t.tab; b.setAttribute("role", "tab"); b.id = "tab-btn-" + i;
+    b.setAttribute("aria-selected", i === 0 ? "true" : "false");
+    b.tabIndex = i === 0 ? 0 : -1;
     if (i === 0) b.classList.add("on");
-    b.addEventListener("click", () => {
-      [...strip.children].forEach(c => c.classList.remove("on"));
-      b.classList.add("on"); currentTab = t; renderTab(t);
+    b.addEventListener("click", () => select(i, false));
+    b.addEventListener("keydown", (e) => {
+      let j = -1;
+      if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % TABS.length;
+      else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = (i - 1 + TABS.length) % TABS.length;
+      else if (e.key === "Home") j = 0;
+      else if (e.key === "End") j = TABS.length - 1;
+      if (j >= 0) { e.preventDefault(); select(j, true); }
     });
-    strip.appendChild(b);
+    buttons.push(b); strip.appendChild(b);
   });
+  panel.setAttribute("aria-labelledby", buttons[0].id);
   $("#scope-seg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
-    $("#scope-seg").querySelectorAll("button").forEach(x => x.classList.remove("on"));
-    b.classList.add("on"); currentScope = b.dataset.scope;
+    $("#scope-seg").querySelectorAll("button").forEach(x => {
+      x.classList.remove("on"); x.setAttribute("aria-pressed", "false");
+    });
+    b.classList.add("on"); b.setAttribute("aria-pressed", "true"); currentScope = b.dataset.scope;
     $("#scope-warn").hidden = currentScope !== "all";
     if (currentTab) renderTab(currentTab);
   }));
