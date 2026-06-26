@@ -1,0 +1,156 @@
+#!/usr/bin/env python3
+"""Re-vendor the non-VLOP data snapshots from the sibling dsa-transparency-data repo.
+
+The API serves a *frozen snapshot* of the data-collection pipeline that lives in
+the separate `dsa-transparency-data` repo (scrapers, raw archives, the canonical
+extracted CSVs, the report-locations catalogue). This script regenerates the two
+vendored artifacts the Docker image is seeded from:
+
+  * data/harmonised-reports.json  <- <data-repo>/harmonised-reports/extracted/<slug>/NN_*.csv
+  * data/report-locations.csv     <- <data-repo>/dsa_reports.csv
+
+and reports any **new extracted platforms that aren't yet curated in
+`seed_harmonised.SLUG_META`** (display name + tier). Those still seed — they fall
+back to (slug, "online-platform") — but a human should give them a real name, so
+the script surfaces a ready-to-paste snippet instead of guessing silently.
+
+It writes a Markdown summary (for a PR body / job summary) to --summary-out (or
+stdout). It is the mechanical half of the "collect upstream, then surface in the
+API" flow; the `.github/workflows/revendor-data.yml` workflow runs it on a
+schedule / on demand and opens a PR with whatever changed.
+
+Usage:
+    python scripts/revendor_data.py                       # re-vendor in place
+    python scripts/revendor_data.py --data-repo /path/... # explicit source repo
+    python scripts/revendor_data.py --check               # report only, no writes
+    python scripts/revendor_data.py --summary-out s.md     # write the summary file
+"""
+from __future__ import annotations
+
+import argparse
+import os
+import shutil
+import sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(HERE)
+sys.path.insert(0, REPO)
+
+import seed_harmonised as sh  # noqa: E402  (after sys.path tweak)
+
+DEFAULT_DATA_REPO = os.getenv(
+    "DATA_REPO", os.path.normpath(os.path.join(REPO, "..", "dsa-transparency-data"))
+)
+VENDORED_SNAPSHOT = os.path.join(REPO, "data", "harmonised-reports.json")
+VENDORED_RL_CSV = os.path.join(REPO, "data", "report-locations.csv")
+RL_HEADER = "platform,company,category,confidence,harmonised_template,format_period,url_label,url,archived"
+
+
+def _suggested_name(slug: str) -> str:
+    """A best-effort display name for an un-curated slug (a hint, not the truth)."""
+    return slug.replace("-", " ").title()
+
+
+def _slugs(extracted_dir: str) -> set[str]:
+    """The extracted platform slugs — just the subdirectory names, so we don't
+    read every section CSV (write_snapshot does that once on its own)."""
+    return {d for d in os.listdir(extracted_dir)
+            if os.path.isdir(os.path.join(extracted_dir, d))}
+
+
+def _uncurated(slugs: set[str]) -> list[str]:
+    """Extracted slugs with no SLUG_META entry (and not intentionally skipped /
+    attached as an extra period) — i.e. would seed under their raw slug name."""
+    curated = set(sh.SLUG_META) | set(sh.SKIP_SLUGS) | set(sh.EXTRA_PERIODS)
+    return sorted(slugs - curated)
+
+
+def _stale(slugs: set[str]) -> list[str]:
+    """SLUG_META entries whose extracted dir has disappeared upstream."""
+    return sorted(k for k in sh.SLUG_META if k not in slugs)
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--data-repo", default=DEFAULT_DATA_REPO,
+                    help="Path to the sibling dsa-transparency-data repo")
+    ap.add_argument("--check", action="store_true",
+                    help="Report what would change without writing the snapshots")
+    ap.add_argument("--summary-out", default="-",
+                    help="Write the Markdown summary here ('-' = stdout)")
+    args = ap.parse_args()
+
+    extracted_dir = os.path.join(args.data_repo, "harmonised-reports", "extracted")
+    rl_src = os.path.join(args.data_repo, "dsa_reports.csv")
+    if not os.path.isdir(extracted_dir):
+        print(f"error: extracted dir not found: {extracted_dir}", file=sys.stderr)
+        return 2
+    if not os.path.isfile(rl_src):
+        print(f"error: report catalogue not found: {rl_src}", file=sys.stderr)
+        return 2
+
+    # Validate the catalogue header before trusting it as a drop-in replacement.
+    with open(rl_src, encoding="utf-8") as f:
+        header = f.readline().rstrip("\n").rstrip("\r")
+    if header != RL_HEADER:
+        print(f"error: {rl_src} header changed.\n  expected: {RL_HEADER}\n  found:    {header}",
+              file=sys.stderr)
+        return 2
+
+    slugs = _slugs(extracted_dir)
+    n_platforms = len(slugs)
+    with open(rl_src, encoding="utf-8") as f:
+        n_rl_rows = sum(1 for _ in f) - 1  # minus header
+    uncurated = _uncurated(slugs)
+    stale = _stale(slugs)
+
+    if not args.check:
+        sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
+        shutil.copyfile(rl_src, VENDORED_RL_CSV)
+
+    verb = "Would re-vendor" if args.check else "Re-vendored"
+    lines = [
+        "## Re-vendor data snapshots",
+        "",
+        f"{verb} from `{os.path.relpath(args.data_repo, REPO)}`:",
+        "",
+        f"- `data/harmonised-reports.json` — **{n_platforms}** extracted report files",
+        f"- `data/report-locations.csv` — **{n_rl_rows}** catalogue rows",
+        "",
+    ]
+    if uncurated:
+        lines += [
+            f"### ⚠️ {len(uncurated)} new platform(s) need a `SLUG_META` entry",
+            "",
+            "These seed under their raw slug until given a display name + tier. "
+            "Paste into `seed_harmonised.SLUG_META` and adjust the name/tier:",
+            "",
+            "```python",
+            *[f'    "{s}": ("{_suggested_name(s)}", "online-platform"),' for s in uncurated],
+            "```",
+            "",
+        ]
+    else:
+        lines += ["All extracted platforms are curated in `SLUG_META`. ✅", ""]
+    if stale:
+        lines += [
+            f"### ℹ️ {len(stale)} `SLUG_META` entr(y/ies) no longer in the extract",
+            "",
+            "Their upstream dir disappeared — drop them if the removal is intended:",
+            "",
+            *[f"- `{s}`" for s in stale],
+            "",
+        ]
+    summary = "\n".join(lines)
+
+    if args.summary_out == "-":
+        print(summary)
+    else:
+        with open(args.summary_out, "a", encoding="utf-8") as f:
+            f.write(summary + "\n")
+        print(summary)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

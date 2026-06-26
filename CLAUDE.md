@@ -49,6 +49,7 @@ Built to demonstrate two things:
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
 | `scripts/refresh-dataset.sh` | Re-vendor `data/vlop-dsa.json` from the canonical sibling-repo dataset |
+| `scripts/revendor_data.py` | Re-vendor the **non-VLOP** snapshots (`data/harmonised-reports.json` + `data/report-locations.csv`) from the sibling `dsa-transparency-data` repo and report any extracted platform still missing a `seed_harmonised.SLUG_META` entry. Run by the `revendor-data.yml` workflow (nightly / on dispatch); also runnable locally (`--check` for a dry run) |
 | `scripts/_demo_server.py` | Shared helper: seed DB + run a temp server (used by the GIF generators) |
 | `scripts/make_gifs.py` | Headless terminal-demo GIF generator (pyte + Pillow) → `docs/gifs/` |
 | `scripts/make_portal_gifs.py` | Portal-workflow GIF generator (Playwright + Pillow) → `docs/gifs/portal-*.gif` |
@@ -61,6 +62,7 @@ Built to demonstrate two things:
 | `test_mcp_server.py` | Tests for `mcp_server.py` — drives the tool functions against the app via an in-process `TestClient` (no network, no `mcp` SDK needed; the `build_server()` test self-skips when the SDK is absent) |
 | `.github/workflows/ci.yml` | CI: `pyflakes` lint + `pytest` on every PR/push (Python 3.11 & 3.12) |
 | `.github/workflows/deploy.yml` | CD: build/push image + deploy to Cloud Run on push to `main` (WIF; skips until configured) |
+| `.github/workflows/revendor-data.yml` | Auto-vendoring: regenerate the non-VLOP snapshots from `dsa-transparency-data` and open/update a single `auto/revendor-data` PR when they change. Triggers: nightly schedule, `workflow_dispatch`, or a `data-updated` `repository_dispatch` from the data repo. Validates by reseeding + `pytest` before opening the PR |
 | `.gcloudignore` | Trims the Cloud Build upload context (keeps Dockerfile + `data/`) |
 
 ## Localization
@@ -103,6 +105,38 @@ It deploys with `--no-traffic`, smoke-tests the new revision's `/readyz`, then
 promotes it with `update-traffic --to-latest`. Gated on the `GCP_PROJECT_ID` repo
 variable, so it **skips** (not fails) until GCP is configured — see README →
 "Continuous deployment". `.gcloudignore` keeps the Cloud Build upload lean.
+
+## Data re-vendoring (automated)
+
+The API serves a **frozen snapshot** of the data-collection pipeline that lives
+in the sibling `dsa-transparency-data` repo (scrapers, raw archives, the
+canonical extracted CSVs, the catalogue). The two vendored artifacts the image is
+seeded from — `data/harmonised-reports.json` and `data/report-locations.csv` —
+are kept in sync **automatically** rather than by hand:
+
+- **`scripts/revendor_data.py`** does the mechanical half: regenerate the
+  snapshot from the sibling repo's `harmonised-reports/extracted/` (via
+  `seed_harmonised.write_snapshot`), copy `dsa_reports.csv` →
+  `data/report-locations.csv` (header-validated), and print a Markdown summary
+  that flags any extracted platform **not yet in `SLUG_META`** (those still seed
+  under their raw slug, so the script suggests a paste-ready entry instead of
+  guessing the display name/tier). `--check` dry-runs without writing.
+- **`.github/workflows/revendor-data.yml`** runs it nightly / on
+  `workflow_dispatch` / on a `data-updated` `repository_dispatch`, **validates**
+  by reseeding + `pytest`, then opens/updates a single `auto/revendor-data` PR
+  (body = the summary) only if something changed. A human still reviews it and
+  finishes any `SLUG_META` naming — judgment stays with the human; the toil is
+  automated.
+- The data repo's **`.github/workflows/notify-revendor.yml`** pokes this workflow
+  the moment its `main` changes (instant instead of waiting for nightly).
+
+**Secrets (optional).** Both work with zero config (nightly schedule + anonymous
+clone of the public data repo). To enable the instant path and let the auto-PR
+trigger `ci.yml`, set a PAT: `REVENDOR_PAT` on this repo (used as the
+create-pull-request token + private-repo clone) and `REVENDOR_DISPATCH_TOKEN` on
+the data repo (scoped to dispatch this repo). Both jobs self-skip cleanly when
+their secret is absent. Note: `schedule`/`workflow_dispatch`/`repository_dispatch`
+only fire once the workflow is on `main`.
 
 ## Setup
 

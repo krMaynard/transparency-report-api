@@ -34,7 +34,7 @@ jobs:
           pip install pytest httpx pyflakes mypy
 
       - name: Lint (pyflakes)
-        run: python -m pyflakes main.py seed.py demo.py conftest.py mcp_server.py test_api.py test_mcp_server.py test_harvest.py scripts/harvest-harmonized.py
+        run: python -m pyflakes main.py seed.py seed_harmonised.py demo.py conftest.py mcp_server.py test_api.py test_mcp_server.py test_harvest.py scripts/harvest-harmonized.py scripts/revendor_data.py
 
       - name: Type check (mypy)
         run: python -m mypy

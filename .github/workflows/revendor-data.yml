@@ -1,0 +1,87 @@
+name: Re-vendor data
+
+# Keeps the vendored non-VLOP snapshots (data/harmonised-reports.json +
+# data/report-locations.csv) in sync with the upstream dsa-transparency-data
+# repo. Runs nightly, on demand, or instantly when the data repo dispatches a
+# `data-updated` event (see that repo's notify-revendor.yml). If anything
+# changed it opens/updates a single PR with a summary of new platforms that
+# still need a SLUG_META entry.
+
+on:
+  schedule:
+    - cron: "37 6 * * *" # nightly ~06:37 UTC (off-minute on purpose)
+  workflow_dispatch:
+  repository_dispatch:
+    types: [data-updated]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  revendor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout API repo
+        uses: actions/checkout@v4
+
+      # Cloned outside the workspace so it never lands in the re-vendor PR.
+      # A PAT is only needed if dsa-transparency-data is private; falls back to
+      # an anonymous clone (public repo) otherwise.
+      - name: Clone dsa-transparency-data (main)
+        env:
+          TOKEN: ${{ secrets.REVENDOR_PAT }}
+        run: |
+          url="https://github.com/krMaynard/dsa-transparency-data"
+          [ -n "$TOKEN" ] && url="https://x-access-token:$TOKEN@github.com/krMaynard/dsa-transparency-data"
+          git clone --depth 1 "$url" "$RUNNER_TEMP/data-repo"
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest httpx pyflakes
+
+      - name: Re-vendor snapshots
+        run: |
+          python scripts/revendor_data.py \
+            --data-repo "$RUNNER_TEMP/data-repo" \
+            --summary-out "$RUNNER_TEMP/revendor-summary.md"
+          cat "$RUNNER_TEMP/revendor-summary.md" >> "$GITHUB_STEP_SUMMARY"
+
+      # Validate the freshly-vendored data actually seeds (uses the vendored
+      # vlop-dsa.json + the new harmonised snapshot / catalogue — fully hermetic).
+      - name: Validate — reseed
+        run: python seed.py --source data/vlop-dsa.json --report-locations data/report-locations.csv
+
+      - name: Lint + test
+        run: |
+          python -m pyflakes scripts/revendor_data.py
+          python -m pytest test_api.py -q
+
+      - name: Open / update re-vendor PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          # A PAT (REVENDOR_PAT) lets the opened PR trigger ci.yml; with the
+          # default GITHUB_TOKEN, GitHub suppresses that (recursion guard) — the
+          # data is still validated by the steps above, so this is belt-and-braces.
+          token: ${{ secrets.REVENDOR_PAT || secrets.GITHUB_TOKEN }}
+          branch: auto/revendor-data
+          base: main
+          delete-branch: true
+          commit-message: "Re-vendor non-VLOP data snapshots from dsa-transparency-data"
+          title: "Re-vendor non-VLOP data snapshots"
+          body-path: ${{ runner.temp }}/revendor-summary.md
+          labels: |
+            automated
+            data
+          add-paths: |
+            data/harmonised-reports.json
+            data/report-locations.csv
