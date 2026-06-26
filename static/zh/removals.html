@@ -482,7 +482,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>删除率随时间变化</h3>
-        <p class="chart-sub">Google 实际删除的被要求项目所占比例（法律 + 政策 + 已删除）。</p>
+        <p class="chart-sub">Google 基于法律或政策理由删除的被要求项目所占比例（不含在 Google 处理前已删除的项目）。</p>
         <div class="chart-loading" id="rate-loading">正在加载…</div>
         <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rate-table" class="sr-only"></div>
@@ -657,9 +657,14 @@ display: flex; align-items: center; justify-content: space-between;
   // Accessible data-table mirror of a chart, written into a visually-hidden
   // (.sr-only) container so screen-reader users get the numbers even though the
   // canvas is aria-hidden (and even if Chart.js fails to load).
-  function srTable(tableId, caption, headers, rows) {
+  function srTable(tableId, headers, rows) {
     var el = document.getElementById(tableId);
     if (!el) return;
+    // Caption = the chart card's own <h3>, which is already localized — avoids a
+    // separate (and easily-stale) English caption literal.
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
     el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
       + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
       + '</tr></thead><tbody>'
@@ -749,7 +754,7 @@ display: flex; align-items: center; justify-content: space-between;
       var labels = rows.map(function(r){ return r[0]; });
       var values = rows.map(function(r){ return r[1]; });
       lineChart('chart-ts', 'ts-loading', labels, [{ label: '被要求项目', data: values }]);
-      srTable('chart-ts-table', 'Items targeted for removal, by period',
+      srTable('chart-ts-table',
         ['报告期', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
     } else {
       // rows = [period, breakdown_val, items] — pivot into per-breakdown datasets
@@ -769,7 +774,7 @@ display: flex; align-items: center; justify-content: space-between;
         return { label: entry.key, data: periodSet.map(function(p){ return seriesMap[entry.key][p] || 0; }) };
       });
       lineChart('chart-ts', 'ts-loading', periodSet, datasets);
-      srTable('chart-ts-table', 'Items targeted for removal, by period',
+      srTable('chart-ts-table',
         ['报告期'].concat(totals.map(function(e){ return e.key; })),
         periodSet.map(function(p){
           return [p].concat(totals.map(function(e){ return fmt(seriesMap[e.key][p] || 0); }));
@@ -779,13 +784,15 @@ display: flex; align-items: center; justify-content: space-between;
 
   function renderRate(rows) {
     // rows = [period, items, legal, policy, already]
+    // Numerator is legal + policy grounds only — items "already removed" were gone
+    // before Google acted, so counting them as Google removals overstates compliance.
     var labels = rows.map(function(r){ return r[0]; });
     var rates  = rows.map(function(r){
-      var items = r[1], removed = (r[2]||0) + (r[3]||0) + (r[4]||0);
+      var items = r[1], removed = (r[2]||0) + (r[3]||0);
       return items > 0 ? removed / items : null;
     });
     pctLineChart('chart-rate', 'rate-loading', labels, rates);
-    srTable('chart-rate-table', 'Removal rate over time', ['报告期', '删除率'],
+    srTable('chart-rate-table', ['报告期', '删除率'],
       rows.map(function(r, i){ return [r[0], rates[i] == null ? '—' : (rates[i] * 100).toFixed(1) + '%']; }));
   }
 
@@ -793,7 +800,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-countries', 'cty-loading', labels, values, '被要求项目');
-    srTable('chart-countries-table', 'Top 10 countries by items targeted',
+    srTable('chart-countries-table',
       ['国家/地区', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -801,7 +808,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; });
     var values = rows.map(function(r){ return r[1]; });
     doughnutChart('chart-reasons', 'rsn-loading', labels, values);
-    srTable('chart-reasons-table', 'Top reasons cited',
+    srTable('chart-reasons-table',
       ['原因', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -809,7 +816,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-products', 'prd-loading', labels, values, '被要求项目');
-    srTable('chart-products-table', 'Top Google products targeted',
+    srTable('chart-products-table',
       ['Google 产品', '被要求项目'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -827,7 +834,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = ['已删除（法律）', '已删除（政策）', '已删除', '未找到', '信息不足', '未处理'];
     var values = [r[0]||0, r[1]||0, r[2]||0, r[3]||0, r[4]||0, r[5]||0];
     doughnutChart('chart-compliance', 'cmp-loading', labels, values);
-    srTable('chart-compliance-table', 'How Google responded',
+    srTable('chart-compliance-table',
       ['处理结果', '条目数'], labels.map(function(l, i){ return [l, fmt(values[i])]; }));
   }
 

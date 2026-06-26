@@ -764,7 +764,7 @@ app = FastAPI(
         "Query public transparency reports — the aggregated EU Digital Services "
         "Act VLOP content-moderation reports (tables 3–11) and Google Government "
         "content-removal requests — with structured parameters (no SQL). Pick a "
-        "`table` (GET /tables), describe filters/group_by/aggregates, get a job "
+        "`table` (GET /api/tables), describe filters/group_by/aggregates, get a job "
         "id, then poll for results as JSON or CSV. Query syntax follows the "
         "TikTok Research API: boolean and/or/not clauses of {operation, "
         "field_name, field_values}."
@@ -1044,7 +1044,7 @@ class Condition(BaseModel):
     """A single filter, e.g. {operation: IN, field_name: service_name, field_values: [YouTube, TikTok]}."""
 
     operation: Operation = Field(..., description="EQ, IN, GT, GTE, LT, LTE.")
-    field_name: str = Field(..., description="A queryable field; see GET /fields.")
+    field_name: str = Field(..., description="A queryable field; see GET /api/fields.")
     field_values: list[str | int | float] = Field(
         ..., min_length=1, max_length=100,
         description="One or more values (max 100); always bound as parameters.",
@@ -1093,7 +1093,7 @@ class Leg(BaseModel):
     table. Every leg is implicitly grouped by the composite's `join_on` keys, so
     all legs aggregate to the same grain before being merged (full-outer)."""
 
-    table: str = Field(..., description="DSA report table this leg queries (see GET /tables).")
+    table: str = Field(..., description="DSA report table this leg queries (see GET /api/tables).")
     query: BooleanQuery = Field(default_factory=BooleanQuery, description="Filters for this leg only.")
     aggregates: list[Aggregate] = Field(
         ..., min_length=1, max_length=_MAX_OUTPUT_COLUMNS,
@@ -1131,7 +1131,7 @@ class QueryRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     table: str | None = Field(
-        default=None, description="Which DSA report table to query (see GET /tables)."
+        default=None, description="Which DSA report table to query (see GET /api/tables)."
     )
     query: BooleanQuery = Field(default_factory=BooleanQuery, description="Filters.")
     fields: list[str] | None = Field(
@@ -1206,7 +1206,7 @@ def _require_string(value: Any, field_name: str) -> None:
 def _compile_condition(cond: Condition, spec: TableSpec) -> tuple[str, list[Any]]:
     field = cond.field_name
     if field not in spec.all_fields:
-        raise QueryCompileError(f"Unknown field '{field}' for this table. See GET /fields?table=…")
+        raise QueryCompileError(f"Unknown field '{field}' for this table. See GET /api/fields?table=…")
     col = spec.all_fields[field]
     is_measure = field in spec.measures
     op = cond.operation
@@ -1477,7 +1477,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
         _safe_alias(leg_name)
         spec = TABLES.get(leg.table)
         if spec is None:
-            raise QueryCompileError(f"Unknown table '{leg.table}' in leg '{leg_name}'. See GET /tables.")
+            raise QueryCompileError(f"Unknown table '{leg.table}' in leg '{leg_name}'. See GET /api/tables.")
         specs[leg_name] = spec
     for dim in req.join_on:
         for leg_name, leg in legs.items():
@@ -1512,7 +1512,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
             elif agg.field_name not in spec.measures:
                 raise QueryCompileError(
                     f"Aggregate field '{agg.field_name}' must be a numeric measure of "
-                    f"'{leg.table}' (leg '{leg_name}'). See GET /fields?table={leg.table}"
+                    f"'{leg.table}' (leg '{leg_name}'). See GET /api/fields?table={leg.table}"
                 )
             else:
                 expr = f"{agg.function}({spec.measures[agg.field_name]})"
@@ -1585,11 +1585,11 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
         )
     if not req.table:
         raise QueryCompileError(
-            "`table` is required. Choose one of: " + ", ".join(TABLES) + ". See GET /tables."
+            "`table` is required. Choose one of: " + ", ".join(TABLES) + ". See GET /api/tables."
         )
     spec = TABLES.get(req.table)
     if spec is None:
-        raise QueryCompileError(f"Unknown table '{req.table}'. See GET /tables.")
+        raise QueryCompileError(f"Unknown table '{req.table}'. See GET /api/tables.")
 
     where, params = _compile_where(req.query, spec)
     aggregating = bool(req.aggregates) or bool(req.group_by)
@@ -1604,7 +1604,7 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
     if aggregating:
         for gb in req.group_by:
             if gb not in spec.dimensions:
-                raise QueryCompileError(f"group_by field '{gb}' must be a dimension of '{req.table}'. See GET /fields?table={req.table}")
+                raise QueryCompileError(f"group_by field '{gb}' must be a dimension of '{req.table}'. See GET /api/fields?table={req.table}")
             if gb in col_expr:
                 raise QueryCompileError(f"Duplicate group_by field '{gb}'.")
             expr = spec.dimensions[gb]
@@ -1619,7 +1619,7 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
                 expr = "COUNT(*)"
             elif agg.field_name not in spec.measures:
                 raise QueryCompileError(
-                    f"Aggregate field '{agg.field_name}' must be a numeric measure of '{req.table}'. See GET /fields?table={req.table}"
+                    f"Aggregate field '{agg.field_name}' must be a numeric measure of '{req.table}'. See GET /api/fields?table={req.table}"
                 )
             else:
                 expr = f"{agg.function}({spec.measures[agg.field_name]})"
@@ -1632,7 +1632,7 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
             raise QueryCompileError("`fields` must name at least one column.")
         for f in fields:
             if f not in spec.all_fields:
-                raise QueryCompileError(f"Unknown field '{f}' for table '{req.table}'. See GET /fields?table={req.table}")
+                raise QueryCompileError(f"Unknown field '{f}' for table '{req.table}'. See GET /api/fields?table={req.table}")
             if f in col_expr:
                 raise QueryCompileError(f"Duplicate field '{f}' in fields list.")
             expr = spec.all_fields[f]
@@ -3036,10 +3036,14 @@ def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
     """A runnable example query for a table — aggregate its first measure, or
     (for the text-only t11) fetch the qualitative field for one service."""
     measures = list(spec.measures)
+    # Group by a dimension the table actually has — service_name for the DSA
+    # tables, but gr_removals has no service_name, so fall back to its first
+    # dimension (otherwise the copy-pasteable example 422s).
+    group_dim = "service_name" if "service_name" in spec.dimensions else next(iter(spec.dimensions))
     if measures:
         return {
             "table": table,
-            "group_by": ["service_name"],
+            "group_by": [group_dim],
             "aggregates": [{"function": "SUM", "field_name": measures[0], "alias": "total"}],
             "sort": [{"field_name": "total", "order": "desc"}],
             "max_count": 10,
@@ -3089,7 +3093,7 @@ def list_fields(table: str | None = None) -> dict[str, Any]:
         }
     spec = TABLES.get(table)
     if spec is None:
-        raise HTTPException(status_code=404, detail=f"Unknown table '{table}'. See GET /tables.")
+        raise HTTPException(status_code=404, detail=f"Unknown table '{table}'. See GET /api/tables.")
     return _table_fields_doc(table, spec)
 
 
@@ -3110,7 +3114,7 @@ def table_schema(table: str) -> dict[str, Any]:
     """The queryable field registry (dimensions + measures) for a report table."""
     spec = TABLES.get(table)
     if spec is None:
-        raise HTTPException(status_code=404, detail=f"Table '{table}' not found. See GET /tables.")
+        raise HTTPException(status_code=404, detail=f"Table '{table}' not found. See GET /api/tables.")
     return _table_fields_doc(table, spec)
 
 

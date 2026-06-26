@@ -482,7 +482,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>削除率の推移</h3>
-        <p class="chart-sub">対象項目のうち Google が実際に削除した割合（法的理由 + ポリシー + 既に削除済み）。</p>
+        <p class="chart-sub">対象項目のうち Google が法的理由またはポリシーに基づいて削除した割合（Google の対応前にすでに削除されていた項目は除く）。</p>
         <div class="chart-loading" id="rate-loading">読み込み中…</div>
         <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rate-table" class="sr-only"></div>
@@ -657,9 +657,14 @@ display: flex; align-items: center; justify-content: space-between;
   // Accessible data-table mirror of a chart, written into a visually-hidden
   // (.sr-only) container so screen-reader users get the numbers even though the
   // canvas is aria-hidden (and even if Chart.js fails to load).
-  function srTable(tableId, caption, headers, rows) {
+  function srTable(tableId, headers, rows) {
     var el = document.getElementById(tableId);
     if (!el) return;
+    // Caption = the chart card's own <h3>, which is already localized — avoids a
+    // separate (and easily-stale) English caption literal.
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
     el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
       + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
       + '</tr></thead><tbody>'
@@ -749,7 +754,7 @@ display: flex; align-items: center; justify-content: space-between;
       var labels = rows.map(function(r){ return r[0]; });
       var values = rows.map(function(r){ return r[1]; });
       lineChart('chart-ts', 'ts-loading', labels, [{ label: '対象項目数', data: values }]);
-      srTable('chart-ts-table', 'Items targeted for removal, by period',
+      srTable('chart-ts-table',
         ['期間', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
     } else {
       // rows = [period, breakdown_val, items] — pivot into per-breakdown datasets
@@ -769,7 +774,7 @@ display: flex; align-items: center; justify-content: space-between;
         return { label: entry.key, data: periodSet.map(function(p){ return seriesMap[entry.key][p] || 0; }) };
       });
       lineChart('chart-ts', 'ts-loading', periodSet, datasets);
-      srTable('chart-ts-table', 'Items targeted for removal, by period',
+      srTable('chart-ts-table',
         ['期間'].concat(totals.map(function(e){ return e.key; })),
         periodSet.map(function(p){
           return [p].concat(totals.map(function(e){ return fmt(seriesMap[e.key][p] || 0); }));
@@ -779,13 +784,15 @@ display: flex; align-items: center; justify-content: space-between;
 
   function renderRate(rows) {
     // rows = [period, items, legal, policy, already]
+    // Numerator is legal + policy grounds only — items "already removed" were gone
+    // before Google acted, so counting them as Google removals overstates compliance.
     var labels = rows.map(function(r){ return r[0]; });
     var rates  = rows.map(function(r){
-      var items = r[1], removed = (r[2]||0) + (r[3]||0) + (r[4]||0);
+      var items = r[1], removed = (r[2]||0) + (r[3]||0);
       return items > 0 ? removed / items : null;
     });
     pctLineChart('chart-rate', 'rate-loading', labels, rates);
-    srTable('chart-rate-table', 'Removal rate over time', ['期間', '削除率'],
+    srTable('chart-rate-table', ['期間', '削除率'],
       rows.map(function(r, i){ return [r[0], rates[i] == null ? '—' : (rates[i] * 100).toFixed(1) + '%']; }));
   }
 
@@ -793,7 +800,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-countries', 'cty-loading', labels, values, '対象項目数');
-    srTable('chart-countries-table', 'Top 10 countries by items targeted',
+    srTable('chart-countries-table',
       ['国', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -801,7 +808,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; });
     var values = rows.map(function(r){ return r[1]; });
     doughnutChart('chart-reasons', 'rsn-loading', labels, values);
-    srTable('chart-reasons-table', 'Top reasons cited',
+    srTable('chart-reasons-table',
       ['理由', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -809,7 +816,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-products', 'prd-loading', labels, values, '対象項目数');
-    srTable('chart-products-table', 'Top Google products targeted',
+    srTable('chart-products-table',
       ['Google プロダクト', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -827,7 +834,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = ['削除（法的理由）', '削除（ポリシー）', '既に削除済み', '見つからず', '情報不足', '対応なし'];
     var values = [r[0]||0, r[1]||0, r[2]||0, r[3]||0, r[4]||0, r[5]||0];
     doughnutChart('chart-compliance', 'cmp-loading', labels, values);
-    srTable('chart-compliance-table', 'How Google responded',
+    srTable('chart-compliance-table',
       ['結果', '件数'], labels.map(function(l, i){ return [l, fmt(values[i])]; }));
   }
 
