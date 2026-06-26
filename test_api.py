@@ -1323,6 +1323,20 @@ class TestDashboard:
         r = client.get("/mcp")
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "mcp_server.py" in r.text and "Model Context Protocol" in r.text
+        # The page must document every tool the server actually registers.
+        import mcp_server
+        for tool in ("list_tables", "describe_table", "dataset_overview", "run_query",
+                     "ask", "register", "submit_query", "poll_job"):
+            assert f"<code>{tool}</code>" in r.text, f"{tool} missing from /mcp"
+        # Host-config snippet matches the example file (server name + valid demo key).
+        assert '"transparency-report-api"' in r.text and '"momo"' in r.text
+
+    def test_mcp_localized_prose_not_in_english(self):
+        for loc, needle in [("es", "El repositorio incluye"), ("zh", "代码库提供了")]:
+            r = client.get(f"/{loc}/mcp")
+            assert r.status_code == 200
+            assert "The repository ships" not in r.text
+            assert needle in r.text
 
     def test_new_pages_in_sidebar_nav(self):
         # Both new pages are linked from every page's sidebar nav.
