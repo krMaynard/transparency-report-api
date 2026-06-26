@@ -182,6 +182,9 @@ display: flex; align-items: center;
   [data-theme="dark"] .error { color: #ff7b72; }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  /* Let long inline tokens (version hashes, dates, the worked citation example)
+     wrap instead of forcing horizontal scroll on narrow screens / at 200% zoom. */
+  code { overflow-wrap: anywhere; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
@@ -407,10 +410,10 @@ display: flex; align-items: center;
     <p class="sub">非 VLOP 平台可以用任何一种欧盟官方语言报送这份统一模板，因此同一个模板行可能以不同的文字出现（<code>Decisions upheld</code> / <code>Décisions confirmées</code> / <code>Bestätigte Entscheidungen</code>）。每一行都保留其原始语言的标签用于显示，同时还被标注上一个与语言无关的标准标签——即<strong>规范键</strong>——它通过一份翻译映射（一份“对照表”）来匹配，该映射将结构相同的报告对齐到一份英文参照，并<em>舍弃任何含义不明确的项</em>。查询可以按规范键进行分组或筛选，从而跨语言进行同类对比，同时仍然显示原始文字——不过目前各语言的覆盖程度尚不一致（见已知局限）。</p>
 
     <h2>如何查询</h2>
-    <p class="sub">本服务没有 SQL 接口。一次查询是一个<strong>结构化请求</strong>——它指定一张表、一个由字段／操作／值条件组成的布尔过滤器，以及可选的分组、聚合、排序和限制。服务器会根据该表固定的注册表校验每个字段和操作，并将其编译为单次预先校验的数据库查找（一个参数化的 <code>SELECT</code>），其中你的输入始终被视为数据，绝不会作为命令执行。查询同样受到限制——结果数量上限、请求大小与复杂度限制，以及按密钥计的速率限制——因此单次请求无法耗尽服务资源。跨表的“复合”查询会通过同一道校验边界，在共享维度上连接两张或更多的表。在启用时，自然语言“Ask”输入框是唯一离开服务器的路径：它会把你输入的问题（连同数据集的模式）发送给第三方 LLM（Anthropic 的 Claude）以<em>起草</em>一个结构化查询，随后该查询会像其他任何查询一样先经过校验再运行——API 的其他任何部分都不会把数据发送到服务器之外。可在 <a href="/zh/reports">DSA 报告</a>仪表板上试用，或阅读 <a href="/docs">API 参考</a>以及我们的<a href="/zh/privacy">隐私</a>说明。</p>
+    <p class="sub">这里没有 SQL 接口。查询是一种<strong>结构化请求</strong>——它指定一张表、一个由字段／操作／值条件构成的布尔过滤器，以及可选的分组、聚合、排序和限制。服务器会针对该表的固定注册表校验每一个字段和操作，并将其编译为单次预先检查过的数据库查找（参数化的 <code>SELECT</code>），其中你的输入始终被当作数据处理，绝不会作为命令运行。查询同样设有边界——结果数量上限、请求大小和复杂度限制，以及按密钥的速率限制——因此单个请求无法耗尽服务。跨表的“复合”查询通过同一个经过校验的边界，在共享维度上连接两张或更多的表。自然语言“Ask”框在启用时，会将你输入的问题（连同数据集的模式）发送给第三方 LLM（Anthropic 的 Claude）以<em>起草</em>一个结构化查询，该查询随后会像其他任何查询一样经过校验才会运行——该 LLM 调用是服务唯一一次主动将你的输入发送给外部方。另一条对外路径是选择性加入且由你指定的：你附加到查询上的可选 <code>callback_url</code>，它会将你自己的结果送达你所选择的 URL。请在 <a href="/zh/reports">DSA 报告</a>仪表板上试用，或阅读 <a href="/docs">API 参考</a>以及我们的<a href="/zh/privacy">隐私</a>说明。</p>
 
     <h2>可复现性与引用</h2>
-    <p class="sub">该数据库是一份静态、只读的<strong>快照</strong>。每份快照都带有一个不可变更的<strong>数据集版本</strong>——它是其内容的指纹，因此只要数据发生变化它就会随之改变——以 <code>ETag</code> 和 <code>X-Dataset-Version</code> 头的形式发送，而且每一条事实行都会公开其来源报送的 <code>report_id</code>。一个数字由三者共同锁定——<em>数据集版本</em>、确切的<em>查询</em>，以及它所取自的 <em>report_id</em>(s)——所以请将这三者一并引用，相关行便可重新取回（仅凭版本和 report_id 只能标识某份来源报送，而非某个具体数字）。无论你进行排序还是分页，结果都会以完全确定的顺序返回，因此保存下来的某次提取在字节层面是可复现的。快照的构建日期和涵盖期间显示在每个仪表板的“Cite as”一行中，也显示在每次导出的头部信息里；而某一行的 <code>report_id</code> 可通过 <a href="/zh/catalog">报告位置</a> 目录解析到其已发布的报送。</p>
+    <p class="sub">该数据库是一个静态、只读的<strong>快照</strong>。每个快照都带有一个不可变的<strong>数据集版本</strong>——它是其内容的指纹，因此只要数据发生变化它就会改变——以 <code>ETag</code> 和 <code>X-Dataset-Version</code> 头的形式发送，并且每个事实行都会公开其来源报送的 <code>report_id</code>。一个数值由三样东西共同锁定——<em>数据集版本</em>、确切的<em>查询</em>，以及它所依据的 <code>report_id</code>——因此请同时引用这三者，这样便可重新获取这些行（仅凭版本和 report_id 只能标识一份来源报送，而非某个特定数值）。每当你排序或分页时，结果都会以完全确定的顺序返回，因此保存下来的提取结果可按字节级复现。快照的构建日期和涵盖期间会显示在每个仪表板的“Cite as”行中以及每次导出的头部，而某一行的 <code>report_id</code> 标识其来源报送（平台、期间和层级）；对于非 VLOP 平台，该报送在何处发布会按平台列示于<a href="/zh/catalog">报告位置</a>目录中。</p>
     <p class="hint"><strong>署名：</strong>请将该数字归于报送它的平台；本站只应作为访问工具加以标注。</p>
     <p class="hint">示例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href="/zh/reports">DSA 报告</a> 和 <a href="/zh/removals">政府删除请求</a> 仪表板的“Cite as”一行中。</p>
 
