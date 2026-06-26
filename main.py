@@ -3080,14 +3080,34 @@ def _dataset_meta() -> dict[str, str]:
     return _meta_cache
 
 
+_dataset_version_cache: str | None = None
+_dataset_version_lock = threading.Lock()
+
+
 def _dataset_version() -> str:
-    """A short, stable digest of the dataset snapshot — an immutable token a
-    researcher can cite ("dataset version 7f3c…") and a client can use as an
-    ETag. Derived from the snapshot's reporting period + build timestamp, so it
-    changes only when the underlying data does (not on a code-only redeploy)."""
-    meta = _dataset_meta()
-    basis = f"{meta.get('period', '')}|{meta.get('generated', '')}"
-    return hashlib.sha256(basis.encode("utf-8")).hexdigest()[:12]
+    """A short, stable fingerprint of the dataset snapshot — an immutable token a
+    researcher can cite ("dataset version 7f3c…") and a client can use as an ETag.
+    It is a digest of the served read-only database file itself, so it changes
+    whenever the data changes (not on a code-only redeploy). Computed once and
+    memoised (the DB is static at runtime); falls back to the snapshot's period +
+    build stamp if the file can't be read."""
+    global _dataset_version_cache
+    if _dataset_version_cache is None:
+        with _dataset_version_lock:
+            if _dataset_version_cache is None:
+                h = hashlib.sha256()
+                try:
+                    with open(DB_PATH, "rb") as f:
+                        for chunk in iter(lambda: f.read(1 << 20), b""):
+                            h.update(chunk)
+                except Exception:
+                    # Re-initialise so a partially-read DB file can't corrupt the
+                    # fallback digest with stray chunk bytes.
+                    h = hashlib.sha256()
+                    meta = _dataset_meta()
+                    h.update(f"{meta.get('period', '')}|{meta.get('generated', '')}".encode("utf-8"))
+                _dataset_version_cache = h.hexdigest()[:12]
+    return _dataset_version_cache
 
 
 # Short, plain-language help for each queryable field — what it means, its unit,
