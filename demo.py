@@ -133,8 +133,8 @@ def main() -> None:
     print("=" * 60)
     _check_server()
 
-    # 1. Root — no auth
-    _step("Root endpoint (no auth required)")
+    # 1. API root — no auth
+    _step("API root endpoint (no auth required)")
     _note("Public meta-endpoint lists all routes and explains the design.")
     get("/api")
 
