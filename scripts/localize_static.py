@@ -299,6 +299,17 @@ PAGES["de"]["home.html"] = [
 ]
 
 PAGES["es"]["index.html"] = [
+    ('''>Key terms</summary>''', '''>Términos clave</summary>'''),
+    ('''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     '''Plataforma o motor de búsqueda en línea de muy gran tamaño: servicios designados por la UE conforme al DSA por tener más de 45 millones de usuarios mensuales en la UE.'''),
+    ('''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     '''Denuncias de contenido presuntamente ilegal que los usuarios o alertadores fiables envían a una plataforma conforme al DSA.'''),
+    ('''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     '''Promedio de destinatarios activos mensuales: la base de usuarios en la UE de una plataforma, usada como denominador para tasas normalizadas.'''),
+    ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     '''Moderación que una plataforma realiza por iniciativa propia (no en respuesta a una denuncia u orden), por motivos legales o de condiciones del servicio.'''),
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     '''Los declarantes no VLOP informan sobre periodos distintos (a menudo el año completo) que las VLOP (S2 2025); los totales brutos entre niveles no son directamente comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de la UE · informes de transparencia'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Informes de transparencia del DSA</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -477,6 +488,17 @@ PAGES["es"]["index.html"] = [
 ]
 
 PAGES["fr"]["index.html"] = [
+    ('''>Key terms</summary>''', '''>Termes clés</summary>'''),
+    ('''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     '''Très grande plateforme / très grand moteur de recherche en ligne — services désignés par l’UE au titre du DSA pour leurs 45 M+ d’utilisateurs mensuels dans l’UE.'''),
+    ('''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     '''Signalements de contenus présumés illicites que des utilisateurs ou des signaleurs de confiance soumettent à une plateforme au titre du DSA.'''),
+    ('''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     '''Nombre moyen de destinataires actifs mensuels — la base d’utilisateurs de la plateforme dans l’UE, utilisée comme dénominateur pour les taux normalisés.'''),
+    ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     '''Modération qu’une plateforme effectue de sa propre initiative (sans signalement ni injonction), pour des motifs juridiques ou de conditions d’utilisation.'''),
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     '''Les déclarants non-VLOP couvrent des périodes différentes (souvent l’année entière) de celles des VLOP (S2 2025) ; les totaux bruts entre catégories ne sont pas directement comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de l’UE · rapports de transparence'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Rapports de transparence du DSA</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -654,6 +676,17 @@ PAGES["fr"]["index.html"] = [
 ]
 
 PAGES["de"]["index.html"] = [
+    ('''>Key terms</summary>''', '''>Schlüsselbegriffe</summary>'''),
+    ('''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     '''Sehr große Online-Plattform / Suchmaschine — von der EU nach dem DSA benannte Dienste mit über 45 Mio. monatlichen EU-Nutzern.'''),
+    ('''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     '''Meldungen mutmaßlich illegaler Inhalte, die Nutzer oder vertrauenswürdige Hinweisgeber nach dem DSA an eine Plattform übermitteln.'''),
+    ('''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     '''Durchschnittliche monatlich aktive Nutzer — die EU-Nutzerbasis einer Plattform, genutzt als Nenner für normalisierte Raten.'''),
+    ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     '''Moderation, die eine Plattform aus eigener Initiative vornimmt (nicht auf eine Meldung oder Anordnung hin), aus rechtlichen oder AGB-Gründen.'''),
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     '''Nicht-VLOP-Meldende berichten über andere Zeiträume (oft das ganze Jahr) als VLOPs (H2 2025); Rohsummen über Stufen hinweg sind nicht direkt vergleichbar.'''),
     ('''EU DSA · transparency reports''', '''EU-DSA · Transparenzberichte'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>DSA-Transparenzberichte</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -831,6 +864,9 @@ PAGES["de"]["index.html"] = [
 ]
 
 PAGES["es"]["removals.html"] = [
+    ('''>Download CSV</button>''', '''>Descargar CSV</button>'''),
+    ("""'Preparing…'""", """'Preparando…'"""),
+    ("""'CSV export failed: '""", """'Error al exportar CSV: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     ("""'Period'""", """'Período'"""),
     ("""'Removal rate'""", """'Tasa de retirada'"""),
@@ -864,8 +900,8 @@ PAGES["es"]["removals.html"] = [
     ('''<option value="reason">Reason</option>''', '''<option value="reason">Motivo</option>'''),
     ('''<h3>Items targeted for removal, by period</h3>''', '''<h3>Elementos señalados para retirada, por período</h3>'''),
     ('''<h3>Removal rate over time</h3>''', '''<h3>Tasa de retirada a lo largo del tiempo</h3>'''),
-    ('''Share of targeted items Google actually removed (legal + policy + already removed).''',
-     '''Proporción de elementos señalados que Google realmente retiró (legal + políticas + ya retirados).'''),
+    ('''Share of targeted items Google removed on legal or policy grounds (excludes items already gone before Google acted).''',
+     '''Proporción de elementos señalados que Google retiró por motivos legales o de políticas (excluye los ya eliminados antes de que Google actuara).'''),
     ('''<h3>Top 10 countries by items targeted</h3>''', '''<h3>10 países principales por elementos señalados</h3>'''),
     ('''<h3>Top reasons cited</h3>''', '''<h3>Principales motivos citados</h3>'''),
     ('''<h3>Top Google products targeted</h3>''', '''<h3>Principales productos de Google señalados</h3>'''),
@@ -909,6 +945,9 @@ PAGES["es"]["removals.html"] = [
 ]
 
 PAGES["fr"]["removals.html"] = [
+    ('''>Download CSV</button>''', '''>Télécharger le CSV</button>'''),
+    ("""'Preparing…'""", """'Préparation…'"""),
+    ("""'CSV export failed: '""", """'Échec de l’export CSV : '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     ("""'Period'""", """'Période'"""),
     ("""'Removal rate'""", """'Taux de retrait'"""),
@@ -942,8 +981,8 @@ PAGES["fr"]["removals.html"] = [
     ('''<option value="reason">Reason</option>''', '''<option value="reason">Motif</option>'''),
     ('''<h3>Items targeted for removal, by period</h3>''', '''<h3>Éléments visés par le retrait, par période</h3>'''),
     ('''<h3>Removal rate over time</h3>''', '''<h3>Taux de retrait au fil du temps</h3>'''),
-    ('''Share of targeted items Google actually removed (legal + policy + already removed).''',
-     '''Part des éléments visés que Google a effectivement retirés (légal + règles + déjà retirés).'''),
+    ('''Share of targeted items Google removed on legal or policy grounds (excludes items already gone before Google acted).''',
+     '''Part des éléments visés que Google a retirés pour des motifs juridiques ou de règles (hors éléments déjà supprimés avant l’intervention de Google).'''),
     ('''<h3>Top 10 countries by items targeted</h3>''', '''<h3>Top 10 des pays par éléments visés</h3>'''),
     ('''<h3>Top reasons cited</h3>''', '''<h3>Principaux motifs invoqués</h3>'''),
     ('''<h3>Top Google products targeted</h3>''', '''<h3>Principaux produits Google visés</h3>'''),
@@ -986,6 +1025,9 @@ PAGES["fr"]["removals.html"] = [
 ]
 
 PAGES["de"]["removals.html"] = [
+    ('''>Download CSV</button>''', '''>CSV herunterladen</button>'''),
+    ("""'Preparing…'""", """'Wird vorbereitet…'"""),
+    ("""'CSV export failed: '""", """'CSV-Export fehlgeschlagen: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     ("""'Period'""", """'Zeitraum'"""),
     ("""'Removal rate'""", """'Entfernungsrate'"""),
@@ -1019,8 +1061,8 @@ PAGES["de"]["removals.html"] = [
     ('''<option value="reason">Reason</option>''', '''<option value="reason">Grund</option>'''),
     ('''<h3>Items targeted for removal, by period</h3>''', '''<h3>Zur Entfernung gemeldete Inhalte, nach Zeitraum</h3>'''),
     ('''<h3>Removal rate over time</h3>''', '''<h3>Entfernungsrate im Zeitverlauf</h3>'''),
-    ('''Share of targeted items Google actually removed (legal + policy + already removed).''',
-     '''Anteil der gemeldeten Inhalte, die Google tatsächlich entfernt hat (rechtlich + Richtlinien + bereits entfernt).'''),
+    ('''Share of targeted items Google removed on legal or policy grounds (excludes items already gone before Google acted).''',
+     '''Anteil der gemeldeten Inhalte, die Google aus rechtlichen oder Richtliniengründen entfernt hat (ohne bereits vor dem Eingreifen von Google entfernte Inhalte).'''),
     ('''<h3>Top 10 countries by items targeted</h3>''', '''<h3>Top 10 Länder nach gemeldeten Inhalten</h3>'''),
     ('''<h3>Top reasons cited</h3>''', '''<h3>Häufigste genannte Gründe</h3>'''),
     ('''<h3>Top Google products targeted</h3>''', '''<h3>Am häufigsten betroffene Google-Produkte</h3>'''),
@@ -1612,6 +1654,17 @@ PAGES["ja"]["home.html"] = [
      r'''· データ：<a'''),
 ]
 PAGES["ja"]["index.html"] = [
+    (r'''>Key terms</summary>''', r'''>主な用語</summary>'''),
+    (r'''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     r'''超大規模オンラインプラットフォーム／検索エンジン — EU 域内の月間利用者が 4,500 万人以上であるとして、EU が DSA に基づき指定したサービス。'''),
+    (r'''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     r'''DSA に基づき、利用者または信頼できる報告者がプラットフォームに提出する、違法の疑いがあるコンテンツの通報。'''),
+    (r'''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     r'''平均月間アクティブ利用者数 — プラットフォームの EU 域内の利用者規模。正規化した比率の分母として使われます。'''),
+    (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     r'''プラットフォームが自らの判断で（通報や命令への対応ではなく）、法的またはサービス利用規約上の理由で行うモデレーション。'''),
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     r'''非 VLOP の提出者は VLOP（2025 年下半期）とは異なる期間（多くは通年）で報告しているため、階層をまたいだ総計は直接比較できません。'''),
     (r'''EU DSA · transparency reports''',
      r'''EU DSA · 透明性レポート'''),
     (r'''<h1>DSA Transparency Reports</h1>''',
@@ -1865,6 +1918,9 @@ PAGES["ja"]["index.html"] = [
      r'''v.toLocaleString('ja-JP', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["ja"]["removals.html"] = [
+    (r'''>Download CSV</button>''', r'''>CSV をダウンロード</button>'''),
+    (r"""'Preparing…'""", r"""'準備中…'"""),
+    (r"""'CSV export failed: '""", r"""'CSV エクスポートに失敗しました: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     (r"""'Period'""", r"""'期間'"""),
     (r"""'Removal rate'""", r"""'削除率'"""),
@@ -1919,8 +1975,8 @@ PAGES["ja"]["removals.html"] = [
      r'''<h3>期間別の削除対象項目</h3>'''),
     (r'''<h3>Removal rate over time</h3>''',
      r'''<h3>削除率の推移</h3>'''),
-    (r'''Share of targeted items Google actually removed (legal + policy + already removed).''',
-     r'''対象項目のうち Google が実際に削除した割合（法的理由 + ポリシー + 既に削除済み）。'''),
+    (r'''Share of targeted items Google removed on legal or policy grounds (excludes items already gone before Google acted).''',
+     r'''対象項目のうち Google が法的理由またはポリシーに基づいて削除した割合（Google の対応前にすでに削除されていた項目は除く）。'''),
     (r'''<h3>Top 10 countries by items targeted</h3>''',
      r'''<h3>削除対象項目の多い国 トップ 10</h3>'''),
     (r'''<h3>Top reasons cited</h3>''',
@@ -2297,6 +2353,17 @@ PAGES["zh"]["home.html"] = [
      r'''· 数据：<a'''),
 ]
 PAGES["zh"]["index.html"] = [
+    (r'''>Key terms</summary>''', r'''>关键术语</summary>'''),
+    (r'''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     r'''超大型在线平台／搜索引擎——因在欧盟拥有 4,500 万以上月活跃用户而被欧盟依据 DSA 指定的服务。'''),
+    (r'''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     r'''用户或可信举报者依据 DSA 向平台提交的涉嫌违法内容的举报。'''),
+    (r'''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     r'''平均月活跃用户数——平台在欧盟的用户规模，用作归一化比率的分母。'''),
+    (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     r'''平台基于法律或服务条款理由自行开展的审核（并非针对举报或命令的回应）。'''),
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     r'''非 VLOP 报告方的报告周期与 VLOP（2025 下半年）不同（通常为整年），跨层级的原始总计不可直接比较。'''),
     (r'''EU DSA · transparency reports''',
      r'''欧盟 DSA · 透明度报告'''),
     (r'''<h1>DSA Transparency Reports</h1>''',
@@ -2549,6 +2616,9 @@ PAGES["zh"]["index.html"] = [
      r'''v.toLocaleString('zh-CN', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["zh"]["removals.html"] = [
+    (r'''>Download CSV</button>''', r'''>下载 CSV</button>'''),
+    (r"""'Preparing…'""", r"""'正在准备…'"""),
+    (r"""'CSV export failed: '""", r"""'CSV 导出失败：'"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     (r"""'Period'""", r"""'报告期'"""),
     (r"""'Removal rate'""", r"""'删除率'"""),
@@ -2603,8 +2673,8 @@ PAGES["zh"]["removals.html"] = [
      r'''<h3>各报告期被要求删除的项目</h3>'''),
     (r'''<h3>Removal rate over time</h3>''',
      r'''<h3>删除率随时间变化</h3>'''),
-    (r'''Share of targeted items Google actually removed (legal + policy + already removed).''',
-     r'''Google 实际删除的被要求项目所占比例（法律 + 政策 + 已删除）。'''),
+    (r'''Share of targeted items Google removed on legal or policy grounds (excludes items already gone before Google acted).''',
+     r'''Google 基于法律或政策理由删除的被要求项目所占比例（不含在 Google 处理前已删除的项目）。'''),
     (r'''<h3>Top 10 countries by items targeted</h3>''',
      r'''<h3>按被要求项目排名前 10 的国家</h3>'''),
     (r'''<h3>Top reasons cited</h3>''',
@@ -2981,6 +3051,17 @@ PAGES["ko"]["home.html"] = [
      r'''· 데이터: <a'''),
 ]
 PAGES["ko"]["index.html"] = [
+    (r'''>Key terms</summary>''', r'''>주요 용어</summary>'''),
+    (r'''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     r'''초대형 온라인 플랫폼 / 검색 엔진 — EU 내 월간 이용자가 4,500만 명 이상이어서 EU가 DSA에 따라 지정한 서비스.'''),
+    (r'''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     r'''이용자 또는 신뢰할 수 있는 신고자가 DSA에 따라 플랫폼에 제출하는 위법 의심 콘텐츠 신고.'''),
+    (r'''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     r'''월평균 활성 이용자 수 — 플랫폼의 EU 이용자 규모로, 정규화된 비율의 분모로 사용됩니다.'''),
+    (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     r'''플랫폼이 (신고나 명령에 대한 대응이 아니라) 자체 판단으로 법적 또는 서비스 약관상의 이유로 수행하는 모더레이션.'''),
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+     r'''비 VLOP 제출자는 VLOP(2025 하반기)와 다른 기간(대개 연간)을 보고하므로, 계층 간 원시 합계는 직접 비교할 수 없습니다.'''),
     (r'''EU DSA · transparency reports''',
      r'''EU DSA · 투명성 보고서'''),
     (r'''<h1>DSA Transparency Reports</h1>''',
@@ -3234,6 +3315,9 @@ PAGES["ko"]["index.html"] = [
      r'''v.toLocaleString('ko-KR', { maximumSignificantDigits: 4 })'''),
 ]
 PAGES["ko"]["removals.html"] = [
+    (r'''>Download CSV</button>''', r'''>CSV 다운로드</button>'''),
+    (r"""'Preparing…'""", r"""'준비 중…'"""),
+    (r"""'CSV export failed: '""", r"""'CSV 내보내기 실패: '"""),
     # Screen-reader chart-table header literals (sr-only JS strings).
     (r"""'Period'""", r"""'기간'"""),
     (r"""'Removal rate'""", r"""'삭제율'"""),
@@ -3288,8 +3372,8 @@ PAGES["ko"]["removals.html"] = [
      r'''<h3>기간별 삭제 대상 항목</h3>'''),
     (r'''<h3>Removal rate over time</h3>''',
      r'''<h3>시간에 따른 삭제율</h3>'''),
-    (r'''Share of targeted items Google actually removed (legal + policy + already removed).''',
-     r'''Google이 실제로 삭제한 대상 항목의 비율 (법적 + 정책 + 이미 삭제됨).'''),
+    (r'''Share of targeted items Google removed on legal or policy grounds (excludes items already gone before Google acted).''',
+     r'''Google가 법적 또는 정책상의 이유로 삭제한 대상 항목의 비율 (Google이 조치하기 전에 이미 삭제된 항목 제외).'''),
     (r'''<h3>Top 10 countries by items targeted</h3>''',
      r'''<h3>삭제 대상 항목 기준 상위 10개국</h3>'''),
     (r'''<h3>Top reasons cited</h3>''',

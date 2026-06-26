@@ -279,6 +279,13 @@
     color: var(--muted); margin: 0; }
   .scope-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 999px;
     overflow: hidden; background: var(--panel2); }
+  .scope-warn { font-size: 12px; color: #8a6d00; margin: 6px 0 0; max-width: 60ch; }
+  [data-theme="dark"] .scope-warn { color: #d29922; }
+  .glossary { margin: 0 0 18px; font-size: 13px; }
+  .glossary summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .glossary dl { margin: 10px 0 0; max-width: 70ch; }
+  .glossary dt { font-weight: 600; margin-top: 8px; }
+  .glossary dd { margin: 1px 0 0; color: var(--muted); }
   .scope-seg button { all: unset; cursor: pointer; padding: 6px 14px; font-size: 12.5px;
     color: var(--muted); white-space: nowrap; }
   .scope-seg button:hover { color: var(--fg); }
@@ -521,6 +528,16 @@
 
   <div class="stats" id="stats" aria-busy="true"><p class="loading">Kennzahlen werden geladen…</p></div>
 
+  <details class="glossary">
+    <summary>Schlüsselbegriffe</summary>
+    <dl>
+      <dt>VLOP / VLOSE</dt><dd>Sehr große Online-Plattform / Suchmaschine — von der EU nach dem DSA benannte Dienste mit über 45 Mio. monatlichen EU-Nutzern.</dd>
+      <dt>Article 16 notices</dt><dd>Meldungen mutmaßlich illegaler Inhalte, die Nutzer oder vertrauenswürdige Hinweisgeber nach dem DSA an eine Plattform übermitteln.</dd>
+      <dt>AMAR</dt><dd>Durchschnittliche monatlich aktive Nutzer — die EU-Nutzerbasis einer Plattform, genutzt als Nenner für normalisierte Raten.</dd>
+      <dt>Own-initiative actions</dt><dd>Moderation, die eine Plattform aus eigener Initiative vornimmt (nicht auf eine Meldung oder Anordnung hin), aus rechtlichen oder AGB-Gründen.</dd>
+    </dl>
+  </details>
+
   <section class="card" id="tabs-card" aria-label="Browse DSA report tables">
     <div class="tabs-head">
       <p class="tabs-eyebrow">Nach DSA-Berichtstabelle durchsuchen</p>
@@ -528,6 +545,7 @@
         <button type="button" class="on" data-scope="vlop">Nur VLOPs</button>
         <button type="button" data-scope="all">Nicht-VLOP-Melder einbeziehen</button>
       </div>
+      <p class="scope-warn" id="scope-warn" role="status" hidden>Nicht-VLOP-Meldende berichten über andere Zeiträume (oft das ganze Jahr) als VLOPs (H2 2025); Rohsummen über Stufen hinweg sind nicht direkt vergleichbar.</p>
     </div>
     <div class="tabstrip" id="tabstrip" role="tablist"></div>
     <div id="tab-panel">
@@ -941,6 +959,7 @@ function setupTabs() {
   $("#scope-seg").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     $("#scope-seg").querySelectorAll("button").forEach(x => x.classList.remove("on"));
     b.classList.add("on"); currentScope = b.dataset.scope;
+    $("#scope-warn").hidden = currentScope !== "all";
     if (currentTab) renderTab(currentTab);
   }));
   currentTab = TABS[0]; renderTab(TABS[0]);

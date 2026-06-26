@@ -213,7 +213,12 @@ display: flex; align-items: center; justify-content: space-between;
   }
   .table-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   .table-card-head h3 { margin: 0; font-size: 15px; }
+  .table-card-actions { display: flex; align-items: center; gap: 12px; }
   .row-count { font-size: 12.5px; color: var(--muted); }
+  .dl-csv { font-size: 12.5px; padding: 5px 12px; border: 1px solid var(--border); border-radius: 7px;
+    background: var(--panel2); color: var(--fg); cursor: pointer; }
+  .dl-csv:hover { border-color: var(--accent); color: var(--accent); }
+  .dl-csv:disabled { opacity: .6; cursor: default; }
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
   th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
@@ -482,7 +487,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>削除率の推移</h3>
-        <p class="chart-sub">対象項目のうち Google が実際に削除した割合（法的理由 + ポリシー + 既に削除済み）。</p>
+        <p class="chart-sub">対象項目のうち Google が法的理由またはポリシーに基づいて削除した割合（Google の対応前にすでに削除されていた項目は除く）。</p>
         <div class="chart-loading" id="rate-loading">読み込み中…</div>
         <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rate-table" class="sr-only"></div>
@@ -522,7 +527,10 @@ display: flex; align-items: center; justify-content: space-between;
     <div class="table-card">
       <div class="table-card-head">
         <h3>レコード（削除対象項目の多い順 上位 50 件）</h3>
-        <span class="row-count" id="row-count"></span>
+        <div class="table-card-actions">
+          <span class="row-count" id="row-count"></span>
+          <button type="button" id="dl-csv" class="dl-csv">CSV をダウンロード</button>
+        </div>
       </div>
       <div class="table-scroll">
         <table>
@@ -607,6 +615,7 @@ display: flex; align-items: center; justify-content: space-between;
   var allPeriods = [], fromIdx = 0, toIdx = 0;
   var charts = {};
   var debounceTimer = null;
+  var datasetGenerated = '';   // snapshot date, for a citable export filename
 
   // ── API calls ─────────────────────────────────────────────────────────────
   async function explore(body) {
@@ -637,6 +646,22 @@ display: flex; align-items: center; justify-content: space-between;
     return conds.length ? { and: conds } : undefined;
   }
 
+  // The records-table query (also reused by the CSV export button), honouring the
+  // current filters.
+  function recordsQuery() {
+    return q('gr_removals',
+      ['period','country_name','requestor','product','reason'],
+      [
+        { function: 'SUM', field_name: 'num_requests',    alias: 'reqs' },
+        { function: 'SUM', field_name: 'items_requested', alias: 'items' },
+        { function: 'SUM', field_name: 'removed_legal',   alias: 'legal' },
+        { function: 'SUM', field_name: 'removed_policy',  alias: 'policy' },
+        { function: 'SUM', field_name: 'already_removed', alias: 'already' },
+      ],
+      [{ field_name: 'items', order: 'desc' }], 50
+    );
+  }
+
   function q(table, group_by, aggregates, sort, max_count) {
     var body = { table: table, group_by: group_by, aggregates: aggregates };
     if (sort)      body.sort = sort;
@@ -657,9 +682,14 @@ display: flex; align-items: center; justify-content: space-between;
   // Accessible data-table mirror of a chart, written into a visually-hidden
   // (.sr-only) container so screen-reader users get the numbers even though the
   // canvas is aria-hidden (and even if Chart.js fails to load).
-  function srTable(tableId, caption, headers, rows) {
+  function srTable(tableId, headers, rows) {
     var el = document.getElementById(tableId);
     if (!el) return;
+    // Caption = the chart card's own <h3>, which is already localized — avoids a
+    // separate (and easily-stale) English caption literal.
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
     el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
       + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
       + '</tr></thead><tbody>'
@@ -749,7 +779,7 @@ display: flex; align-items: center; justify-content: space-between;
       var labels = rows.map(function(r){ return r[0]; });
       var values = rows.map(function(r){ return r[1]; });
       lineChart('chart-ts', 'ts-loading', labels, [{ label: '対象項目数', data: values }]);
-      srTable('chart-ts-table', 'Items targeted for removal, by period',
+      srTable('chart-ts-table',
         ['期間', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
     } else {
       // rows = [period, breakdown_val, items] — pivot into per-breakdown datasets
@@ -769,7 +799,7 @@ display: flex; align-items: center; justify-content: space-between;
         return { label: entry.key, data: periodSet.map(function(p){ return seriesMap[entry.key][p] || 0; }) };
       });
       lineChart('chart-ts', 'ts-loading', periodSet, datasets);
-      srTable('chart-ts-table', 'Items targeted for removal, by period',
+      srTable('chart-ts-table',
         ['期間'].concat(totals.map(function(e){ return e.key; })),
         periodSet.map(function(p){
           return [p].concat(totals.map(function(e){ return fmt(seriesMap[e.key][p] || 0); }));
@@ -779,13 +809,15 @@ display: flex; align-items: center; justify-content: space-between;
 
   function renderRate(rows) {
     // rows = [period, items, legal, policy, already]
+    // Numerator is legal + policy grounds only — items "already removed" were gone
+    // before Google acted, so counting them as Google removals overstates compliance.
     var labels = rows.map(function(r){ return r[0]; });
     var rates  = rows.map(function(r){
-      var items = r[1], removed = (r[2]||0) + (r[3]||0) + (r[4]||0);
+      var items = r[1], removed = (r[2]||0) + (r[3]||0);
       return items > 0 ? removed / items : null;
     });
     pctLineChart('chart-rate', 'rate-loading', labels, rates);
-    srTable('chart-rate-table', 'Removal rate over time', ['期間', '削除率'],
+    srTable('chart-rate-table', ['期間', '削除率'],
       rows.map(function(r, i){ return [r[0], rates[i] == null ? '—' : (rates[i] * 100).toFixed(1) + '%']; }));
   }
 
@@ -793,7 +825,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-countries', 'cty-loading', labels, values, '対象項目数');
-    srTable('chart-countries-table', 'Top 10 countries by items targeted',
+    srTable('chart-countries-table',
       ['国', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -801,7 +833,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; });
     var values = rows.map(function(r){ return r[1]; });
     doughnutChart('chart-reasons', 'rsn-loading', labels, values);
-    srTable('chart-reasons-table', 'Top reasons cited',
+    srTable('chart-reasons-table',
       ['理由', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -809,7 +841,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = rows.map(function(r){ return r[0]; }).reverse();
     var values = rows.map(function(r){ return r[1]; }).reverse();
     barChart('chart-products', 'prd-loading', labels, values, '対象項目数');
-    srTable('chart-products-table', 'Top Google products targeted',
+    srTable('chart-products-table',
       ['Google プロダクト', '対象項目数'], rows.map(function(r){ return [r[0], fmt(r[1])]; }));
   }
 
@@ -827,7 +859,7 @@ display: flex; align-items: center; justify-content: space-between;
     var labels = ['削除（法的理由）', '削除（ポリシー）', '既に削除済み', '見つからず', '情報不足', '対応なし'];
     var values = [r[0]||0, r[1]||0, r[2]||0, r[3]||0, r[4]||0, r[5]||0];
     doughnutChart('chart-compliance', 'cmp-loading', labels, values);
-    srTable('chart-compliance-table', 'How Google responded',
+    srTable('chart-compliance-table',
       ['結果', '件数'], labels.map(function(l, i){ return [l, fmt(values[i])]; }));
   }
 
@@ -928,17 +960,7 @@ display: flex; align-items: center; justify-content: space-between;
           { function: 'SUM', field_name: 'not_enough_info', alias: 'not_info' },
           { function: 'SUM', field_name: 'no_action',       alias: 'no_action' },
         ], [], 1)),
-        explore(q('gr_removals',
-          ['period','country_name','requestor','product','reason'],
-          [
-            { function: 'SUM', field_name: 'num_requests',    alias: 'reqs' },
-            { function: 'SUM', field_name: 'items_requested', alias: 'items' },
-            { function: 'SUM', field_name: 'removed_legal',   alias: 'legal' },
-            { function: 'SUM', field_name: 'removed_policy',  alias: 'policy' },
-            { function: 'SUM', field_name: 'already_removed', alias: 'already' },
-          ],
-          [{ field_name: 'items', order: 'desc' }], 50
-        )),
+        explore(recordsQuery()),
       ]);
 
       // Sort chronologically using allPeriods order (avoids lexicographic sorting bugs)
@@ -977,6 +999,7 @@ display: flex; align-items: center; justify-content: space-between;
       document.getElementById('stats').removeAttribute('aria-busy');
 
       // Provenance + citation line (dataset snapshot date + covered window).
+      datasetGenerated = d.generated || '';
       if (d.generated) {
         document.getElementById('prov-snap').textContent =
           d.generated + (d.coverage ? ' (' + d.coverage + ')' : '');
@@ -1034,6 +1057,32 @@ display: flex; align-items: center; justify-content: space-between;
           document.getElementById(id).value = '';
         });
         scheduleRefresh();
+      });
+
+      // Export the current records view as CSV (honours the active filters).
+      document.getElementById('dl-csv').addEventListener('click', async function () {
+        var btn = this, label = btn.textContent;
+        btn.disabled = true; btn.textContent = '準備中…';
+        try {
+          var res = await fetch('/api/explore?format=csv', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(recordsQuery()),
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          var blob = await res.blob();
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          // Descriptive name + snapshot date, so the export is self-identifying and citable.
+          a.href = url;
+          a.download = 'google-removals-records' + (datasetGenerated ? '-' + datasetGenerated : '') + '.csv';
+          document.body.appendChild(a); a.click(); a.remove();
+          URL.revokeObjectURL(url);
+        } catch (e) {
+          var errEl = document.getElementById('chart-error');
+          errEl.textContent = 'CSV エクスポートに失敗しました: ' + e.message; errEl.classList.remove('hidden');
+        } finally {
+          btn.disabled = false; btn.textContent = label;
+        }
       });
 
       document.getElementById('dashboard').classList.remove('hidden');
