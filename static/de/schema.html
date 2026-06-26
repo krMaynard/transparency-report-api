@@ -183,6 +183,19 @@ display: flex; align-items: center;
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 4px; }
+  .cta { display: inline-block; font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 8px;
+    background: var(--accent); color: var(--on-accent); text-decoration: none; border: 1px solid var(--accent); }
+  .cta:hover { opacity: .9; }
+  .cta-ghost { background: transparent; color: var(--accent); }
+  .cta-ghost:hover { background: var(--panel2); opacity: 1; }
+  .example { margin: 10px 0 2px; }
+  .example summary { cursor: pointer; font-size: 12px; color: var(--accent); font-weight: 600; }
+  .example pre { margin: 8px 0 0; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 8px; overflow-x: auto; font-family: var(--mono); font-size: 12px; line-height: 1.5; }
+  .ops { margin: 2px 0 8px; }
+  .ops .pill { font-size: 11px; padding: 1px 7px; }
+  .ops .ops-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-right: 6px; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
@@ -385,8 +398,13 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card">
+    <p class="hint">Dies sind die Tabellen hinter den Dashboards <a href="/de/reports">Berichte</a> und <a href="/de/removals">Entfernungen</a> — durchsuchen Sie die Felder und fragen Sie sie dann mit dem Explore-Builder, dem Eingabefeld für natürliche Sprache oder der API ab. Siehe <a href="/de/methodology">Methodik</a> dazu, woher die Daten stammen und wie Doppelzählung vermieden wird.</p>
+    <p class="cta-row">
+      <a class="cta" href="/de/reports">Abfrage-Builder öffnen →</a>
+      <a class="cta cta-ghost" href="/docs">API-Referenz (Swagger)</a>
+    </p>
     <p class="hint">Feldregister sind öffentlich, ebenso die begrenzten Abfragen der Dashboards. Ein <a href="/de/api-key">API-Schlüssel</a> wird nur für die asynchrone Abfrage-API, Massenexporte als JSON/CSV und die Ask-Box in natürlicher Sprache benötigt.</p>
-    <p class="hint" id="dataset-meta" aria-busy="true">Wird geladen…</p>
+    <p class="hint" id="dataset-meta" aria-busy="true" aria-live="polite">Loading…</p>
     <div class="error hidden" id="error" role="alert"></div>
     <h3 style="font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:18px 0 10px;">Berichtstabellen</h3>
     <div id="tables"></div>
@@ -414,20 +432,36 @@ async function api(path) {
   return res.json();
 }
 
-function fieldDefs(names, help) {
-  if (!names.length) return '<p class="dim">—</p>';
+function fieldDefs(names, help, emptyNote) {
+  if (!names.length) return '<p class="dim">' + esc(emptyNote || "—") + '</p>';
   return '<dl class="fielddefs">' + names.map(function (n) {
     var desc = help && help[n] ? '<dd>' + esc(help[n]) + '</dd>' : '<dd class="dim">—</dd>';
     return '<dt><code>' + esc(n) + '</code></dt>' + desc;
   }).join('') + '</dl>';
 }
 
+// Render an operations/aggregate vocabulary as labelled pills.
+function opsPills(label, ops) {
+  if (!ops || !ops.length) return '';
+  return '<div class="ops"><span class="ops-label">' + esc(label) + '</span>'
+    + ops.map(function (o) { return '<span class="pill">' + esc(o) + '</span>'; }).join('') + '</div>';
+}
+
 function renderTable(t) {
+  var dims = t.dimensions || {}, meas = t.measures || {};
+  var example = t.example
+    ? `<details class="example"><summary>Beispielabfrage — in den Explore-Builder oder <code>POST /api/query</code> kopieren</summary><pre>${esc(JSON.stringify(t.example, null, 2))}</pre></details>`
+    : "";
+  var aggLine = (meas.fields && meas.fields.length)
+    ? opsPills("Aggregation", t.aggregate_functions) : "";
   return `<div class="tbl">
     <div class="name">${esc(t.table)}</div>
     <p class="hint">${esc(t.description || "")}</p>
-    <div class="field-cat"><h3>Dimensionen <span class="dim">· filtern / gruppieren / sortieren</span></h3>${fieldDefs(t.dimensions.fields, t.field_help)}</div>
-    <div class="field-cat"><h3>Maße <span class="dim">· filtern / aggregieren</span></h3>${fieldDefs(t.measures.fields, t.field_help)}</div>
+    <div class="field-cat"><h3>Dimensionen <span class="dim">· filtern / gruppieren / sortieren</span></h3>
+      ${opsPills("Operationen", dims.operations)}${fieldDefs(dims.fields, t.field_help)}</div>
+    <div class="field-cat"><h3>Maße <span class="dim">· filtern / aggregieren</span></h3>
+      ${opsPills("Operationen", meas.operations)}${aggLine}${fieldDefs(meas.fields, t.field_help, "Keine numerischen Kennzahlen — eine Freitexttabelle; fordern Sie eine Dimension über fields an.")}</div>
+    ${example}
   </div>`;
 }
 
@@ -435,20 +469,24 @@ function renderTable(t) {
 async function loadSchema() {
   const meta = await api("/api/tables");
   const m = $("#dataset-meta");
-  m.textContent = `${meta.dataset} · Zeitraum ${meta.period} · ${meta.tables.length} Berichtstabellen`;
+  m.textContent = `${meta.dataset} · DSA-Zeitraum ${meta.period} · ${meta.tables.length} abfragbare Tabellen`;
   m.removeAttribute("aria-busy");
   if (meta.generated) {
     $("#prov-snap").textContent = meta.generated + (meta.period ? ` (${meta.period})` : "");
-    $("#prov-cite").textContent = `“${meta.dataset}, via the Transparency Report API (${meta.generated} snapshot).”`;
+    $("#prov-cite").textContent = `“${meta.dataset}, über die Transparency Report API (Momentaufnahme vom ${meta.generated}).”`;
     $("#provenance").hidden = false;
   }
   // Fetch every table's field registry in parallel rather than one roundtrip at a time.
   const details = await Promise.all(meta.tables.map((t) => api(`/api/schema/${t.name}`)));
-  $("#tables").innerHTML = details.map(renderTable).join("");
+  $("#tables").innerHTML = details.length
+    ? details.map(renderTable).join("")
+    : '<p class="hint">Keine abfragbaren Tabellen verfügbar.</p>';
 }
 
 loadSchema().catch((err) => {
-  $("#dataset-meta").classList.add("hidden");
+  const m = $("#dataset-meta");
+  m.classList.add("hidden");
+  m.removeAttribute("aria-busy");
   const e = $("#error");
   e.textContent = "Schema konnte nicht geladen werden: " + err.message;
   show(e);

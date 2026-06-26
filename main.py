@@ -3181,6 +3181,8 @@ FIELD_HELP: dict[str, str] = {
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",
+    "items": "Number of content items the orders/notices refer to (Tables 3 & 4).",
+    "tf_items": "Of those items, the count referenced by trusted-flagger notices (Table 4).",
     "median_time": "Median time to act on notices (units as reported). A median — do NOT SUM or AVG it across rows.",
     "tf_median_time": "Median time to act on trusted-flagger notices. A median — do NOT SUM or AVG it.",
     "orders_to_act": "Member-state orders to act against content (Table 3, Art. 9).",
@@ -3209,8 +3211,6 @@ FIELD_HELP: dict[str, str] = {
     # ── measures: Google removals ──
     "num_requests": "Number of government removal requests.",
     "items_requested": "Items governments asked Google to remove (what was requested, not necessarily removed).",
-    "items": "Item count.",
-    "tf_items": "Trusted-flagger item count.",
     "removed_legal": "Items removed on legal grounds.",
     "removed_policy": "Items removed on content-policy grounds.",
     "already_removed": "Items already removed before Google acted.",
@@ -3290,7 +3290,7 @@ def list_tables() -> dict[str, Any]:
     """The queryable DSA report tables and the dataset's reporting period."""
     meta = _dataset_meta()
     return {
-        "dataset": "EU DSA VLOP transparency reports",
+        "dataset": "EU DSA transparency reports & Google government removals",
         "period": meta.get("period"),
         "generated": meta.get("generated"),
         "tables": [{"name": name, "description": spec.description} for name, spec in TABLES.items()],
