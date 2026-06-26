@@ -281,6 +281,11 @@
     overflow: hidden; background: var(--panel2); }
   .scope-warn { font-size: 12px; color: #8a6d00; margin: 6px 0 0; max-width: 60ch; }
   [data-theme="dark"] .scope-warn { color: #d29922; }
+  .glossary { margin: 0 0 18px; font-size: 13px; }
+  .glossary summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .glossary dl { margin: 10px 0 0; max-width: 70ch; }
+  .glossary dt { font-weight: 600; margin-top: 8px; }
+  .glossary dd { margin: 1px 0 0; color: var(--muted); }
   .scope-seg button { all: unset; cursor: pointer; padding: 6px 14px; font-size: 12.5px;
     color: var(--muted); white-space: nowrap; }
   .scope-seg button:hover { color: var(--fg); }
@@ -522,6 +527,16 @@
   </section>
 
   <div class="stats" id="stats" aria-busy="true"><p class="loading">Loading headline figures…</p></div>
+
+  <details class="glossary">
+    <summary>Key terms</summary>
+    <dl>
+      <dt>VLOP / VLOSE</dt><dd>Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.</dd>
+      <dt>Article 16 notices</dt><dd>Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.</dd>
+      <dt>AMAR</dt><dd>Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.</dd>
+      <dt>Own-initiative actions</dt><dd>Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.</dd>
+    </dl>
+  </details>
 
   <section class="card" id="tabs-card" aria-label="Browse DSA report tables">
     <div class="tabs-head">

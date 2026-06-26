@@ -281,6 +281,11 @@
     overflow: hidden; background: var(--panel2); }
   .scope-warn { font-size: 12px; color: #8a6d00; margin: 6px 0 0; max-width: 60ch; }
   [data-theme="dark"] .scope-warn { color: #d29922; }
+  .glossary { margin: 0 0 18px; font-size: 13px; }
+  .glossary summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .glossary dl { margin: 10px 0 0; max-width: 70ch; }
+  .glossary dt { font-weight: 600; margin-top: 8px; }
+  .glossary dd { margin: 1px 0 0; color: var(--muted); }
   .scope-seg button { all: unset; cursor: pointer; padding: 6px 14px; font-size: 12.5px;
     color: var(--muted); white-space: nowrap; }
   .scope-seg button:hover { color: var(--fg); }
@@ -522,6 +527,16 @@
   </section>
 
   <div class="stats" id="stats" aria-busy="true"><p class="loading">주요 수치 불러오는 중…</p></div>
+
+  <details class="glossary">
+    <summary>주요 용어</summary>
+    <dl>
+      <dt>VLOP / VLOSE</dt><dd>초대형 온라인 플랫폼 / 검색 엔진 — EU 내 월간 이용자가 4,500만 명 이상이어서 EU가 DSA에 따라 지정한 서비스.</dd>
+      <dt>Article 16 notices</dt><dd>이용자 또는 신뢰할 수 있는 신고자가 DSA에 따라 플랫폼에 제출하는 위법 의심 콘텐츠 신고.</dd>
+      <dt>AMAR</dt><dd>월평균 활성 이용자 수 — 플랫폼의 EU 이용자 규모로, 정규화된 비율의 분모로 사용됩니다.</dd>
+      <dt>Own-initiative actions</dt><dd>플랫폼이 (신고나 명령에 대한 대응이 아니라) 자체 판단으로 법적 또는 서비스 약관상의 이유로 수행하는 모더레이션.</dd>
+    </dl>
+  </details>
 
   <section class="card" id="tabs-card" aria-label="Browse DSA report tables">
     <div class="tabs-head">

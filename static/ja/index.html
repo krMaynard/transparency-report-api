@@ -281,6 +281,11 @@
     overflow: hidden; background: var(--panel2); }
   .scope-warn { font-size: 12px; color: #8a6d00; margin: 6px 0 0; max-width: 60ch; }
   [data-theme="dark"] .scope-warn { color: #d29922; }
+  .glossary { margin: 0 0 18px; font-size: 13px; }
+  .glossary summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .glossary dl { margin: 10px 0 0; max-width: 70ch; }
+  .glossary dt { font-weight: 600; margin-top: 8px; }
+  .glossary dd { margin: 1px 0 0; color: var(--muted); }
   .scope-seg button { all: unset; cursor: pointer; padding: 6px 14px; font-size: 12.5px;
     color: var(--muted); white-space: nowrap; }
   .scope-seg button:hover { color: var(--fg); }
@@ -522,6 +527,16 @@
   </section>
 
   <div class="stats" id="stats" aria-busy="true"><p class="loading">主要数値を読み込み中…</p></div>
+
+  <details class="glossary">
+    <summary>主な用語</summary>
+    <dl>
+      <dt>VLOP / VLOSE</dt><dd>超大規模オンラインプラットフォーム／検索エンジン — EU 域内の月間利用者が 4,500 万人以上であるとして、EU が DSA に基づき指定したサービス。</dd>
+      <dt>Article 16 notices</dt><dd>DSA に基づき、利用者または信頼できる報告者がプラットフォームに提出する、違法の疑いがあるコンテンツの通報。</dd>
+      <dt>AMAR</dt><dd>平均月間アクティブ利用者数 — プラットフォームの EU 域内の利用者規模。正規化した比率の分母として使われます。</dd>
+      <dt>Own-initiative actions</dt><dd>プラットフォームが自らの判断で（通報や命令への対応ではなく）、法的またはサービス利用規約上の理由で行うモデレーション。</dd>
+    </dl>
+  </details>
 
   <section class="card" id="tabs-card" aria-label="Browse DSA report tables">
     <div class="tabs-head">

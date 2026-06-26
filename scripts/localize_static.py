@@ -299,6 +299,15 @@ PAGES["de"]["home.html"] = [
 ]
 
 PAGES["es"]["index.html"] = [
+    ('''>Key terms</summary>''', '''>Términos clave</summary>'''),
+    ('''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     '''Plataforma o motor de búsqueda en línea de muy gran tamaño: servicios designados por la UE conforme al DSA por tener más de 45 millones de usuarios mensuales en la UE.'''),
+    ('''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     '''Denuncias de contenido presuntamente ilegal que los usuarios o alertadores fiables envían a una plataforma conforme al DSA.'''),
+    ('''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     '''Promedio de destinatarios activos mensuales: la base de usuarios en la UE de una plataforma, usada como denominador para tasas normalizadas.'''),
+    ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     '''Moderación que una plataforma realiza por iniciativa propia (no en respuesta a una denuncia u orden), por motivos legales o de condiciones del servicio.'''),
     ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
      '''Los declarantes no VLOP informan sobre periodos distintos (a menudo el año completo) que las VLOP (S2 2025); los totales brutos entre niveles no son directamente comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de la UE · informes de transparencia'''),
@@ -479,6 +488,15 @@ PAGES["es"]["index.html"] = [
 ]
 
 PAGES["fr"]["index.html"] = [
+    ('''>Key terms</summary>''', '''>Termes clés</summary>'''),
+    ('''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     '''Très grande plateforme / très grand moteur de recherche en ligne — services désignés par l’UE au titre du DSA pour leurs 45 M+ d’utilisateurs mensuels dans l’UE.'''),
+    ('''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     '''Signalements de contenus présumés illicites que des utilisateurs ou des signaleurs de confiance soumettent à une plateforme au titre du DSA.'''),
+    ('''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     '''Nombre moyen de destinataires actifs mensuels — la base d’utilisateurs de la plateforme dans l’UE, utilisée comme dénominateur pour les taux normalisés.'''),
+    ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     '''Modération qu’une plateforme effectue de sa propre initiative (sans signalement ni injonction), pour des motifs juridiques ou de conditions d’utilisation.'''),
     ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
      '''Les déclarants non-VLOP couvrent des périodes différentes (souvent l’année entière) de celles des VLOP (S2 2025) ; les totaux bruts entre catégories ne sont pas directement comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de l’UE · rapports de transparence'''),
@@ -658,6 +676,15 @@ PAGES["fr"]["index.html"] = [
 ]
 
 PAGES["de"]["index.html"] = [
+    ('''>Key terms</summary>''', '''>Schlüsselbegriffe</summary>'''),
+    ('''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     '''Sehr große Online-Plattform / Suchmaschine — von der EU nach dem DSA benannte Dienste mit über 45 Mio. monatlichen EU-Nutzern.'''),
+    ('''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     '''Meldungen mutmaßlich illegaler Inhalte, die Nutzer oder vertrauenswürdige Hinweisgeber nach dem DSA an eine Plattform übermitteln.'''),
+    ('''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     '''Durchschnittliche monatlich aktive Nutzer — die EU-Nutzerbasis einer Plattform, genutzt als Nenner für normalisierte Raten.'''),
+    ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     '''Moderation, die eine Plattform aus eigener Initiative vornimmt (nicht auf eine Meldung oder Anordnung hin), aus rechtlichen oder AGB-Gründen.'''),
     ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
      '''Nicht-VLOP-Meldende berichten über andere Zeiträume (oft das ganze Jahr) als VLOPs (H2 2025); Rohsummen über Stufen hinweg sind nicht direkt vergleichbar.'''),
     ('''EU DSA · transparency reports''', '''EU-DSA · Transparenzberichte'''),
@@ -1627,6 +1654,15 @@ PAGES["ja"]["home.html"] = [
      r'''· データ：<a'''),
 ]
 PAGES["ja"]["index.html"] = [
+    (r'''>Key terms</summary>''', r'''>主な用語</summary>'''),
+    (r'''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     r'''超大規模オンラインプラットフォーム／検索エンジン — EU 域内の月間利用者が 4,500 万人以上であるとして、EU が DSA に基づき指定したサービス。'''),
+    (r'''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     r'''DSA に基づき、利用者または信頼できる報告者がプラットフォームに提出する、違法の疑いがあるコンテンツの通報。'''),
+    (r'''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     r'''平均月間アクティブ利用者数 — プラットフォームの EU 域内の利用者規模。正規化した比率の分母として使われます。'''),
+    (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     r'''プラットフォームが自らの判断で（通報や命令への対応ではなく）、法的またはサービス利用規約上の理由で行うモデレーション。'''),
     (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
      r'''非 VLOP の提出者は VLOP（2025 年下半期）とは異なる期間（多くは通年）で報告しているため、階層をまたいだ総計は直接比較できません。'''),
     (r'''EU DSA · transparency reports''',
@@ -2317,6 +2353,15 @@ PAGES["zh"]["home.html"] = [
      r'''· 数据：<a'''),
 ]
 PAGES["zh"]["index.html"] = [
+    (r'''>Key terms</summary>''', r'''>关键术语</summary>'''),
+    (r'''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     r'''超大型在线平台／搜索引擎——因在欧盟拥有 4,500 万以上月活跃用户而被欧盟依据 DSA 指定的服务。'''),
+    (r'''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     r'''用户或可信举报者依据 DSA 向平台提交的涉嫌违法内容的举报。'''),
+    (r'''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     r'''平均月活跃用户数——平台在欧盟的用户规模，用作归一化比率的分母。'''),
+    (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     r'''平台基于法律或服务条款理由自行开展的审核（并非针对举报或命令的回应）。'''),
     (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
      r'''非 VLOP 报告方的报告周期与 VLOP（2025 下半年）不同（通常为整年），跨层级的原始总计不可直接比较。'''),
     (r'''EU DSA · transparency reports''',
@@ -3006,6 +3051,15 @@ PAGES["ko"]["home.html"] = [
      r'''· 데이터: <a'''),
 ]
 PAGES["ko"]["index.html"] = [
+    (r'''>Key terms</summary>''', r'''>주요 용어</summary>'''),
+    (r'''Very Large Online Platform / Search Engine — services the EU has designated under the DSA for having 45M+ monthly EU users.''',
+     r'''초대형 온라인 플랫폼 / 검색 엔진 — EU 내 월간 이용자가 4,500만 명 이상이어서 EU가 DSA에 따라 지정한 서비스.'''),
+    (r'''Reports of allegedly illegal content that users or trusted flaggers submit to a platform under the DSA.''',
+     r'''이용자 또는 신뢰할 수 있는 신고자가 DSA에 따라 플랫폼에 제출하는 위법 의심 콘텐츠 신고.'''),
+    (r'''Average Monthly Active Recipients — a platform's EU user base, used as a denominator for normalised rates.''',
+     r'''월평균 활성 이용자 수 — 플랫폼의 EU 이용자 규모로, 정규화된 비율의 분모로 사용됩니다.'''),
+    (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
+     r'''플랫폼이 (신고나 명령에 대한 대응이 아니라) 자체 판단으로 법적 또는 서비스 약관상의 이유로 수행하는 모더레이션.'''),
     (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
      r'''비 VLOP 제출자는 VLOP(2025 하반기)와 다른 기간(대개 연간)을 보고하므로, 계층 간 원시 합계는 직접 비교할 수 없습니다.'''),
     (r'''EU DSA · transparency reports''',
