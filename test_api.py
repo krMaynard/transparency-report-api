@@ -1255,6 +1255,21 @@ class TestDashboard:
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "/api/overview" in r.text  # dashboard fetches the public overview
 
+    def test_methodology_page_served(self):
+        r = client.get("/methodology")
+        assert r.status_code == 200 and "text/html" in r.headers["content-type"]
+        assert "<h1>Methodology</h1>" in r.text
+        assert "script-src 'self'" in r.headers.get("content-security-policy", "")
+
+    def test_methodology_page_localized(self):
+        # The page is generated into every locale; the chrome + body translate and
+        # the route serves with its own recomputed CSP.
+        r = client.get("/es/methodology")
+        assert r.status_code == 200
+        assert "<h1>Metodología</h1>" in r.text
+        assert "Methodology</h1>" not in r.text  # no English heading leaked
+        assert "script-src 'self'" in r.headers.get("content-security-policy", "")
+
     def test_catalog_page_served(self):
         r = client.get("/catalog")
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]

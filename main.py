@@ -2083,6 +2083,12 @@ def mcp_page() -> FileResponse:
     return _serve_page("mcp.html", "MCP page")
 
 
+@app.get("/methodology", response_class=HTMLResponse)
+def methodology_page() -> FileResponse:
+    """Serve the methodology page (static; how the dataset is sourced/processed)."""
+    return _serve_page("methodology.html", "Methodology page")
+
+
 @app.get("/portal", include_in_schema=False)
 def portal_redirect() -> RedirectResponse:
     """Permanent redirect from the old researcher-portal URL to /api-key."""
@@ -2118,6 +2124,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "removals": ("removals.html", "Removals page", {}),
     "catalog": ("catalog.html", "Catalogue page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
+    "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
     "api-key": ("api-key.html", "API key page", _API_KEY_CSP_HOSTS),
     "privacy": ("privacy.html", "Privacy policy", {}),
