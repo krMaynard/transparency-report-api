@@ -1567,6 +1567,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
         params.extend(having_params)
 
     order_parts = []
+    sorted_cols: set[str] = set()
     for s in req.sort:
         if s.field_name not in col_types:
             raise QueryCompileError(
@@ -1574,9 +1575,20 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
                 f"(one of: {', '.join(col_types)})."
             )
         order_parts.append(f"{s.field_name} {'DESC' if s.order == 'desc' else 'ASC'}")
+        sorted_cols.add(s.field_name)
+    # Deterministic tie-break, matching the single-table path: when the caller
+    # sorts or paginates, append every remaining output column so the row order is
+    # total — otherwise a sorted-but-tied or offset composite pull isn't
+    # byte-reproducible across runs (the merge/UNION order isn't guaranteed).
+    if req.sort or req.offset:
+        for c in col_types:
+            if c not in sorted_cols:
+                order_parts.append(f"{c} ASC")
     if order_parts:
         sql += " ORDER BY " + ", ".join(order_parts)
     sql += f" LIMIT {min(req.max_count, ROW_LIMIT)}"
+    if req.offset:
+        sql += f" OFFSET {int(req.offset)}"
 
     return sql, params, list(col_types)
 

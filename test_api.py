@@ -1510,6 +1510,18 @@ class TestCompositeQueries:
         # Full-outer semantics: Facebook has no t5 rows but is kept, with NULLs.
         assert rows["Facebook"][1:] == [None, 500, None]
 
+    def test_composite_pagination_is_deterministic(self):
+        # Composite (cross-table) pulls get the same deterministic tie-break as the
+        # single-table path: paginated windows are stable across runs and disjoint
+        # at the page boundary (regression — the composite compiler previously
+        # appended no tie-break and ignored offset entirely).
+        base = _ratio_query(sort=[], max_count=1)
+        p0a = client.post("/api/explore", json={**base, "offset": 0}).json()["rows"]
+        p0b = client.post("/api/explore", json={**base, "offset": 0}).json()["rows"]
+        p1 = client.post("/api/explore", json={**base, "offset": 1}).json()["rows"]
+        assert p0a and p0a == p0b                 # repeated pull is byte-identical
+        assert p1 and p0a[0][0] != p1[0][0]       # page 2 is a different row
+
     def test_division_is_real_not_integer(self):
         # SUM of INTEGER columns must not integer-divide (9/1000 → 0).
         r = client.post("/api/explore", json=_ratio_query())
