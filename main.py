@@ -2236,6 +2236,7 @@ def _compute_overview() -> dict[str, Any]:
         return {
             "period": meta.get("period"),
             "generated": meta.get("generated"),
+            "version": _dataset_version(),
             "services": services,
             "platforms": platforms,
             "total_notices": total_notices,
@@ -2247,17 +2248,31 @@ def _compute_overview() -> dict[str, Any]:
         conn.close()
 
 
+def _dataset_etag(request: Request, response: Response) -> Response | None:
+    """Stamp the dataset-version ETag (+ a short cache window) on a public,
+    snapshot-static response. Returns a bare 304 when the client already holds
+    this version (conditional GET), else None and the caller serves the body."""
+    etag = f'W/"{_dataset_version()}"'
+    response.headers["ETag"] = etag
+    response.headers["Cache-Control"] = "public, max-age=300"
+    inm = request.headers.get("if-none-match")
+    if inm and etag in {t.strip() for t in inm.split(",")}:
+        return Response(status_code=304, headers={"ETag": etag, "Cache-Control": "public, max-age=300"})
+    return None
+
+
 @api_router.get("/overview")
-def overview() -> dict[str, Any]:
+def overview(request: Request, response: Response) -> Any:
     """Public headline aggregates for the dashboard — no auth. Memoised: the
     read-only DB is static, so we compute the fixed queries once (no user input
-    reaches SQL) and serve from memory thereafter."""
+    reaches SQL) and serve from memory thereafter. Carries the dataset-version
+    ETag so clients can cache and cite an immutable snapshot."""
     global _overview_cache
     if _overview_cache is None:
         with _overview_cache_lock:
             if _overview_cache is None:
                 _overview_cache = _compute_overview()
-    return _overview_cache
+    return _dataset_etag(request, response) or _overview_cache
 
 
 _gr_overview_cache: dict[str, Any] | None = None
@@ -2294,6 +2309,7 @@ def _compute_gr_overview() -> dict[str, Any]:
             # Provenance: the snapshot build date (shared with the DSA dataset) and
             # the covered reporting window, so the dashboard can cite both.
             "generated": _dataset_meta().get("generated"),
+            "version": _dataset_version(),
             "coverage": (periods[0] + " – " + periods[-1]) if periods else None,
             "countries": countries,
             "requestors": requestors,
@@ -2305,16 +2321,16 @@ def _compute_gr_overview() -> dict[str, Any]:
 
 
 @api_router.get("/overview/removals")
-def overview_removals() -> dict[str, Any]:
+def overview_removals(request: Request, response: Response) -> Any:
     """Public headline stats and filter options for the Government Removals dataset — no auth.
     Returns totals, the ordered period list (chronological), and dimension value lists for
-    populating filter dropdowns. Memoised like /overview."""
+    populating filter dropdowns. Memoised like /overview; carries the dataset-version ETag."""
     global _gr_overview_cache
     if _gr_overview_cache is None:
         with _gr_overview_cache_lock:
             if _gr_overview_cache is None:
                 _gr_overview_cache = _compute_gr_overview()
-    return _gr_overview_cache
+    return _dataset_etag(request, response) or _gr_overview_cache
 
 
 # --- Report-locations catalogue (non-VLOP DSA transparency reports) -----------
@@ -3056,6 +3072,16 @@ def _dataset_meta() -> dict[str, str]:
     return _meta_cache
 
 
+def _dataset_version() -> str:
+    """A short, stable digest of the dataset snapshot — an immutable token a
+    researcher can cite ("dataset version 7f3c…") and a client can use as an
+    ETag. Derived from the snapshot's reporting period + build timestamp, so it
+    changes only when the underlying data does (not on a code-only redeploy)."""
+    meta = _dataset_meta()
+    basis = f"{meta.get('period', '')}|{meta.get('generated', '')}"
+    return hashlib.sha256(basis.encode("utf-8")).hexdigest()[:12]
+
+
 # Short, plain-language help for each queryable field — what it means, its unit,
 # and any aggregation gotcha. Surfaced by /api/schema and the schema browser so
 # bare field names aren't a guessing game. English by design (field names are too).
@@ -3223,13 +3249,23 @@ def submit_query(
     response: Response,
     principal: dict = Depends(require_api_key),
 ) -> dict[str, Any]:
-    # Throttle the expensive job-spawning path per API key.
-    if _key_store.incr(f"query:{principal['key']}", QUERY_RATE_WINDOW) > QUERY_RATE_MAX:
+    # Throttle the expensive job-spawning path per API key. Advertise the limit
+    # on every response (success and 429) so a scripted caller can self-pace
+    # instead of discovering the ceiling by hitting it.
+    used = _key_store.incr(f"query:{principal['key']}", QUERY_RATE_WINDOW)
+    remaining = max(0, QUERY_RATE_MAX - used)
+    rate_headers = {
+        "X-RateLimit-Limit": str(QUERY_RATE_MAX),
+        "X-RateLimit-Remaining": str(remaining),
+        "X-RateLimit-Reset": str(QUERY_RATE_WINDOW),
+    }
+    if used > QUERY_RATE_MAX:
         raise HTTPException(
             status_code=429,
             detail=f"Query rate limit exceeded ({QUERY_RATE_MAX}/{QUERY_RATE_WINDOW}s). Slow down.",
-            headers={"Retry-After": str(QUERY_RATE_WINDOW)},
+            headers={**rate_headers, "Retry-After": str(QUERY_RATE_WINDOW)},
         )
+    response.headers.update(rate_headers)
 
     try:
         sql, params, _columns = compile_query(body)
@@ -3297,6 +3333,7 @@ def _provenance() -> dict[str, str | None]:
     return {
         "period": meta.get("period"),
         "generated": meta.get("generated"),
+        "version": _dataset_version(),
         "app_version": APP_VERSION,
         "source": "https://github.com/krMaynard/transparency-report-api",
     }
@@ -3306,7 +3343,7 @@ def _provenance_headers() -> dict[str, str]:
     """Same provenance as response headers — so a CSV export (whose body can't
     carry a metadata block without breaking the header row) is still citable."""
     prov = _provenance()
-    h = {"X-App-Version": APP_VERSION}
+    h = {"X-App-Version": APP_VERSION, "X-Dataset-Version": str(prov["version"])}
     if prov["period"]:
         h["X-Dataset-Period"] = prov["period"]
     if prov["generated"]:

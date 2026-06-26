@@ -736,10 +736,16 @@ class TestQueryRateLimit:
         main._key_store = main.MemoryKeyStore()  # isolated, so it doesn't affect other tests
         main.QUERY_RATE_MAX = 2
         try:
-            statuses = [client.post("/api/query", json=COUNT_ALL, headers=MOMO).status_code for _ in range(4)]
-            assert statuses == [202, 202, 429, 429]
+            first = client.post("/api/query", json=COUNT_ALL, headers=MOMO)
+            assert first.status_code == 202
+            # Success responses advertise the budget so a caller can self-pace.
+            assert first.headers["X-RateLimit-Limit"] == "2"
+            assert first.headers["X-RateLimit-Remaining"] == "1"
+            statuses = [client.post("/api/query", json=COUNT_ALL, headers=MOMO).status_code for _ in range(3)]
+            assert statuses == [202, 429, 429]
             r = client.post("/api/query", json=COUNT_ALL, headers=MOMO)
             assert r.status_code == 429 and r.headers["Retry-After"] == str(main.QUERY_RATE_WINDOW)
+            assert r.headers["X-RateLimit-Remaining"] == "0"
         finally:
             main._key_store, main.QUERY_RATE_MAX = original_store, original_max
 
@@ -1181,6 +1187,24 @@ class TestDashboard:
         assert {"platform", "notices"} <= set(d["top_platforms"][0])
         assert isinstance(d["by_category"], list)
         assert "period" in d and "generated" in d
+
+    def test_overview_carries_dataset_version_and_etag(self):
+        # The snapshot exposes an immutable version token (citable) and an ETag
+        # that lets a client revalidate with a conditional GET → 304.
+        r = client.get("/api/overview")
+        assert r.json().get("version")
+        etag = r.headers.get("ETag")
+        assert etag and r.headers.get("Cache-Control")
+        not_modified = client.get("/api/overview", headers={"If-None-Match": etag})
+        assert not_modified.status_code == 304
+
+    def test_removals_overview_carries_version_and_etag(self):
+        r = client.get("/api/overview/removals")
+        assert r.status_code == 200 and r.json().get("version")
+        etag = r.headers.get("ETag")
+        assert etag
+        assert client.get("/api/overview/removals",
+                          headers={"If-None-Match": etag}).status_code == 304
 
     def test_overview_notices_not_double_counted(self):
         # Regression: t4 carries a reported grand-total row (code 'TOTAL') plus two
