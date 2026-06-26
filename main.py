@@ -381,6 +381,7 @@ class Job:
     error: str | None = None
     row_count: int | None = None
     callback_url: str | None = None  # optional webhook notified on terminal state
+    warnings: list[str] = field(default_factory=list)  # non-fatal query caveats
     # columns/rows live in the result store, not on the job object.
     columns: list[str] | None = field(default=None, repr=False)
     rows: list[list[Any]] | None = field(default=None, repr=False)
@@ -397,6 +398,7 @@ class Job:
             "error": self.error,
             "row_count": rc,
             "compiled_sql": self.sql,
+            "warnings": self.warnings,
             "status_url": f"{API_PREFIX}/jobs/{self.id}",
             "result_url": f"{API_PREFIX}/jobs/{self.id}/result" if self.status == "done" else None,
             # Signed, expiring links that download the result without an API key.
@@ -3222,6 +3224,9 @@ def submit_query(
         except CallbackUrlError as exc:
             raise HTTPException(status_code=400, detail=str(exc))
 
+    # Non-fatal correctness advisories (double-count grain, median aggregation,
+    # cross-tier). Stored on the job so they ride along to /result and the CSV —
+    # not just the 202 — so the exported artifact keeps its guardrail.
     job = Job(
         id=uuid.uuid4().hex,
         sql=sql,
@@ -3229,19 +3234,14 @@ def submit_query(
         owner_key=principal["key"],
         submitted_by=principal["name"],
         callback_url=body.callback_url,
+        warnings=_query_warnings(body),
     )
     _store.put(job)
     JOB_QUEUE_DEPTH.inc()  # queued; decremented when _execute_job picks it up
     _executor.submit(_execute_job, job.id)
     logger.info("job_submitted", extra={"data": {"job_id": job.id, "user": principal["name"]}})
     response.headers["Location"] = f"{API_PREFIX}/jobs/{job.id}"
-    # Non-fatal correctness advisories (double-count grain, median aggregation) so a
-    # scripted caller sees them on submit rather than getting a silently-wrong number.
-    submitted = job.to_public()
-    warnings = _query_warnings(body)
-    if warnings:
-        submitted["warnings"] = warnings
-    return submitted
+    return job.to_public()
 
 
 @api_router.get("/jobs")
@@ -3305,6 +3305,8 @@ def _render_result(
         raise HTTPException(status_code=404, detail="Result not found (may have expired).")
     cols, rows = result
     prov_headers = _provenance_headers()
+    job = _store.get(job_id)
+    warnings = job.warnings if job else []
 
     if fmt == "csv":
         buf = io.StringIO()
@@ -3328,7 +3330,13 @@ def _render_result(
     # Stamp the result with dataset provenance so an exported JSON is self-describing
     # and citable (snapshot period + generation date + build) without a separate lookup.
     return JSONResponse(
-        {"columns": cols, "rows": rows, "row_count": len(rows), "dataset": _provenance()},
+        {
+            "columns": cols,
+            "rows": rows,
+            "row_count": len(rows),
+            "warnings": warnings,  # ride along to the result, not just the 202
+            "dataset": _provenance(),
+        },
         headers=headers,
     )
 

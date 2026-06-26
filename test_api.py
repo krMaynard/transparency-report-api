@@ -304,6 +304,18 @@ class TestQueryLifecycle:
         assert body["columns"] == ["n"]
         assert body["rows"][0][0] == 3  # 3 rows seeded in conftest.py
 
+    def test_warnings_ride_along_to_result(self):
+        # A double-count-prone query (no category_is_total grain) must carry its
+        # warning all the way to /result and the polled job — not only the 202 —
+        # so the exported artifact keeps its guardrail.
+        job = _submit_and_wait({
+            "table": "t4_notices", "group_by": ["service_name"],
+            "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+        })
+        assert any("double-count" in w for w in job.get("warnings", []))
+        r = client.get(f"/api/jobs/{job['job_id']}/result", headers=MOMO)
+        assert any("double-count" in w for w in r.json().get("warnings", []))
+
     def test_happy_path_csv(self):
         job = _submit_and_wait(
             {
