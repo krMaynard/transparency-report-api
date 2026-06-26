@@ -509,6 +509,7 @@ class RedisJobStore:
             "error": job.error or "",
             "row_count": "" if job.row_count is None else str(job.row_count),
             "callback_url": job.callback_url or "",
+            "warnings": json.dumps(job.warnings),
         }
 
     def _from_hash(self, h: dict[str, str]) -> Job:
@@ -525,6 +526,7 @@ class RedisJobStore:
             error=h.get("error") or None,
             row_count=int(h["row_count"]) if h.get("row_count") else None,
             callback_url=h.get("callback_url") or None,
+            warnings=json.loads(h.get("warnings") or "[]"),
         )
 
     def put(self, job: Job) -> None:
@@ -1653,12 +1655,15 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
             )
         order_parts.append(f"{col_expr[s.field_name]} {'DESC' if s.order == 'desc' else 'ASC'}")
         sorted_cols.add(s.field_name)
-    # Deterministic tie-break: append every remaining output column so the row order
-    # is a total order. Without this, a capped/paginated pull isn't byte-reproducible
-    # across runs (SQLite may return ties in any order) — fatal for snapshot diffing.
-    for c in columns:
-        if c not in sorted_cols:
-            order_parts.append(f"{col_expr[c]} ASC")
+    # Deterministic tie-break: append remaining output columns so the order is total.
+    # Only when the caller sorts or paginates — those are the cases where tie order is
+    # observable (a sorted view, or stable page boundaries across offset pulls). A bare
+    # capped query skips this to avoid forcing a full sort on large tables (the static
+    # read-only DB returns a stable order for an identical query anyway).
+    if req.sort or req.offset:
+        for c in columns:
+            if c not in sorted_cols:
+                order_parts.append(f"{col_expr[c]} ASC")
 
     limit = min(req.max_count, ROW_LIMIT)
 
@@ -3078,7 +3083,7 @@ FIELD_HELP: dict[str, str] = {
     "scope_key": "Language-neutral canonical label for `scope`.",
     "qualitative_text": "Free-text description (Table 11). Request it via `fields`; this table has no numeric measures.",
     # ── Google removals dims ──
-    "period_ord": "Chronological ordinal of the reporting period (1 = earliest). Sort by this for a correct timeline — the text `period` sorts alphabetically.",
+    "period_ord": "Chronological ordinal of the reporting period (1 = earliest). Sort or group by this for a correct timeline — the text `period` sorts alphabetically. It is a dimension, so filtering uses `EQ`/`IN` on the ordinal value (e.g. one specific period); for a range, sort by it and page, or `IN`-list the ordinals you want.",
     "country_code": "Requesting country's ISO code (Google government removals).",
     "country_name": "Requesting country (Google government removals).",
     "requestor": "Type of government body making the removal request.",

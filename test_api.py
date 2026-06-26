@@ -325,13 +325,19 @@ class TestQueryLifecycle:
         p1 = client.post("/api/explore", json={**base, "offset": 1}).json()["rows"]
         assert p0 and p1 and p0[0][0] != p1[0][0]  # distinct rows under a stable order
 
-    def test_results_are_deterministic_without_sort(self):
-        # No user sort → the tie-break makes repeated pulls byte-identical (snapshot diffing).
+    def test_paginated_pulls_are_deterministic(self):
+        # Under pagination the tie-break kicks in (req.offset), giving a total order so
+        # page boundaries are stable and repeated pulls are byte-identical — the property
+        # snapshot diffing and offset paging actually depend on.
         q = {"table": "t4_notices", "group_by": ["service_name", "category_label"],
-             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
+             "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+             "max_count": 5, "offset": 0}
         a = client.post("/api/explore", json=q).json()["rows"]
         b = client.post("/api/explore", json=q).json()["rows"]
         assert a == b
+        # And page 2 never repeats a page-1 row (stable boundary).
+        page2 = client.post("/api/explore", json={**q, "offset": 5}).json()["rows"]
+        assert not ({tuple(r) for r in a} & {tuple(r) for r in page2})
 
     def test_gr_period_ord_sorts_chronologically(self):
         r = client.post("/api/explore", json={
