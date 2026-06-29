@@ -1735,11 +1735,11 @@ COMMON["ja"] = [
 PAGES["ja"] = {}
 PAGES["ja"]["home.html"] = [
     (r'''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
-     r'''プラットフォームの透明性データを、役立つかたちに。EU デジタルサービス法（DSA）の透明性レポートと Google の政府コンテンツ削除要請を対象とする、インタラクティブなダッシュボードと構造化クエリ API。'''),
+     r'''プラットフォームの透明性データが、一目瞭然。EU デジタルサービス法（DSA）の透明性レポートと Google の政府コンテンツ削除要請を対象とする、インタラクティブなダッシュボードと構造化クエリ API。'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
      r'''<span class="hero-eyebrow">プラットフォームの透明性</span>'''),
     (r'''Platform transparency data,<br>made useful.''',
-     r'''プラットフォームの透明性データを、<br>役立つかたちに。'''),
+     r'''プラットフォームの透明性データが、<br>一目瞭然。'''),
     (r'''<p>Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.</p>''',
      r'''<p>EU デジタルサービス法（DSA）の透明性レポートと Google の政府コンテンツ削除要請を対象とする、インタラクティブなダッシュボードと構造化クエリ API。</p>'''),
     (r'''Explore the data''',
@@ -2474,11 +2474,11 @@ COMMON["zh"] = [
 PAGES["zh"] = {}
 PAGES["zh"]["home.html"] = [
     (r'''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
-     r'''让平台透明度数据真正用得上。为欧盟《数字服务法》（DSA）透明度报告和 Google 政府删除请求，提供交互式仪表板与结构化查询 API。'''),
+     r'''让平台透明度数据一目了然。为欧盟《数字服务法》（DSA）透明度报告和 Google 政府删除请求，提供交互式仪表板与结构化查询 API。'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
      r'''<span class="hero-eyebrow">平台透明度</span>'''),
     (r'''Platform transparency data,<br>made useful.''',
-     r'''平台透明度数据，<br>真正用得上。'''),
+     r'''平台透明度数据，<br>一目了然。'''),
     (r'''<p>Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.</p>''',
      r'''<p>为欧盟《数字服务法》（DSA）透明度报告和 Google 政府删除请求，提供交互式仪表板与结构化查询 API。</p>'''),
     (r'''Explore the data''',
@@ -3212,11 +3212,11 @@ COMMON["ko"] = [
 PAGES["ko"] = {}
 PAGES["ko"]["home.html"] = [
     (r'''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
-     r'''플랫폼 투명성 데이터를 유용하게. EU 디지털 서비스법(DSA) 투명성 보고서와 Google 정부 콘텐츠 삭제 요청을 위한 대화형 대시보드와 구조화된 쿼리 API.'''),
+     r'''플랫폼 투명성 데이터를 일목요연하게. EU 디지털 서비스법(DSA) 투명성 보고서와 Google 정부 콘텐츠 삭제 요청을 위한 대화형 대시보드와 구조화된 쿼리 API.'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
      r'''<span class="hero-eyebrow">플랫폼 투명성</span>'''),
     (r'''Platform transparency data,<br>made useful.''',
-     r'''플랫폼 투명성 데이터를,<br>유용하게.'''),
+     r'''플랫폼 투명성 데이터를,<br>일목요연하게.'''),
     (r'''<p>Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.</p>''',
      r'''<p>EU 디지털 서비스법(DSA) 투명성 보고서와 Google 정부 콘텐츠 삭제 요청을 위한 대화형 대시보드와 구조화된 쿼리 API.</p>'''),
     (r'''Explore the data''',
