@@ -1,12 +1,13 @@
 <!doctype html>
-<html lang="ja">
+<html lang="it">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Report locations · Transparency Report</title>
+<title>Ottieni una chiave API · Transparency Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async></script>
 <script>
   // Match the main site: set the theme before first paint to avoid a flash.
   (function () {
@@ -177,19 +178,53 @@ display: flex; align-items: center;
   }
   .card h2 { margin: 0 0 4px; font-size: 18px; }
   .card .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 6px; }
+  input {
+    width: 100%; padding: 11px 13px; border-radius: 9px; border: 1px solid var(--border);
+    background: var(--panel2); color: var(--fg); font-size: 15px;
+  }
+  input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(42,157,143,.2); }
+  button {
+    margin-top: 20px; width: 100%; padding: 12px 16px; border: 0; border-radius: 9px;
+    background: var(--accent); color: var(--on-accent); font-size: 15px; font-weight: 650; cursor: pointer;
+  }
+  button:hover { background: var(--accent-dark); }
+  button:disabled { opacity: .6; cursor: default; }
   .hidden { display: none !important; }
   .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
   [data-theme="dark"] .error { color: #ff7b72; }
+  .keyrow { display: flex; gap: 10px; align-items: stretch; }
+  .keybox {
+    flex: 1; font-family: var(--mono); font-size: 14px; background: var(--panel2); color: var(--accent2);
+    border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; overflow-x: auto;
+    white-space: nowrap;
+  }
+  .copy { width: auto; margin: 0; padding: 0 16px; background: var(--panel2); color: var(--fg); border: 1px solid var(--border); }
   .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
   .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .curl { margin: 8px 0 4px; padding: 12px 14px; background: var(--panel2); border: 1px solid var(--border);
+    border-radius: 9px; overflow-x: auto; font-family: var(--mono); font-size: 12.5px; color: var(--fg); white-space: pre; }
+  .linkbtn { width: auto; margin: 0; padding: 0; background: none; border: none; color: var(--accent);
+    font: inherit; cursor: pointer; text-decoration: underline; }
+  .linkbtn:hover { color: var(--accent2); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
   .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
   .dim { color: var(--muted); }
   .field-cat { margin: 6px 0 16px; }
   .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
   .tbl { margin: 0 0 18px; }
   .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  th { color: var(--muted); font-weight: 600; }
+  td.type { font-family: var(--mono); color: var(--accent2); }
+  td.flag { color: var(--muted); font-family: var(--mono); }
   footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
   footer a { color: var(--accent); text-decoration: none; }
+  .gbtn { display: flex; justify-content: center; margin: 4px 0 2px; min-height: 44px; }
+  .divider { display: flex; align-items: center; text-align: center; color: var(--muted); font-size: 13px; margin: 18px 0 4px; }
+  .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+  .divider span { padding: 0 12px; }
   /* Keyboard focus visibility — a clear ring on every interactive control. */
   a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
   [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
@@ -209,94 +244,39 @@ display: flex; align-items: center;
     .wrap { padding: 20px 1rem; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
-  .controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--fg); gap: 4px; }
-  select, input[type=search] { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 14px; min-width: 130px; }
-  .controls button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 650; cursor: pointer; }
-  .controls button:hover { background: var(--accent-dark); }
-  /* Let a wide table scroll inside its own box instead of widening the page. */
-  #rl-out { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
-  .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
-  .restable th { color: var(--muted); font-weight: 600; }
-  .restable a { color: var(--accent); text-decoration: none; }
-  .restable .na { color: var(--muted); }
-  /* Screen-reader-only helper (for "opens in new tab" cues + the mobile header row). */
-  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-  /* Column key */
-  .legend { margin: 0 0 16px; font-size: 13px; }
-  .legend > summary { cursor: pointer; color: var(--accent-dark); font-weight: 600; }
-  [data-theme="dark"] .legend > summary { color: var(--accent); }
-  .legend p { color: var(--muted); margin: 8px 0 0; }
-  .legend code, .legend em { font-style: normal; }
-  /* Provenance / cite-as line (mirrors the dashboards). */
-  .provenance { font-size: 12px; margin-top: 10px; color: var(--muted); }
-  .provenance .prov-label { font-weight: 600; }
-  /* On phones the 7-column table can't fit, so collapse each row into a stacked
-     "card": hide the header row and label each cell with its column name (pulled
-     from the header via data-label, so it stays localized). */
-  @media (max-width: 620px) {
-    #rl-out { overflow-x: visible; }
-    /* Controls stack full-width so the selects/search don't overrun the page. */
-    .controls { gap: 10px; }
-    .controls label { width: 100%; }
-    .controls select, .controls input[type=search] { width: 100%; min-width: 0; }
-    .controls button { width: 100%; }
-    .restable { font-size: 14px; margin-top: 4px; }
-    /* The card labels (data-label) replace the header row visually, but keep the
-       header in the accessibility tree (sr-only) so screen-reader column context
-       isn't lost on mobile. */
-    .restable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
-    .restable, .restable tbody, .restable tr, .restable td { display: block; width: 100%; }
-    .restable tr {
-      border: 1px solid var(--border); border-radius: 10px;
-      background: var(--panel2); padding: 4px 14px; margin: 0 0 12px;
-    }
-    .restable td {
-      border: none; border-bottom: 1px solid var(--border); padding: 9px 0;
-      text-align: left; word-break: break-word;
-    }
-    .restable tr td:last-child { border-bottom: none; }
-    .restable td::before {
-      content: attr(data-label); display: block; margin-bottom: 2px;
-      font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
-      text-transform: uppercase; color: var(--muted);
-    }
-    .restable td:empty { display: none; }  /* drop blank cells (e.g. no archived link) */
-  }
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">本文へスキップ</a>
+<a class="skip-link" href="#main">Vai al contenuto</a>
 <div class="page-header">
-<nav class="site-nav" aria-label="サイト">
+<nav class="site-nav" aria-label="Sito">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">実績</a>
-      <a href="https://kieranmaynard.com/transparency.html">プロダクト</a>
-      <a href="https://kieranmaynard.com/consulting.html">コンサルティング</a>
-      <a href="https://kieranmaynard.com/blog.html">ブログ</a>
-      <a href="https://kieranmaynard.com/contact.html">お問い合わせ</a>
+      <a href="https://kieranmaynard.com/work.html">Lavori</a>
+      <a href="https://kieranmaynard.com/transparency.html">Prodotti</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulenza</a>
+      <a href="https://kieranmaynard.com/blog.html">Blog</a>
+      <a href="https://kieranmaynard.com/contact.html">Contatti</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="言語" title="言語">
+      <summary class="lang-current" aria-label="Lingua" title="Lingua">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>日本語</span>
+        <span>Italiano</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/catalog"><span>English</span></a></li>
-        <li><a class="lang-opt" href="/es/catalog"><span>Español</span></a></li>
-        <li><a class="lang-opt" href="/fr/catalog"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/catalog"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/it/catalog"><span>Italiano</span></a></li>
-        <li><a class="lang-opt is-current" href="/ja/catalog" aria-current="page"><span>日本語</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/zh/catalog"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/catalog"><span>한국어</span></a></li>
+        <li><a class="lang-opt" href="/api-key"><span>English</span></a></li>
+        <li><a class="lang-opt" href="/es/api-key"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/api-key"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/api-key"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt is-current" href="/it/api-key" aria-current="page"><span>Italiano</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/ja/api-key"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/api-key"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/api-key"><span>한국어</span></a></li>
       </ul>
     </details>
-    <button type="button" class="theme-toggle" data-theme-toggle aria-label="ダークモードの切り替え" aria-pressed="false">
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Attiva/disattiva modalità scura" aria-pressed="false">
       <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
     </button>
@@ -307,12 +287,12 @@ display: flex; align-items: center;
 <header class="topbar">
   <div class="topbar-left">
     <button type="button" class="hamburger" id="hamburger"
-            aria-label="ナビゲーションの切り替え" aria-expanded="false" aria-controls="sidebar">
+            aria-label="Attiva/disattiva navigazione" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/ja/" class="topbar-brand">Transparency Report API</a>
+    <a href="/it/" class="topbar-brand">Transparency Report API</a>
   </div>
 </header>
 </div>
@@ -320,82 +300,89 @@ display: flex; align-items: center;
 <div class="app-body">
 
 <!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
-<aside class="sidebar" id="sidebar" aria-label="アプリケーションのナビゲーション">
+<aside class="sidebar" id="sidebar" aria-label="Navigazione dell'applicazione">
   <nav>
-    <div class="nav-section">データセット</div>
+    <a href="/it/" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
+      </svg>
+      Home
+    </a>
 
-    <a href="/ja/reports" class="nav-item">
+    <div class="nav-section">Set di dati</div>
+
+    <a href="/it/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
-      DSA レポート
+      Report DSA
     </a>
 
-    <a href="/ja/removals" class="nav-item">
+    <a href="/it/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      政府による削除要請
+      Rimozioni governative
     </a>
 
-    <a href="/ja/catalog" class="nav-item is-active" aria-current="page">
+    <a href="/it/catalog" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      レポートの掲載先
+      Posizioni dei report
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">ツール</div>
+    <div class="nav-section">Strumenti</div>
 
-    <a href="/ja/schema" class="nav-item">
+    <a href="/it/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      スキーマ
+      Schema
     </a>
 
-    <a href="/ja/methodology" class="nav-item">
+    <a href="/it/methodology" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
         <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
       </svg>
-      方法論
+      Metodologia
     </a>
 
-    <a href="/ja/api-key" class="nav-item">
+    <a href="/it/api-key" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
       </svg>
-      API キー
+      Chiave API
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      API リファレンス
+      Riferimento API
     </a>
 
-    <a href="/ja/mcp" class="nav-item">
+    <a href="/it/mcp" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
         <rect x="2" y="9" width="12" height="4.5" rx="1"/>
         <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
       </svg>
-      MCP サーバー
+      Server MCP
     </a>
 
-    <a href="/ja/privacy" class="nav-item">
+    <a href="/it/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
-      プライバシー
+      Privacy
     </a>
 
     <hr class="nav-hr">
@@ -414,7 +401,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">作成：<a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/ja/privacy">プライバシー</a></div>
+  <div class="sidebar-footer">Di <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/it/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -422,154 +409,217 @@ display: flex; align-items: center;
 <div class="main-area">
 <div class="wrap">
   <header>
-    <span class="badge">Catalogue</span>
-    <h1>プラットフォームが報告書を公開している場所</h1>
-    <p>オンラインプラットフォーム（VLOPかどうかを問わず）がDSA第15/24条の透明性報告書を公開している場所。</p>
+    <span class="badge">Accesso all’API</span>
+    <h1>Ottieni una chiave API</h1>
+    <p>Trasparenza sulla moderazione dei contenuti dei VLOP ai sensi del DSA dell’UE: accedi per ottenere una chiave API.</p>
   </header>
 
  <main id="main" tabindex="-1">
-  <section class="card" id="locations-card">
-    <p class="sub">オンラインプラットフォームがDSA第15/24条の透明性報告書を公開している場所をまとめたカタログ。指定VLOP以外の多数のプラットフォームを中心に扱いつつ、一部のVLOPの公開場所も掲載しています。公開・読み取り専用の<code>GET /api/report-locations</code>が提供します。</p>
-    <details class="legend">
-      <summary>各列の意味</summary>
-      <p><strong>確度</strong> — このURLが本当にそのプラットフォームのDSA報告書であるという編纂者の評価であり、報告書の内容についての判断ではありません： <em>verified</em> ＝リンクを確認済み、<em>likely</em> ＝有力な手がかりはあるが未確認、<em>uncertain</em> ＝推測。</p>
-      <p><strong>テンプレート</strong> — プラットフォームがEUの統一報告テンプレート（実施規則）を用いて提出したかどうか： <em>yes</em> / <em>no</em> / <em>partial</em> / <em>unknown</em>。</p>
-      <p><strong>形式／対象期間</strong> — ファイル形式と報告書が対象とする報告期間。 <strong>アーカイブ</strong> — ライブリンクが移動した場合に備え、本プロジェクトのオープンデータリポジトリにミラーした元ファイルのスナップショット。</p>
-    </details>
-    <div class="controls">
-      <label>カテゴリ <select id="rl-category"><option value="">すべて</option></select></label>
-      <label>信頼度 <select id="rl-confidence"><option value="">すべて</option></select></label>
-      <label>テンプレート <select id="rl-template"><option value="">すべて</option></select></label>
-      <label>検索 <input id="rl-q" type="search" placeholder="プラットフォーム、会社、URL" /></label>
-      <button id="rl-csv" type="button">CSV をダウンロード</button>
+  <!-- Step 1: sign in -->
+  <section class="card" id="login-card" tabindex="-1">
+    <h2>Richiedi l’accesso all’API</h2>
+    <p class="sub" id="login-sub">Accedi per ottenere una chiave API.</p>
+    <p class="hint">Una chiave API sblocca l’<strong>API di interrogazione asincrona</strong> —invia un job, esegui il polling ed esporta i risultati completi in JSON/CSV— oltre al riquadro <strong>Ask</strong> in linguaggio naturale, alle callback webhook e a limiti di utilizzo più elevati. Per esplorare lo <a href="/it/schema">schema</a> ed eseguire le interrogazioni limitate dei pannelli non serve alcuna chiave.</p>
+
+    <!-- Google sign-in (shown when GOOGLE_CLIENT_ID is configured) -->
+    <div id="google-block" class="hidden">
+      <div class="gbtn" id="google-btn"></div>
+      <p class="hint">Accedi con un qualsiasi account Google: la tua chiave API viene emessa immediatamente.</p>
     </div>
-    <div class="error" id="rl-error" role="alert"></div>
-    <div id="rl-summary" class="sub" aria-live="polite"></div>
-    <div id="rl-out" aria-busy="true"></div>
-    <p class="provenance" id="rl-prov" hidden><span class="prov-label">スナップショット：</span> <span id="rl-snap"></span> · <span class="prov-label">引用方法：</span> <span id="rl-cite"></span></p>
+
+    <!-- Divider, shown only when both Google and key-based sign-in are available -->
+    <div class="divider hidden" id="auth-divider"><span>oppure ottieni una chiave demo</span></div>
+
+    <!-- Demo-key registration (shown when ALLOW_DEMO_KEYS is on). This path is
+         NOT verified — any name/email mints a temporary key for trying the API. -->
+    <form id="login-form" autocomplete="off" class="hidden">
+      <p class="hint">Senza verifica: questo emette una <strong>chiave demo</strong> temporanea per provare l’API. Usa un nome e un’email qualsiasi.</p>
+      <label for="name">Nome</label>
+      <input id="name" name="name" placeholder="Ada Lovelace" />
+      <label for="email">Email (qualsiasi indirizzo)</label>
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="ada@example.org" />
+      <button id="submit" type="submit">Ottieni chiave demo</button>
+    </form>
+    <div class="error" id="error" role="alert"></div>
+  </section>
+
+  <!-- Step 2: issued key -->
+  <section class="card hidden" id="key-card" aria-live="polite" tabindex="-1">
+    <h2>Benvenuto/a, <span id="who">ricercatore/trice</span> 👋</h2>
+    <p class="sub">La tua chiave API è stata emessa. Tienila segreta: trattala come una password.</p>
+    <div class="keyrow">
+      <div class="keybox" id="apikey"></div>
+      <button class="copy" id="copy" type="button">Copia</button>
+    </div>
+    <p class="hint" id="expires"></p>
+    <p class="hint">Invia­la in ogni richiesta come intestazione <code>X-API-Key</code>:</p>
+    <pre class="curl" id="curl-example"></pre>
+    <p class="hint">Provala nella <a href="/docs" target="_blank" rel="noopener">documentazione interattiva dell’API</a>, esplora lo <a href="/it/schema">schema del set di dati</a> oppure apri i <a href="/it/reports">pannelli</a>.</p>
+    <p class="hint"><button type="button" class="linkbtn" id="revoke">Revoca questa chiave</button> — accedendo di nuovo ne viene emessa una nuova.</p>
+    <p class="sr-only" id="copied-status" role="status" aria-live="polite"></p>
   </section>
  </main>
 
-  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/ja/privacy">プライバシー</a></footer>
+  <footer>Basato sulla Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/it/privacy">Privacy</a></footer>
 </div><!-- /.wrap -->
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
 
 <script>
-const $ = (s) => document.querySelector(s);
-const fmt = (n) => (n ?? 0).toLocaleString();
-// Escape DB/registry values before they go into innerHTML (defence in depth).
-const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
-// Only http(s) or root-relative URLs become links — never `javascript:`/`data:`
-// (defence in depth: the data is curated, but never trust a URL into an href).
-const safeHref = (u) =>
-  (typeof u === "string" && /^(https?:\/\/|\/)/i.test(u)) ? u : "";
+const $ = (sel) => document.querySelector(sel);
+let apiKey = null;
 
-function rlParams() {
-  const p = new URLSearchParams();
-  const cat = $("#rl-category").value, conf = $("#rl-confidence").value,
-        tmpl = $("#rl-template").value, q = $("#rl-q").value.trim();
-  if (cat) p.set("category", cat);
-  if (conf) p.set("confidence", conf);
-  if (tmpl) p.set("harmonised_template", tmpl);
-  if (q) p.set("q", q);
-  return p;
+function show(el) { el.classList.remove("hidden"); }
+
+// Common success path for both Google sign-in and detail-based registration:
+// reveal the issued key.
+async function onAuthSuccess(data) {
+  apiKey = data.api_key;
+  // Share the key with the dashboard's Ask box (same origin, picked up on focus).
+  try { localStorage.setItem("vlop_api_key", apiKey); } catch (e) {}
+  $("#who").textContent = data.name || "researcher";
+  $("#apikey").textContent = apiKey;
+  // A concrete, copy-pasteable request using the issued key (set via textContent
+  // so the key is never interpolated into HTML).
+  $("#curl-example").textContent = 'curl -H "X-API-Key: ' + apiKey + '" ' + location.origin + '/api/jobs';
+  if (data.expires_at) {
+    const d = new Date(data.expires_at);
+    $("#expires").textContent = "Valida fino al " + d.toLocaleDateString('it-IT', { year: "numeric", month: "long", day: "numeric" }) + ".";
+  }
+  $("#login-card").classList.add("hidden");
+  show($("#key-card"));
+  // Move focus to the result so screen-reader + keyboard users land on the key.
+  $("#key-card").focus();
 }
 
-let rlAbortController = null;
+// Friendly message for a failed fetch (network error vs. server detail).
+function authError(err) {
+  return (err && err.name === "TypeError")
+    ? "Impossibile contattare il server. Riprova."
+    : (err && err.message) || "Qualcosa è andato storto.";
+}
 
-async function runLocations() {
-  // Abort any in-flight request so a slow earlier response can't overwrite the
-  // results of a newer filter/search (rapid typing or dropdown changes).
-  if (rlAbortController) rlAbortController.abort();
-  rlAbortController = new AbortController();
-  const { signal } = rlAbortController;
-  $("#rl-error").textContent = "";
-  $("#rl-out").setAttribute("aria-busy", "true");
-  const params = rlParams();
-  let d;
+// ── Google sign-in ──────────────────────────────────────────────────────────
+// The GSI client library (FedCM-backed) hands us an ID token; we POST it to
+// /auth/google, which verifies it and mints a session for any verified account.
+async function onGoogleCredential(resp) {
+  $("#error").textContent = "";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
-    const res = await fetch("/api/report-locations?" + params.toString(), { signal });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    d = await res.json();
+    const r = await fetch("/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: resp.credential }),
+    });
+    if (!r.ok) {
+      const data = await r.json().catch(() => ({}));
+      throw new Error(data.detail || "Accesso non riuscito");
+    }
+    const data = await r.json();
+    await onAuthSuccess(data);
   } catch (err) {
-    if (err.name === "AbortError") return;  // superseded by a newer request
-    $("#rl-error").textContent = "カタログを読み込めませんでした: " + err.message;
-    $("#rl-out").setAttribute("aria-busy", "false");
-    return;
+    $("#error").textContent = authError(err);
+  } finally {
+    $("#login-card").removeAttribute("aria-busy");
   }
-  $("#rl-out").setAttribute("aria-busy", "false");
-  $("#rl-summary").textContent =
-    `${fmt(d.platform_count)} 個のプラットフォームの報告書 URL ${fmt(d.total)} 件のうち ${fmt(d.count)} 件を表示しています。`;
-  // Provenance / cite-as line for the catalogue snapshot (version + build date).
-  if (d.version) {
-    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "バージョン " + d.version;
-    $("#rl-cite").textContent =
-      `“DSA透明性報告書の掲載先（Transparency Report API 経由、カタログバージョン ${d.version}）。”`;
-    $("#rl-prov").hidden = false;
-  }
-  const head = '<tr><th scope="col">プラットフォーム</th><th scope="col">企業</th><th scope="col">カテゴリ</th>' +
-    '<th scope="col">確度</th><th scope="col">テンプレート</th><th scope="col">形式／対象期間</th>' +
-    '<th scope="col">報告書</th><th scope="col">アーカイブ</th></tr>';
-  // Column labels, taken from the (already-localized) header cells, so the
-  // mobile card view can label each cell via data-label without a second
-  // translatable copy of the column names.
-  const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
-  const body = d.rows.map(r => {
-    const href = safeHref(r.url);
-    const linkText = r.url_label || "報告書";
-    const link = href
-      ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc(linkText + " — " + r.platform + "（新しいタブで開く）")}">${esc(linkText)}</a>`
-      : esc(r.url_label || "");
-    // `archived` is one or more (semicolon-separated) GitHub URLs to the file(s)
-    // mirrored in this project's data repo — sanitise + link each separately.
-    const archLink = (r.archived || "").split(";").map(part => {
-      const href = safeHref(part.trim());
-      return href ? `<a href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("アーカイブ報告書 — " + r.platform + "（新しいタブで開く）")}">GitHub</a>` : "";
-    }).filter(Boolean).join(", ");
-    const archCell = archLink || '<span class="na">アーカイブなし</span>';
-    const cells = [esc(r.platform), esc(r.company || ""), esc(r.category),
-      esc(r.confidence), esc(r.harmonised_template || ""), esc(r.format_period || ""), link, archCell];
-    return "<tr>" + cells.map((c, i) =>
-      `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
-  }).join("");
-  $("#rl-out").innerHTML = d.rows.length
-    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
-    : "<p class='sub'>一致するプラットフォームはありません。</p>";
 }
 
-async function setupLocations() {
-  let d;
+function setupGoogle(clientId) {
+  const render = () => {
+    if (!window.google || !window.google.accounts || !window.google.accounts.id) return false;
+    google.accounts.id.initialize({
+      client_id: clientId,
+      callback: onGoogleCredential,
+      use_fedcm_for_prompt: true,
+    });
+    google.accounts.id.renderButton($("#google-btn"), {
+      theme: "filled_blue", size: "large", shape: "pill", text: "signin_with", logo_alignment: "left",
+    });
+    show($("#google-block"));
+    return true;
+  };
+  // The library loads async — poll briefly until it's ready.
+  if (!render()) {
+    let tries = 0;
+    const iv = setInterval(() => { if (render() || ++tries > 50) clearInterval(iv); }, 100);
+  }
+}
+
+$("#login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("#error").textContent = "";
+  const name = $("#name").value.trim();
+  const email = $("#email").value.trim();
+  if (!name || !email) { $("#error").textContent = "Compila entrambi i campi."; return; }
+
+  const btn = $("#submit");
+  btn.disabled = true; btn.textContent = "Emissione chiave…";
+  $("#login-card").setAttribute("aria-busy", "true");
   try {
-    const res = await fetch("/api/report-locations");
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    d = await res.json();
+    const res = await fetch("/api/portal/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.detail || "Registrazione non riuscita");
+    }
+    const data = await res.json();
+    await onAuthSuccess(data);
   } catch (err) {
-    $("#rl-error").textContent = "カタログを読み込めませんでした: " + err.message;
-    $("#rl-out").setAttribute("aria-busy", "false");
-    return;
+    $("#error").textContent = authError(err);
+  } finally {
+    btn.disabled = false; btn.textContent = "Ottieni chiave demo";
+    $("#login-card").removeAttribute("aria-busy");
   }
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  const facets = d?.facets || {};
-  $("#rl-category").insertAdjacentHTML("beforeend", (facets.category || []).map(opt).join(""));
-  $("#rl-confidence").insertAdjacentHTML("beforeend", (facets.confidence || []).map(opt).join(""));
-  $("#rl-template").insertAdjacentHTML("beforeend", (facets.harmonised_template || []).map(opt).join(""));
-  ["#rl-category", "#rl-confidence", "#rl-template"].forEach(s => $(s).addEventListener("change", runLocations));
-  // Debounce the free-text search so we don't fire a request per keystroke.
-  let t = null;
-  $("#rl-q").addEventListener("input", () => {
-    if (t) clearTimeout(t);
-    t = setTimeout(runLocations, 250);
-  });
-  $("#rl-csv").addEventListener("click", () => {
-    const p = rlParams(); p.set("format", "csv");
-    window.open("/api/report-locations?" + p.toString(), "_blank");
-  });
-  runLocations();
-}
+});
 
-document.addEventListener("DOMContentLoaded", setupLocations);
+// Self-revoke the issued key (session or demo key) via DELETE /portal/key.
+$("#revoke").addEventListener("click", async () => {
+  if (!apiKey) return;
+  const b = $("#revoke");
+  b.disabled = true;
+  try {
+    await fetch("/api/portal/key", { method: "DELETE", headers: { "X-API-Key": apiKey } });
+  } catch (_) {}
+  try { localStorage.removeItem("vlop_api_key"); } catch (_) {}
+  apiKey = null;
+  $("#key-card").classList.add("hidden");
+  show($("#login-card"));
+  $("#error").textContent = "Chiave revocata. Accedi di nuovo per ottenerne una nuova.";
+  $("#login-card").focus();   // re-shown sign-in card (tabindex=-1) — land the user there
+});
+
+// Decide which sign-in methods to offer based on server config.
+async function init() {
+  let cfg = {};
+  try { cfg = (await (await fetch("/api")).json()).auth_config || {}; } catch (_) {}
+  const googleOn = !!(cfg.google_signin && cfg.google_client_id);
+  const demoOn = !!cfg.demo_keys;
+
+  if (googleOn) setupGoogle(cfg.google_client_id);
+  if (demoOn) show($("#login-form"));
+  if (googleOn && demoOn) show($("#auth-divider"));
+
+  $("#login-sub").textContent = googleOn
+    ? "Accedi con il tuo account Google per richiedere l’accesso."
+    : "Inserisci un nome e un’email qualsiasi per ottenere una chiave demo temporanea.";
+  if (!googleOn && !demoOn) {
+    $("#login-sub").textContent = "Nessun metodo di accesso è abilitato su questo server.";
+  }
+}
+init();
+
+$("#copy").addEventListener("click", async () => {
+  const b = $("#copy"); const t = b.textContent;
+  let ok = true;
+  try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) { ok = false; }
+  const msg = ok ? "Copied!" : "Premi Ctrl-C per copiare";
+  b.textContent = msg;
+  $("#copied-status").textContent = msg;   // announce to screen readers
+  setTimeout(() => (b.textContent = t), 1500);
+});
 </script>
 <script>
   // Hamburger — mobile sidebar toggle

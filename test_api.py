@@ -1953,10 +1953,10 @@ class TestAccessibility:
         assert 'role="alert"' in html
 
 
-# ── Localized static pages (es / fr / de) ────────────────────────────────────
+# ── Localized static pages (es / fr / de / it / ja / zh / ko) ─────────────────
 
 class TestLocalization:
-    LOCALES = ("es", "fr", "de", "ja", "zh", "ko")
+    LOCALES = ("es", "fr", "de", "it", "ja", "zh", "ko")
     SUFFIXES = ("", "reports", "removals", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
