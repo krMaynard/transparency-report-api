@@ -28,6 +28,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import csv
 import os
 import shutil
 import sys
@@ -70,6 +71,33 @@ def _stale(slugs: set[str]) -> list[str]:
     return sorted(k for k in sh.SLUG_META if k not in slugs)
 
 
+def _unknown_surfaces(extracted_dir: str) -> dict[str, list[str]]:
+    """Surface labels in the extracted t6/t7/t8 CSVs that the seeder doesn't
+    recognise. A folded section has a trailing 'Surface' header; the seeder maps
+    its values via sh.FOLDED_SURFACES and silently falls back to 'All' for
+    anything else — which, for a per-surface filer with no real 'All' total,
+    would reintroduce a double-count. Return {label: [slug/section, ...]} for any
+    value not in FOLDED_SURFACES so the re-vendor surfaces it for a human."""
+    known = set(sh.FOLDED_SURFACES)
+    found: dict[str, list[str]] = {}
+    # Only sections 6/7/8 carry a surface dimension.
+    surface_sections = [s for s in sh.SECTIONS if s[:2] in ("06", "07", "08")]
+    for slug in sorted(_slugs(extracted_dir)):
+        for sec in surface_sections:
+            path = os.path.join(extracted_dir, slug, sec + ".csv")
+            if not os.path.isfile(path):
+                continue
+            with open(path, encoding="utf-8") as f:
+                rows = list(csv.reader(f))
+            if not rows or not rows[0] or rows[0][-1] != "Surface":
+                continue  # not a folded section — single 'All' surface
+            for r in rows[1:]:
+                label = r[-1] if r else ""
+                if label and label not in known:
+                    found.setdefault(label, []).append(f"{slug}/{sec}")
+    return {k: sorted(set(v)) for k, v in found.items()}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data-repo", default=DEFAULT_DATA_REPO,
@@ -103,6 +131,7 @@ def main() -> int:
         n_rl_rows = sum(1 for _ in f) - 1  # minus header
     uncurated = _uncurated(slugs)
     stale = _stale(slugs)
+    unknown_surf = _unknown_surfaces(extracted_dir)
 
     if not args.check:
         sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
@@ -139,6 +168,19 @@ def main() -> int:
             "Their upstream dir disappeared — drop them if the removal is intended:",
             "",
             *[f"- `{s}`" for s in stale],
+            "",
+        ]
+    if unknown_surf:
+        lines += [
+            f"### ⚠️ {len(unknown_surf)} unrecognised surface label(s) in t6/t7/t8",
+            "",
+            f"The extractor folded a `Surface` value the seeder doesn't know "
+            f"(it maps only {list(sh.FOLDED_SURFACES)}; anything else silently "
+            f"falls back to the `All` total, which for a per-surface filer "
+            f"**reintroduces a double-count**). Extend `seed_harmonised.FOLDED_SURFACES` "
+            f"+ `_load_facts` (and the `surfaces` dimension) to handle these:",
+            "",
+            *[f"- `{label}` — in {', '.join(locs)}" for label, locs in sorted(unknown_surf.items())],
             "",
         ]
     summary = "\n".join(lines)
