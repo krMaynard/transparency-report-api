@@ -333,6 +333,14 @@ def _load_facts(conn, intern, rep, svc, sec, surface_all) -> int:
     def cat(r, i):
         return intern.category(r[i] if len(r) > i else "")
 
+    def surf(r):
+        # The extractor folds Google's ads-surface sub-breakdown (Hotels,
+        # Workspace) into the base section with a trailing 'Surface' column —
+        # 'Core' for the base rows, 'Ads' for the ads rows. Read that last cell
+        # when present; every other report carries no such column and is the
+        # service's single 'All' surface.
+        return intern.dim("surfaces", r[-1]) if r and r[-1] in ("Core", "Ads") else surface_all
+
     # t3 — member-state orders: cat=3, scope=5, act=6, items=7, info=10
     for r in sec(2):
         if len(r) < 7:
@@ -352,13 +360,14 @@ def _load_facts(conn, intern, rep, svc, sec, surface_all) -> int:
         n += 1
     # t5 / t6 — own initiative: cat=3, measures=5, automated=6, vis 7-13,
     # monetary 14-16, service 17-18, account 19-20 (t6 + surface).
-    for tbl, si, extra in (("t5_own_initiative_illegal", 4, ()),
-                           ("t6_own_initiative_tos", 5, (surface_all,))):
+    for tbl, si, with_surface in (("t5_own_initiative_illegal", 4, False),
+                                   ("t6_own_initiative_tos", 5, True)):
         for r in sec(si):
             if len(r) < 7:
                 continue
             vals = ([rep, svc, cat(r, 3), _cell(r, 5), _cell(r, 6)]
-                    + [_cell(r, i) for i in range(7, 21)] + list(extra))
+                    + [_cell(r, i) for i in range(7, 21)]
+                    + ([surf(r)] if with_surface else []))
             conn.execute(f"INSERT INTO {tbl} VALUES ({', '.join(['?'] * len(vals))})", vals)
             n += 1
     # t7 / t8 — section=3, indicator=4, scope=5, value=6 (+ default surface)
@@ -368,7 +377,7 @@ def _load_facts(conn, intern, rep, svc, sec, surface_all) -> int:
                 continue
             conn.execute(f"INSERT INTO {tbl} VALUES (?,?,?,?,?,?,?)",
                          (rep, svc, intern.dim("sections", r[3]), intern.dim("indicators", r[4]),
-                          intern.dim("scopes", r[5]), _num(r[6]), surface_all))
+                          intern.dim("scopes", r[5]), _num(r[6]), surf(r)))
             n += 1
     # t9 — section=3, indicator=4, scope=5, value=6
     for r in sec(8):

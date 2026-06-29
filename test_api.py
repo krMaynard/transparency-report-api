@@ -1499,6 +1499,35 @@ class TestExplore:
         d = client.post("/api/explore", json=q).json()
         assert any("median" in w.lower() for w in d.get("warnings", []))
 
+    def test_surface_is_total_grain_filterable(self):
+        # t6/t7/t8 carry a cross-surface 'All' aggregate beside the per-surface
+        # rows (Core/Ads/…). surface_is_total lets a query pick a single grain so
+        # a SUM doesn't add the 'All' total to its own parts.
+        all_only = client.post("/api/explore", json={
+            "table": "t6_own_initiative_tos", "group_by": ["surface"],
+            "aggregates": [{"function": "SUM", "field_name": "measures", "alias": "n"}],
+            "query": {"and": [{"operation": "EQ", "field_name": "surface_is_total",
+                               "field_values": ["1"]}]}, "max_count": 50}).json()
+        si = all_only["columns"].index("surface")
+        assert {row[si] for row in all_only["rows"]} == {"All"}
+        breakdown = client.post("/api/explore", json={
+            "table": "t6_own_initiative_tos", "group_by": ["surface"],
+            "aggregates": [{"function": "SUM", "field_name": "measures", "alias": "n"}],
+            "query": {"and": [{"operation": "EQ", "field_name": "surface_is_total",
+                               "field_values": ["0"]}]}, "max_count": 50}).json()
+        bi = breakdown["columns"].index("surface")
+        assert "All" not in {row[bi] for row in breakdown["rows"]}
+
+    def test_explore_warns_on_surface_double_count_grain(self):
+        # Aggregating t6 without pinning surface_is_total may double-count the
+        # cross-surface 'All' total with its per-surface breakdown.
+        q = {"table": "t6_own_initiative_tos", "group_by": ["service_name"],
+             "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]},
+                               {"operation": "EQ", "field_name": "report_tier", "field_values": ["vlop"]}]},
+             "aggregates": [{"function": "SUM", "field_name": "measures", "alias": "n"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("surface_is_total" in w for w in d.get("warnings", []))
+
     def test_explore_no_warning_when_grain_pinned(self):
         # Pinning both the category total grain and the report tier → no advisories.
         q = {"table": "t4_notices", "group_by": ["service_name"],
@@ -2209,6 +2238,23 @@ class TestHarmonisedFacts:
             "SELECT COALESCE(SUM(t.notices), 0) FROM t4_notices t JOIN reports r "
             "ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
         assert vlop_notices == 100
+
+    def test_google_ads_surface_split(self, tmp_path):
+        # Google Hotels/Workspace ship an ads-surface sub-breakdown of t6-t8; the
+        # extractor folds it in with a trailing Surface column and the seeder reads
+        # it, so those services carry both 'Core' and 'Ads' surface rows (additive,
+        # non-overlapping — neither is the 'All' total grain).
+        db, counts, conn = self._build(tmp_path)
+        for tbl in ("t6_own_initiative_tos", "t7_appeals_recidivism", "t8_automated_means"):
+            surfaces = {r[0] for r in conn.execute(
+                f"SELECT DISTINCT su.name FROM {tbl} t JOIN surfaces su "
+                f"ON su.id = t.surface_id JOIN services s ON s.id = t.service_id "
+                f"WHERE s.name = 'Google Hotels'")}
+            assert {"Core", "Ads"} <= surfaces, (tbl, surfaces)
+        # The folded surfaces are breakdown rows, not the 'All' aggregate total.
+        is_total = conn.execute(
+            "SELECT su.is_total FROM surfaces su WHERE su.name IN ('Core', 'Ads')").fetchall()
+        assert all(t == 0 for (t,) in is_total)
 
 
 class TestDimensionNormalization:
