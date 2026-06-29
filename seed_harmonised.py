@@ -93,6 +93,8 @@ SLUG_META = {
     # SHEET_MAP (LINE's unnumbered sheets; Discord's renumbered ones).
     "line": ("LINE", "online-platform"),
     "discord": ("Discord", "online-platform"),
+    "gemini": ("Gemini", "online-platform"),
+    "notebooklm": ("NotebookLM", "online-platform"),
 }
 
 SECTIONS = [

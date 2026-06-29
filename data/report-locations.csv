@@ -62,6 +62,7 @@ Fyndiq,Fyndiq AB,E-commerce marketplaces & retail,verified,no,HTML; CY2025,Trans
 Galaxus / Digitec,Digitec Galaxus AG,E-commerce marketplaces & retail,likely,no,HTML (DE/AT),Report,https://www.galaxus.de/de/page/transparenzbericht-dsa-9020,
 GameDistribution,Azerion,App stores & gaming,verified,no,HTML; CY2024,Report,https://static.gamedistribution.com/dsa-transparency-report.html,
 Gandi,Gandi SAS,"Web hosting, registrars, site builders & infrastructure",verified,no,Web + PDF; 2024 & 2025,Report,https://www.gandi.net/en-US/digital-service-act-transparency-report,
+Gemini,Google Ireland Limited,AI assistants & generative AI,verified,yes,ZIP (harmonised template); H2 2025,Transparency report,https://transparencyreport.google.com/report-downloads?hl=en,https://github.com/krMaynard/dsa-transparency-data/tree/main/harmonised-reports/extracted/gemini
 GetYourGuide,GetYourGuide GmbH / AG,"Travel, mobility, accommodation & events",likely,no,HTML; 2024 (Art. 15/24/42),DSA page,https://www.getyourguide.com/c/dsa/,
 GitHub,"GitHub, Inc. (Microsoft)",Developer / software / hosting,verified,no,PDF; Feb – Dec 2024,Transparency Center,https://transparencycenter.github.com/,https://github.com/krMaynard/dsa-transparency-data/tree/main/pdf-reports/github
 GitHub,"GitHub, Inc. (Microsoft)",Developer / software / hosting,verified,no,PDF; Feb – Dec 2024,2024 PDF,https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/microsoft/final/en-us/microsoft-brand/documents/GitHub-DSA-Transparency-Report-Feb-Dec-2024.pdf,https://github.com/krMaynard/dsa-transparency-data/tree/main/pdf-reports/github
@@ -137,6 +138,7 @@ Nexon,Nexon,App stores & gaming,verified,yes,XLSX (harmonised template); 2025,DS
 Nextdoor,"Nextdoor Holdings, Inc.","Social, messaging, community & video",likely,no,HTML; periodic,Report,https://help.nextdoor.com/s/article/DSA-Transparency-Report,
 "Niantic (Pokémon GO, …)",Niantic Inc.,App stores & gaming,verified,yes,Landing + Excel/PDF; CY2025,Report,https://nianticlabs.com/dsa-transparency,https://github.com/krMaynard/dsa-transparency-data/tree/main/harmonised-reports/extracted/niantic
 Nintendo eShop,"Nintendo Co., Ltd.",App stores & gaming,verified,yes,XLSX (harmonised template); Feb 2026,DSA page,https://www.nintendo.com/en-gb/Legal-information/Digital-Services-Act-2522334.html,https://github.com/krMaynard/dsa-transparency-data/tree/main/harmonised-reports/extracted/nintendo
+NotebookLM,Google Ireland Limited,AI assistants & generative AI,verified,yes,ZIP (harmonised template); H2 2025,Transparency report,https://transparencyreport.google.com/report-downloads?hl=en,https://github.com/krMaynard/dsa-transparency-data/tree/main/harmonised-reports/extracted/notebooklm
 Notino,Notino s.r.o.,E-commerce marketplaces & retail,likely,no,HTML/PDF,Report,https://www.notino.com/dsa-transparency-report/,
 Novasol,Awaze A/S,"Travel, mobility, accommodation & events",verified,no,PDF; Feb 2026 (Awaze group),Report,https://www.novasol.com/digital-services-act,
 OLX,OLX B.V. (Prosus),"Classifieds, real estate & auto",likely,no,HTML; semi-annual,Report,https://www.olx.pl/d/dsa-transparency-report/,
