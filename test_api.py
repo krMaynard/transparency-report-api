@@ -2239,6 +2239,23 @@ class TestHarmonisedFacts:
             "ON r.id = t.report_id WHERE r.tier = 'vlop'").fetchone()[0]
         assert vlop_notices == 100
 
+    def test_google_ads_surface_split(self, tmp_path):
+        # Google Hotels/Workspace ship an ads-surface sub-breakdown of t6-t8; the
+        # extractor folds it in with a trailing Surface column and the seeder reads
+        # it, so those services carry both 'Core' and 'Ads' surface rows (additive,
+        # non-overlapping — neither is the 'All' total grain).
+        db, counts, conn = self._build(tmp_path)
+        for tbl in ("t6_own_initiative_tos", "t7_appeals_recidivism", "t8_automated_means"):
+            surfaces = {r[0] for r in conn.execute(
+                f"SELECT DISTINCT su.name FROM {tbl} t JOIN surfaces su "
+                f"ON su.id = t.surface_id JOIN services s ON s.id = t.service_id "
+                f"WHERE s.name = 'Google Hotels'")}
+            assert {"Core", "Ads"} <= surfaces, (tbl, surfaces)
+        # The folded surfaces are breakdown rows, not the 'All' aggregate total.
+        is_total = conn.execute(
+            "SELECT su.is_total FROM surfaces su WHERE su.name IN ('Core', 'Ads')").fetchall()
+        assert all(t == 0 for (t,) in is_total)
+
 
 class TestDimensionNormalization:
     """seed.normalize_dimensions flags aggregate rows and drops junk facts so a
