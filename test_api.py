@@ -1512,7 +1512,9 @@ class TestExplore:
     def test_report_tier_help_covers_vlose(self):
         # The 'vlop' tier is the aggregated designated set — it folds in VLOSEs
         # (search engines), so the field help must say so, not just "platform".
-        body = client.get("/api/schema/t3_member_state_orders").json()
+        response = client.get("/api/schema/t3_member_state_orders")
+        assert response.status_code == 200
+        body = response.json()
         assert "VLOSE" in body["field_help"]["report_tier"]
 
     def test_explore_warns_on_cross_tier_mix(self):
