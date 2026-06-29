@@ -112,6 +112,12 @@ SLUG_META = {
     "google-news": ("Google News", "online-platform"),
     "google-public-dns": ("Google Public DNS", "intermediary"),
     "waze": ("Waze", "online-platform"),
+    "google-ads": ("Google Ads", "online-platform"),
+    "google-classroom": ("Google Classroom", "online-platform"),
+    "chrome-web-store": ("Chrome Web Store", "online-platform"),
+    "google-cloud-storage": ("Google Cloud Storage", "hosting"),
+    "colab": ("Google Colab", "online-platform"),
+    "fitbit": ("Fitbit", "online-platform"),
 }
 
 SECTIONS = [
