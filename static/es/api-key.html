@@ -270,6 +270,7 @@ display: flex; align-items: center;
         <li><a class="lang-opt is-current" href="/es/api-key" aria-current="page"><span>Español</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
         <li><a class="lang-opt" href="/fr/api-key"><span>Français</span></a></li>
         <li><a class="lang-opt" href="/de/api-key"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it/api-key"><span>Italiano</span></a></li>
         <li><a class="lang-opt" href="/ja/api-key"><span>日本語</span></a></li>
         <li><a class="lang-opt" href="/zh/api-key"><span>中文</span></a></li>
         <li><a class="lang-opt" href="/ko/api-key"><span>한국어</span></a></li>
@@ -614,7 +615,7 @@ $("#copy").addEventListener("click", async () => {
   const b = $("#copy"); const t = b.textContent;
   let ok = true;
   try { await navigator.clipboard.writeText(apiKey || ""); } catch (_) { ok = false; }
-  const msg = ok ? "Copied!" : "Pulsa Ctrl-C para copiar";
+  const msg = ok ? "¡Copiado!" : "Pulsa Ctrl-C para copiar";
   b.textContent = msg;
   $("#copied-status").textContent = msg;   // announce to screen readers
   setTimeout(() => (b.textContent = t), 1500);

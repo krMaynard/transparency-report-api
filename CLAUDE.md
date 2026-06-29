@@ -44,7 +44,7 @@ Built to demonstrate two things:
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
-| `static/{es,fr,de,ja,zh,ko}/*.html` | Localized copies of the nine pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the nine pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -68,8 +68,9 @@ Built to demonstrate two things:
 ## Localization
 
 The nine static pages are localized into **Spanish (`/es`), French (`/fr`),
-German (`/de`), Japanese (`/ja`), Chinese (`/zh`), and Korean (`/ko`)** alongside
-the English originals (served at the root). English is the source of truth; the
+German (`/de`), Italian (`/it`), Japanese (`/ja`), Chinese (`/zh`), and Korean
+(`/ko`)** alongside the English originals (served at the root). English is the
+source of truth; the
 translations are **generated**, not hand-written:
 
 - `scripts/localize_static.py` holds the per-locale translation tables (chrome +
@@ -85,7 +86,7 @@ translations are **generated**, not hand-written:
   endpoints stay locale-agnostic; localized pages call the same `/api/*`.
 - The globe **language switcher** (formerly a cross-site link to
   kieranmaynard.com) now switches the transparency site's own language —
-  English / Español / Français / Deutsch — pointing at the equivalent page in
+  English / Español / Français / Deutsch / Italiano / … — pointing at the equivalent page in
   each locale. The switcher block is rebuilt by the generator, so it is
   consistent across every page and locale.
 
