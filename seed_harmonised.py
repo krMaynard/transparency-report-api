@@ -95,6 +95,23 @@ SLUG_META = {
     "discord": ("Discord", "online-platform"),
     "gemini": ("Gemini", "online-platform"),
     "notebooklm": ("NotebookLM", "online-platform"),
+    "pubdev": ("pub.dev", "online-platform"),
+    "workspace": ("Google Workspace", "online-platform"),
+    "wallet-api": ("Google Wallet API", "online-platform"),
+    "looker": ("Looker", "online-platform"),
+    "google-pay-api": ("Google Pay API", "online-platform"),
+    "google-ai-developer-forum": ("Google AI Developers Forum", "online-platform"),
+    "gdp-forums": ("GDP Forums (Google)", "online-platform"),
+    "vacation-rentals": ("Google Vacation Rentals", "online-platform"),
+    "google-hotels": ("Google Hotels", "online-platform"),
+    "google-flights": ("Google Flights", "online-platform"),
+    "tenor": ("Tenor", "online-platform"),
+    "google-photos": ("Google Photos", "online-platform"),
+    "manufacturer-center": ("Google Manufacturer Center", "online-platform"),
+    "google-help-support": ("Google Help & Support", "online-platform"),
+    "google-news": ("Google News", "online-platform"),
+    "google-public-dns": ("Google Public DNS", "intermediary"),
+    "waze": ("Waze", "online-platform"),
 }
 
 SECTIONS = [
