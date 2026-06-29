@@ -87,14 +87,15 @@ def _unknown_surfaces(extracted_dir: str) -> dict[str, list[str]]:
             path = os.path.join(extracted_dir, slug, sec + ".csv")
             if not os.path.isfile(path):
                 continue
-            with open(path, encoding="utf-8") as f:
-                rows = list(csv.reader(f))
-            if not rows or not rows[0] or rows[0][-1] != "Surface":
-                continue  # not a folded section — single 'All' surface
-            for r in rows[1:]:
-                label = r[-1] if r else ""
-                if label and label not in known:
-                    found.setdefault(label, []).append(f"{slug}/{sec}")
+            with open(path, encoding="utf-8", newline="") as f:
+                reader = csv.reader(f)
+                header = next(reader, None)
+                if not header or header[-1] != "Surface":
+                    continue  # not a folded section — single 'All' surface
+                for r in reader:
+                    label = r[-1] if r else ""
+                    if label and label not in known:
+                        found.setdefault(label, []).append(f"{slug}/{sec}")
     return {k: sorted(set(v)) for k, v in found.items()}
 
 
