@@ -97,6 +97,21 @@ _APPLE_FIXTURE = {
 }
 seed.build_apple_db(_APPLE_FIXTURE, _DB)
 
+# A small slice of the GitHub Transparency dataset (github-transparency.json shape).
+# [year, period, dataset, government, iso2, category, metric, count_low, count_high]
+_GITHUB_FIXTURE = {
+    "columns": ["year", "period", "dataset", "government", "iso2", "category",
+                "metric", "count_low", "count_high"],
+    "rows": [
+        [2025, "", "government_takedowns_received", "Brazil", "BR", "", "received", 4, 4],
+        [2025, "", "user_info_requests", "", "", "criminal court order", "received", 115, 115],
+        [2025, "", "user_info_requests", "", "", "criminal court order", "disclosed", 82, 82],
+        # national_security: a banded range (count_low != count_high).
+        [2025, "Jul-Dec", "national_security", "", "", "Affected accounts", "count", 1000, 1249],
+    ],
+}
+seed.build_github_db(_GITHUB_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /

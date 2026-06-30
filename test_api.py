@@ -2216,6 +2216,54 @@ class TestAppleTable:
         assert data["countries"] == sorted(data["countries"])  # deterministic order
 
 
+class TestGitHubTable:
+    def test_github_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "github_metrics" in names
+
+    def test_github_fields_endpoint(self):
+        body = client.get("/api/fields?table=github_metrics", headers=MOMO).json()
+        assert {"year", "period", "dataset", "government", "iso2", "category", "metric"} <= set(body["dimensions"]["fields"])
+        assert {"count_low", "count_high"} <= set(body["measures"]["fields"])
+
+    def test_github_metric_value(self):
+        # user_info_requests / criminal court order / disclosed, 2025 = 82 (fixture).
+        job = _submit_and_wait({
+            "table": "github_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "dataset", "field_values": ["user_info_requests"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["criminal court order"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["disclosed"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "count_low", "alias": "n"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 82
+
+    def test_github_national_security_range(self):
+        # Banded range: count_low != count_high for national-security rows.
+        job = _submit_and_wait({
+            "table": "github_metrics",
+            "fields": ["count_low", "count_high"],
+            "query": {"and": [{"operation": "EQ", "field_name": "dataset", "field_values": ["national_security"]}]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert [1000, 1249] in body["rows"]
+
+    def test_vendored_github_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("github-transparency.json").read_text())
+        assert data["columns"][0] == "year" and len(data["columns"]) == 9
+        assert all(len(r) == 9 for r in data["rows"][:50])
+        # rows are sorted deterministically (dataset, year, period, gov, category, metric).
+        keys = [(r[2], r[0], r[1], r[3], r[5], r[6]) for r in data["rows"]]
+        assert keys == sorted(keys)
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:

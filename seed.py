@@ -40,6 +40,11 @@ _DEFAULT_RL_SOURCE = os.getenv(
 _DEFAULT_APPLE_SOURCE = os.getenv(
     "SEED_APPLE_SOURCE_JSON", os.path.join(HERE, "data", "apple-transparency.json")
 )
+# GitHub Transparency dataset — vendored in-repo (from the sibling data repo's
+# github-transparency/build_github.py).
+_DEFAULT_GITHUB_SOURCE = os.getenv(
+    "SEED_GITHUB_SOURCE_JSON", os.path.join(HERE, "data", "github-transparency.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -247,6 +252,24 @@ CREATE TABLE apple_national_security (
 
 CREATE INDEX idx_ap_period  ON apple_requests(period_id);
 CREATE INDEX idx_ap_country ON apple_requests(country_id);
+
+-- GitHub Transparency Report (open CC-BY CSVs): a heterogeneous set of small
+-- metric series normalised onto one tidy-long fact table — one row per measured
+-- value. count_low == count_high for exact counts; national-security letters and
+-- EU-DSA MAU are banded ranges, so they carry distinct low/high bounds. Dims are
+-- stored inline (the table is small, so no interned lookup tables).
+CREATE TABLE github_metrics (
+    year        INTEGER NOT NULL,
+    period      TEXT NOT NULL,   -- sub-year label ('Jul-Dec', a month), else ''
+    dataset     TEXT NOT NULL,   -- source series (government_takedowns_received, …)
+    government  TEXT NOT NULL,   -- country (country-keyed series), else ''
+    iso2        TEXT NOT NULL,   -- ISO-3166 alpha-2, else ''
+    category    TEXT NOT NULL,   -- in-row breakdown (request/abuse/takedown type), else ''
+    metric      TEXT NOT NULL,   -- count column when several are reported, else 'count'
+    count_low   INTEGER,
+    count_high  INTEGER
+);
+CREATE INDEX idx_gh_dataset ON github_metrics(dataset);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -561,6 +584,29 @@ def build_apple_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_github_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the github_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA, i.e. build_db()
+    must have run first). The dataset is the tidy-long github-transparency.json
+    (a `columns` header + `rows`, each row matching the table column order).
+    Returns the fact-row count.
+    """
+    rows = data["rows"]
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO github_metrics ("
+                "year, period, dataset, government, iso2, category, metric, "
+                "count_low, count_high) VALUES (?,?,?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -598,6 +644,8 @@ def main() -> None:
                         help="Path to report-locations.csv (non-VLOP catalogue)")
     parser.add_argument("--apple-source", default=_DEFAULT_APPLE_SOURCE,
                         help="Path to apple-transparency.json")
+    parser.add_argument("--github-source", default=_DEFAULT_GITHUB_SOURCE,
+                        help="Path to github-transparency.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -644,6 +692,15 @@ def main() -> None:
         )
     else:
         print(f"  (skipping Apple transparency — not found: {args.apple_source})")
+
+    if os.path.isfile(args.github_source):
+        with open(args.github_source, "r", encoding="utf-8") as f:
+            gh_data = json.load(f)
+        gh_rows = build_github_db(gh_data, args.db)
+        print(f"  github transparency: {gh_rows} metric rows across "
+              f"{len({r[2] for r in gh_data['rows']})} datasets")
+    else:
+        print(f"  (skipping GitHub transparency — not found: {args.github_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

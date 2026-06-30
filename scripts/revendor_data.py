@@ -46,6 +46,8 @@ VENDORED_SNAPSHOT = os.path.join(REPO, "data", "harmonised-reports.json")
 VENDORED_RL_CSV = os.path.join(REPO, "data", "report-locations.csv")
 VENDORED_APPLE = os.path.join(REPO, "data", "apple-transparency.json")
 APPLE_SRC_REL = os.path.join("apple-transparency", "apple-transparency.json")
+VENDORED_GITHUB = os.path.join(REPO, "data", "github-transparency.json")
+GITHUB_SRC_REL = os.path.join("github-transparency", "github-transparency.json")
 RL_HEADER = "platform,company,category,confidence,harmonised_template,format_period,url_label,url,archived"
 
 
@@ -137,12 +139,16 @@ def main() -> int:
     unknown_surf = _unknown_surfaces(extracted_dir)
     apple_src = os.path.join(args.data_repo, APPLE_SRC_REL)
     apple_present = os.path.isfile(apple_src)
+    github_src = os.path.join(args.data_repo, GITHUB_SRC_REL)
+    github_present = os.path.isfile(github_src)
 
     if not args.check:
         sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
         shutil.copyfile(rl_src, VENDORED_RL_CSV)
         if apple_present:
             shutil.copyfile(apple_src, VENDORED_APPLE)
+        if github_present:
+            shutil.copyfile(github_src, VENDORED_GITHUB)
 
     verb = "Would re-vendor" if args.check else "Re-vendored"
     lines = [
@@ -153,6 +159,7 @@ def main() -> int:
         f"- `data/harmonised-reports.json` — **{n_platforms}** extracted report files",
         f"- `data/report-locations.csv` — **{n_rl_rows}** catalogue rows",
         f"- `data/apple-transparency.json` — {'present upstream' if apple_present else '**missing upstream — skipped**'}",
+        f"- `data/github-transparency.json` — {'present upstream' if github_present else '**missing upstream — skipped**'}",
         "",
     ]
     if uncurated:

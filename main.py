@@ -1089,6 +1089,23 @@ TABLES: dict[str, TableSpec] = {
             "accounts_high": "f.accounts_high",
         },
     ),
+    "github_metrics": TableSpec(
+        "GitHub Transparency Report — government takedowns, requests to disclose user information (incl. national-security letters), DMCA, automated detection, appeals/reinstatements, and EU-DSA MAU. A tidy-long table: one row per measured value, identified by dataset × year × period × government × category × metric. Counts are exact (count_low == count_high) except national-security letters/orders and EU-DSA MAU, which are banded ranges.",
+        "FROM github_metrics f",
+        {
+            "year":       "f.year",
+            "period":     "f.period",
+            "dataset":    "f.dataset",
+            "government": "f.government",
+            "iso2":       "f.iso2",
+            "category":   "f.category",
+            "metric":     "f.metric",
+        },
+        {
+            "count_low":  "f.count_low",
+            "count_high": "f.count_high",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3253,6 +3270,14 @@ FIELD_HELP: dict[str, str] = {
     "requests_high": "Upper bound of the reported request range (apple_national_security).",
     "accounts_low": "Lower bound of the reported accounts/users range (apple_national_security).",
     "accounts_high": "Upper bound of the reported accounts/users range (apple_national_security).",
+    # ── GitHub transparency (tidy-long github_metrics) ──
+    "dataset": "Which GitHub transparency series the row belongs to — e.g. government_takedowns_received / government_takedowns_processed / user_info_requests / cross_border_data_requests / national_security / dmca_takedowns / dmca_circumvention_claims / automated_detection / appeals_abuse_related / appeals_trade_controls / eu_dsa_mau. Pin a dataset before aggregating; metrics aren't comparable across datasets.",
+    "category": "In-row breakdown within a github_metrics dataset — request type, abuse type, takedown type, etc. (empty when the dataset has no sub-breakdown).",
+    "metric": "Which reported count the row is, when a github_metrics dataset has several (e.g. received / disclosed; repos_affected / pages_affected / accounts_affected); otherwise 'count'.",
+    "count_low": "Reported value (github_metrics). Equals count_high for exact counts; for national_security and eu_dsa_mau the value is a banded range, so this is the lower bound.",
+    "count_high": "Upper bound of the reported value (github_metrics); equals count_low for exact counts.",
+    "year": "Calendar year of the github_metrics row.",
+    "iso2": "Requesting government's ISO-3166 alpha-2 code (country-keyed github_metrics datasets).",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",
