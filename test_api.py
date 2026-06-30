@@ -2160,6 +2160,62 @@ class TestGRTable:
             assert 'th scope="col"' in r.text
 
 
+class TestAppleTable:
+    def test_apple_tables_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "apple_requests" in names and "apple_national_security" in names
+
+    def test_apple_fields_endpoint(self):
+        body = client.get("/api/fields?table=apple_requests", headers=MOMO).json()
+        assert {"period", "period_ord", "country_name", "request_type"} <= set(body["dimensions"]["fields"])
+        assert {"requests_received", "items_specified", "pct_data_provided", "apps_removed"} <= set(body["measures"]["fields"])
+
+    def test_apple_value_and_grouping(self):
+        # device / United States / 2024 H1 from the fixture: 12,043 received.
+        job = _submit_and_wait({
+            "table": "apple_requests",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "request_type", "field_values": ["device"]},
+                {"operation": "EQ", "field_name": "country_name", "field_values": ["United States of America"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2024 H1"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "requests_received", "alias": "r"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 12043
+
+    def test_apple_national_security_ranges(self):
+        # The NS table carries banded low/high bounds, not exact counts.
+        job = _submit_and_wait({
+            "table": "apple_national_security",
+            "fields": ["request_type", "requests_low", "requests_high"],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        rows = {r[0]: (r[1], r[2]) for r in body["rows"]}
+        assert rows["National Security"] == (0, 249)
+
+    def test_apple_invalid_field_rejected(self):
+        r = client.post("/api/query", json={
+            "table": "apple_requests",
+            "query": {"and": [{"operation": "EQ", "field_name": "nope", "field_values": ["x"]}]},
+        }, headers=MOMO)
+        assert r.status_code == 400
+
+    def test_vendored_apple_dataset_shape(self):
+        # The shipped snapshot the Docker image seeds from: sane shape + history.
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("apple-transparency.json").read_text())
+        assert data["periods"][0] == "2013 H1" and data["coverage"] == data["periods"][-1]
+        assert len(data["request_types"]) == 10
+        # rows = 3 interned dims + 16 measures.
+        assert all(len(r) == 19 for r in data["rows"][:50])
+        assert data["countries"] == sorted(data["countries"])  # deterministic order
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:
