@@ -31,6 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC = os.path.join(ROOT, "static")
 
 PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-tos.html",
+               "apple.html", "github.html", "snap.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
@@ -39,6 +40,9 @@ SUFFIX = {
     "removals.html": "removals",
     "catalog.html": "catalog",
     "ny-tos.html": "ny-tos",
+    "apple.html": "apple",
+    "github.html": "github",
+    "snap.html": "snap",
     "mcp.html": "mcp",
     "methodology.html": "methodology",
     "schema.html": "schema",
@@ -135,6 +139,15 @@ COMMON = {
         ('''      NY ToS reports
     </a>''', '''      Informes ToS de NY
     </a>'''),
+        ('''      Apple Transparency
+    </a>''', '''      Transparencia de Apple
+    </a>'''),
+        ('''      GitHub Transparency
+    </a>''', '''      Transparencia de GitHub
+    </a>'''),
+        ('''      Snap Transparency
+    </a>''', '''      Transparencia de Snap
+    </a>'''),
         ('''      MCP server
     </a>''', '''      Servidor MCP
     </a>'''),
@@ -180,6 +193,15 @@ COMMON = {
     </a>'''),
         ('''      NY ToS reports
     </a>''', '''      Rapports CGU de NY
+    </a>'''),
+        ('''      Apple Transparency
+    </a>''', '''      Transparence d'Apple
+    </a>'''),
+        ('''      GitHub Transparency
+    </a>''', '''      Transparence de GitHub
+    </a>'''),
+        ('''      Snap Transparency
+    </a>''', '''      Transparence de Snap
     </a>'''),
         ('''      MCP server
     </a>''', '''      Serveur MCP
@@ -227,6 +249,15 @@ COMMON = {
         ('''      NY ToS reports
     </a>''', '''      NY-ToS-Berichte
     </a>'''),
+        ('''      Apple Transparency
+    </a>''', '''      Apple-Transparenz
+    </a>'''),
+        ('''      GitHub Transparency
+    </a>''', '''      GitHub-Transparenz
+    </a>'''),
+        ('''      Snap Transparency
+    </a>''', '''      Snap-Transparenz
+    </a>'''),
         ('''      MCP server
     </a>''', '''      MCP-Server
     </a>'''),
@@ -273,6 +304,15 @@ COMMON = {
         ('''      NY ToS reports
     </a>''', '''      Report ToS di NY
     </a>'''),
+        ('''      Apple Transparency
+    </a>''', '''      Trasparenza Apple
+    </a>'''),
+        ('''      GitHub Transparency
+    </a>''', '''      Trasparenza GitHub
+    </a>'''),
+        ('''      Snap Transparency
+    </a>''', '''      Trasparenza Snap
+    </a>'''),
         ('''      MCP server
     </a>''', '''      Server MCP
     </a>'''),
@@ -299,6 +339,19 @@ COMMON = {
 PAGES: dict[str, dict[str, list[tuple[str, str]]]] = {"es": {}, "fr": {}, "de": {}, "it": {}}
 
 PAGES["es"]["home.html"] = [
+    ('''<h3>Apple Transparency</h3>''', '''<h3>Transparencia de Apple</h3>'''),
+    ('''<h3>GitHub Transparency</h3>''', '''<h3>Transparencia de GitHub</h3>'''),
+    ('''<h3>Snap Transparency</h3>''', '''<h3>Transparencia de Snap</h3>'''),
+    ('''<h3>NY ToS reports</h3>''', '''<h3>Informes ToS de NY</h3>'''),
+    ('''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     '''Solicitudes de gobiernos y particulares que Apple declara para datos de dispositivos, cuentas, identificadores financieros y otros, más retiradas de la App Store, por período, país y tipo de solicitud (desde el primer semestre de 2013).'''),
+    ('''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     '''Retiradas gubernamentales que GitHub declara, solicitudes para revelar información de usuarios (incl. cartas de seguridad nacional), avisos DMCA, detección automatizada, apelaciones y usuarios activos mensuales del DSA de la UE.'''),
+    ('''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     '''Medidas de seguridad y confianza que Snap declara, solicitudes gubernamentales de retirada de contenido/cuentas y de información (incl. seguridad nacional de EE. UU.) y avisos DMCA/de marca, por sección, categoría y métrica.'''),
+    ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     '''Los informes sobre las condiciones del servicio de redes sociales de Nueva York: las presentaciones de políticas semestrales que las plataformas envían a la Fiscalía General de NY conforme a la Stop Hiding Hate Act. Un catálogo con copias archivadas.'''),
+    ('''Browse the catalogue''', '''Explorar el catálogo'''),
     ('''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      '''Datos de transparencia de las plataformas, hechos útiles. Paneles interactivos y una API de consultas estructuradas para los informes de transparencia de la Ley de Servicios Digitales de la UE y las solicitudes gubernamentales de retirada de contenido de Google.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
@@ -321,6 +374,19 @@ PAGES["es"]["home.html"] = [
 ]
 
 PAGES["fr"]["home.html"] = [
+    ('''<h3>Apple Transparency</h3>''', '''<h3>Transparence d'Apple</h3>'''),
+    ('''<h3>GitHub Transparency</h3>''', '''<h3>Transparence de GitHub</h3>'''),
+    ('''<h3>Snap Transparency</h3>''', '''<h3>Transparence de Snap</h3>'''),
+    ('''<h3>NY ToS reports</h3>''', '''<h3>Rapports CGU de NY</h3>'''),
+    ('''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     '''Demandes des autorités et de tiers qu'Apple déclare pour des données d'appareils, de comptes, d'identifiants financiers et autres, ainsi que les retraits de l'App Store, par période, pays et type de demande (depuis le 1er semestre 2013).'''),
+    ('''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     '''Retraits gouvernementaux déclarés par GitHub, demandes de divulgation d'informations sur les utilisateurs (y c. lettres de sécurité nationale), avis DMCA, détection automatisée, recours et utilisateurs actifs mensuels au titre du DSA de l'UE.'''),
+    ('''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     '''Mesures de confiance et sécurité déclarées par Snap, demandes gouvernementales de retrait de contenu/comptes et d'informations (y c. sécurité nationale américaine) et avis DMCA/de marque, par section, catégorie et indicateur.'''),
+    ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     '''Les rapports sur les conditions d'utilisation des réseaux sociaux de l'État de New York : les dépôts semestriels de politiques que les plateformes soumettent au procureur général de NY au titre du Stop Hiding Hate Act. Un catalogue avec copies archivées.'''),
+    ('''Browse the catalogue''', '''Parcourir le catalogue'''),
     ('''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      '''Les données de transparence des plateformes, rendues utiles. Des tableaux de bord interactifs et une API de requêtes structurées pour les rapports de transparence du règlement européen sur les services numériques et les demandes gouvernementales de retrait de contenu de Google.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
@@ -343,6 +409,19 @@ PAGES["fr"]["home.html"] = [
 ]
 
 PAGES["de"]["home.html"] = [
+    ('''<h3>Apple Transparency</h3>''', '''<h3>Apple-Transparenz</h3>'''),
+    ('''<h3>GitHub Transparency</h3>''', '''<h3>GitHub-Transparenz</h3>'''),
+    ('''<h3>Snap Transparency</h3>''', '''<h3>Snap-Transparenz</h3>'''),
+    ('''<h3>NY ToS reports</h3>''', '''<h3>NY-ToS-Berichte</h3>'''),
+    ('''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     '''Von Apple gemeldete Anfragen von Behörden und Privatparteien nach Geräte-, Konto-, Finanzkennung- und anderen Daten sowie App-Store-Entfernungen – nach Zeitraum, Land und Anfragetyp (ab 1. Halbjahr 2013).'''),
+    ('''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     '''Von GitHub gemeldete behördliche Entfernungen, Anfragen zur Offenlegung von Nutzerdaten (inkl. National-Security-Letters), DMCA-Meldungen, automatisierte Erkennung, Widersprüche und monatlich aktive EU-DSA-Nutzer.'''),
+    ('''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     '''Von Snap gemeldete Trust-&amp;-Safety-Maßnahmen, behördliche Anfragen zur Entfernung von Inhalten/Konten und nach Informationen (inkl. US-Sicherheitsbehörden) sowie DMCA-/Markenmeldungen – nach Abschnitt, Kategorie und Kennzahl.'''),
+    ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     '''New Yorks Berichte zu den Nutzungsbedingungen sozialer Medien – die halbjährlichen Richtlinien-Einreichungen, die Plattformen dem Generalstaatsanwalt von NY nach dem Stop Hiding Hate Act vorlegen. Ein Katalog mit archivierten Kopien.'''),
+    ('''Browse the catalogue''', '''Katalog durchsuchen'''),
     ('''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      '''Transparenzdaten von Plattformen, nutzbar gemacht. Interaktive Dashboards und eine API für strukturierte Abfragen für die Transparenzberichte des Gesetzes über digitale Dienste der EU und behördliche Anfragen zur Entfernung von Inhalten bei Google.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
@@ -1765,6 +1844,15 @@ COMMON["ja"] = [
     (r'''      NY ToS reports
     </a>''', r'''      NY 利用規約報告
     </a>'''),
+    (r'''      Apple Transparency
+    </a>''', r'''      Apple 透明性レポート
+    </a>'''),
+    (r'''      GitHub Transparency
+    </a>''', r'''      GitHub 透明性レポート
+    </a>'''),
+    (r'''      Snap Transparency
+    </a>''', r'''      Snap 透明性レポート
+    </a>'''),
     (r'''      MCP server
     </a>''', r'''      MCP サーバー
     </a>'''),
@@ -1793,6 +1881,19 @@ COMMON["ja"] = [
 ]
 PAGES["ja"] = {}
 PAGES["ja"]["home.html"] = [
+    (r'''<h3>Apple Transparency</h3>''', r'''<h3>Apple 透明性レポート</h3>'''),
+    (r'''<h3>GitHub Transparency</h3>''', r'''<h3>GitHub 透明性レポート</h3>'''),
+    (r'''<h3>Snap Transparency</h3>''', r'''<h3>Snap 透明性レポート</h3>'''),
+    (r'''<h3>NY ToS reports</h3>''', r'''<h3>NY 利用規約報告</h3>'''),
+    (r'''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     r'''Apple が報告する、デバイス・アカウント・金融識別子などのデータに関する政府および私人からの要請と、App Store での削除を、期間・国・要請種別ごとにまとめたもの（2013 年上半期以降）。'''),
+    (r'''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     r'''GitHub が報告する、政府による削除、ユーザー情報の開示要請（国家安全保障レターを含む）、DMCA 通知、自動検出、異議申し立て、EU DSA の月間アクティブユーザー。'''),
+    (r'''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     r'''Snap が報告する、トラスト＆セーフティの執行、政府によるコンテンツ・アカウント削除および情報の要請（米国の国家安全保障を含む）、DMCA・商標通知を、セクション・カテゴリ・指標ごとに。'''),
+    (r'''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     r'''ニューヨーク州のソーシャルメディア利用規約報告 — Stop Hiding Hate Act に基づき、プラットフォームが年 2 回 NY 司法長官に提出するポリシー文書。アーカイブ付きのカタログ。'''),
+    (r'''Browse the catalogue''', r'''カタログを見る'''),
     (r'''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      r'''プラットフォームの透明性データが、一目瞭然。EU デジタルサービス法（DSA）の透明性レポートと Google の政府コンテンツ削除要請を対象とする、インタラクティブなダッシュボードと構造化クエリ API。'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
@@ -2507,6 +2608,15 @@ COMMON["zh"] = [
     (r'''      NY ToS reports
     </a>''', r'''      纽约服务条款报告
     </a>'''),
+    (r'''      Apple Transparency
+    </a>''', r'''      Apple 透明度报告
+    </a>'''),
+    (r'''      GitHub Transparency
+    </a>''', r'''      GitHub 透明度报告
+    </a>'''),
+    (r'''      Snap Transparency
+    </a>''', r'''      Snap 透明度报告
+    </a>'''),
     (r'''      MCP server
     </a>''', r'''      MCP 服务器
     </a>'''),
@@ -2535,6 +2645,19 @@ COMMON["zh"] = [
 ]
 PAGES["zh"] = {}
 PAGES["zh"]["home.html"] = [
+    (r'''<h3>Apple Transparency</h3>''', r'''<h3>Apple 透明度报告</h3>'''),
+    (r'''<h3>GitHub Transparency</h3>''', r'''<h3>GitHub 透明度报告</h3>'''),
+    (r'''<h3>Snap Transparency</h3>''', r'''<h3>Snap 透明度报告</h3>'''),
+    (r'''<h3>NY ToS reports</h3>''', r'''<h3>纽约服务条款报告</h3>'''),
+    (r'''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     r'''Apple 报告的政府与私方对设备、账户、金融标识符等数据的请求，以及 App Store 下架，按周期、国家和请求类型划分（自 2013 年上半年起）。'''),
+    (r'''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     r'''GitHub 报告的政府下架请求、披露用户信息的请求（含国家安全函）、DMCA 通知、自动检测、申诉，以及欧盟 DSA 月活跃用户。'''),
+    (r'''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     r'''Snap 报告的信任与安全执法、政府内容/账户删除及信息请求（含美国国家安全）、DMCA/商标通知，按板块、类别和指标划分。'''),
+    (r'''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     r'''纽约州社交媒体服务条款报告——依据《停止传播仇恨法》，平台每半年向纽约总检察长提交的政策文件。附有存档副本的目录。'''),
+    (r'''Browse the catalogue''', r'''浏览目录'''),
     (r'''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      r'''让平台透明度数据一目了然。为欧盟《数字服务法》（DSA）透明度报告和 Google 政府删除请求，提供交互式仪表板与结构化查询 API。'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
@@ -3248,6 +3371,15 @@ COMMON["ko"] = [
     (r'''      NY ToS reports
     </a>''', r'''      뉴욕 약관 보고서
     </a>'''),
+    (r'''      Apple Transparency
+    </a>''', r'''      Apple 투명성 보고서
+    </a>'''),
+    (r'''      GitHub Transparency
+    </a>''', r'''      GitHub 투명성 보고서
+    </a>'''),
+    (r'''      Snap Transparency
+    </a>''', r'''      Snap 투명성 보고서
+    </a>'''),
     (r'''      MCP server
     </a>''', r'''      MCP 서버
     </a>'''),
@@ -3276,6 +3408,19 @@ COMMON["ko"] = [
 ]
 PAGES["ko"] = {}
 PAGES["ko"]["home.html"] = [
+    (r'''<h3>Apple Transparency</h3>''', r'''<h3>Apple 투명성 보고서</h3>'''),
+    (r'''<h3>GitHub Transparency</h3>''', r'''<h3>GitHub 투명성 보고서</h3>'''),
+    (r'''<h3>Snap Transparency</h3>''', r'''<h3>Snap 투명성 보고서</h3>'''),
+    (r'''<h3>NY ToS reports</h3>''', r'''<h3>뉴욕 약관 보고서</h3>'''),
+    (r'''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     r'''Apple이 보고한, 기기·계정·금융 식별자 등 데이터에 대한 정부 및 사인의 요청과 App Store 게시 중단을 기간·국가·요청 유형별로 정리(2013년 상반기 이후).'''),
+    (r'''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     r'''GitHub이 보고한 정부 게시 중단, 사용자 정보 공개 요청(국가안보 서신 포함), DMCA 통지, 자동 탐지, 이의 제기, EU DSA 월간 활성 사용자.'''),
+    (r'''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     r'''Snap이 보고한 신뢰·안전 집행, 정부의 콘텐츠/계정 삭제 및 정보 요청(미국 국가안보 포함), DMCA/상표 통지를 섹션·카테고리·지표별로 정리.'''),
+    (r'''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     r'''뉴욕주 소셜미디어 약관 보고서 — Stop Hiding Hate Act에 따라 플랫폼이 연 2회 뉴욕 법무장관에게 제출하는 정책 문서. 아카이브 사본이 포함된 카탈로그.'''),
+    (r'''Browse the catalogue''', r'''카탈로그 보기'''),
     (r'''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      r'''플랫폼 투명성 데이터를 일목요연하게. EU 디지털 서비스법(DSA) 투명성 보고서와 Google 정부 콘텐츠 삭제 요청을 위한 대화형 대시보드와 구조화된 쿼리 API.'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
@@ -3958,6 +4103,19 @@ PAGES["ko"]["privacy.html"] = [
 # them to catalog.html, convert the panel <h2> heading into the page <h1>, and
 # prepend the catalogue page's own header (h1 + tagline) strings.
 PAGES["it"]["home.html"] = [
+    ('''<h3>Apple Transparency</h3>''', '''<h3>Trasparenza Apple</h3>'''),
+    ('''<h3>GitHub Transparency</h3>''', '''<h3>Trasparenza GitHub</h3>'''),
+    ('''<h3>Snap Transparency</h3>''', '''<h3>Trasparenza Snap</h3>'''),
+    ('''<h3>NY ToS reports</h3>''', '''<h3>Report ToS di NY</h3>'''),
+    ('''Apple's reported government &amp; private-party requests for device, account, financial-identifier and other data, plus App Store takedowns — by period, country and request type (2013 H1 onward).''',
+     '''Le richieste di autorità e privati che Apple dichiara per dati di dispositivi, account, identificatori finanziari e altro, più le rimozioni dall'App Store, per periodo, paese e tipo di richiesta (dal primo semestre 2013).'''),
+    ('''GitHub's reported government takedowns, requests to disclose user information (incl. national-security letters), DMCA notices, automated detection, appeals, and EU-DSA monthly active users.''',
+     '''Rimozioni governative dichiarate da GitHub, richieste di divulgazione di informazioni sugli utenti (incl. lettere di sicurezza nazionale), avvisi DMCA, rilevamento automatizzato, ricorsi e utenti attivi mensili ai sensi del DSA dell'UE.'''),
+    ('''Snap's reported Trust &amp; Safety enforcements, government content/account-removal and information requests (incl. US national security), and DMCA/trademark notices — by section, category and metric.''',
+     '''Misure di Trust &amp; Safety dichiarate da Snap, richieste governative di rimozione di contenuti/account e di informazioni (incl. sicurezza nazionale USA) e avvisi DMCA/marchi, per sezione, categoria e metrica.'''),
+    ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
+     '''I report sulle condizioni di servizio dei social media dello Stato di New York: i depositi semestrali sulle policy che le piattaforme inviano al procuratore generale di NY ai sensi dello Stop Hiding Hate Act. Un catalogo con copie archiviate.'''),
+    ('''Browse the catalogue''', '''Sfoglia il catalogo'''),
     ('''Platform transparency data, made useful. Interactive dashboards and a structured query API for the EU Digital Services Act transparency reports and Google government content-removal requests.''',
      '''Dati sulla trasparenza delle piattaforme, resi utili. Dashboard interattive e un'API di query strutturate per i report di trasparenza del Digital Services Act dell'UE e le richieste governative di rimozione di contenuti di Google.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',

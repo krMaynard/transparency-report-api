@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Apple Transparency Report — Transparency Report API</title>
+<meta name="description" content="Apple's reported government & private-party data requests and App Store takedowns — by reporting period, country, and request type (2013 H1 – 2025 H1)." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f2f2f2; --panel: #fff; --panel2: #f5f5f5; --border: #e8e8e8;
+    --fg: #333; --muted: #666; --accent: #1e7268; --accent-dark: #155a52; --accent2: #1e7268;
+    --on-accent: #fff; --shadow: rgba(0,0,0,.07);
+    --mono: ui-monospace, SFMono-Regular, "DejaVu Sans Mono", Menlo, monospace;
+    --topbar-h: 52px; --header-h: var(--topbar-h); --sidebar-w: 220px;
+  }
+  [data-theme="dark"] {
+    --bg: #15181c; --panel: #1d2025; --panel2: #2a2f35; --border: #2c3138;
+    --fg: #e8e8e8; --muted: #b0b0b0; --accent: #4ec1b1; --accent-dark: #6ed3c4; --accent2: #6ed3c4;
+    --on-accent: #08110f; --shadow: rgba(0,0,0,.45);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  /* ── Site banner ─────────────────────────────────────────────── */
+  .page-header { position: sticky; top: 0; z-index: 200; }
+  .site-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.9rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .site-nav .nav-name { font-weight: 700; font-size: 1rem; color: var(--fg); text-decoration: none; }
+  .site-nav .nav-links { display: flex; gap: 1.4rem; align-items: center; }
+  .site-nav .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .site-nav .nav-links a:hover { color: var(--accent); }
+  /* Cross-site language switcher (globe) — CSS-only <details> disclosure */
+  .site-nav .nav-right { display: flex; align-items: center; gap: 1.4rem; }
+  .lang-switcher { position: relative; }
+  .lang-switcher > summary {
+    display: inline-flex; align-items: center; gap: 0.38rem; list-style: none; cursor: pointer;
+    padding: 0.34rem 0.55rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel); color: var(--fg); font-weight: 600; font-size: 0.85rem; line-height: 1; white-space: nowrap;
+  }
+  .lang-switcher > summary::-webkit-details-marker { display: none; }
+  .lang-switcher > summary:hover,
+  .lang-switcher[open] > summary { border-color: var(--accent); color: var(--accent); }
+  .lang-switcher .lang-globe { width: 17px; height: 17px; }
+  .lang-switcher .lang-caret { width: 11px; height: 11px; opacity: .75; transition: transform .2s ease; }
+  .lang-switcher[open] .lang-caret { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; min-width: 170px; margin: 0; padding: .3rem;
+    list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 12px 30px var(--shadow); z-index: 201;
+  }
+  .lang-menu li { margin: 0; }
+  .lang-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    padding: .5rem .65rem; border-radius: 8px; text-decoration: none; color: var(--fg); font-size: .9rem; white-space: nowrap;
+  }
+  .lang-opt:hover { background: var(--panel2); }
+  .lang-opt.is-current { font-weight: 700; }
+  .lang-check { width: 16px; height: 16px; color: var(--accent); }
+  @media (max-width: 640px) {
+    .site-nav { flex-wrap: wrap; row-gap: .5rem; }
+    .site-nav .nav-links { flex-wrap: wrap; gap: 0.9rem 1.1rem; }
+    .lang-switcher > summary > span { display: none; }
+    .lang-switcher > summary { padding: .3rem .42rem; }
+  }
+  .topbar {
+display: flex; align-items: center; justify-content: space-between;
+    height: var(--topbar-h); padding: 0 1rem;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 0.6rem; }
+  .topbar-brand { font-weight: 700; font-size: 0.95rem; color: var(--fg); text-decoration: none; white-space: nowrap; }
+  .topbar-brand:hover { color: var(--accent); }
+  .topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+  .hamburger {
+    display: none; align-items: center; justify-content: center;
+    background: none; border: 0; color: var(--fg); cursor: pointer; padding: 6px;
+    border-radius: 6px; width: auto; margin: 0;
+  }
+  .hamburger:hover { color: var(--accent); background: var(--panel2); }
+  .hamburger svg { width: 20px; height: 20px; display: block; }
+  .theme-toggle {
+    background: none; border: 0; color: var(--muted); cursor: pointer; padding: 4px;
+    display: inline-flex; width: auto; margin: 0; border-radius: 6px;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle svg { width: 20px; height: 20px; }
+  .theme-icon-light { display: none; }
+  [data-theme="dark"] .theme-toggle .theme-icon-light { display: block; }
+  [data-theme="dark"] .theme-toggle .theme-icon-dark { display: none; }
+  .app-body { display: flex; min-height: calc(100vh - var(--header-h)); }
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h));
+    overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; transition: transform 0.22s ease;
+  }
+  .sidebar nav { flex: 1; padding: 0.75rem 0.5rem; }
+  .nav-section {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); padding: 0.55rem 0.75rem 0.25rem;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.45rem 0.75rem; border-radius: 7px;
+    color: var(--fg); text-decoration: none; font-size: 13.5px; margin: 1px 0; position: relative;
+  }
+  .nav-item svg { flex-shrink: 0; color: var(--muted); }
+  .nav-item:hover { background: var(--panel2); color: var(--accent); }
+  .nav-item:hover svg { color: var(--accent); }
+  .nav-item.is-active { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-dark); font-weight: 600; }
+  [data-theme="dark"] .nav-item.is-active { color: var(--accent); }
+  .nav-item.is-active svg { color: var(--accent); }
+  .nav-item.is-active::before {
+    content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 2px; background: var(--accent);
+  }
+  .nav-item.is-soon { color: var(--muted); cursor: default; }
+  .nav-item.is-soon:hover { background: none; color: var(--muted); }
+  .nav-item.is-soon svg { opacity: 0.5; }
+  .soon-badge {
+    margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .05em;
+    background: var(--panel2); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 1px 7px;
+  }
+  .nav-item.is-ext { color: var(--muted); font-size: 12.5px; }
+  .nav-item.is-ext:hover { color: var(--accent); }
+  .nav-hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0.75rem; }
+  .sidebar-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .sidebar-footer a { color: var(--muted); text-decoration: none; }
+  .sidebar-footer a:hover { color: var(--accent); }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 205; background: rgba(0,0,0,.4); }
+  .sidebar-overlay.is-open { display: block; }
+  .main-area { flex: 1; min-width: 0; }
+  .wrap { max-width: 960px; padding: 28px 2rem; }
+  header { margin-bottom: 16px; }
+  header .badge {
+    display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--border); border-radius: 999px;
+    padding: 3px 12px; background: var(--panel); margin-bottom: 14px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; color: var(--muted); max-width: 680px; }
+
+  /* ── Data section ────────────────────────────────────────────── */
+  .data-section { margin-bottom: 28px; }
+  .data-section h2 { font-size: 18px; margin: 0 0 4px; }
+  .data-section .sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  .table-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 8px 4px;
+  }
+  .table-scroll { overflow-x: auto; }
+  table.restable { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.restable th, table.restable td { text-align: left; padding: 9px 14px; border-bottom: 1px solid var(--border); }
+  table.restable th { color: var(--muted); font-weight: 600; font-size: 12px; white-space: nowrap; }
+  table.restable th.num, table.restable td.num { text-align: right; }
+  table.restable td.num { font-family: var(--mono); color: var(--accent2); }
+  table.restable tr:last-child td { border-bottom: none; }
+  .table-loading { color: var(--muted); font-size: 13px; padding: 18px 14px; }
+
+  /* ── Utils ───────────────────────────────────────────────────── */
+  .error { color: #c0392b; font-size: 13px; padding: 8px 0; }
+  [data-theme="dark"] .error { color: #ff7b72; }
+  .hidden { display: none !important; }
+  a:focus-visible, button:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 999;
+    background: var(--accent); color: var(--on-accent); padding: 8px 14px;
+    border-radius: 8px; font-weight: 700; transition: top .15s;
+  }
+  .skip-link:focus { top: 8px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 18px 0 8px; }
+  .hint a { color: var(--accent); text-decoration: none; }
+  footer { color: var(--muted); font-size: 13px; margin-top: 8px; padding-bottom: 2rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  .provenance { font-size: 12px; margin-top: 6px; }
+  .provenance .prov-label { font-weight: 600; }
+
+  @media (max-width: 720px) {
+    .hamburger { display: flex; }
+    .sidebar { position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 210; transform: translateX(calc(-1 * var(--sidebar-w))); }
+    .sidebar.is-open { transform: translateX(0); }
+    .wrap { padding: 20px 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Vai al contenuto</a>
+
+<!-- ── Site banner ──────────────────────────────────────────────────────── -->
+<div class="page-header">
+<nav class="site-nav" aria-label="Sito">
+  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="https://kieranmaynard.com/work.html">Lavori</a>
+      <a href="https://kieranmaynard.com/transparency.html">Prodotti</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulenza</a>
+      <a href="https://kieranmaynard.com/blog.html">Blog</a>
+      <a href="https://kieranmaynard.com/contact.html">Contatti</a>
+    </div>
+    <details class="lang-switcher">
+      <summary class="lang-current" aria-label="Lingua" title="Lingua">
+        <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+        <span>Italiano</span>
+        <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+      </summary>
+      <ul class="lang-menu">
+        <li><a class="lang-opt" href="/apple"><span>English</span></a></li>
+        <li><a class="lang-opt" href="/es/apple"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/apple"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/apple"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt is-current" href="/it/apple" aria-current="page"><span>Italiano</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/ja/apple"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/apple"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/apple"><span>한국어</span></a></li>
+      </ul>
+    </details>
+  </div>
+</nav>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" class="hamburger" id="hamburger" aria-label="Attiva/disattiva navigazione" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <a href="/it/" class="topbar-brand">Transparency Report API</a>
+  </div>
+  <div class="topbar-right">
+    <button type="button" class="theme-toggle" aria-label="Attiva/disattiva modalità scura" aria-pressed="false" data-theme-toggle>
+      <svg class="theme-icon-dark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+      <svg class="theme-icon-light" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
+    </button>
+  </div>
+</header>
+</div>
+
+<div class="app-body">
+
+<aside class="sidebar" id="sidebar" aria-label="Navigazione dell'applicazione">
+  <nav>
+    <a href="/it/" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
+      </svg>
+      Home
+    </a>
+
+    <div class="nav-section">Set di dati</div>
+
+    <a href="/it/reports" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <rect x="1" y="9" width="3" height="6" rx="1"/>
+        <rect x="6" y="5" width="3" height="10" rx="1"/>
+        <rect x="11" y="1" width="3" height="14" rx="1"/>
+      </svg>
+      Report DSA
+    </a>
+
+    <a href="/it/removals" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25"/>
+        <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
+      </svg>
+      Rimozioni governative
+    </a>
+
+    <a href="/apple" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="4.25" y="1.75" width="7.5" height="12.5" rx="1.5"/>
+        <path d="M6.75 12.5h2.5" stroke-linecap="round"/>
+      </svg>
+      Trasparenza Apple
+    </a>
+
+    <a href="/github" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
+      </svg>
+      Trasparenza GitHub
+    </a>
+
+    <a href="/snap" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 1.9c-1.85 0-3 1.35-3 3.25 0 1.15.2 1.75-.35 2.35-.4.45-1.15.45-1.15.95 0 .5.95.65 1.3.9.3.55-.45 1.1-.15 1.5.3.35 1.05-.1 1.65.2.5.25.85 1.1 1.85 1.1s1.35-.85 1.85-1.1c.6-.3 1.35.15 1.65-.2.3-.4-.45-.95-.15-1.5.35-.25 1.3-.4 1.3-.9 0-.5-.75-.5-1.15-.95-.55-.6-.35-1.2-.35-2.35 0-1.9-1.15-3.25-3-3.25z"/>
+      </svg>
+      Trasparenza Snap
+    </a>
+
+    <a href="/it/catalog" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
+        <circle cx="8" cy="6" r="1.55"/>
+      </svg>
+      Posizioni dei report
+    </a>
+
+    <a href="/it/ny-tos" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M3.5 1.75h6l3 3v9.5a.5.5 0 0 1-.5.5h-8.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5z"/>
+        <path d="M9.25 1.9v3.1h3.1M5.25 8.5h5.5M5.25 11h5.5" stroke-linecap="round"/>
+      </svg>
+      Report ToS di NY
+    </a>
+
+    <hr class="nav-hr">
+    <div class="nav-section">Strumenti</div>
+
+    <a href="/it/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
+      </svg>
+      Schema
+    </a>
+
+    <a href="/it/methodology" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
+        <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
+      </svg>
+      Metodologia
+    </a>
+
+    <a href="/it/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      Chiave API
+    </a>
+
+    <a href="/docs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
+      </svg>
+      Riferimento API
+    </a>
+
+    <a href="/it/mcp" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
+        <rect x="2" y="9" width="12" height="4.5" rx="1"/>
+        <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
+      </svg>
+      Server MCP
+    </a>
+
+    <a href="/it/privacy" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      Privacy
+    </a>
+
+    <hr class="nav-hr">
+
+    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
+      </svg>
+      kieranmaynard.com
+    </a>
+
+    <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
+      </svg>
+      GitHub
+    </a>
+  </nav>
+  <div class="sidebar-footer">Di <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/it/privacy">Privacy</a></div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<div class="main-area">
+<div class="wrap">
+
+<main id="main" tabindex="-1">
+
+  <header>
+    <span class="badge">Apple · 2013 H1 – 2025 H1</span>
+    <h1>Apple Transparency Report</h1>
+    <p>Apple's reported government &amp; private-party requests for device, account, financial-identifier, push-token, emergency, preservation and digital-content-provider data, plus App Store takedown requests — broken down by reporting period × country × request type. These are Apple's own reported figures. US national-security (FISA/NSL) and UK Investigatory-Powers-Act figures are published as banded ranges in a separate table, not as exact counts.</p>
+  </header>
+
+  <div class="error hidden" id="load-error" role="alert"></div>
+
+  <section class="data-section">
+    <h2>Requests by type</h2>
+    <p class="sub">Total requests received per request type, summed across all reporting periods and countries.</p>
+    <div class="table-card">
+      <div class="table-scroll" id="byType" aria-busy="true">
+        <p class="table-loading">Loading…</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="data-section">
+    <h2>Requests over time</h2>
+    <p class="sub">Total requests received per reporting period, most recent first.</p>
+    <div class="table-card">
+      <div class="table-scroll" id="byPeriod" aria-busy="true">
+        <p class="table-loading">Loading…</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="hint">Refine or extend these in the <a href="/it/reports">query builder</a>, browse the full field list on the <a href="/it/schema">Schema</a> page, or read the <a href="/it/methodology">Methodology</a>.</p>
+
+</main>
+
+<footer>
+  <p>Source: <a href="https://www.apple.com/legal/transparency/" target="_blank" rel="noopener noreferrer">Apple Transparency Report</a> — government &amp; private-party data requests and App Store takedowns (2013 H1 – 2025 H1). Data via <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Methodology</a> · <a href="/it/api-key">API key</a> · <a href="/it/privacy">Privacy</a></p>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">Istantanea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citare come:</span> <span id="prov-cite"></span></p>
+</footer>
+
+</div>
+</div><!-- /.main-area -->
+</div><!-- /.app-body -->
+
+<script>
+(function () {
+  'use strict';
+
+  // ── Dark mode + hamburger ─────────────────────────────────────────────────
+  var themeBtn = document.querySelector('[data-theme-toggle]');
+  if (themeBtn) {
+    var syncThemeBtn = function () {
+      themeBtn.setAttribute('aria-pressed', String(document.documentElement.getAttribute('data-theme') === 'dark'));
+    };
+    syncThemeBtn();
+    themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      syncThemeBtn();
+    });
+  }
+    // Keep --header-h in sync with the actual rendered height of the site
+  // banner + topbar (which varies as the nav links wrap on narrow widths),
+  // so the fixed/sticky sidebar starts right below it instead of overlapping.
+  var pageHeader = document.querySelector('.page-header');
+  if (pageHeader) {
+    var syncHeaderHeight = function () {
+      document.documentElement.style.setProperty('--header-h', pageHeader.offsetHeight + 'px');
+    };
+    syncHeaderHeight();
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncHeaderHeight).observe(pageHeader);
+    } else {
+      window.addEventListener('resize', syncHeaderHeight);
+    }
+  }
+  var hamburger = document.getElementById('hamburger');
+  var sidebar   = document.getElementById('sidebar');
+  var overlay   = document.getElementById('sidebar-overlay');
+  function openSidebar()  { sidebar.classList.add('is-open'); overlay.classList.add('is-open'); hamburger.setAttribute('aria-expanded','true'); overlay.removeAttribute('aria-hidden'); }
+  function closeSidebar() { sidebar.classList.remove('is-open'); overlay.classList.remove('is-open'); hamburger.setAttribute('aria-expanded','false'); overlay.setAttribute('aria-hidden','true'); }
+  hamburger.addEventListener('click', function () { sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar(); });
+  overlay.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && sidebar.classList.contains('is-open')) closeSidebar(); });
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function fmt(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('en-US');
+  }
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  // ── API call ──────────────────────────────────────────────────────────────
+  async function explore(body) {
+    var r = await fetch('/api/explore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'HTTP ' + r.status);
+    return d;
+  }
+
+  // ── Validated /api/explore bodies ─────────────────────────────────────────
+  var BY_TYPE = {"table":"apple_requests","group_by":["request_type"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"requests","order":"desc"}],"max_count":30};
+  var BY_PERIOD = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"desc"}],"max_count":30};
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  // Render rows into an accessible HTML table inside `container`.
+  // `cols` = [{label, srcIdx, num}] selecting which response columns to show.
+  function renderTable(container, caption, headers, rows, cols) {
+    var el = document.getElementById(container);
+    if (!rows.length) {
+      el.innerHTML = '<p class="table-loading">No data available.</p>';
+      el.removeAttribute('aria-busy');
+      return;
+    }
+    var html = '<table class="restable"><caption class="sr-only">' + esc(caption) + '</caption><thead><tr>'
+      + headers.map(function (h) {
+          return '<th scope="col"' + (h.num ? ' class="num"' : '') + '>' + esc(h.label) + '</th>';
+        }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + cols.map(function (c) {
+            var v = r[c.srcIdx];
+            return c.num
+              ? '<td class="num">' + fmt(v) + '</td>'
+              : '<td>' + esc(v) + '</td>';
+          }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+    el.innerHTML = html;
+    el.removeAttribute('aria-busy');
+  }
+
+  function showError(msg) {
+    var errEl = document.getElementById('load-error');
+    errEl.textContent = 'Failed to load Apple data: ' + msg;
+    errEl.classList.remove('hidden');
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  async function init() {
+    try {
+      var results = await Promise.all([explore(BY_TYPE), explore(BY_PERIOD)]);
+      var byType = results[0], byPeriod = results[1];
+
+      // byType columns: [request_type, requests]
+      renderTable('byType',
+        'Total Apple requests received, by request type.',
+        [{ label: 'Request type' }, { label: 'Requests received', num: true }],
+        byType.rows,
+        [{ srcIdx: 0 }, { srcIdx: 1, num: true }]);
+
+      // byPeriod columns: [period, period_ord, requests] — period_ord is a sort
+      // helper only, so it is not rendered.
+      renderTable('byPeriod',
+        'Total Apple requests received, by reporting period (most recent first).',
+        [{ label: 'Reporting period' }, { label: 'Requests received', num: true }],
+        byPeriod.rows,
+        [{ srcIdx: 0 }, { srcIdx: 2, num: true }]);
+
+      // Provenance + citation line (dataset snapshot date + version).
+      var d = byType;
+      if (d.generated) {
+        document.getElementById('prov-snap').textContent = d.generated;
+        document.getElementById('prov-cite').textContent =
+          '“Apple Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' + (d.version ? ', dataset version ' + d.version : '') + ').”';
+        document.getElementById('provenance').hidden = false;
+      }
+    } catch (err) {
+      showError(err.message);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
