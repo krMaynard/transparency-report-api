@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GitHub Transparency Report — Transparency Report API</title>
+<title>GitHub 透明性レポート — Transparency Report API</title>
 <meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,32 +402,32 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">GitHub · 2014 – 2024</span>
-    <h1>GitHub Transparency Report</h1>
-    <p>GitHub’s reported government takedown requests, requests to disclose user information (including national-security letters), DMCA takedowns and circumvention claims, automated detection, appeals and reinstatements, and EU-DSA monthly active users. A tidy-long dataset: each row is one measured value, identified by dataset × year × period × government × category × metric. Exact counts have equal low/high bounds; national-security letters/orders and EU-DSA MAU are published as banded ranges (low ≠ high) — so summing the upper bound is an upper estimate.</p>
+    <h1>GitHub 透明性レポート</h1>
+    <p>GitHub が報告した政府による削除要請、ユーザー情報の開示要請（国家安全保障レターを含む）、DMCA による削除および回避主張、自動検出、異議申し立てと復元、ならびに EU-DSA の月間アクティブユーザー。tidy-long 形式のデータセットで、各行は dataset × 年 × 期間 × 政府 × カテゴリ × メトリックで識別される 1 つの測定値です。正確な件数は下限/上限が等しく、国家安全保障レター/命令と EU-DSA MAU は帯状の範囲（下限 ≠ 上限）として公表されるため、上限を合計すると最大推定値になります。</p>
   </header>
 
   <div class="data-section">
-    <h2>Reported values by report area</h2>
+    <h2>レポート領域別の報告値</h2>
     <div class="results" id="byDataset" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">読み込み中…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), the summed upper-bound count across all years, periods, governments and categories.</p>
+    <p class="sub">各レポート領域（<code>dataset</code>）について、すべての年・期間・政府・カテゴリにわたって合計した上限件数。</p>
   </div>
 
   <div class="data-section">
-    <h2>Top categories by reported volume</h2>
+    <h2>報告件数の多い上位カテゴリ</h2>
     <div class="results" id="byCategory" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">読み込み中…</p>
     </div>
-    <p class="sub">The categories with the largest summed upper-bound counts. Banded ranges contribute their upper bound, so totals are upper estimates.</p>
+    <p class="sub">上限件数の合計が最も大きいカテゴリ。帯状の範囲は上限値で寄与するため、合計は最大推定値となります。</p>
   </div>
 
-  <p class="hint">Refine or extend these in the <a href="/ja/reports">query builder</a>, browse the full field list on the <a href="/ja/schema">Schema</a> page, or read the <a href="/ja/methodology">Methodology</a>.</p>
+  <p class="hint">これらは<a href="/ja/reports">クエリビルダー</a>で絞り込みや拡張ができます。フィールドの全リストは<a href="/ja/schema">スキーマ</a>ページで確認でき、<a href="/ja/methodology">方法論</a>もご覧いただけます。</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014–2024). Data via <a href="/api">Transparency Report API</a> · <a href="/ja/methodology">Methodology</a> · <a href="/ja/api-key">API key</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p>出典: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub 透明性レポート</a> — 政府による削除、ユーザー情報要請、DMCA、自動検出、異議申し立て、EU-DSA MAU（2014–2024）。データ提供元 <a href="/api">Transparency Report API</a> · <a href="/ja/methodology">Methodology</a> · <a href="/ja/api-key">API key</a> · <a href="/ja/privacy">プライバシー</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -514,7 +514,7 @@ display: flex; align-items: center; justify-content: space-between;
       + '<caption class="sr-only">' + esc(caption) + '</caption>'
       + '<thead><tr>'
       + '<th scope="col">' + esc(dimLabel) + '</th>'
-      + '<th scope="col" class="num">Reported count (upper bound)</th>'
+      + '<th scope="col" class="num">報告値（上限）</th>'
       + '</tr></thead><tbody>'
       + rows.map(function (r) {
           return '<tr>'
@@ -542,25 +542,25 @@ display: flex; align-items: center; justify-content: space-between;
       provFilled = true;
       document.getElementById('prov-snap').textContent = d.generated;
       document.getElementById('prov-cite').textContent =
-        '“GitHub Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' +
-        (d.version ? ', dataset version ' + d.version : '') + ').”';
+        '“GitHub 透明性レポート（Transparency Report API 経由、' + d.generated +  のスナップショット +
+        (d.version ? 、データセットバージョン  + d.version : '') + ').”';
       document.getElementById('provenance').hidden = false;
     }
 
     try {
       var d = await explore(byDataset);
-      renderTable('byDataset', 'Report area', 'Reported values by report area.', d);
+      renderTable('byDataset', 'レポート領域', 'レポート領域別の報告値。', d);
       fillProvenance(d);
     } catch (err) {
-      showError('byDataset', 'Failed to load report areas: ' + err.message);
+      showError('byDataset', 'レポート領域の読み込みに失敗しました: ' + err.message);
     }
 
     try {
       var d2 = await explore(byCategory);
-      renderTable('byCategory', 'Category', 'Top categories by reported volume.', d2);
+      renderTable('byCategory', 'カテゴリ', '報告件数の多い上位カテゴリ。', d2);
       fillProvenance(d2);
     } catch (err) {
-      showError('byCategory', 'Failed to load categories: ' + err.message);
+      showError('byCategory', 'カテゴリの読み込みに失敗しました: ' + err.message);
     }
   }
 

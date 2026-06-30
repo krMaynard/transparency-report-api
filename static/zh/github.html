@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GitHub Transparency Report — Transparency Report API</title>
+<title>GitHub 透明度报告 — Transparency Report API</title>
 <meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,32 +402,32 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">GitHub · 2014 – 2024</span>
-    <h1>GitHub Transparency Report</h1>
-    <p>GitHub’s reported government takedown requests, requests to disclose user information (including national-security letters), DMCA takedowns and circumvention claims, automated detection, appeals and reinstatements, and EU-DSA monthly active users. A tidy-long dataset: each row is one measured value, identified by dataset × year × period × government × category × metric. Exact counts have equal low/high bounds; national-security letters/orders and EU-DSA MAU are published as banded ranges (low ≠ high) — so summing the upper bound is an upper estimate.</p>
+    <h1>GitHub 透明度报告</h1>
+    <p>GitHub 报告的政府删除请求、披露用户信息的请求（包括国家安全信函）、DMCA 删除及规避主张、自动检测、申诉与恢复，以及 EU-DSA 月活跃用户。一个 tidy-long 数据集：每一行是一个测量值，由 dataset × 年份 × 期间 × 政府 × 类别 × 指标标识。精确计数的上下限相等；国家安全信函/命令和 EU-DSA MAU 以分段范围发布（下限 ≠ 上限）——因此对上限求和是最大估计值。</p>
   </header>
 
   <div class="data-section">
-    <h2>Reported values by report area</h2>
+    <h2>按报告领域划分的报告值</h2>
     <div class="results" id="byDataset" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">加载中…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), the summed upper-bound count across all years, periods, governments and categories.</p>
+    <p class="sub">对于每个报告领域（<code>dataset</code>），跨所有年份、期间、政府和类别求和后的上限计数。</p>
   </div>
 
   <div class="data-section">
-    <h2>Top categories by reported volume</h2>
+    <h2>按报告数量划分的主要类别</h2>
     <div class="results" id="byCategory" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">加载中…</p>
     </div>
-    <p class="sub">The categories with the largest summed upper-bound counts. Banded ranges contribute their upper bound, so totals are upper estimates.</p>
+    <p class="sub">上限计数总和最大的类别。分段范围以其上限计入，因此总计为最大估计值。</p>
   </div>
 
-  <p class="hint">Refine or extend these in the <a href="/zh/reports">query builder</a>, browse the full field list on the <a href="/zh/schema">Schema</a> page, or read the <a href="/zh/methodology">Methodology</a>.</p>
+  <p class="hint">可在<a href="/zh/reports">查询构建器</a>中细化或扩展这些内容，在<a href="/zh/schema">架构</a>页面浏览完整字段列表，或阅读<a href="/zh/methodology">方法论</a>。</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014–2024). Data via <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">Methodology</a> · <a href="/zh/api-key">API key</a> · <a href="/zh/privacy">隐私</a></p>
+  <p>来源：<a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub 透明度报告</a> — 政府删除、用户信息请求、DMCA、自动检测、申诉以及 EU-DSA MAU（2014–2024）。数据经由 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">Methodology</a> · <a href="/zh/api-key">API key</a> · <a href="/zh/privacy">隐私</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">快照：</span> <span id="prov-snap"></span> · <span class="prov-label">引用格式：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -514,7 +514,7 @@ display: flex; align-items: center; justify-content: space-between;
       + '<caption class="sr-only">' + esc(caption) + '</caption>'
       + '<thead><tr>'
       + '<th scope="col">' + esc(dimLabel) + '</th>'
-      + '<th scope="col" class="num">Reported count (upper bound)</th>'
+      + '<th scope="col" class="num">报告计数（上限）</th>'
       + '</tr></thead><tbody>'
       + rows.map(function (r) {
           return '<tr>'
@@ -542,25 +542,25 @@ display: flex; align-items: center; justify-content: space-between;
       provFilled = true;
       document.getElementById('prov-snap').textContent = d.generated;
       document.getElementById('prov-cite').textContent =
-        '“GitHub Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' +
-        (d.version ? ', dataset version ' + d.version : '') + ').”';
+        '“GitHub 透明度报告，经由 Transparency Report API（' + d.generated +  快照 +
+        (d.version ? ，数据集版本  + d.version : '') + ').”';
       document.getElementById('provenance').hidden = false;
     }
 
     try {
       var d = await explore(byDataset);
-      renderTable('byDataset', 'Report area', 'Reported values by report area.', d);
+      renderTable('byDataset', '报告领域', '按报告领域划分的报告值。', d);
       fillProvenance(d);
     } catch (err) {
-      showError('byDataset', 'Failed to load report areas: ' + err.message);
+      showError('byDataset', '加载报告领域失败：' + err.message);
     }
 
     try {
       var d2 = await explore(byCategory);
-      renderTable('byCategory', 'Category', 'Top categories by reported volume.', d2);
+      renderTable('byCategory', '类别', '按报告数量划分的主要类别。', d2);
       fillProvenance(d2);
     } catch (err) {
-      showError('byCategory', 'Failed to load categories: ' + err.message);
+      showError('byCategory', '加载类别失败：' + err.message);
     }
   }
 

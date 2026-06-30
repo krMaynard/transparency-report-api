@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GitHub Transparency Report — Transparency Report API</title>
+<title>GitHub 투명성 보고서 — Transparency Report API</title>
 <meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,32 +402,32 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">GitHub · 2014 – 2024</span>
-    <h1>GitHub Transparency Report</h1>
-    <p>GitHub’s reported government takedown requests, requests to disclose user information (including national-security letters), DMCA takedowns and circumvention claims, automated detection, appeals and reinstatements, and EU-DSA monthly active users. A tidy-long dataset: each row is one measured value, identified by dataset × year × period × government × category × metric. Exact counts have equal low/high bounds; national-security letters/orders and EU-DSA MAU are published as banded ranges (low ≠ high) — so summing the upper bound is an upper estimate.</p>
+    <h1>GitHub 투명성 보고서</h1>
+    <p>GitHub이 보고한 정부 삭제 요청, 사용자 정보 공개 요청(국가 안보 서신 포함), DMCA 삭제 및 우회 주장, 자동 탐지, 이의 제기 및 복원, 그리고 EU-DSA 월간 활성 사용자. tidy-long 형식의 데이터셋으로, 각 행은 dataset × 연도 × 기간 × 정부 × 분류 × 지표로 식별되는 하나의 측정값입니다. 정확한 건수는 하한/상한이 같으며, 국가 안보 서신/명령과 EU-DSA MAU는 구간 범위(하한 ≠ 상한)로 공표되므로 상한을 합산하면 최대 추정치가 됩니다.</p>
   </header>
 
   <div class="data-section">
-    <h2>Reported values by report area</h2>
+    <h2>보고 영역별 보고값</h2>
     <div class="results" id="byDataset" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">불러오는 중…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), the summed upper-bound count across all years, periods, governments and categories.</p>
+    <p class="sub">각 보고 영역(<code>dataset</code>)에 대해 모든 연도, 기간, 정부 및 분류에 걸쳐 합산한 상한 건수.</p>
   </div>
 
   <div class="data-section">
-    <h2>Top categories by reported volume</h2>
+    <h2>보고량 기준 상위 분류</h2>
     <div class="results" id="byCategory" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">불러오는 중…</p>
     </div>
-    <p class="sub">The categories with the largest summed upper-bound counts. Banded ranges contribute their upper bound, so totals are upper estimates.</p>
+    <p class="sub">상한 건수 합계가 가장 큰 분류. 구간 범위는 상한값으로 기여하므로 합계는 최대 추정치입니다.</p>
   </div>
 
-  <p class="hint">Refine or extend these in the <a href="/ko/reports">query builder</a>, browse the full field list on the <a href="/ko/schema">Schema</a> page, or read the <a href="/ko/methodology">Methodology</a>.</p>
+  <p class="hint">이 결과는 <a href="/ko/reports">쿼리 빌더</a>에서 세분화하거나 확장할 수 있고, 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서 확인하거나 <a href="/ko/methodology">방법론</a>을 읽어보세요.</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014–2024). Data via <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
+  <p>출처: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub 투명성 보고서</a> — 정부 삭제, 사용자 정보 요청, DMCA, 자동 탐지, 이의 제기 및 EU-DSA MAU (2014–2024). 데이터 제공 <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -514,7 +514,7 @@ display: flex; align-items: center; justify-content: space-between;
       + '<caption class="sr-only">' + esc(caption) + '</caption>'
       + '<thead><tr>'
       + '<th scope="col">' + esc(dimLabel) + '</th>'
-      + '<th scope="col" class="num">Reported count (upper bound)</th>'
+      + '<th scope="col" class="num">보고 건수(상한)</th>'
       + '</tr></thead><tbody>'
       + rows.map(function (r) {
           return '<tr>'
@@ -542,25 +542,25 @@ display: flex; align-items: center; justify-content: space-between;
       provFilled = true;
       document.getElementById('prov-snap').textContent = d.generated;
       document.getElementById('prov-cite').textContent =
-        '“GitHub Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' +
-        (d.version ? ', dataset version ' + d.version : '') + ').”';
+        '“GitHub 투명성 보고서, Transparency Report API 경유 (' + d.generated +  스냅샷 +
+        (d.version ? , 데이터셋 버전  + d.version : '') + ').”';
       document.getElementById('provenance').hidden = false;
     }
 
     try {
       var d = await explore(byDataset);
-      renderTable('byDataset', 'Report area', 'Reported values by report area.', d);
+      renderTable('byDataset', '보고 영역', '보고 영역별 보고값.', d);
       fillProvenance(d);
     } catch (err) {
-      showError('byDataset', 'Failed to load report areas: ' + err.message);
+      showError('byDataset', '보고 영역을 불러오지 못했습니다: ' + err.message);
     }
 
     try {
       var d2 = await explore(byCategory);
-      renderTable('byCategory', 'Category', 'Top categories by reported volume.', d2);
+      renderTable('byCategory', '분류', '보고량 기준 상위 분류.', d2);
       fillProvenance(d2);
     } catch (err) {
-      showError('byCategory', 'Failed to load categories: ' + err.message);
+      showError('byCategory', '분류를 불러오지 못했습니다: ' + err.message);
     }
   }
 

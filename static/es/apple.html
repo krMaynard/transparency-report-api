@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Apple Transparency Report — Transparency Report API</title>
+<title>Informe de transparencia de Apple — Transparency Report API</title>
 <meta name="description" content="Apple's reported government & private-party data requests and App Store takedowns — by reporting period, country, and request type (2013 H1 – 2025 H1)." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -403,38 +403,38 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">Apple · 2013 H1 – 2025 H1</span>
-    <h1>Apple Transparency Report</h1>
-    <p>Apple's reported government &amp; private-party requests for device, account, financial-identifier, push-token, emergency, preservation and digital-content-provider data, plus App Store takedown requests — broken down by reporting period × country × request type. These are Apple's own reported figures. US national-security (FISA/NSL) and UK Investigatory-Powers-Act figures are published as banded ranges in a separate table, not as exact counts.</p>
+    <h1>Informe de transparencia de Apple</h1>
+    <p>Solicitudes notificadas por Apple, gubernamentales y de particulares, de datos de dispositivos, cuentas, identificadores financieros, tokens push, emergencias, conservación y proveedores de contenido digital, además de solicitudes de retirada de la App Store — desglosadas por período de referencia × país × tipo de solicitud. Estas son las cifras notificadas por la propia Apple. Las cifras de seguridad nacional de EE. UU. (FISA/NSL) y de la Ley de Poderes de Investigación del Reino Unido se publican como rangos por bandas en una tabla aparte, no como recuentos exactos.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
   <section class="data-section">
-    <h2>Requests by type</h2>
-    <p class="sub">Total requests received per request type, summed across all reporting periods and countries.</p>
+    <h2>Solicitudes por tipo</h2>
+    <p class="sub">Total de solicitudes recibidas por tipo de solicitud, sumadas en todos los períodos de referencia y países.</p>
     <div class="table-card">
       <div class="table-scroll" id="byType" aria-busy="true">
-        <p class="table-loading">Loading…</p>
+        <p class="table-loading">Cargando…</p>
       </div>
     </div>
   </section>
 
   <section class="data-section">
-    <h2>Requests over time</h2>
-    <p class="sub">Total requests received per reporting period, most recent first.</p>
+    <h2>Solicitudes a lo largo del tiempo</h2>
+    <p class="sub">Total de solicitudes recibidas por período de referencia, las más recientes primero.</p>
     <div class="table-card">
       <div class="table-scroll" id="byPeriod" aria-busy="true">
-        <p class="table-loading">Loading…</p>
+        <p class="table-loading">Cargando…</p>
       </div>
     </div>
   </section>
 
-  <p class="hint">Refine or extend these in the <a href="/es/reports">query builder</a>, browse the full field list on the <a href="/es/schema">Schema</a> page, or read the <a href="/es/methodology">Methodology</a>.</p>
+  <p class="hint">Refina o amplía estos resultados en el <a href="/es/reports">generador de consultas</a>, consulta la lista completa de campos en la página de <a href="/es/schema">Esquema</a> o lee la <a href="/es/methodology">Metodología</a>.</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://www.apple.com/legal/transparency/" target="_blank" rel="noopener noreferrer">Apple Transparency Report</a> — government &amp; private-party data requests and App Store takedowns (2013 H1 – 2025 H1). Data via <a href="/api">Transparency Report API</a> · <a href="/es/methodology">Methodology</a> · <a href="/es/api-key">API key</a> · <a href="/es/privacy">Privacidad</a></p>
+  <p>Fuente: <a href="https://www.apple.com/legal/transparency/" target="_blank" rel="noopener noreferrer">Informe de transparencia de Apple</a> — solicitudes de datos gubernamentales y de particulares y retiradas de la App Store (2013 H1 – 2025 H1). Datos vía <a href="/api">Transparency Report API</a> · <a href="/es/methodology">Metodología</a> · <a href="/es/api-key">Clave de API</a> · <a href="/es/privacy">Privacidad</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantánea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citar como:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -551,25 +551,25 @@ display: flex; align-items: center; justify-content: space-between;
 
       // byType columns: [request_type, requests]
       renderTable('byType',
-        'Total Apple requests received, by request type.',
-        [{ label: 'Request type' }, { label: 'Requests received', num: true }],
+        'Total de solicitudes de Apple recibidas, por tipo de solicitud.',
+        [{ label: 'Tipo de solicitud' }, { label: 'Solicitudes recibidas', num: true }],
         byType.rows,
         [{ srcIdx: 0 }, { srcIdx: 1, num: true }]);
 
       // byPeriod columns: [period, period_ord, requests] — period_ord is a sort
       // helper only, so it is not rendered.
       renderTable('byPeriod',
-        'Total Apple requests received, by reporting period (most recent first).',
-        [{ label: 'Reporting period' }, { label: 'Requests received', num: true }],
+        'Total de solicitudes de Apple recibidas, por período de referencia (las más recientes primero).',
+        [{ label: 'Período de referencia' }, { label: 'Solicitudes recibidas', num: true }],
         byPeriod.rows,
         [{ srcIdx: 0 }, { srcIdx: 2, num: true }]);
 
-      // Provenance + citation line (dataset snapshot date + version).
+      // Provenance + citation line (dataset date + version).
       var d = byType;
       if (d.generated) {
         document.getElementById('prov-snap').textContent = d.generated;
         document.getElementById('prov-cite').textContent =
-          '“Apple Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' + (d.version ? ', dataset version ' + d.version : '') + ').”';
+          '“Informe de transparencia de Apple, vía la Transparency Report API (instantánea de ' + d.generated + '' + (d.version ? ', versión del conjunto de datos ' + d.version : '') + ').”';
         document.getElementById('provenance').hidden = false;
       }
     } catch (err) {

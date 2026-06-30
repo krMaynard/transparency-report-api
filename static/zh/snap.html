@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Snap Transparency Report — Transparency Report API</title>
+<title>Snap 透明度报告 — Transparency Report API</title>
 <meta name="description" content="Snap (Snapchat) Transparency Report — Trust &amp; Safety enforcements, government content/account-removal and information requests, and DMCA/trademark notices, by period × section × category × metric." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -429,36 +429,36 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">Snap · 2024 H2 – 2025 H1</span>
-    <h1>Snap Transparency Report</h1>
-    <p>Snap's reported Trust &amp; Safety enforcements, content &amp; account-removal and information requests from governments (including US national security), and DMCA/trademark notices. A tidy-long dataset: each row is one measured value identified by period × section × category × sub-categories × metric. Figures are <strong>not comparable across sections</strong>, and some metrics are <strong>medians</strong> — so they cannot be summed; this page pins a single section and metric for each table.</p>
+    <h1>Snap 透明度报告</h1>
+    <p>Snap 报告的信任与安全执行措施、来自政府（包括美国国家安全）的内容与账号删除请求及信息请求，以及 DMCA／商标通知。一个 tidy-long 数据集：每一行是由期间 × 板块 × 类别 × 子类别 × 指标标识的一个测量值。这些数字<strong>在不同板块之间不可比较</strong>，并且部分指标为<strong>中位数</strong> — 因此不能求和；本页面为每张表固定单一板块和指标。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── 报告涵盖的内容 ─────────────────────────────────── -->
   <section class="data-section">
-    <h2>What the report covers</h2>
-    <p class="sub">The number of reported values in each section of the dataset — a coverage overview of how the report is broken down. Counts of rows, not summed quantities.</p>
+    <h2>报告涵盖的内容</h2>
+    <p class="sub">数据集中每个板块的报告值数量 — 报告如何拆分的覆盖概览。这是行数统计，而非求和的数量。</p>
     <div class="results" id="sectionCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">加载中…</div>
     </div>
   </section>
 
-  <!-- ── US government information requests ─────────────────────── -->
+  <!-- ── 美国政府信息请求 ─────────────────────── -->
   <section class="data-section">
-    <h2>US government information requests</h2>
-    <p class="sub">The reported totals per metric within the United States Government Information Requests section.</p>
+    <h2>美国政府信息请求</h2>
+    <p class="sub">United States Government Information Requests 板块内按指标报告的合计。</p>
     <div class="results" id="usGov" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">加载中…</div>
     </div>
   </section>
 
-  <p class="hint">Refine or extend these in the <a href="/zh/reports">query builder</a> (pin a <code>section</code> before aggregating), browse the full field list on the <a href="/zh/schema">Schema</a> page, or read the <a href="/zh/methodology">Methodology</a>.</p>
+  <p class="hint">可在<a href="/zh/reports">查询构建器</a>中细化或扩展这些查询（在聚合前固定一个 <code>section</code>），在 <a href="/zh/schema">Schema</a> 页面浏览完整字段列表，或阅读<a href="/zh/methodology">方法论</a>。</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://values.snap.com/privacy/transparency" target="_blank" rel="noopener noreferrer">Snap Transparency Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">Methodology</a> · <a href="/zh/api-key">API key</a> · <a href="/zh/privacy">隐私</a></p>
+  <p>来源：<a href="https://values.snap.com/privacy/transparency" target="_blank" rel="noopener noreferrer">Snap 透明度报告</a>。数据经由 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">方法论</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">快照：</span> <span id="prov-snap"></span> · <span class="prov-label">引用格式：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -563,8 +563,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      '“Snap Transparency Report, via the Transparency Report API (' + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      '“Snap 透明度报告，经由 Transparency Report API（' + generated + ' 快照'
+      + (version ? '，数据集版本 ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -573,19 +573,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per section.
     try {
       var d = await explore({"table":"snap_metrics","group_by":["section"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"values"}],"sort":[{"field_name":"values","order":"desc"}],"max_count":30});
-      renderTable('sectionCoverage', d.rows || [], 'Reported values in each section of the Snap Transparency Report.', 'Section', 'Reported values');
+      renderTable('sectionCoverage', d.rows || [], 'Snap 透明度报告中每个板块的报告值。', '板块', '报告值数量');
       fillProvenance(d.generated, d.version);
     } catch (err) {
-      showError('sectionCoverage', 'Failed to load section coverage: ' + err.message);
+      showError('sectionCoverage', '加载板块覆盖情况失败：' + err.message);
     }
 
-    // US government information requests: SUM per metric within that section.
+    // 美国政府信息请求: SUM per metric within that section.
     try {
       var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
-      renderTable('usGov', d2.rows || [], 'US government information requests to Snap, totalled per metric.', 'Metric', 'Total');
+      renderTable('usGov', d2.rows || [], '向 Snap 提出的美国政府信息请求，按指标合计。', '指标', '合计');
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usGov', 'Failed to load US government requests: ' + err.message);
+      showError('usGov', '加载美国政府请求失败：' + err.message);
     }
   }
 

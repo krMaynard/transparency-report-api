@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GitHub Transparency Report — Transparency Report API</title>
+<title>GitHub-Transparenzbericht — Transparency Report API</title>
 <meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,32 +402,32 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">GitHub · 2014 – 2024</span>
-    <h1>GitHub Transparency Report</h1>
-    <p>GitHub’s reported government takedown requests, requests to disclose user information (including national-security letters), DMCA takedowns and circumvention claims, automated detection, appeals and reinstatements, and EU-DSA monthly active users. A tidy-long dataset: each row is one measured value, identified by dataset × year × period × government × category × metric. Exact counts have equal low/high bounds; national-security letters/orders and EU-DSA MAU are published as banded ranges (low ≠ high) — so summing the upper bound is an upper estimate.</p>
+    <h1>GitHub-Transparenzbericht</h1>
+    <p>Die von GitHub gemeldeten behördlichen Entfernungsanfragen, Anfragen zur Offenlegung von Nutzerinformationen (einschließlich National-Security-Letters), DMCA-Entfernungen und Umgehungsansprüche, automatisierte Erkennung, Widersprüche und Wiederherstellungen sowie die monatlich aktiven Nutzer nach EU-DSA. Ein Datensatz im tidy-long-Format: Jede Zeile ist ein gemessener Wert, identifiziert durch dataset × Jahr × Zeitraum × Regierung × Kategorie × Metrik. Exakte Zählungen haben gleiche Unter-/Obergrenzen; National-Security-Letters/-Anordnungen und EU-DSA-MAU werden als Spannenbereiche veröffentlicht (untere ≠ obere) — die Summe der Obergrenze ist daher eine Höchstschätzung.</p>
   </header>
 
   <div class="data-section">
-    <h2>Reported values by report area</h2>
+    <h2>Gemeldete Werte nach Berichtsbereich</h2>
     <div class="results" id="byDataset" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">Wird geladen…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), the summed upper-bound count across all years, periods, governments and categories.</p>
+    <p class="sub">Für jeden Berichtsbereich (<code>dataset</code>) die summierte Obergrenzenanzahl über alle Jahre, Zeiträume, Regierungen und Kategorien.</p>
   </div>
 
   <div class="data-section">
-    <h2>Top categories by reported volume</h2>
+    <h2>Top-Kategorien nach gemeldetem Volumen</h2>
     <div class="results" id="byCategory" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">Wird geladen…</p>
     </div>
-    <p class="sub">The categories with the largest summed upper-bound counts. Banded ranges contribute their upper bound, so totals are upper estimates.</p>
+    <p class="sub">Die Kategorien mit den größten summierten Obergrenzenanzahlen. Spannenbereiche tragen mit ihrer Obergrenze bei, sodass die Summen Höchstschätzungen sind.</p>
   </div>
 
-  <p class="hint">Refine or extend these in the <a href="/de/reports">query builder</a>, browse the full field list on the <a href="/de/schema">Schema</a> page, or read the <a href="/de/methodology">Methodology</a>.</p>
+  <p class="hint">Verfeinern oder erweitern Sie diese im <a href="/de/reports">Abfrage-Generator</a>, durchsuchen Sie die vollständige Feldliste auf der Seite <a href="/de/schema">Schema</a> oder lesen Sie die <a href="/de/methodology">Methodik</a>.</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014–2024). Data via <a href="/api">Transparency Report API</a> · <a href="/de/methodology">Methodology</a> · <a href="/de/api-key">API key</a> · <a href="/de/privacy">Datenschutz</a></p>
+  <p>Quelle: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub-Transparenzbericht</a> — behördliche Entfernungen, Anfragen zu Nutzerinformationen, DMCA, automatisierte Erkennung, Widersprüche und EU-DSA-MAU (2014–2024). Daten über <a href="/api">Transparency Report API</a> · <a href="/de/methodology">Methodology</a> · <a href="/de/api-key">API key</a> · <a href="/de/privacy">Datenschutz</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Momentaufnahme:</span> <span id="prov-snap"></span> · <span class="prov-label">Zitieren als:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -514,7 +514,7 @@ display: flex; align-items: center; justify-content: space-between;
       + '<caption class="sr-only">' + esc(caption) + '</caption>'
       + '<thead><tr>'
       + '<th scope="col">' + esc(dimLabel) + '</th>'
-      + '<th scope="col" class="num">Reported count (upper bound)</th>'
+      + '<th scope="col" class="num">Gemeldete Anzahl (Obergrenze)</th>'
       + '</tr></thead><tbody>'
       + rows.map(function (r) {
           return '<tr>'
@@ -542,25 +542,25 @@ display: flex; align-items: center; justify-content: space-between;
       provFilled = true;
       document.getElementById('prov-snap').textContent = d.generated;
       document.getElementById('prov-cite').textContent =
-        '“GitHub Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' +
-        (d.version ? ', dataset version ' + d.version : '') + ').”';
+        '“GitHub-Transparenzbericht, über die Transparency Report API (' + d.generated + ' Momentaufnahme' +
+        (d.version ? ', Datensatzversion ' + d.version : '') + ').”';
       document.getElementById('provenance').hidden = false;
     }
 
     try {
       var d = await explore(byDataset);
-      renderTable('byDataset', 'Report area', 'Reported values by report area.', d);
+      renderTable('byDataset', 'Berichtsbereich', 'Gemeldete Werte nach Berichtsbereich.', d);
       fillProvenance(d);
     } catch (err) {
-      showError('byDataset', 'Failed to load report areas: ' + err.message);
+      showError('byDataset', 'Berichtsbereiche konnten nicht geladen werden: ' + err.message);
     }
 
     try {
       var d2 = await explore(byCategory);
-      renderTable('byCategory', 'Category', 'Top categories by reported volume.', d2);
+      renderTable('byCategory', 'Kategorie', 'Top-Kategorien nach gemeldetem Volumen.', d2);
       fillProvenance(d2);
     } catch (err) {
-      showError('byCategory', 'Failed to load categories: ' + err.message);
+      showError('byCategory', 'Kategorien konnten nicht geladen werden: ' + err.message);
     }
   }
 

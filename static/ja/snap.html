@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Snap Transparency Report — Transparency Report API</title>
+<title>Snap 透明性レポート — Transparency Report API</title>
 <meta name="description" content="Snap (Snapchat) Transparency Report — Trust &amp; Safety enforcements, government content/account-removal and information requests, and DMCA/trademark notices, by period × section × category × metric." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -429,36 +429,36 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">Snap · 2024 H2 – 2025 H1</span>
-    <h1>Snap Transparency Report</h1>
-    <p>Snap's reported Trust &amp; Safety enforcements, content &amp; account-removal and information requests from governments (including US national security), and DMCA/trademark notices. A tidy-long dataset: each row is one measured value identified by period × section × category × sub-categories × metric. Figures are <strong>not comparable across sections</strong>, and some metrics are <strong>medians</strong> — so they cannot be summed; this page pins a single section and metric for each table.</p>
+    <h1>Snap 透明性レポート</h1>
+    <p>Snap が報告するトラスト＆セーフティの執行措置、政府（米国の国家安全保障を含む）からのコンテンツ・アカウント削除要請および情報要請、ならびに DMCA／商標通知。tidy-long 形式のデータセットで、各行は期間 × セクション × カテゴリ × サブカテゴリ × 指標で識別される 1 つの測定値です。数値は<strong>セクション間で比較できず</strong>、一部の指標は<strong>中央値</strong>であるため合計できません。このページでは各テーブルについて単一のセクションと指標を固定しています。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── レポートが対象とする範囲 ─────────────────────────────────── -->
   <section class="data-section">
-    <h2>What the report covers</h2>
-    <p class="sub">The number of reported values in each section of the dataset — a coverage overview of how the report is broken down. Counts of rows, not summed quantities.</p>
+    <h2>レポートが対象とする範囲</h2>
+    <p class="sub">データセットの各セクションにおける報告値の数 — レポートがどのように分解されているかのカバレッジ概要です。合計された量ではなく、行数のカウントです。</p>
     <div class="results" id="sectionCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">読み込み中…</div>
     </div>
   </section>
 
-  <!-- ── US government information requests ─────────────────────── -->
+  <!-- ── 米国政府による情報要請 ─────────────────────── -->
   <section class="data-section">
-    <h2>US government information requests</h2>
-    <p class="sub">The reported totals per metric within the United States Government Information Requests section.</p>
+    <h2>米国政府による情報要請</h2>
+    <p class="sub">United States Government Information Requests セクション内の指標ごとに報告された合計。</p>
     <div class="results" id="usGov" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">読み込み中…</div>
     </div>
   </section>
 
-  <p class="hint">Refine or extend these in the <a href="/ja/reports">query builder</a> (pin a <code>section</code> before aggregating), browse the full field list on the <a href="/ja/schema">Schema</a> page, or read the <a href="/ja/methodology">Methodology</a>.</p>
+  <p class="hint">これらは<a href="/ja/reports">クエリビルダー</a>で絞り込みまたは拡張でき（集計の前に <code>section</code> を固定してください）、<a href="/ja/schema">Schema</a> ページで全フィールド一覧を閲覧したり、<a href="/ja/methodology">方法論</a>を読んだりできます。</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://values.snap.com/privacy/transparency" target="_blank" rel="noopener noreferrer">Snap Transparency Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/ja/methodology">Methodology</a> · <a href="/ja/api-key">API key</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p>出典: <a href="https://values.snap.com/privacy/transparency" target="_blank" rel="noopener noreferrer">Snap 透明性レポート</a>。データは <a href="/api">Transparency Report API</a> 経由 · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -563,8 +563,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      '“Snap Transparency Report, via the Transparency Report API (' + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      '“Snap 透明性レポート（Transparency Report API 経由、' + generated + ' のスナップショット'
+      + (version ? '、データセットバージョン ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -573,19 +573,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per section.
     try {
       var d = await explore({"table":"snap_metrics","group_by":["section"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"values"}],"sort":[{"field_name":"values","order":"desc"}],"max_count":30});
-      renderTable('sectionCoverage', d.rows || [], 'Reported values in each section of the Snap Transparency Report.', 'Section', 'Reported values');
+      renderTable('sectionCoverage', d.rows || [], 'Snap 透明性レポートの各セクションにおける報告値。', 'セクション', '報告値の件数');
       fillProvenance(d.generated, d.version);
     } catch (err) {
-      showError('sectionCoverage', 'Failed to load section coverage: ' + err.message);
+      showError('sectionCoverage', 'セクションカバレッジの読み込みに失敗しました: ' + err.message);
     }
 
-    // US government information requests: SUM per metric within that section.
+    // 米国政府による情報要請: SUM per metric within that section.
     try {
       var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
-      renderTable('usGov', d2.rows || [], 'US government information requests to Snap, totalled per metric.', 'Metric', 'Total');
+      renderTable('usGov', d2.rows || [], 'Snap への米国政府による情報要請、指標ごとに合計。', '指標', '合計');
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usGov', 'Failed to load US government requests: ' + err.message);
+      showError('usGov', '米国政府の要請の読み込みに失敗しました: ' + err.message);
     }
   }
 

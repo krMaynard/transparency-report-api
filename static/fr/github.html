@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>GitHub Transparency Report — Transparency Report API</title>
+<title>Rapport de transparence de GitHub — Transparency Report API</title>
 <meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -402,32 +402,32 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">GitHub · 2014 – 2024</span>
-    <h1>GitHub Transparency Report</h1>
-    <p>GitHub’s reported government takedown requests, requests to disclose user information (including national-security letters), DMCA takedowns and circumvention claims, automated detection, appeals and reinstatements, and EU-DSA monthly active users. A tidy-long dataset: each row is one measured value, identified by dataset × year × period × government × category × metric. Exact counts have equal low/high bounds; national-security letters/orders and EU-DSA MAU are published as banded ranges (low ≠ high) — so summing the upper bound is an upper estimate.</p>
+    <h1>Rapport de transparence de GitHub</h1>
+    <p>Les demandes gouvernementales de retrait déclarées par GitHub, les demandes de divulgation d’informations sur les utilisateurs (y compris les lettres de sécurité nationale), les retraits DMCA et réclamations pour contournement, la détection automatisée, les recours et rétablissements, ainsi que les utilisateurs actifs mensuels au titre du DSA de l’UE. Un jeu de données au format tidy-long : chaque ligne est une valeur mesurée, identifiée par dataset × année × période × gouvernement × catégorie × métrique. Les comptages exacts ont des bornes inférieure/supérieure égales ; les lettres/ordonnances de sécurité nationale et les MAU au titre du DSA de l’UE sont publiés sous forme de plages par tranches (inférieur ≠ supérieur) — additionner la borne supérieure donne donc une estimation maximale.</p>
   </header>
 
   <div class="data-section">
-    <h2>Reported values by report area</h2>
+    <h2>Valeurs déclarées par domaine du rapport</h2>
     <div class="results" id="byDataset" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">Chargement…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), the summed upper-bound count across all years, periods, governments and categories.</p>
+    <p class="sub">Pour chaque domaine du rapport (<code>dataset</code>), le comptage de la borne supérieure cumulé sur toutes les années, périodes, gouvernements et catégories.</p>
   </div>
 
   <div class="data-section">
-    <h2>Top categories by reported volume</h2>
+    <h2>Principales catégories par volume déclaré</h2>
     <div class="results" id="byCategory" aria-busy="true">
-      <p class="loading">Loading…</p>
+      <p class="loading">Chargement…</p>
     </div>
-    <p class="sub">The categories with the largest summed upper-bound counts. Banded ranges contribute their upper bound, so totals are upper estimates.</p>
+    <p class="sub">Les catégories ayant les plus grands comptages de borne supérieure cumulés. Les plages par tranches contribuent par leur borne supérieure, de sorte que les totaux sont des estimations maximales.</p>
   </div>
 
-  <p class="hint">Refine or extend these in the <a href="/fr/reports">query builder</a>, browse the full field list on the <a href="/fr/schema">Schema</a> page, or read the <a href="/fr/methodology">Methodology</a>.</p>
+  <p class="hint">Affinez ou étendez ces résultats dans le <a href="/fr/reports">générateur de requêtes</a>, parcourez la liste complète des champs sur la page <a href="/fr/schema">Schéma</a>, ou lisez la <a href="/fr/methodology">Méthodologie</a>.</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014–2024). Data via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Methodology</a> · <a href="/fr/api-key">API key</a> · <a href="/fr/privacy">Confidentialité</a></p>
+  <p>Source : <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">Rapport de transparence de GitHub</a> — retraits gouvernementaux, demandes d’informations sur les utilisateurs, DMCA, détection automatisée, recours et MAU au titre du DSA de l’UE (2014–2024). Données via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Methodology</a> · <a href="/fr/api-key">API key</a> · <a href="/fr/privacy">Confidentialité</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -514,7 +514,7 @@ display: flex; align-items: center; justify-content: space-between;
       + '<caption class="sr-only">' + esc(caption) + '</caption>'
       + '<thead><tr>'
       + '<th scope="col">' + esc(dimLabel) + '</th>'
-      + '<th scope="col" class="num">Reported count (upper bound)</th>'
+      + '<th scope="col" class="num">Nombre déclaré (borne supérieure)</th>'
       + '</tr></thead><tbody>'
       + rows.map(function (r) {
           return '<tr>'
@@ -542,25 +542,25 @@ display: flex; align-items: center; justify-content: space-between;
       provFilled = true;
       document.getElementById('prov-snap').textContent = d.generated;
       document.getElementById('prov-cite').textContent =
-        '“GitHub Transparency Report, via the Transparency Report API (' + d.generated + ' snapshot' +
-        (d.version ? ', dataset version ' + d.version : '') + ').”';
+        '“Rapport de transparence de GitHub, via la Transparency Report API (' + d.generated + ' instantané' +
+        (d.version ? ', version du jeu de données ' + d.version : '') + ').”';
       document.getElementById('provenance').hidden = false;
     }
 
     try {
       var d = await explore(byDataset);
-      renderTable('byDataset', 'Report area', 'Reported values by report area.', d);
+      renderTable('byDataset', 'Domaine du rapport', 'Valeurs déclarées par domaine du rapport.', d);
       fillProvenance(d);
     } catch (err) {
-      showError('byDataset', 'Failed to load report areas: ' + err.message);
+      showError('byDataset', 'Échec du chargement des domaines du rapport : ' + err.message);
     }
 
     try {
       var d2 = await explore(byCategory);
-      renderTable('byCategory', 'Category', 'Top categories by reported volume.', d2);
+      renderTable('byCategory', 'Catégorie', 'Principales catégories par volume déclaré.', d2);
       fillProvenance(d2);
     } catch (err) {
-      showError('byCategory', 'Failed to load categories: ' + err.message);
+      showError('byCategory', 'Échec du chargement des catégories : ' + err.message);
     }
   }
 

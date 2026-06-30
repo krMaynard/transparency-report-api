@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Snap Transparency Report — Transparency Report API</title>
+<title>Rapport de transparence de Snap — Transparency Report API</title>
 <meta name="description" content="Snap (Snapchat) Transparency Report — Trust &amp; Safety enforcements, government content/account-removal and information requests, and DMCA/trademark notices, by period × section × category × metric." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -429,36 +429,36 @@ display: flex; align-items: center; justify-content: space-between;
 
   <header>
     <span class="badge">Snap · 2024 H2 – 2025 H1</span>
-    <h1>Snap Transparency Report</h1>
-    <p>Snap's reported Trust &amp; Safety enforcements, content &amp; account-removal and information requests from governments (including US national security), and DMCA/trademark notices. A tidy-long dataset: each row is one measured value identified by period × section × category × sub-categories × metric. Figures are <strong>not comparable across sections</strong>, and some metrics are <strong>medians</strong> — so they cannot be summed; this page pins a single section and metric for each table.</p>
+    <h1>Rapport de transparence de Snap</h1>
+    <p>Mesures de confiance et sécurité déclarées par Snap, demandes de retrait de contenu et de comptes et demandes d'informations émanant de gouvernements (y compris la sécurité nationale des États-Unis), et avis DMCA/de marque. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par période × section × catégorie × sous-catégories × indicateur. Les chiffres <strong>ne sont pas comparables d'une section à l'autre</strong>, et certains indicateurs sont des <strong>médianes</strong> — ils ne peuvent donc pas être additionnés ; cette page fixe une seule section et un seul indicateur pour chaque tableau.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── Ce que couvre le rapport ─────────────────────────────────── -->
   <section class="data-section">
-    <h2>What the report covers</h2>
-    <p class="sub">The number of reported values in each section of the dataset — a coverage overview of how the report is broken down. Counts of rows, not summed quantities.</p>
+    <h2>Ce que couvre le rapport</h2>
+    <p class="sub">Le nombre de valeurs déclarées dans chaque section du jeu de données — un aperçu de la couverture montrant comment le rapport est ventilé. Des décomptes de lignes, et non des quantités additionnées.</p>
     <div class="results" id="sectionCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">Chargement…</div>
     </div>
   </section>
 
-  <!-- ── US government information requests ─────────────────────── -->
+  <!-- ── Demandes d'informations du gouvernement des États-Unis ─────────────────────── -->
   <section class="data-section">
-    <h2>US government information requests</h2>
-    <p class="sub">The reported totals per metric within the United States Government Information Requests section.</p>
+    <h2>Demandes d'informations du gouvernement des États-Unis</h2>
+    <p class="sub">Les totaux déclarés par indicateur au sein de la section United States Government Information Requests.</p>
     <div class="results" id="usGov" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">Chargement…</div>
     </div>
   </section>
 
-  <p class="hint">Refine or extend these in the <a href="/fr/reports">query builder</a> (pin a <code>section</code> before aggregating), browse the full field list on the <a href="/fr/schema">Schema</a> page, or read the <a href="/fr/methodology">Methodology</a>.</p>
+  <p class="hint">Affinez ou étendez ces requêtes dans le <a href="/fr/reports">générateur de requêtes</a> (fixez une <code>section</code> avant d'agréger), parcourez la liste complète des champs sur la page <a href="/fr/schema">Schema</a>, ou lisez la <a href="/fr/methodology">Méthodologie</a>.</p>
 
 </main>
 
 <footer>
-  <p>Source: <a href="https://values.snap.com/privacy/transparency" target="_blank" rel="noopener noreferrer">Snap Transparency Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Methodology</a> · <a href="/fr/api-key">API key</a> · <a href="/fr/privacy">Confidentialité</a></p>
+  <p>Source : <a href="https://values.snap.com/privacy/transparency" target="_blank" rel="noopener noreferrer">Rapport de transparence de Snap</a>. Données via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Méthodologie</a> · <a href="/fr/api-key">Clé d'API</a> · <a href="/fr/privacy">Confidentialité</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -563,8 +563,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      '“Snap Transparency Report, via the Transparency Report API (' + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      '“Rapport de transparence de Snap, via la Transparency Report API (instantané du ' + generated + ''
+      + (version ? ', version du jeu de données ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -573,19 +573,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per section.
     try {
       var d = await explore({"table":"snap_metrics","group_by":["section"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"values"}],"sort":[{"field_name":"values","order":"desc"}],"max_count":30});
-      renderTable('sectionCoverage', d.rows || [], 'Reported values in each section of the Snap Transparency Report.', 'Section', 'Reported values');
+      renderTable('sectionCoverage', d.rows || [], 'Valeurs déclarées dans chaque section du Rapport de transparence de Snap.', 'Section', 'Valeurs déclarées');
       fillProvenance(d.generated, d.version);
     } catch (err) {
-      showError('sectionCoverage', 'Failed to load section coverage: ' + err.message);
+      showError('sectionCoverage', 'Échec du chargement de la couverture par section : ' + err.message);
     }
 
-    // US government information requests: SUM per metric within that section.
+    // Demandes d'informations du gouvernement des États-Unis: SUM per metric within that section.
     try {
       var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
-      renderTable('usGov', d2.rows || [], 'US government information requests to Snap, totalled per metric.', 'Metric', 'Total');
+      renderTable('usGov', d2.rows || [], 'Demandes d'informations du gouvernement des États-Unis à Snap, totalisées par indicateur.', 'Indicateur', 'Total');
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usGov', 'Failed to load US government requests: ' + err.message);
+      showError('usGov', 'Échec du chargement des demandes du gouvernement des États-Unis : ' + err.message);
     }
   }
 
