@@ -130,6 +130,27 @@ _SNAP_FIXTURE = {
 }
 seed.build_snap_db(_SNAP_FIXTURE, _DB)
 
+# A small slice of the India IT Rules dataset (india-it-rules.json shape).
+# [platform, period, section, category, metric, unit, value]
+_INDIA_FIXTURE = {
+    "columns": ["platform", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Facebook", "2023-06", "content_actioned_proactive",
+         "Adult Nudity and Sexual Activity", "content_actioned", "approx_count", 2300000],
+        ["Facebook", "2023-06", "content_actioned_proactive",
+         "Adult Nudity and Sexual Activity", "proactive_rate", "percent", 97.7],
+        ["Facebook", "2023-06", "grievances_received", "BullyingorHarassment",
+         "reports", "count", 10038],
+        ["Instagram", "2023-06", "grievances_received", "BullyingorHarassment",
+         "reports", "count", 5485],
+        ["Meta", "2023-06", "gac_orders", "", "orders_received", "count", 3],
+        ["Twitter", "2022-10", "grievances", "Abuse / Harassment",
+         "grievances_received", "count", 582],
+        ["Moj", "2021-06", "complaints", "", "complaints_received", "count", 1958124],
+    ],
+}
+seed.build_india_db(_INDIA_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /

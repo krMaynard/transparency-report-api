@@ -1121,6 +1121,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "india_metrics": TableSpec(
+        "India IT Rules 2021 monthly compliance reports — significant social media intermediaries' monthly filings: content actioned proactively (by policy area + proactive-detection rate), user grievances received/actioned (by category), accounts actioned, Grievance Appellate Committee (GAC) orders, and law-enforcement/takedown actions. A tidy-long table: one row per measured value, identified by platform × period × section × category × metric, with a `unit` (count/approx_count/percent). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat.",
+        "FROM india_metrics f",
+        {
+            "platform": "f.platform",
+            "period":   "f.period",
+            "section":  "f.section",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3017,6 +3032,24 @@ def _leg_warnings(
                     "snap_metrics SUM/AVG over a 'median_*' metric isn't statistically "
                     "meaningful — read it per row instead."
                 )
+    # india_metrics mixes exact counts, Meta's abbreviated approx_count figures,
+    # and proactive-rate percentages in one `value` column, across non-comparable
+    # sections — so an unpinned aggregate can silently sum a percentage with a count.
+    if table == "india_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "unit" not in pinned:
+            out.append(
+                "'india_metrics' keeps counts, approx_count and percent in one 'value' "
+                "column; this aggregate pins no 'unit', so it may sum a percentage or "
+                "Meta's rounded estimates with exact counts. Filter or group by 'unit'."
+            )
+        if "section" not in pinned:
+            out.append(
+                "'india_metrics' spans sections whose metrics aren't comparable; this "
+                "aggregate pins no 'section', so it may combine unrelated measures. "
+                "Filter or group by 'section'."
+            )
     return out
 
 
@@ -3451,6 +3484,8 @@ FIELD_HELP: dict[str, str] = {
     # the generic DSA help above; only these two are Snap-specific. ──
     "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
     "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
+    # ── India IT Rules (tidy-long india_metrics) ──
+    "unit": "What `value` measures in india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). Never SUM across different units; pin a unit before aggregating.",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",

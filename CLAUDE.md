@@ -12,9 +12,11 @@ Implementing Regulation template), **Google Government content-removal
 requests**, the **Apple Transparency Report** (government/private-party data
 requests + App Store takedowns, biannual since 2013 H1), the **GitHub
 Transparency Report** (government takedowns, user-information requests, DMCA,
-automated detection, appeals, EU-DSA MAU), and the **Snap Transparency Report**
+automated detection, appeals, EU-DSA MAU), the **Snap Transparency Report**
 (T&S enforcements, government content/account-removal & information requests,
-DMCA takedowns, by country × violation category).
+DMCA takedowns, by country × violation category), and **India's IT Rules 2021
+monthly compliance reports** (proactive content actioned, user grievances,
+accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat).
 
 Built to demonstrate two things:
 
@@ -34,7 +36,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), and the non-VLOP harmonised reports |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), and the non-VLOP harmonised reports |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -42,6 +44,7 @@ Built to demonstrate two things:
 | `data/apple-transparency.json` | Vendored snapshot of the Apple Transparency Report (sibling `dsa-transparency-data/apple-transparency/build_apple.py`) — interned `periods`/`countries`/`request_types` + fact rows; seeded into `ap_*`/`apple_*` tables by `seed.build_apple_db` |
 | `data/github-transparency.json` | Vendored snapshot of the GitHub Transparency Report (sibling `dsa-transparency-data/github-transparency/build_github.py`) — a tidy-long `columns`+`rows` list; seeded into the `github_metrics` table by `seed.build_github_db` |
 | `data/snap-transparency.json` | Vendored snapshot of the Snap Transparency Report (sibling `dsa-transparency-data/snap-transparency/build_snap.py`) — a tidy-long `columns`+`rows` list; seeded into the `snap_metrics` table by `seed.build_snap_db` |
+| `data/india-it-rules.json` | Vendored snapshot of India's IT Rules 2021 monthly compliance reports (sibling `dsa-transparency-data/india-it-rules/build_india.py`) — a tidy-long `columns`+`rows` list across publishers; seeded into the `india_metrics` table by `seed.build_india_db` |
 | `data/template-crosswalk.json` | Vendored `{original-language label → canonical English}` map for the template's `sections`/`indicators`/`scopes`, applied by `seed.normalize_dimensions` to stamp each dim row's language-neutral `key`. Regenerate with `scripts/build_template_crosswalk.py` |
 | `scripts/build_template_crosswalk.py` | Learns `data/template-crosswalk.json` by aligning same-structure non-VLOP report sheets to an English reference (drops ambiguous labels) — reads the sibling repo's extracted CSVs |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
@@ -215,7 +218,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Four non-DSA datasets ride alongside, each exposed as an ordinary query table
+Five non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -234,6 +237,14 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `value` is `REAL` because some metrics are medians (e.g.
   `median_turnaround_time_minutes`) — don't SUM a median. Pin a `section` before
   aggregating; metrics aren't comparable across sections.
+- **India IT Rules 2021 monthly compliance reports** — a single **tidy-long**
+  `india_metrics` table (one row per measured value: `platform`/`period`/
+  `section`/`category`/`metric`/`unit` + a `value`; dims stored inline, no lookup
+  tables). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat (+ `Meta` for
+  report-level GAC orders). `value` is `REAL` and `unit` is `count` (exact),
+  `approx_count` (Meta's abbreviated proactive figures like `2.3M` — rounded
+  best-estimates) or `percent` (proactive-detection rates) — **never SUM across
+  units**, and pin a `section` before aggregating.
 
 **Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
 `build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an

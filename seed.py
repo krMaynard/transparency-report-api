@@ -55,6 +55,11 @@ _DEFAULT_GITHUB_SOURCE = os.getenv(
 _DEFAULT_SNAP_SOURCE = os.getenv(
     "SEED_SNAP_SOURCE_JSON", os.path.join(HERE, "data", "snap-transparency.json")
 )
+# India IT Rules 2021 monthly compliance reports — vendored in-repo (from the
+# sibling data repo's india-it-rules/build_india.py).
+_DEFAULT_INDIA_SOURCE = os.getenv(
+    "SEED_INDIA_SOURCE_JSON", os.path.join(HERE, "data", "india-it-rules.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -294,6 +299,21 @@ CREATE TABLE snap_metrics (
     value          REAL
 );
 CREATE INDEX idx_snap_section ON snap_metrics(section);
+
+-- India IT Rules 2021 monthly compliance reports (india-it-rules/build_india.py).
+-- Tidy-long: one row per measured value across publishers' monthly filings.
+-- `value` is REAL because Meta's proactive figures are abbreviated approximations
+-- and proactive rates are percentages (see `unit`). Dims stored inline.
+CREATE TABLE india_metrics (
+    platform TEXT NOT NULL,   -- Facebook/Instagram/Twitter/Moj/ShareChat/Meta
+    period   TEXT NOT NULL,   -- covered month, 'YYYY-MM'
+    section  TEXT NOT NULL,   -- content_actioned_proactive, grievances_received, …
+    category TEXT NOT NULL,   -- policy area / complaint category / ban duration / ''
+    metric   TEXT NOT NULL,   -- the measured quantity within the section
+    unit     TEXT NOT NULL,   -- count / approx_count / percent
+    value    REAL
+);
+CREATE INDEX idx_india_section ON india_metrics(section);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -689,6 +709,34 @@ def build_snap_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_india_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the india_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long india-it-rules.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    expected_cols = ["platform", "period", "section", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"india dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("india dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO india_metrics (platform, period, section, category, "
+                "metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -752,6 +800,8 @@ def main() -> None:
                         help="Path to github-transparency.json")
     parser.add_argument("--snap-source", default=_DEFAULT_SNAP_SOURCE,
                         help="Path to snap-transparency.json")
+    parser.add_argument("--india-source", default=_DEFAULT_INDIA_SOURCE,
+                        help="Path to india-it-rules.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -823,6 +873,16 @@ def main() -> None:
               f"{len({r[0] for r in snap_data['rows']})} periods")
     else:
         print(f"  (skipping Snap transparency — not found: {args.snap_source})")
+
+    if os.path.isfile(args.india_source):
+        with open(args.india_source, "r", encoding="utf-8") as f:
+            india_data = json.load(f)
+        india_rows = build_india_db(india_data, args.db)
+        print(f"  india IT Rules: {india_rows} metric rows across "
+              f"{len({r[0] for r in india_data['rows']})} platforms, "
+              f"{len({r[1] for r in india_data['rows']})} periods")
+    else:
+        print(f"  (skipping India IT Rules — not found: {args.india_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).
