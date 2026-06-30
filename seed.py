@@ -673,7 +673,9 @@ def build_snap_db(data: dict[str, Any], db_path: str) -> int:
     if data.get("columns") != expected_cols:
         raise ValueError(f"snap dataset columns {data.get('columns')} "
                          f"don't match the expected order {expected_cols}")
-    rows = data["rows"]
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("snap dataset is missing 'rows'")
     conn = sqlite3.connect(db_path)
     try:
         with conn:

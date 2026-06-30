@@ -2989,6 +2989,34 @@ def _leg_warnings(
                 f"{agg.function}({agg.field_name}) aggregates a median across rows, which "
                 f"is not statistically meaningful — read it per row instead."
             )
+    # snap_metrics is tidy-long: its single generic `value` column mixes counts
+    # and medians across non-comparable sections, so the name-keyed
+    # NON_ADDITIVE_MEASURES check above can't catch a summed median here.
+    if table == "snap_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'snap_metrics' spans multiple sections whose metrics aren't comparable; "
+                "this aggregate pins no 'section', so it may combine unrelated measures. "
+                "Filter or group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'snap_metrics' stores counts and medians in one 'value' column; this "
+                "aggregate pins no 'metric', so a median may be summed with counts. "
+                "Filter or group by 'metric'."
+            )
+        else:
+            metric_values = {
+                v for c in (*(query.and_ or ()), *(query.or_ or ()), *(query.not_ or ()))
+                if c.field_name == "metric" for v in c.field_values
+            }
+            if any(isinstance(v, str) and "median" in v.lower() for v in metric_values):
+                out.append(
+                    "snap_metrics SUM/AVG over a 'median_*' metric isn't statistically "
+                    "meaningful — read it per row instead."
+                )
     return out
 
 

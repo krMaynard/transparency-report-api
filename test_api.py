@@ -1560,6 +1560,40 @@ class TestExplore:
         d = client.post("/api/explore", json=q).json()
         assert any("median" in w.lower() for w in d.get("warnings", []))
 
+    def test_explore_warns_on_snap_median_aggregation(self):
+        # snap_metrics keeps counts and medians in one generic `value` column, so
+        # SUM/AVG over a pinned median metric must still warn (the name-keyed
+        # NON_ADDITIVE_MEASURES check can't see it).
+        q = {"table": "snap_metrics", "group_by": ["section"],
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section",
+                  "field_values": ["Overview of Our T&S Enforcements"]},
+                 {"operation": "EQ", "field_name": "metric",
+                  "field_values": ["median_turnaround_time_minutes"]},
+             ]},
+             "aggregates": [{"function": "AVG", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("median" in w.lower() for w in d.get("warnings", []))
+
+    def test_explore_warns_on_snap_unpinned_section_and_metric(self):
+        # Aggregating snap `value` with neither section nor metric pinned warns on both.
+        q = {"table": "snap_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        warns = d.get("warnings", [])
+        assert any("section" in w for w in warns)
+        assert any("metric" in w for w in warns)
+
+    def test_explore_no_snap_warning_when_count_metric_pinned(self):
+        # Pinning a section + a non-median metric → no Snap advisory.
+        q = {"table": "snap_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["Ads Moderation"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["total_ads_removed"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        assert "warnings" not in client.post("/api/explore", json=q).json()
+
     def test_surface_is_total_grain_filterable(self):
         # t6/t7/t8 carry a cross-surface 'All' aggregate beside the per-surface
         # rows (Core/Ads/…). surface_is_total lets a query pick a single grain so
@@ -2365,7 +2399,7 @@ class TestSnapTable:
         import json
         import pathlib
         data = json.loads(pathlib.Path(__file__).with_name("data")
-                          .joinpath("snap-transparency.json").read_text())
+                          .joinpath("snap-transparency.json").read_text(encoding="utf-8"))
         assert data["columns"][0] == "period" and len(data["columns"]) == 7
         assert all(len(r) == 7 for r in data["rows"][:50])
 
