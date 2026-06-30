@@ -959,6 +959,10 @@ _J_GR_REQ = "JOIN gr_requestors req ON req.id = f.requestor_id"
 _J_GR_PRD = "JOIN gr_products   prd ON prd.id = f.product_id"
 _J_GR_RSN = "JOIN gr_reasons    rsn ON rsn.id = f.reason_id"
 
+_J_AP_PER = "JOIN ap_periods       per ON per.id = f.period_id"
+_J_AP_CTY = "JOIN ap_countries     cty ON cty.id = f.country_id"
+_J_AP_RT  = "JOIN ap_request_types rt  ON rt.id  = f.request_type_id"
+
 TABLES: dict[str, TableSpec] = {
     "t3_member_state_orders": TableSpec(
         "Member-State orders to act on illegal content / to provide information (Art. 9 & 10), by category and scope.",
@@ -1039,6 +1043,50 @@ TABLES: dict[str, TableSpec] = {
             "not_enough_info": "f.not_enough_info",
             "no_action":       "f.no_action",
             "already_removed": "f.already_removed",
+        },
+    ),
+    "apple_requests": TableSpec(
+        "Apple Transparency Report — government/private-party requests for device, account, financial-identifier, push-token, emergency, preservation and digital-content-provider data, plus App Store takedown requests (2013 H1–), by period × country × request type. Measures not reported for a given request type are NULL.",
+        f"FROM apple_requests f {_J_AP_PER} {_J_AP_CTY} {_J_AP_RT}",
+        {
+            "period":       "per.name",
+            "period_ord":   "per.id",   # chronological ordinal — sort by this, not the text label
+            "country_name": "cty.name",
+            "request_type": "rt.name",
+        },
+        {
+            "requests_received":            "f.requests_received",
+            "items_specified":              "f.items_specified",
+            "requests_data_provided":       "f.requests_data_provided",
+            "pct_data_provided":            "f.pct_data_provided",
+            "requests_challenged_rejected": "f.requests_challenged_rejected",
+            "requests_no_data":             "f.requests_no_data",
+            "content_provided":             "f.content_provided",
+            "noncontent_provided":          "f.noncontent_provided",
+            "accounts_preserved":           "f.accounts_preserved",
+            "accounts_restricted":          "f.accounts_restricted",
+            "accounts_deleted":             "f.accounts_deleted",
+            "requests_app_removed":         "f.requests_app_removed",
+            "apps_removed":                 "f.apps_removed",
+            "appeals_received":             "f.appeals_received",
+            "appeals_granted":              "f.appeals_granted",
+            "apps_reinstated":              "f.apps_reinstated",
+        },
+    ),
+    "apple_national_security": TableSpec(
+        "Apple Transparency Report — US national-security (FISA / NSL) and UK IPA-warrant requests, reported as banded ranges (e.g. '0 - 249'), not exact counts. By period × country × request type, with low/high bounds for requests and accounts.",
+        f"FROM apple_national_security f {_J_AP_PER} {_J_AP_CTY}",
+        {
+            "period":       "per.name",
+            "period_ord":   "per.id",
+            "country_name": "cty.name",
+            "request_type": "f.request_type",
+        },
+        {
+            "requests_low":  "f.requests_low",
+            "requests_high": "f.requests_high",
+            "accounts_low":  "f.accounts_low",
+            "accounts_high": "f.accounts_high",
         },
     ),
 }
@@ -3183,6 +3231,28 @@ FIELD_HELP: dict[str, str] = {
     "requestor": "Type of government body making the removal request.",
     "product": "Google product the request targets (Web Search, YouTube, …).",
     "reason": "Government's stated reason for the removal request.",
+    # ── Apple transparency dims/measures ──
+    "request_type": "Apple request category — e.g. device / account / financial_identifier / push_token / emergency / account_preservation / account_restriction_deletion / digital_content_provider / app_takedown_legal_violation / app_takedown_platform_policy (apple_requests), or the national-security/IPA type (apple_national_security).",
+    "requests_received": "Number of requests Apple received (apple_requests).",
+    "items_specified": "Devices / accounts / financial identifiers / push tokens / apps named in those requests, per request type.",
+    "requests_data_provided": "Requests where Apple provided some data (data-request types).",
+    "pct_data_provided": "Percentage of requests where some data was provided. A percentage — AVG it, never SUM.",
+    "requests_challenged_rejected": "Requests Apple objected to in part or rejected in full (per request type).",
+    "requests_no_data": "Requests where no data was provided (emergency requests).",
+    "content_provided": "Account requests where content data was provided.",
+    "noncontent_provided": "Account requests where only non-content data was provided.",
+    "accounts_preserved": "Accounts whose data Apple preserved (preservation requests).",
+    "accounts_restricted": "Requests where an account was restricted.",
+    "accounts_deleted": "Requests where an account was deleted.",
+    "requests_app_removed": "App-takedown requests where the app was removed.",
+    "apps_removed": "Apps removed in response to takedown requests.",
+    "appeals_received": "Developer appeals received against app takedowns.",
+    "appeals_granted": "Developer appeals granted.",
+    "apps_reinstated": "Apps reinstated after a successful appeal.",
+    "requests_low": "Lower bound of the reported range (apple_national_security; counts are banded, e.g. 0–249, not exact).",
+    "requests_high": "Upper bound of the reported request range (apple_national_security).",
+    "accounts_low": "Lower bound of the reported accounts/users range (apple_national_security).",
+    "accounts_high": "Upper bound of the reported accounts/users range (apple_national_security).",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",

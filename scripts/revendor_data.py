@@ -44,6 +44,8 @@ DEFAULT_DATA_REPO = os.getenv(
 )
 VENDORED_SNAPSHOT = os.path.join(REPO, "data", "harmonised-reports.json")
 VENDORED_RL_CSV = os.path.join(REPO, "data", "report-locations.csv")
+VENDORED_APPLE = os.path.join(REPO, "data", "apple-transparency.json")
+APPLE_SRC_REL = os.path.join("apple-transparency", "apple-transparency.json")
 RL_HEADER = "platform,company,category,confidence,harmonised_template,format_period,url_label,url,archived"
 
 
@@ -133,10 +135,14 @@ def main() -> int:
     uncurated = _uncurated(slugs)
     stale = _stale(slugs)
     unknown_surf = _unknown_surfaces(extracted_dir)
+    apple_src = os.path.join(args.data_repo, APPLE_SRC_REL)
+    apple_present = os.path.isfile(apple_src)
 
     if not args.check:
         sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
         shutil.copyfile(rl_src, VENDORED_RL_CSV)
+        if apple_present:
+            shutil.copyfile(apple_src, VENDORED_APPLE)
 
     verb = "Would re-vendor" if args.check else "Re-vendored"
     lines = [
@@ -146,6 +152,7 @@ def main() -> int:
         "",
         f"- `data/harmonised-reports.json` — **{n_platforms}** extracted report files",
         f"- `data/report-locations.csv` — **{n_rl_rows}** catalogue rows",
+        f"- `data/apple-transparency.json` — {'present upstream' if apple_present else '**missing upstream — skipped**'}",
         "",
     ]
     if uncurated:

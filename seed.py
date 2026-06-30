@@ -35,6 +35,11 @@ _DEFAULT_DB = os.getenv("DB_PATH", os.path.join(HERE, "demo.db"))
 _DEFAULT_RL_SOURCE = os.getenv(
     "SEED_REPORT_LOCATIONS_CSV", os.path.join(HERE, "data", "report-locations.csv")
 )
+# Apple Transparency dataset — vendored in-repo (from the sibling data repo's
+# apple-transparency/build_apple.py); not in krMaynard.github.io like gr/vlop.
+_DEFAULT_APPLE_SOURCE = os.getenv(
+    "SEED_APPLE_SOURCE_JSON", os.path.join(HERE, "data", "apple-transparency.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -196,6 +201,52 @@ CREATE TABLE gr_removals (
 
 CREATE INDEX idx_gr_period  ON gr_removals(period_id);
 CREATE INDEX idx_gr_country ON gr_removals(country_id);
+
+-- Apple Transparency Report (government/private-party requests, App Store
+-- takedowns), biannual since 2013 H1. Interned dims shared by both fact tables.
+CREATE TABLE ap_periods       (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+CREATE TABLE ap_countries     (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+CREATE TABLE ap_request_types (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+
+-- One row per (period, country, request_type). Heterogeneous per-type columns
+-- are normalised onto this wide-sparse measure set; measures not reported for a
+-- given request type are NULL. pct_data_provided is a percentage (avg, not sum).
+CREATE TABLE apple_requests (
+    period_id                    INTEGER NOT NULL,
+    country_id                   INTEGER NOT NULL,
+    request_type_id              INTEGER NOT NULL,
+    requests_received            INTEGER,
+    items_specified              INTEGER,
+    requests_data_provided       INTEGER,
+    pct_data_provided            REAL,
+    requests_challenged_rejected INTEGER,
+    requests_no_data             INTEGER,
+    content_provided             INTEGER,
+    noncontent_provided          INTEGER,
+    accounts_preserved           INTEGER,
+    accounts_restricted          INTEGER,
+    accounts_deleted             INTEGER,
+    requests_app_removed         INTEGER,
+    apps_removed                 INTEGER,
+    appeals_received             INTEGER,
+    appeals_granted              INTEGER,
+    apps_reinstated              INTEGER
+);
+
+-- US national-security & UK IPA requests are reported as banded ranges
+-- (e.g. "0 - 249"), not exact counts, so they get low/high bounds, not measures.
+CREATE TABLE apple_national_security (
+    period_id     INTEGER NOT NULL,
+    country_id    INTEGER NOT NULL,
+    request_type  TEXT NOT NULL,
+    requests_low  INTEGER,
+    requests_high INTEGER,
+    accounts_low  INTEGER,
+    accounts_high INTEGER
+);
+
+CREATE INDEX idx_ap_period  ON apple_requests(period_id);
+CREATE INDEX idx_ap_country ON apple_requests(country_id);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -474,6 +525,42 @@ def build_gr_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_apple_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the Apple Transparency tables in an existing DB at db_path.
+
+    The DB must already contain the ap_*/apple_* tables (created by SCHEMA, i.e.
+    build_db() must have run first). The dataset is the interned
+    apple-transparency.json (periods/countries/request_types arrays + fact rows
+    whose leading values index those arrays). Returns the fact-row count.
+    """
+    measures = data["measures"]
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany("INSERT INTO ap_periods (id, name) VALUES (?, ?)",
+                             list(enumerate(data["periods"])))
+            conn.executemany("INSERT INTO ap_countries (id, name) VALUES (?, ?)",
+                             list(enumerate(data["countries"])))
+            conn.executemany("INSERT INTO ap_request_types (id, name) VALUES (?, ?)",
+                             list(enumerate(data["request_types"])))
+            cols = ["period_id", "country_id", "request_type_id"] + measures
+            conn.executemany(
+                f"INSERT INTO apple_requests ({', '.join(cols)}) "
+                f"VALUES ({', '.join(['?'] * len(cols))})",
+                data["rows"],
+            )
+            conn.executemany(
+                "INSERT INTO apple_national_security ("
+                "period_id, country_id, request_type, "
+                "requests_low, requests_high, accounts_low, accounts_high"
+                ") VALUES (?,?,?,?,?,?,?)",
+                data["ns_rows"],
+            )
+        return len(data["rows"]) + len(data["ns_rows"])
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -509,6 +596,8 @@ def main() -> None:
     parser.add_argument("--db", default=_DEFAULT_DB, help="Output SQLite database path")
     parser.add_argument("--report-locations", default=_DEFAULT_RL_SOURCE,
                         help="Path to report-locations.csv (non-VLOP catalogue)")
+    parser.add_argument("--apple-source", default=_DEFAULT_APPLE_SOURCE,
+                        help="Path to apple-transparency.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -542,6 +631,19 @@ def main() -> None:
         print(f"  report_locations: {n} rows from {os.path.basename(args.report_locations)}")
     else:
         print(f"  (skipping report locations — not found: {args.report_locations})")
+
+    if os.path.isfile(args.apple_source):
+        with open(args.apple_source, "r", encoding="utf-8") as f:
+            apple_data = json.load(f)
+        ap_rows = build_apple_db(apple_data, args.db)
+        print(
+            f"  apple transparency: {ap_rows} rows across "
+            f"{len(apple_data['periods'])} periods, "
+            f"{len(apple_data['countries'])} countries, "
+            f"{len(apple_data['request_types'])} request types"
+        )
+    else:
+        print(f"  (skipping Apple transparency — not found: {args.apple_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).
