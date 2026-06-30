@@ -2404,6 +2404,62 @@ class TestSnapTable:
         assert all(len(r) == 7 for r in data["rows"][:50])
 
 
+class TestIndiaTable:
+    def test_india_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "india_metrics" in names
+
+    def test_india_fields_endpoint(self):
+        body = client.get("/api/fields?table=india_metrics", headers=MOMO).json()
+        assert {"platform", "period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_india_grievance_value(self):
+        # Facebook June-2023 Bullying grievances received = 10038 (fixture).
+        job = _submit_and_wait({
+            "table": "india_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["grievances_received"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["reports"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 10038
+
+    def test_india_proactive_rate_is_percent(self):
+        # A proactive_rate row carries a percent unit + non-integer value.
+        job = _submit_and_wait({
+            "table": "india_metrics",
+            "fields": ["unit", "value"],
+            "query": {"and": [{"operation": "EQ", "field_name": "metric",
+                               "field_values": ["proactive_rate"]}]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0] == ["percent", 97.7]
+
+    def test_india_warns_on_mixed_unit_aggregation(self):
+        # Summing `value` without pinning `unit` mixes percent/approx/count.
+        q = {"table": "india_metrics", "group_by": ["platform"],
+             "query": {"and": [{"operation": "EQ", "field_name": "section",
+                                "field_values": ["content_actioned_proactive"]}]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("unit" in w for w in d.get("warnings", []))
+
+    def test_vendored_india_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("india-it-rules.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["platform", "period", "section", "category",
+                                    "metric", "unit", "value"]
+        assert all(len(r) == 7 for r in data["rows"][:50])
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:
