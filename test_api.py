@@ -1462,6 +1462,67 @@ class TestReportLocations:
         assert len(lines) == 4  # header + 3 rows
 
 
+# ── Public NY ToS-reports catalogue (GET /api/ny-tos-reports) ────────────────
+
+class TestNYTosReports:
+    def test_public_and_populated(self):
+        r = client.get("/api/ny-tos-reports")  # no X-API-Key
+        assert r.status_code == 200
+        d = r.json()
+        # The conftest fixture seeds one public (Snap Q3) + one gated (TikTok Q4).
+        assert d["count"] == d["total"] == 2
+        assert d["company_count"] == 2
+        assert d["archived_count"] == 1  # only the public one is mirrored
+        assert set(d["facets"]) == {"period", "access"}
+        assert d["facets"]["access"] == ["auth-required", "public"]
+        # Sorted by period DESC: Q4 (TikTok) before Q3 (Snap).
+        assert [row["company"] for row in d["rows"]] == ["TikTok Inc", "Snap Inc"]
+        snap = next(row for row in d["rows"] if row["company"] == "Snap Inc")
+        assert snap["access"] == "public"
+        assert snap["archived"].startswith("https://github.com/")
+        assert snap["bytes"] == 11222370  # INTEGER affinity, not the "..." string
+        tiktok = next(row for row in d["rows"] if row["company"] == "TikTok Inc")
+        assert tiktok["access"] == "auth-required" and tiktok["archived"] is None
+
+    def test_catalogue_carries_provenance(self):
+        r = client.get("/api/ny-tos-reports")
+        d = r.json()
+        assert d.get("version") and "generated" in d
+        assert r.headers.get("X-Catalogue-Version") == d["version"]
+        cv = client.get("/api/ny-tos-reports", params={"format": "csv"})
+        assert cv.headers.get("X-Catalogue-Version") == d["version"]
+        assert f'ny-tos-reports-{d["version"]}.csv' in cv.headers.get("content-disposition", "")
+
+    def test_filter_by_period(self):
+        r = client.get("/api/ny-tos-reports", params={"period": "2025 Q4"})
+        d = r.json()
+        assert d["count"] == 1 and d["rows"][0]["company"] == "TikTok Inc"
+
+    def test_filter_by_access(self):
+        r = client.get("/api/ny-tos-reports", params={"access": "public"})
+        d = r.json()
+        assert d["count"] == 1 and d["rows"][0]["company"] == "Snap Inc"
+
+    def test_free_text_search(self):
+        # Matches company / platform / source url, case-insensitively.
+        assert client.get("/api/ny-tos-reports", params={"q": "tiktok"}).json()["count"] == 1
+        assert client.get("/api/ny-tos-reports", params={"q": "ag.ny.gov"}).json()["count"] == 2
+        assert client.get("/api/ny-tos-reports", params={"q": "nomatch-xyz"}).json()["count"] == 0
+
+    def test_csv_export(self):
+        r = client.get("/api/ny-tos-reports", params={"format": "csv"})
+        assert r.status_code == 200
+        assert "text/csv" in r.headers["content-type"]
+        lines = r.text.splitlines()
+        assert lines[0] == "company,platform,period,upload_date,access,source_url,filename,archived,sha256,bytes"
+        assert len(lines) == 3  # header + 2 rows
+
+    def test_page_served(self):
+        r = client.get("/ny-tos")
+        assert r.status_code == 200
+        assert "/api/ny-tos-reports" in r.text and 'id="rl-period"' in r.text
+
+
 # ── Public interactive query (POST /api/explore) ─────────────────────────────
 
 class TestExplore:

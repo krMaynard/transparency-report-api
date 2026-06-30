@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Rapports CGU de NY · Transparency Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+  // Match the main site: set the theme before first paint to avoid a flash.
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f2f2f2; --panel: #fff; --panel2: #f5f5f5; --border: #e8e8e8;
+    --fg: #333; --muted: #666; --accent: #1e7268; --accent-dark: #155a52; --accent2: #1e7268;
+    --on-accent: #fff; --shadow: rgba(0,0,0,.07);
+    --mono: ui-monospace, SFMono-Regular, "DejaVu Sans Mono", Menlo, monospace;
+    --topbar-h: 52px; --header-h: var(--topbar-h);
+    --sidebar-w: 220px;
+  }
+  [data-theme="dark"] {
+    --bg: #15181c; --panel: #1d2025; --panel2: #2a2f35; --border: #2c3138;
+    --fg: #e8e8e8; --muted: #b0b0b0; --accent: #4ec1b1; --accent-dark: #6ed3c4; --accent2: #6ed3c4;
+    --on-accent: #08110f; --shadow: rgba(0,0,0,.45);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg);
+    color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  /* Top site bar — mirrors kieranmaynard.com */
+  .page-header { position: sticky; top: 0; z-index: 200; }
+  .site-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.9rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .site-nav .nav-name { font-weight: 700; font-size: 1rem; color: var(--fg); text-decoration: none; }
+  .site-nav .nav-links { display: flex; gap: 1.4rem; align-items: center; }
+  .site-nav .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .site-nav .nav-links a:hover { color: var(--accent); }
+  /* Cross-site language switcher (globe) — CSS-only <details> disclosure */
+  .site-nav .nav-right { display: flex; align-items: center; gap: 1.4rem; }
+  .lang-switcher { position: relative; }
+  .lang-switcher > summary {
+    display: inline-flex; align-items: center; gap: 0.38rem; list-style: none; cursor: pointer;
+    padding: 0.34rem 0.55rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel); color: var(--fg); font-weight: 600; font-size: 0.85rem; line-height: 1; white-space: nowrap;
+  }
+  .lang-switcher > summary::-webkit-details-marker { display: none; }
+  .lang-switcher > summary:hover,
+  .lang-switcher[open] > summary { border-color: var(--accent); color: var(--accent); }
+  .lang-switcher .lang-globe { width: 17px; height: 17px; }
+  .lang-switcher .lang-caret { width: 11px; height: 11px; opacity: .75; transition: transform .2s ease; }
+  .lang-switcher[open] .lang-caret { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; min-width: 170px; margin: 0; padding: .3rem;
+    list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 12px 30px var(--shadow); z-index: 201;
+  }
+  .lang-menu li { margin: 0; }
+  .lang-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    padding: .5rem .65rem; border-radius: 8px; text-decoration: none; color: var(--fg); font-size: .9rem; white-space: nowrap;
+  }
+  .lang-opt:hover { background: var(--panel2); }
+  .lang-opt.is-current { font-weight: 700; }
+  .lang-check { width: 16px; height: 16px; color: var(--accent); }
+  @media (max-width: 640px) {
+    .site-nav { flex-wrap: wrap; row-gap: .5rem; }
+    .site-nav .nav-links { flex-wrap: wrap; gap: 0.9rem 1.1rem; }
+    .lang-switcher > summary > span { display: none; }
+    .lang-switcher > summary { padding: .3rem .42rem; }
+  }
+  .theme-toggle {
+    background: none; border: 0; color: var(--muted); cursor: pointer; padding: 4px;
+    display: inline-flex; width: auto; margin: 0;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle svg { width: 20px; height: 20px; }
+  .theme-icon-light { display: none; }
+  [data-theme="dark"] .theme-toggle .theme-icon-light { display: block; }
+  [data-theme="dark"] .theme-toggle .theme-icon-dark { display: none; }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 1.5rem; }
+  header { text-align: center; margin-bottom: 28px; }
+  header .badge {
+    display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--border); border-radius: 999px;
+    padding: 3px 12px; background: var(--panel); margin-bottom: 14px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; color: var(--muted); }
+  /* ── Top bar ─────────────────────────────────────────────────── */
+  .topbar {
+display: flex; align-items: center;
+    height: var(--topbar-h); padding: 0 1rem;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 0.6rem; }
+  .topbar-brand { font-weight: 700; font-size: 0.95rem; color: var(--fg); text-decoration: none; white-space: nowrap; }
+  .topbar-brand:hover { color: var(--accent); }
+  .hamburger {
+    display: none; align-items: center; justify-content: center;
+    background: none; border: 0; color: var(--fg); cursor: pointer; padding: 6px;
+    border-radius: 6px; width: auto; margin: 0;
+  }
+  .hamburger:hover { color: var(--accent); background: var(--panel2); }
+  .hamburger svg { width: 20px; height: 20px; display: block; }
+
+  /* ── App body + sidebar ──────────────────────────────────────── */
+  .app-body { display: flex; min-height: calc(100vh - var(--header-h)); }
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: sticky; top: var(--header-h);
+    height: calc(100vh - var(--header-h));
+    overflow-y: auto;
+    background: var(--panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    transition: transform 0.22s ease;
+  }
+  .sidebar nav { flex: 1; padding: 0.75rem 0.5rem; }
+  .nav-section {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted);
+    padding: 0.55rem 0.75rem 0.25rem;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.45rem 0.75rem; border-radius: 7px;
+    color: var(--fg); text-decoration: none; font-size: 13.5px;
+    margin: 1px 0; position: relative;
+  }
+  .nav-item svg { flex-shrink: 0; color: var(--muted); }
+  .nav-item:hover { background: var(--panel2); color: var(--accent); }
+  .nav-item:hover svg { color: var(--accent); }
+  .nav-item.is-active {
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent-dark); font-weight: 600;
+  }
+  [data-theme="dark"] .nav-item.is-active { color: var(--accent); }
+  .nav-item.is-active svg { color: var(--accent); }
+  .nav-item.is-active::before {
+    content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 2px; background: var(--accent);
+  }
+  .nav-item.is-soon { color: var(--muted); cursor: default; }
+  .nav-item.is-soon:hover { background: none; color: var(--muted); }
+  .nav-item.is-soon svg { opacity: 0.5; }
+  .soon-badge {
+    margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .05em;
+    background: var(--panel2); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 1px 7px;
+  }
+  .nav-item.is-ext { color: var(--muted); font-size: 12.5px; }
+  .nav-item.is-ext:hover { color: var(--accent); }
+  .nav-hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0.75rem; }
+  .sidebar-footer {
+    padding: 0.75rem 1rem; border-top: 1px solid var(--border);
+    font-size: 12px; color: var(--muted);
+  }
+  .sidebar-footer a { color: var(--muted); text-decoration: none; }
+  .sidebar-footer a:hover { color: var(--accent); }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 205; background: rgba(0,0,0,.4); }
+  .sidebar-overlay.is-open { display: block; }
+  .main-area { flex: 1; min-width: 0; }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; margin: 0 0 20px; box-shadow: 0 8px 30px rgba(0,0,0,.25);
+  }
+  .card h2 { margin: 0 0 4px; font-size: 18px; }
+  .card .sub { color: var(--muted); margin: 0 0 18px; font-size: 14px; }
+  .hidden { display: none !important; }
+  .error { color: #c0392b; font-size: 14px; margin-top: 12px; min-height: 18px; }
+  [data-theme="dark"] .error { color: #ff7b72; }
+  .hint { color: var(--muted); font-size: 13px; margin-top: 12px; }
+  .hint code { font-family: var(--mono); color: var(--fg); background: var(--panel2); padding: 1px 6px; border-radius: 5px; }
+  .pill { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 8px; border-radius: 6px; border: 1px solid var(--border); margin: 0 6px 6px 0; }
+  .dim { color: var(--muted); }
+  .field-cat { margin: 6px 0 16px; }
+  .field-cat h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+  .tbl { margin: 0 0 18px; }
+  .tbl > .name { font-family: var(--mono); color: var(--accent); font-size: 15px; margin-bottom: 6px; }
+  footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 8px; }
+  footer a { color: var(--accent); text-decoration: none; }
+  /* Keyboard focus visibility — a clear ring on every interactive control. */
+  a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible,
+  [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px; }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 10;
+    background: var(--accent); color: var(--on-accent); padding: 8px 14px;
+    border-radius: 8px; font-weight: 700; transition: top .15s;
+  }
+  .skip-link:focus { top: 8px; }
+  @media (max-width: 720px) {
+    .hamburger { display: flex; }
+    .sidebar {
+      position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 210;
+      transform: translateX(calc(-1 * var(--sidebar-w)));
+    }
+    .sidebar.is-open { transform: translateX(0); }
+    .wrap { padding: 20px 1rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin-bottom: 14px; }
+  .controls label { display: flex; flex-direction: column; font-size: 12px; color: var(--fg); gap: 4px; }
+  select, input[type=search] { background: var(--panel2); color: var(--fg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 14px; min-width: 130px; }
+  .controls button { background: var(--accent); color: var(--on-accent); border: 0; border-radius: 8px; padding: 9px 18px; font-size: 14px; font-weight: 650; cursor: pointer; }
+  .controls button:hover { background: var(--accent-dark); }
+  /* Let a wide table scroll inside its own box instead of widening the page. */
+  #rl-out { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
+  .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .restable th { color: var(--muted); font-weight: 600; }
+  .restable a { color: var(--accent); text-decoration: none; }
+  .restable .na { color: var(--muted); }
+  /* Screen-reader-only helper (for "opens in new tab" cues + the mobile header row). */
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  /* Column key */
+  .legend { margin: 0 0 16px; font-size: 13px; }
+  .legend > summary { cursor: pointer; color: var(--accent-dark); font-weight: 600; }
+  [data-theme="dark"] .legend > summary { color: var(--accent); }
+  .legend p { color: var(--muted); margin: 8px 0 0; }
+  .legend code, .legend em { font-style: normal; }
+  /* Provenance / cite-as line (mirrors the dashboards). */
+  .provenance { font-size: 12px; margin-top: 10px; color: var(--muted); }
+  .provenance .prov-label { font-weight: 600; }
+  /* On phones the 7-column table can't fit, so collapse each row into a stacked
+     "card": hide the header row and label each cell with its column name (pulled
+     from the header via data-label, so it stays localized). */
+  @media (max-width: 620px) {
+    #rl-out { overflow-x: visible; }
+    /* Controls stack full-width so the selects/search don't overrun the page. */
+    .controls { gap: 10px; }
+    .controls label { width: 100%; }
+    .controls select, .controls input[type=search] { width: 100%; min-width: 0; }
+    .controls button { width: 100%; }
+    .restable { font-size: 14px; margin-top: 4px; }
+    /* The card labels (data-label) replace the header row visually, but keep the
+       header in the accessibility tree (sr-only) so screen-reader column context
+       isn't lost on mobile. */
+    .restable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    .restable, .restable tbody, .restable tr, .restable td { display: block; width: 100%; }
+    .restable tr {
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--panel2); padding: 4px 14px; margin: 0 0 12px;
+    }
+    .restable td {
+      border: none; border-bottom: 1px solid var(--border); padding: 9px 0;
+      text-align: left; word-break: break-word;
+    }
+    .restable tr td:last-child { border-bottom: none; }
+    .restable td::before {
+      content: attr(data-label); display: block; margin-bottom: 2px;
+      font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .restable td:empty { display: none; }  /* drop blank cells (e.g. no archived link) */
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Aller au contenu</a>
+<div class="page-header">
+<nav class="site-nav" aria-label="Site">
+  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="https://kieranmaynard.com/work.html">Travaux</a>
+      <a href="https://kieranmaynard.com/transparency.html">Produits</a>
+      <a href="https://kieranmaynard.com/consulting.html">Conseil</a>
+      <a href="https://kieranmaynard.com/blog.html">Blog</a>
+      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+    </div>
+    <details class="lang-switcher">
+      <summary class="lang-current" aria-label="Langue" title="Langue">
+        <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+        <span>Français</span>
+        <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+      </summary>
+      <ul class="lang-menu">
+        <li><a class="lang-opt" href="/ny-tos"><span>English</span></a></li>
+        <li><a class="lang-opt" href="/es/ny-tos"><span>Español</span></a></li>
+        <li><a class="lang-opt is-current" href="/fr/ny-tos" aria-current="page"><span>Français</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/de/ny-tos"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it/ny-tos"><span>Italiano</span></a></li>
+        <li><a class="lang-opt" href="/ja/ny-tos"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh/ny-tos"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/ny-tos"><span>한국어</span></a></li>
+      </ul>
+    </details>
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Basculer le mode sombre" aria-pressed="false">
+      <svg class="theme-icon-dark" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M17.293 13.293A8 8 0 0 1 6.707 2.707a8.001 8.001 0 1 0 10.586 10.586z"/></svg>
+      <svg class="theme-icon-light" viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="3.2" fill="currentColor" stroke="none"/><line x1="10" y1="2" x2="10" y2="3.8"/><line x1="10" y1="16.2" x2="10" y2="18"/><line x1="2" y1="10" x2="3.8" y2="10"/><line x1="16.2" y1="10" x2="18" y2="10"/><line x1="3.86" y1="3.86" x2="5.13" y2="5.13"/><line x1="14.87" y1="14.87" x2="16.14" y2="16.14"/><line x1="3.86" y1="16.14" x2="5.13" y2="14.87"/><line x1="14.87" y1="5.13" x2="16.14" y2="3.86"/></svg>
+    </button>
+  </div>
+</nav>
+
+<!-- ── Top bar ──────────────────────────────────────────────────────────── -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" class="hamburger" id="hamburger"
+            aria-label="Basculer la navigation" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <a href="/fr/" class="topbar-brand">Transparency Report API</a>
+  </div>
+</header>
+</div>
+
+<div class="app-body">
+
+<!-- ── Sidebar ──────────────────────────────────────────────────────────── -->
+<aside class="sidebar" id="sidebar" aria-label="Navigation de l’application">
+  <nav>
+    <div class="nav-section">Jeux de données</div>
+
+    <a href="/fr/reports" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <rect x="1" y="9" width="3" height="6" rx="1"/>
+        <rect x="6" y="5" width="3" height="10" rx="1"/>
+        <rect x="11" y="1" width="3" height="14" rx="1"/>
+      </svg>
+      Rapports DSA
+    </a>
+
+    <a href="/fr/removals" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25"/>
+        <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
+      </svg>
+      Retraits gouvernementaux
+    </a>
+
+    <a href="/fr/catalog" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
+        <circle cx="8" cy="6" r="1.55"/>
+      </svg>
+      Emplacements des rapports
+    </a>
+
+    <a href="/fr/ny-tos" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M3.5 1.75h6l3 3v9.5a.5.5 0 0 1-.5.5h-8.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5z"/>
+        <path d="M9.25 1.9v3.1h3.1M5.25 8.5h5.5M5.25 11h5.5" stroke-linecap="round"/>
+      </svg>
+      Rapports CGU de NY
+    </a>
+
+    <hr class="nav-hr">
+    <div class="nav-section">Outils</div>
+
+    <a href="/fr/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
+      </svg>
+      Schéma
+    </a>
+
+    <a href="/fr/methodology" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
+        <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
+      </svg>
+      Méthodologie
+    </a>
+
+    <a href="/fr/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      Clé d’API
+    </a>
+
+    <a href="/docs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
+      </svg>
+      Référence API
+    </a>
+
+    <a href="/fr/mcp" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
+        <rect x="2" y="9" width="12" height="4.5" rx="1"/>
+        <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
+      </svg>
+      Serveur MCP
+    </a>
+
+    <a href="/fr/privacy" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      Confidentialité
+    </a>
+
+    <hr class="nav-hr">
+
+    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
+      </svg>
+      kieranmaynard.com
+    </a>
+
+    <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
+      </svg>
+      GitHub
+    </a>
+  </nav>
+  <div class="sidebar-footer">Par <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/fr/privacy">Confidentialité</a></div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<div class="main-area">
+<div class="wrap">
+  <header>
+    <span class="badge">Catalogue</span>
+    <h1>Rapports sur les conditions générales d’utilisation de l’État de New York</h1>
+    <p>Les rapports sur les conditions générales d’utilisation que les entreprises de réseaux sociaux déposent auprès du procureur général de New York en vertu du Stop Hiding Hate Act.</p>
+  </header>
+
+ <main id="main" tabindex="-1">
+  <section class="card" id="locations-card">
+    <p class="sub">Le <strong>Stop Hiding Hate Act</strong> de New York (S895B) impose aux plateformes de réseaux sociaux réalisant plus de 100 M$ de chiffre d’affaires annuel et comptant des utilisateurs new-yorkais de déposer <strong>deux fois par an</strong> des rapports sur leurs conditions générales d’utilisation auprès du procureur général de l’État, décrivant comment elles définissent et modèrent les contenus haineux, la désinformation et le harcèlement. Ce catalogue recense chaque dépôt publié. Fourni par l’endpoint public en lecture seule <code>GET /api/ny-tos-reports</code>.</p>
+    <details class="legend">
+      <summary>Ce que signifient les colonnes</summary>
+      <p><strong>Plateforme</strong> — la plateforme ou la marque filiale nommée dans le dépôt, lorsque l’entreprise dépose pour l’une d’elles (p. ex. <em>Twitch</em> et <em>GoodReads</em> d’Amazon). <strong>Période</strong> — la période couverte par le dépôt.</p>
+      <p><strong>Accès</strong> — si le PDF du dépôt est téléchargeable publiquement : <em>public</em> = servi depuis le répertoire ouvert du procureur général ; <em>auth-required</em> = servi depuis un répertoire protégé par identification, il n’est donc catalogué qu’avec son lien source.</p>
+      <p><strong>Rapport</strong> — le dépôt sur le site du procureur général. <strong>Archivé</strong> — une copie du PDF hébergée dans le dépôt de données ouvertes de ce projet (dépôts publics uniquement), au cas où le lien original change.</p>
+    </details>
+    <div class="controls">
+      <label>Période <select id="rl-period"><option value="">Toutes</option></select></label>
+      <label>Accès <select id="rl-access"><option value="">Toutes</option></select></label>
+      <label>Rechercher <input id="rl-q" type="search" placeholder="entreprise, plateforme, URL" /></label>
+      <button id="rl-csv" type="button">Télécharger le CSV</button>
+    </div>
+    <div class="error" id="rl-error" role="alert"></div>
+    <div id="rl-summary" class="sub" aria-live="polite"></div>
+    <div id="rl-out" aria-busy="true"></div>
+    <p class="provenance" id="rl-prov" hidden><span class="prov-label">Instantané :</span> <span id="rl-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="rl-cite"></span></p>
+  </section>
+ </main>
+
+  <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/fr/privacy">Confidentialité</a></footer>
+</div><!-- /.wrap -->
+</div><!-- /.main-area -->
+</div><!-- /.app-body -->
+
+<script>
+const $ = (s) => document.querySelector(s);
+const fmt = (n) => (n ?? 0).toLocaleString();
+// Escape DB/registry values before they go into innerHTML (defence in depth).
+const esc = (s) => String(s).replace(/[&<>'"]/g, (m) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#039;", '"': "&quot;" }[m]));
+// Only http(s) or root-relative URLs become links — never `javascript:`/`data:`
+// (defence in depth: the data is curated, but never trust a URL into an href).
+const safeHref = (u) =>
+  (typeof u === "string" && /^(https?:\/\/|\/)/i.test(u)) ? u : "";
+
+function rlParams() {
+  const p = new URLSearchParams();
+  const period = $("#rl-period").value, access = $("#rl-access").value,
+        q = $("#rl-q").value.trim();
+  if (period) p.set("period", period);
+  if (access) p.set("access", access);
+  if (q) p.set("q", q);
+  return p;
+}
+
+let rlAbortController = null;
+
+async function runLocations() {
+  // Abort any in-flight request so a slow earlier response can't overwrite the
+  // results of a newer filter/search (rapid typing or dropdown changes).
+  if (rlAbortController) rlAbortController.abort();
+  rlAbortController = new AbortController();
+  const { signal } = rlAbortController;
+  $("#rl-error").textContent = "";
+  $("#rl-out").setAttribute("aria-busy", "true");
+  const params = rlParams();
+  let d;
+  try {
+    const res = await fetch("/api/ny-tos-reports?" + params.toString(), { signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
+  } catch (err) {
+    if (err.name === "AbortError") return;  // superseded by a newer request
+    $("#rl-error").textContent = "Impossible de charger le catalogue : " + err.message;
+    $("#rl-out").setAttribute("aria-busy", "false");
+    return;
+  }
+  $("#rl-out").setAttribute("aria-busy", "false");
+  $("#rl-summary").textContent =
+    `Affichage de ${fmt(d.count)} dépôts sur ${fmt(d.total)} pour ${fmt(d.company_count)} entreprises (${fmt(d.archived_count)} archivés).`;
+  // Provenance / cite-as line for the catalogue snapshot (version + build date).
+  if (d.version) {
+    $("#rl-snap").textContent = (d.generated ? d.generated + " · " : "") + "version " + d.version;
+    $("#rl-cite").textContent =
+      `“Rapports sur les conditions générales d’utilisation des réseaux sociaux de l’État de New York, via la Transparency Report API (version du catalogue ${d.version}).”`;
+    $("#rl-prov").hidden = false;
+  }
+  const head = '<tr><th scope="col">Entreprise</th><th scope="col">Plateforme</th><th scope="col">Période</th>' +
+    '<th scope="col">Mis en ligne</th><th scope="col">Accès</th>' +
+    '<th scope="col">Rapport</th><th scope="col">Archivé</th></tr>';
+  // Column labels, taken from the (already-localized) header cells, so the
+  // mobile card view can label each cell via data-label without a second
+  // translatable copy of the column names.
+  const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
+  const body = d.rows.map(r => {
+    const src = safeHref(r.source_url);
+    const link = src
+      ? `<a href="${esc(src)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("Rapport — " + r.company + " (s’ouvre dans un nouvel onglet)")}">AG.NY.gov</a>`
+      : "";
+    const arch = safeHref(r.archived || "");
+    const archCell = arch
+      ? `<a href="${esc(arch)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("Rapport archivé — " + r.company + " (s’ouvre dans un nouvel onglet)")}">GitHub</a>`
+      : '<span class="na">non archivé</span>';
+    const cells = [esc(r.company), esc(r.platform || ""), esc(r.period),
+      esc(r.upload_date || ""), esc(r.access || ""), link, archCell];
+    return "<tr>" + cells.map((c, i) =>
+      `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
+  }).join("");
+  $("#rl-out").innerHTML = d.rows.length
+    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    : "<p class='sub'>Aucun dépôt correspondant.</p>";
+}
+
+async function setupLocations() {
+  let d;
+  try {
+    const res = await fetch("/api/ny-tos-reports");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
+  } catch (err) {
+    $("#rl-error").textContent = "Impossible de charger le catalogue : " + err.message;
+    $("#rl-out").setAttribute("aria-busy", "false");
+    return;
+  }
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  const facets = d?.facets || {};
+  $("#rl-period").insertAdjacentHTML("beforeend", (facets.period || []).map(opt).join(""));
+  $("#rl-access").insertAdjacentHTML("beforeend", (facets.access || []).map(opt).join(""));
+  ["#rl-period", "#rl-access"].forEach(s => $(s).addEventListener("change", runLocations));
+  // Debounce the free-text search so we don't fire a request per keystroke.
+  let t = null;
+  $("#rl-q").addEventListener("input", () => {
+    if (t) clearTimeout(t);
+    t = setTimeout(runLocations, 250);
+  });
+  $("#rl-csv").addEventListener("click", () => {
+    const p = rlParams(); p.set("format", "csv");
+    window.open("/api/ny-tos-reports?" + p.toString(), "_blank");
+  });
+  runLocations();
+}
+
+document.addEventListener("DOMContentLoaded", setupLocations);
+</script>
+<script>
+  // Hamburger — mobile sidebar toggle
+  (function () {
+      // Keep --header-h in sync with the actual rendered height of the site
+  // banner + topbar (which varies as the nav links wrap on narrow widths),
+  // so the fixed/sticky sidebar starts right below it instead of overlapping.
+  var pageHeader = document.querySelector('.page-header');
+  if (pageHeader) {
+    var syncHeaderHeight = function () {
+      document.documentElement.style.setProperty('--header-h', pageHeader.offsetHeight + 'px');
+    };
+    syncHeaderHeight();
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncHeaderHeight).observe(pageHeader);
+    } else {
+      window.addEventListener('resize', syncHeaderHeight);
+    }
+  }
+    var hamburger = document.getElementById('hamburger');
+    var sidebar   = document.getElementById('sidebar');
+    var overlay   = document.getElementById('sidebar-overlay');
+    if (!hamburger || !sidebar || !overlay) return;
+    function openSidebar()  { sidebar.classList.add('is-open'); overlay.classList.add('is-open'); hamburger.setAttribute('aria-expanded','true'); overlay.removeAttribute('aria-hidden'); }
+    function closeSidebar() { sidebar.classList.remove('is-open'); overlay.classList.remove('is-open'); hamburger.setAttribute('aria-expanded','false'); overlay.setAttribute('aria-hidden','true'); }
+    hamburger.addEventListener('click', function () { sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar(); });
+    overlay.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSidebar(); });
+  })();
+</script>
+<script>
+  // Dark-mode toggle — persists to localStorage, shared with the main site.
+  (function () {
+    const btn = document.querySelector('[data-theme-toggle]');
+    if (!btn) return;
+    const sync = () => btn.setAttribute('aria-pressed',
+      String(document.documentElement.getAttribute('data-theme') === 'dark'));
+    sync();
+    btn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      sync();
+    });
+  })();
+</script>
+</body>
+</html>

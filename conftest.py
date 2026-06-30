@@ -83,6 +83,21 @@ _RL_FIXTURE = [
 ]
 seed.build_report_locations(_RL_FIXTURE, _DB)
 
+# A tiny slice of the NY Social Media ToS catalogue: one publicly-archived filing
+# and one login-gated one, so the access facet + archived-link rendering are both
+# exercised.
+_NY_TOS_FIXTURE = [
+    {"company": "Snap Inc", "platform": "", "period": "2025 Q3", "upload_date": "01-01-2026",
+     "access": "public", "source_url": "https://ag.ny.gov/sites/default/files/social-media-policy-report/2025-q3-snap-inc-policy.pdf",
+     "filename": "2025-q3-snap-inc.pdf",
+     "archived": "https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/pdfs/2025-q3-snap-inc.pdf",
+     "sha256": "abc123", "bytes": "11222370"},
+    {"company": "TikTok Inc", "platform": "", "period": "2025 Q4", "upload_date": "04-01-2026",
+     "access": "auth-required", "source_url": "https://ag.ny.gov/system/files/webform/social_media_terms_of_service_re/106547/2025-q4-tiktok-inc-policy.pdf",
+     "filename": "", "archived": "", "sha256": "", "bytes": ""},
+]
+seed.build_ny_tos_reports(_NY_TOS_FIXTURE, _DB)
+
 os.environ.setdefault("DB_PATH", _DB)
 os.environ.setdefault("API_KEYS_JSON", '{"momo":{"name":"momo"},"honggildong":{"name":"honggildong"}}')
 # Google sign-in config for the auth tests (token verification is monkeypatched).

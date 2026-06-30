@@ -35,6 +35,11 @@ _DEFAULT_DB = os.getenv("DB_PATH", os.path.join(HERE, "demo.db"))
 _DEFAULT_RL_SOURCE = os.getenv(
     "SEED_REPORT_LOCATIONS_CSV", os.path.join(HERE, "data", "report-locations.csv")
 )
+# Vendored in-repo catalogue of New York's Social Media Terms-of-Service reports
+# (one row per filing; sibling dsa-transparency-data/ny_tos_reports.csv).
+_DEFAULT_NY_TOS_SOURCE = os.getenv(
+    "SEED_NY_TOS_CSV", os.path.join(HERE, "data", "ny-tos-reports.csv")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -213,10 +218,32 @@ CREATE TABLE report_locations (
 );
 CREATE INDEX idx_rl_category   ON report_locations(category);
 CREATE INDEX idx_rl_confidence ON report_locations(confidence);
+
+-- New York's Social Media Terms-of-Service reports (Stop Hiding Hate Act): one
+-- row per filing the AG publishes. A flat catalogue like report_locations, not
+-- part of the DSA star schema. `access` is public|auth-required; `archived` is a
+-- GitHub URL to the mirrored PDF when access=public.
+CREATE TABLE ny_tos_reports (
+    id           INTEGER PRIMARY KEY,
+    company      TEXT NOT NULL,
+    platform     TEXT,
+    period       TEXT NOT NULL,
+    upload_date  TEXT,
+    access       TEXT NOT NULL,
+    source_url   TEXT NOT NULL,
+    filename     TEXT,
+    archived     TEXT,
+    sha256       TEXT,
+    bytes        INTEGER
+);
+CREATE INDEX idx_ny_period ON ny_tos_reports(period);
+CREATE INDEX idx_ny_access ON ny_tos_reports(access);
 """
 
 _RL_COLUMNS = ("platform", "company", "category", "confidence",
                "harmonised_template", "format_period", "url_label", "url", "archived")
+_NY_TOS_COLUMNS = ("company", "platform", "period", "upload_date", "access",
+                   "source_url", "filename", "archived", "sha256", "bytes")
 
 # fact table name → (number of columns, source JSON key)
 _FACT_TABLES = {
@@ -501,6 +528,26 @@ def _load_report_locations_csv(path: str) -> list[dict[str, str]]:
         return list(_csv.DictReader(f))
 
 
+def build_ny_tos_reports(rows: list[dict[str, str]], db_path: str) -> int:
+    """Populate the ny_tos_reports table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). `rows` are dicts
+    keyed by `_NY_TOS_COLUMNS`. Returns the number of rows inserted.
+    """
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ny_tos_reports "
+                "(company, platform, period, upload_date, access, source_url, "
+                "filename, archived, sha256, bytes) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                [tuple((r.get(c) or None) for c in _NY_TOS_COLUMNS) for r in rows],
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Seed demo.db from the VLOP DSA dataset.")
     parser.add_argument("--source", default=_DEFAULT_SOURCE, help="Path to vlop-dsa.json")
@@ -509,6 +556,8 @@ def main() -> None:
     parser.add_argument("--db", default=_DEFAULT_DB, help="Output SQLite database path")
     parser.add_argument("--report-locations", default=_DEFAULT_RL_SOURCE,
                         help="Path to report-locations.csv (non-VLOP catalogue)")
+    parser.add_argument("--ny-tos", default=_DEFAULT_NY_TOS_SOURCE,
+                        help="Path to ny-tos-reports.csv (NY ToS catalogue)")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -542,6 +591,13 @@ def main() -> None:
         print(f"  report_locations: {n} rows from {os.path.basename(args.report_locations)}")
     else:
         print(f"  (skipping report locations — not found: {args.report_locations})")
+
+    if os.path.isfile(args.ny_tos):
+        ny_rows = _load_report_locations_csv(args.ny_tos)
+        n = build_ny_tos_reports(ny_rows, args.db)
+        print(f"  ny_tos_reports: {n} rows from {os.path.basename(args.ny_tos)}")
+    else:
+        print(f"  (skipping NY ToS reports — not found: {args.ny_tos})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

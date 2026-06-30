@@ -2093,6 +2093,12 @@ def catalog_page() -> FileResponse:
     return _serve_page("catalog.html", "Catalogue page")
 
 
+@app.get("/ny-tos", response_class=HTMLResponse)
+def ny_tos_page() -> FileResponse:
+    """Serve the NY ToS-reports catalogue page (reads GET /api/ny-tos-reports)."""
+    return _serve_page("ny-tos.html", "NY ToS reports page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2139,6 +2145,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "reports": ("index.html", "Dashboard page", {}),
     "removals": ("removals.html", "Removals page", {}),
     "catalog": ("catalog.html", "Catalogue page", {}),
+    "ny-tos": ("ny-tos.html", "NY ToS reports page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
@@ -2478,6 +2485,125 @@ def report_locations(
         "count": len(out),
         "total": data["total"],
         "platform_count": data["platform_count"],
+        "version": version,
+        "generated": generated,
+        "facets": data["facets"],
+        "rows": out,
+    }, headers=prov_headers)
+
+
+# New York's Social Media Terms-of-Service reports (Stop Hiding Hate Act), seeded
+# from data/ny-tos-reports.csv into the read-only `ny_tos_reports` table. Same
+# memoise-and-filter-in-memory pattern as /report-locations — the table is static.
+_NY_OUT_COLUMNS = (
+    "company", "platform", "period", "upload_date", "access",
+    "source_url", "filename", "archived", "sha256", "bytes",
+)
+_ny_tos_cache: dict[str, Any] | None = None
+_ny_tos_cache_lock = threading.Lock()
+
+
+def _compute_ny_tos_reports() -> dict[str, Any]:
+    conn = _connect_ro()
+    try:
+        rows = [
+            dict(zip(_NY_OUT_COLUMNS, r))
+            for r in conn.execute(
+                "SELECT company, platform, period, upload_date, access, "
+                "source_url, filename, archived, sha256, bytes "
+                "FROM ny_tos_reports "
+                "ORDER BY period DESC, company COLLATE NOCASE, id"
+            ).fetchall()
+        ]
+    finally:
+        conn.close()
+
+    def _facet(key: str) -> list[str]:
+        return sorted({r[key] for r in rows if r.get(key)}, key=str.lower)
+
+    version = hashlib.sha256(
+        json.dumps(rows, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()[:12]
+
+    return {
+        "rows": rows,
+        "total": len(rows),
+        "company_count": len({r["company"] for r in rows}),
+        "archived_count": sum(1 for r in rows if r.get("access") == "public"),
+        "version": version,
+        "facets": {
+            "period": sorted({r["period"] for r in rows if r.get("period")}, reverse=True),
+            "access": _facet("access"),
+        },
+    }
+
+
+def _ny_tos_data() -> dict[str, Any]:
+    global _ny_tos_cache
+    if _ny_tos_cache is None:
+        with _ny_tos_cache_lock:
+            if _ny_tos_cache is None:
+                _ny_tos_cache = _compute_ny_tos_reports()
+    return _ny_tos_cache
+
+
+@api_router.get("/ny-tos-reports", response_model=None)
+def ny_tos_reports(
+    period: str | None = None,
+    access: str | None = None,
+    q: str | None = Query(None, max_length=200),
+    format: Literal["json", "csv"] = "json",
+) -> JSONResponse | PlainTextResponse:
+    """Public catalogue of New York's Social Media Terms-of-Service reports — the
+    twice-yearly policy filings social-media companies submit to the NY Attorney
+    General under the Stop Hiding Hate Act — no auth. Filter by `period`,
+    `access` (`public`/`auth-required`), and a free-text `q` (matches
+    company/platform/URL). Returns JSON (`{count, total, facets, rows}`) or
+    `format=csv`. Memoised: the read-only table is static, so rows are loaded
+    once and filtered in memory (no user input reaches SQL)."""
+    data = _ny_tos_data()
+    rows = data["rows"]
+
+    needle = q.strip().lower() if q and q.strip() else None
+    out = [
+        r for r in rows
+        if (period is None or r["period"] == period)
+        and (access is None or r["access"] == access)
+        and (
+            needle is None
+            or needle in (r["company"] or "").lower()
+            or needle in (r["platform"] or "").lower()
+            or needle in (r["source_url"] or "").lower()
+        )
+    ]
+
+    version = data["version"]
+    generated = _dataset_meta().get("generated")
+    prov_headers = {"X-Catalogue-Version": version}
+    if generated:
+        prov_headers["X-Dataset-Generated"] = generated
+
+    if format == "csv":
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(_NY_OUT_COLUMNS)
+        writer.writerows(
+            [[_csv_safe(r[c] if r[c] is not None else "") for c in _NY_OUT_COLUMNS] for r in out]
+        )
+        return PlainTextResponse(
+            buf.getvalue(),
+            media_type="text/csv",
+            headers={
+                **prov_headers,
+                "Content-Disposition": f'attachment; filename="ny-tos-reports-{version}.csv"',
+            },
+        )
+
+    return JSONResponse({
+        "count": len(out),
+        "total": data["total"],
+        "company_count": data["company_count"],
+        "archived_count": data["archived_count"],
         "version": version,
         "generated": generated,
         "facets": data["facets"],
