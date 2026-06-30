@@ -2221,6 +2221,62 @@ class TestGRTable:
             assert 'th scope="col"' in r.text
 
 
+class TestAppleTable:
+    def test_apple_tables_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "apple_requests" in names and "apple_national_security" in names
+
+    def test_apple_fields_endpoint(self):
+        body = client.get("/api/fields?table=apple_requests", headers=MOMO).json()
+        assert {"period", "period_ord", "country_name", "request_type"} <= set(body["dimensions"]["fields"])
+        assert {"requests_received", "items_specified", "pct_data_provided", "apps_removed"} <= set(body["measures"]["fields"])
+
+    def test_apple_value_and_grouping(self):
+        # device / United States / 2024 H1 from the fixture: 12,043 received.
+        job = _submit_and_wait({
+            "table": "apple_requests",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "request_type", "field_values": ["device"]},
+                {"operation": "EQ", "field_name": "country_name", "field_values": ["United States of America"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2024 H1"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "requests_received", "alias": "r"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 12043
+
+    def test_apple_national_security_ranges(self):
+        # The NS table carries banded low/high bounds, not exact counts.
+        job = _submit_and_wait({
+            "table": "apple_national_security",
+            "fields": ["request_type", "requests_low", "requests_high"],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        rows = {r[0]: (r[1], r[2]) for r in body["rows"]}
+        assert rows["National Security"] == (0, 249)
+
+    def test_apple_invalid_field_rejected(self):
+        r = client.post("/api/query", json={
+            "table": "apple_requests",
+            "query": {"and": [{"operation": "EQ", "field_name": "nope", "field_values": ["x"]}]},
+        }, headers=MOMO)
+        assert r.status_code == 400
+
+    def test_vendored_apple_dataset_shape(self):
+        # The shipped snapshot the Docker image seeds from: sane shape + history.
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("apple-transparency.json").read_text())
+        assert data["periods"][0] == "2013 H1" and data["coverage"] == data["periods"][-1]
+        assert len(data["request_types"]) == 10
+        # rows = 3 interned dims + 16 measures.
+        assert all(len(r) == 19 for r in data["rows"][:50])
+        assert data["countries"] == sorted(data["countries"])  # deterministic order
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:
@@ -2316,6 +2372,57 @@ class TestHarmonisedFacts:
         is_total = conn.execute(
             "SELECT su.is_total FROM surfaces su WHERE su.name IN ('Core', 'Ads')").fetchall()
         assert all(t == 0 for (t,) in is_total)
+
+    def test_non_folded_reports_use_all_surface(self, tmp_path):
+        # The surf() fallback: only the two folded Google reports carry Core/Ads;
+        # every other filer's t6/t7/t8 rows must land on the single 'All' surface
+        # (a regression in surf() reading a stray cell as a surface would break
+        # this and silently mis-bucket / double-count).
+        db, counts, conn = self._build(tmp_path)
+        for tbl in ("t6_own_initiative_tos", "t7_appeals_recidivism", "t8_automated_means"):
+            split = {r[0] for r in conn.execute(
+                f"SELECT DISTINCT s.name FROM {tbl} t JOIN surfaces su "
+                f"ON su.id = t.surface_id JOIN services s ON s.id = t.service_id "
+                f"WHERE su.name IN ('Core', 'Ads')")}
+            assert split <= {"Google Hotels", "Google Workspace"}, (tbl, split)
+        # And at least one non-folded service genuinely sits on 'All' (proves the
+        # fallback fires, not that the table is empty).
+        all_svcs = {r[0] for r in conn.execute(
+            "SELECT DISTINCT s.name FROM t6_own_initiative_tos t JOIN surfaces su "
+            "ON su.id = t.surface_id JOIN services s ON s.id = t.service_id "
+            "WHERE su.name = 'All'")}
+        assert all_svcs - {"Google Hotels", "Google Workspace"}
+
+
+class TestRevendorUnknownSurface:
+    """revendor_data._unknown_surfaces flags folded Surface labels the seeder
+    doesn't recognise, so a new upstream surface can't silently fall back to the
+    'All' total (which, for a per-surface filer, would reintroduce a double-count)."""
+
+    def _extracted(self, tmp_path, surface_rows, *, folded=True, section="06_own_initiative_TC"):
+        import csv
+        d = tmp_path / "extracted" / "svc"
+        d.mkdir(parents=True)
+        header = ["Applicability", "Service", "Period", "Category", "x"]
+        with open(d.parent / "svc" / f"{section}.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(header + (["Surface"] if folded else ["Contextual Information"]))
+            for s in surface_rows:
+                w.writerow(["All", "Svc", "p", "TOTAL", "1", s])
+        return str(tmp_path / "extracted")
+
+    def test_flags_unknown_label(self, tmp_path):
+        import scripts.revendor_data as rv
+        ex = self._extracted(tmp_path, ["Core", "Ads", "URL-level"])
+        found = rv._unknown_surfaces(ex)
+        assert "URL-level" in found and "Core" not in found and "Ads" not in found
+
+    def test_ignores_non_folded_section(self, tmp_path):
+        # No trailing 'Surface' header → not a folded section; a stray 'Ads' in a
+        # free-text contextual cell must NOT be treated as a surface label.
+        import scripts.revendor_data as rv
+        ex = self._extracted(tmp_path, ["Ads"], folded=False)
+        assert rv._unknown_surfaces(ex) == {}
 
 
 class TestDimensionNormalization:

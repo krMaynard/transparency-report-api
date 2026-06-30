@@ -66,6 +66,37 @@ _GR_FIXTURE = {
 }
 seed.build_gr_db(_GR_FIXTURE, _DB)
 
+# A small slice of the Apple Transparency dataset (apple-transparency.json shape).
+_APPLE_MEASURES = [
+    "requests_received", "items_specified", "requests_data_provided",
+    "pct_data_provided", "requests_challenged_rejected", "requests_no_data",
+    "content_provided", "noncontent_provided", "accounts_preserved",
+    "accounts_restricted", "accounts_deleted", "requests_app_removed",
+    "apps_removed", "appeals_received", "appeals_granted", "apps_reinstated",
+]
+_APPLE_FIXTURE = {
+    "measures": _APPLE_MEASURES,
+    "periods": ["2024 H1", "2024 H2"],
+    "countries": ["Germany", "United States of America"],
+    "request_types": ["device", "account"],
+    # [period, country, request_type] + 16 measures (order = _APPLE_MEASURES).
+    # device populates received/specified/data_provided/pct; account adds
+    # content/non-content; all other measures stay NULL.
+    "rows": [
+        [0, 1, 0, 12043, 42747, 10377, 86.0] + [None] * 12,
+        [0, 0, 0, 200, 300, 150, 75.0] + [None] * 12,
+        # account US 2024 H2: received, specified, (no data_provided), pct,
+        # challenged=100, (no no_data), content=4000, noncontent=1000, rest NULL.
+        [1, 1, 1, 5000, 9000, None, 90.0, 100, None, 4000, 1000] + [None] * 8,
+    ],
+    # [period, country, ns_type, req_low, req_high, acc_low, acc_high]
+    "ns_rows": [
+        [0, 1, "National Security", 0, 249, 0, 249],
+        [1, 1, "FISA Content", 250, 499, 250, 499],
+    ],
+}
+seed.build_apple_db(_APPLE_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /

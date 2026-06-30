@@ -127,6 +127,14 @@ SECTIONS = [
     "10_AMAR", "11_qualitative",
 ]
 
+# Surface labels the extractor folds into t6/t7/t8 via a trailing 'Surface' cell
+# (Google Hotels/Workspace: base rows -> 'Core', ads rows -> 'Ads'). _load_facts
+# reads these from the last cell; any other label falls back to 'All'. If the
+# upstream extractor ever emits a new surface label (e.g. a finer ads breakdown),
+# the fallback would silently mislabel it as the 'All' total — so revendor_data.py
+# checks the extracted CSVs against this set and flags anything unrecognised.
+FOLDED_SURFACES = ("Core", "Ads")
+
 
 def _num(v: str | None):
     """Parse a template cell as an int, else None (blanks, 'n/a', free text)."""
@@ -339,7 +347,7 @@ def _load_facts(conn, intern, rep, svc, sec, surface_all) -> int:
         # 'Core' for the base rows, 'Ads' for the ads rows. Read that last cell
         # when present; every other report carries no such column and is the
         # service's single 'All' surface.
-        return intern.dim("surfaces", r[-1]) if r and r[-1] in ("Core", "Ads") else surface_all
+        return intern.dim("surfaces", r[-1]) if r and r[-1] in FOLDED_SURFACES else surface_all
 
     # t3 — member-state orders: cat=3, scope=5, act=6, items=7, info=10
     for r in sec(2):
