@@ -41,12 +41,14 @@ Built to demonstrate two things:
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
 | `static/index.html` | Public VLOP dashboard (served at `/reports`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
 | `static/catalog.html` | Public report-locations catalogue page (served at `/catalog`) — the "Where platforms publish their reports" filterable table over `GET /api/report-locations` |
+| `static/ny-tos.html` | Public NY Terms-of-Service reports catalogue page (served at `/ny-tos`) — filterable table over `GET /api/ny-tos-reports` (New York's Stop Hiding Hate Act filings) |
+| `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
 | `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 8 tools, and host config; static, no page JS |
 | `static/methodology.html` | Public methodology page (served at `/methodology`) — how the dataset is sourced, processed (double-count handling, cross-language keys), queried, and cited, plus known limitations; static, no page JS |
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
-| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the nine pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the ten pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -69,7 +71,7 @@ Built to demonstrate two things:
 
 ## Localization
 
-The nine static pages are localized into **Spanish (`/es`), French (`/fr`),
+The ten static pages are localized into **Spanish (`/es`), French (`/fr`),
 German (`/de`), Italian (`/it`), Japanese (`/ja`), Chinese (`/zh`), and Korean
 (`/ko`)** alongside the English originals (served at the root). English is the
 source of truth; the
@@ -81,7 +83,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -268,6 +270,17 @@ the sibling `dsa-transparency-data` repo (set in its catalogue by
 powers the public `GET /api/report-locations` endpoint and the dashboard's
 "Where platforms publish their reports" panel.
 
+A second standalone **`ny_tos_reports`** table (also flat) holds **New York's
+Social Media Terms-of-Service reports** — the twice-yearly policy filings
+social-media companies submit to the NY Attorney General under the Stop Hiding
+Hate Act (a different jurisdiction/format from the EU DSA data; narrative policy
+PDFs, not the 1–11 template). Seeded from `data/ny-tos-reports.csv` via
+`build_ny_tos_reports()` (`company`, `platform`, `period`, `upload_date`,
+`access`, `source_url`, `filename`, `archived`, `sha256`, `bytes`). `access` is
+`public` (PDF mirrored in the sibling data repo, with `archived` GitHub link) or
+`auth-required` (login-gated at the AG, catalogued with `source_url` only). It
+powers the public `GET /api/ny-tos-reports` endpoint and the `/ny-tos` page.
+
 ## Query model
 
 Requests are structured (see `QueryRequest`/`compile_query`/`TableSpec` in
@@ -427,11 +440,13 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/` | — | Public VLOP transparency dashboard (web UI) |
 | GET | `/api/overview` | — | Public headline aggregates powering the dashboard |
 | GET | `/api/report-locations` | — | Public: non-VLOP DSA report-locations catalogue (filters: `category`/`confidence`/`harmonised_template`/`q`; `format=json\|csv`) — memoised, read-only |
+| GET | `/api/ny-tos-reports` | — | Public: New York Social Media ToS-reports catalogue (filters: `period`/`access`/`q`; `format=json\|csv`) — memoised, read-only |
 | GET | `/api/explore/options` | — | Public: tables + dimensions/measures for the query builder |
 | POST | `/api/explore` | — | Public: run a bounded structured query inline (row-capped, IP-rate-limited, ≤`EXPLORE_MAX_LEGS` composite legs) |
 | POST | `/api/ask` | key | NL→query via an LLM (Claude) → structured `QueryRequest` → `compile_query`; requires an API key, IP-rate-limited; off unless `ANTHROPIC_API_KEY` set |
 | GET | `/api` | — | API service info |
 | GET | `/catalog` | — | Public report-locations catalogue page (web UI over `GET /api/report-locations`) |
+| GET | `/ny-tos` | — | Public NY Terms-of-Service reports catalogue page (web UI over `GET /api/ny-tos-reports`) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/methodology` | — | Public methodology page (web UI; how the dataset is sourced/processed/cited) |
 | GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |
