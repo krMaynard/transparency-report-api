@@ -592,6 +592,14 @@ def build_github_db(data: dict[str, Any], db_path: str) -> int:
     (a `columns` header + `rows`, each row matching the table column order).
     Returns the fact-row count.
     """
+    # Rows are inserted positionally, so refuse to seed if the snapshot's column
+    # order ever drifts from the table's — otherwise values would silently land
+    # in the wrong columns.
+    expected_cols = ["year", "period", "dataset", "government", "iso2", "category",
+                     "metric", "count_low", "count_high"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"github dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
     rows = data["rows"]
     conn = sqlite3.connect(db_path)
     try:
