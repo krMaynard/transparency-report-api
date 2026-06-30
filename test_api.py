@@ -2256,6 +2256,57 @@ class TestHarmonisedFacts:
             "SELECT su.is_total FROM surfaces su WHERE su.name IN ('Core', 'Ads')").fetchall()
         assert all(t == 0 for (t,) in is_total)
 
+    def test_non_folded_reports_use_all_surface(self, tmp_path):
+        # The surf() fallback: only the two folded Google reports carry Core/Ads;
+        # every other filer's t6/t7/t8 rows must land on the single 'All' surface
+        # (a regression in surf() reading a stray cell as a surface would break
+        # this and silently mis-bucket / double-count).
+        db, counts, conn = self._build(tmp_path)
+        for tbl in ("t6_own_initiative_tos", "t7_appeals_recidivism", "t8_automated_means"):
+            split = {r[0] for r in conn.execute(
+                f"SELECT DISTINCT s.name FROM {tbl} t JOIN surfaces su "
+                f"ON su.id = t.surface_id JOIN services s ON s.id = t.service_id "
+                f"WHERE su.name IN ('Core', 'Ads')")}
+            assert split <= {"Google Hotels", "Google Workspace"}, (tbl, split)
+        # And at least one non-folded service genuinely sits on 'All' (proves the
+        # fallback fires, not that the table is empty).
+        all_svcs = {r[0] for r in conn.execute(
+            "SELECT DISTINCT s.name FROM t6_own_initiative_tos t JOIN surfaces su "
+            "ON su.id = t.surface_id JOIN services s ON s.id = t.service_id "
+            "WHERE su.name = 'All'")}
+        assert all_svcs - {"Google Hotels", "Google Workspace"}
+
+
+class TestRevendorUnknownSurface:
+    """revendor_data._unknown_surfaces flags folded Surface labels the seeder
+    doesn't recognise, so a new upstream surface can't silently fall back to the
+    'All' total (which, for a per-surface filer, would reintroduce a double-count)."""
+
+    def _extracted(self, tmp_path, surface_rows, *, folded=True, section="06_own_initiative_TC"):
+        import csv
+        d = tmp_path / "extracted" / "svc"
+        d.mkdir(parents=True)
+        header = ["Applicability", "Service", "Period", "Category", "x"]
+        with open(d.parent / "svc" / f"{section}.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.writer(f)
+            w.writerow(header + (["Surface"] if folded else ["Contextual Information"]))
+            for s in surface_rows:
+                w.writerow(["All", "Svc", "p", "TOTAL", "1", s])
+        return str(tmp_path / "extracted")
+
+    def test_flags_unknown_label(self, tmp_path):
+        import scripts.revendor_data as rv
+        ex = self._extracted(tmp_path, ["Core", "Ads", "URL-level"])
+        found = rv._unknown_surfaces(ex)
+        assert "URL-level" in found and "Core" not in found and "Ads" not in found
+
+    def test_ignores_non_folded_section(self, tmp_path):
+        # No trailing 'Surface' header → not a folded section; a stray 'Ads' in a
+        # free-text contextual cell must NOT be treated as a surface label.
+        import scripts.revendor_data as rv
+        ex = self._extracted(tmp_path, ["Ads"], folded=False)
+        assert rv._unknown_surfaces(ex) == {}
+
 
 class TestDimensionNormalization:
     """seed.normalize_dimensions flags aggregate rows and drops junk facts so a
