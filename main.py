@@ -1106,6 +1106,21 @@ TABLES: dict[str, TableSpec] = {
             "count_high": "f.count_high",
         },
     ),
+    "snap_metrics": TableSpec(
+        "Snap (Snapchat) Transparency Report — Trust & Safety enforcements, ads moderation, appeals, CSEA, DMCA/trademark notices, governmental content & account removal requests, information requests (incl. US national-security), bilateral data-access requests, and a regional/country overview. A tidy-long table: one row per measured value, identified by period × section × category × sub_category_1 × sub_category_2 × metric.",
+        "FROM snap_metrics f",
+        {
+            "period":         "f.period",
+            "section":        "f.section",
+            "category":       "f.category",
+            "sub_category_1": "f.sub_category_1",
+            "sub_category_2": "f.sub_category_2",
+            "metric":         "f.metric",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3404,6 +3419,10 @@ FIELD_HELP: dict[str, str] = {
     "count_high": "Upper bound of the reported value (github_metrics); equals count_low for exact counts.",
     "year": "Calendar year of the github_metrics row.",
     "iso2": "Requesting government's ISO-3166 alpha-2 code (country-keyed github_metrics datasets).",
+    # ── Snap transparency (tidy-long snap_metrics) — `section` and `value` reuse
+    # the generic DSA help above; only these two are Snap-specific. ──
+    "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
+    "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",

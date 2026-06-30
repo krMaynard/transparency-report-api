@@ -2325,6 +2325,51 @@ class TestGitHubTable:
         assert keys == sorted(keys)
 
 
+class TestSnapTable:
+    def test_snap_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "snap_metrics" in names
+
+    def test_snap_fields_endpoint(self):
+        body = client.get("/api/fields?table=snap_metrics", headers=MOMO).json()
+        assert {"period", "section", "category", "sub_category_1", "sub_category_2", "metric"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_snap_metric_value(self):
+        # Ads Moderation / total_ads_removed, 2024-H1 = 10711 (fixture).
+        job = _submit_and_wait({
+            "table": "snap_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["Ads Moderation"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["total_ads_removed"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 10711
+
+    def test_snap_median_is_real(self):
+        # A median metric carries a non-integer value (REAL column).
+        job = _submit_and_wait({
+            "table": "snap_metrics",
+            "fields": ["value"],
+            "query": {"and": [{"operation": "EQ", "field_name": "metric",
+                               "field_values": ["median_turnaround_time_minutes"]}]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 51.68
+
+    def test_vendored_snap_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("snap-transparency.json").read_text())
+        assert data["columns"][0] == "period" and len(data["columns"]) == 7
+        assert all(len(r) == 7 for r in data["rows"][:50])
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:
