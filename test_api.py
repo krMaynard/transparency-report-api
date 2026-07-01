@@ -2052,7 +2052,8 @@ class TestAccessibility:
 
 class TestLocalization:
     LOCALES = ("es", "fr", "de", "it", "ja", "zh", "ko")
-    SUFFIXES = ("", "reports", "removals", "schema", "api-key", "privacy")
+    SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
+                "github", "snap", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.

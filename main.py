@@ -2194,6 +2194,24 @@ def ny_tos_page() -> FileResponse:
     return _serve_page("ny-tos.html", "NY ToS reports page")
 
 
+@app.get("/apple", response_class=HTMLResponse)
+def apple_page() -> FileResponse:
+    """Serve the Apple Transparency Report dataset page (reads POST /api/explore)."""
+    return _serve_page("apple.html", "Apple transparency page")
+
+
+@app.get("/github", response_class=HTMLResponse)
+def github_page() -> FileResponse:
+    """Serve the GitHub Transparency Report dataset page (reads POST /api/explore)."""
+    return _serve_page("github.html", "GitHub transparency page")
+
+
+@app.get("/snap", response_class=HTMLResponse)
+def snap_page() -> FileResponse:
+    """Serve the Snap Transparency Report dataset page (reads POST /api/explore)."""
+    return _serve_page("snap.html", "Snap transparency page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2241,6 +2259,9 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "removals": ("removals.html", "Removals page", {}),
     "catalog": ("catalog.html", "Catalogue page", {}),
     "ny-tos": ("ny-tos.html", "NY ToS reports page", {}),
+    "apple": ("apple.html", "Apple transparency page", {}),
+    "github": ("github.html", "GitHub transparency page", {}),
+    "snap": ("snap.html", "Snap transparency page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
