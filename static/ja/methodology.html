@@ -316,7 +316,7 @@ display: flex; align-items: center;
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Google の削除
+      Google の削除要請
     </a>
 
     <a href="/apple" class="nav-item">
@@ -425,7 +425,7 @@ display: flex; align-items: center;
     <p class="sub">これは公開された透明性レポートデータを<strong>独立して非公式に</strong>集約したものであり、いかなるプラットフォーム、企業、政府とも提携していません。2つのレポート群を1つのクエリ可能なスキーマにまとめています：</p>
     <ul class="toollist">
       <li><strong>EU DSA 透明性レポート</strong><div class="desc">プロバイダーがEUデジタルサービス法（DSA）に基づいて公開する定期的なコンテンツモデレーション統計です。これは、DSA第15条・第24条・第42条（それぞれ仲介サービス、オンラインプラットフォーム、超大規模プラットフォームに課される報告義務）が義務付ける定期的な透明性レポートであり、個別の理由説明書（Statements of Reasons）を扱う別個のリアルタイムなDSA透明性データベースとは異なります。提出者は共通の階層型EUテンプレートを使用し、各プロバイダーは自らの階層が求める報告セクションのみを記入します（本データセットでは、それらのセクションを内部的にt3〜t11として索引付けしています）。対象には、EU域内でのリーチを理由として欧州委員会が正式に<em>指定</em>した超大規模オンラインプラットフォームおよび検索エンジン（VLOP / VLOSE）が含まれ、これらはより頻繁かつ詳細に報告するほか、数十の小規模プラットフォームも対象となります。最新の件数および対象期間については、<a href="/ja/reports">DSA レポート</a>ダッシュボードをご覧ください。</div></li>
-      <li><strong>Google 政府による削除要請</strong><div class="desc">国・製品・理由・レポート期間ごとに集計された、コンテンツ削除を求める政府からの要請件数に関する Google の報告です。これは DSA に基づく提出ではなく、Google が長年にわたり自主的に公表してきた透明性レポートです。<a href="/ja/removals">Google の削除</a> ダッシュボードでご確認いただけます。</div></li>
+      <li><strong>Google 政府による削除要請</strong><div class="desc">国・製品・理由・レポート期間ごとに集計された、コンテンツ削除を求める政府からの要請件数に関する Google の報告です。これは DSA に基づく提出ではなく、Google が長年にわたり自主的に公表してきた透明性レポートです。<a href="/ja/removals">Google の削除要請</a> ダッシュボードでご確認いただけます。</div></li>
     </ul>
     <p class="hint">各プラットフォームが元となるレポートをどこで公開しているかは、<a href="/ja/catalog">レポートの掲載先</a>ページにカタログ化されており、ソースファイルのアーカイブコピーへのリンクも掲載しています。</p>
 
@@ -451,7 +451,7 @@ display: flex; align-items: center;
     <h2>再現性と引用</h2>
     <p class="sub">データベースは静的で読み取り専用の<strong>スナップショット</strong>です。各スナップショットには不変の<strong>データセットバージョン</strong>が付与されます。これはその内容のフィンガープリントであり、データが変わるたびに変化します。<code>ETag</code> および <code>X-Dataset-Version</code> ヘッダーとして送信され、すべてのファクト行はその出典となる提出物の <code>report_id</code> を公開します。ある数値は、<em>データセットバージョン</em>、正確な<em>クエリ</em>、そしてそれが参照する <code>report_id</code> という 3 つの要素を合わせて固定されます。したがってこの 3 つをすべて引用すれば、行を再取得できます（バージョンと report_id だけでは出典の提出物を特定するのであって、特定の数値を特定するわけではありません）。ソートやページネーションを行う際、結果は常に完全に決定論的な順序で返ってくるため、保存した抽出はバイト単位で再現可能です。スナップショットのビルド日と対象期間は、各ダッシュボードの「Cite as」行とすべてのエクスポートのヘッダーに表示され、行の <code>report_id</code> はその出典となる提出物（プラットフォーム、期間、ティア）を特定します。VLOP 以外のプラットフォームについては、その提出物がどこで公開されているかが<a href="/ja/catalog">レポートの掲載先</a>カタログにプラットフォームごとに一覧化されています。</p>
     <p class="hint"><strong>帰属表示：</strong>数値は、それを報告したプラットフォームに帰属させてください。本サイトはアクセスのためのツールとしてのみ引用してください。</p>
-    <p class="hint">例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> ライブスナップショットの正確なデータセットバージョンと対象期間は、<a href="/ja/reports">DSA レポート</a>および<a href="/ja/removals">Google の削除</a>ダッシュボードの「Cite as」の行に表示されます。</p>
+    <p class="hint">例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> ライブスナップショットの正確なデータセットバージョンと対象期間は、<a href="/ja/reports">DSA レポート</a>および<a href="/ja/removals">Google の削除要請</a>ダッシュボードの「Cite as」の行に表示されます。</p>
 
     <h2>既知の制限</h2>
     <ul class="toollist">
@@ -462,7 +462,7 @@ display: flex; align-items: center;
     </ul>
 
     <h2>ソースとコード</h2>
-    <p class="hint">完全に公開レポートから構築されています。抽出、正規化、クロスウォーク、クエリレイヤーを含むパイプライン全体は、<a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">github.com/krMaynard/transparency-report-api</a> でオープンソースとして公開されています。さっそく探索してみましょう：<a href="/ja/reports">DSA レポート</a> · <a href="/ja/removals">Google の削除</a> · <a href="/ja/schema">スキーマ</a>。</p>
+    <p class="hint">完全に公開レポートから構築されています。抽出、正規化、クロスウォーク、クエリレイヤーを含むパイプライン全体は、<a href="https://github.com/krMaynard/transparency-report-api" target="_blank" rel="noopener noreferrer">github.com/krMaynard/transparency-report-api</a> でオープンソースとして公開されています。さっそく探索してみましょう：<a href="/ja/reports">DSA レポート</a> · <a href="/ja/removals">Google の削除要請</a> · <a href="/ja/schema">スキーマ</a>。</p>
   </section>
  </main>
 

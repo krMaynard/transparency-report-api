@@ -1846,7 +1846,7 @@ COMMON["ja"] = [
     (r'''DSA Reports''',
      r'''DSA レポート'''),
     (r'''Google Removals''',
-     r'''Google の削除'''),
+     r'''Google の削除要請'''),
     (r'''      Report locations
     </a>''', r'''      レポートの掲載先
     </a>'''),
@@ -2612,7 +2612,7 @@ COMMON["zh"] = [
     (r'''DSA Reports''',
      r'''DSA 报告'''),
     (r'''Google Removals''',
-     r'''Google 删除'''),
+     r'''Google 删除请求'''),
     (r'''      Report locations
     </a>''', r'''      报告位置
     </a>'''),
@@ -3377,7 +3377,7 @@ COMMON["ko"] = [
     (r'''DSA Reports''',
      r'''DSA 보고서'''),
     (r'''Google Removals''',
-     r'''Google 삭제'''),
+     r'''Google 삭제 요청'''),
     (r'''      Report locations
     </a>''', r'''      보고서 위치
     </a>'''),
@@ -5436,7 +5436,7 @@ _METH = {
         "C1": "EU DSA 透明性レポート",
         "D1": "プロバイダーがEUデジタルサービス法（DSA）に基づいて公開する定期的なコンテンツモデレーション統計です。これは、DSA第15条・第24条・第42条（それぞれ仲介サービス、オンラインプラットフォーム、超大規模プラットフォームに課される報告義務）が義務付ける定期的な透明性レポートであり、個別の理由説明書（Statements of Reasons）を扱う別個のリアルタイムなDSA透明性データベースとは異なります。提出者は共通の階層型EUテンプレートを使用し、各プロバイダーは自らの階層が求める報告セクションのみを記入します（本データセットでは、それらのセクションを内部的にt3〜t11として索引付けしています）。対象には、EU域内でのリーチを理由として欧州委員会が正式に<em>指定</em>した超大規模オンラインプラットフォームおよび検索エンジン（VLOP / VLOSE）が含まれ、これらはより頻繁かつ詳細に報告するほか、数十の小規模プラットフォームも対象となります。最新の件数および対象期間については、<a href=\"/reports\">DSA レポート</a>ダッシュボードをご覧ください。",
         "C2": "Google 政府による削除要請",
-        "D2": "国・製品・理由・レポート期間ごとに集計された、コンテンツ削除を求める政府からの要請件数に関する Google の報告です。これは DSA に基づく提出ではなく、Google が長年にわたり自主的に公表してきた透明性レポートです。<a href=\"/removals\">Google の削除</a> ダッシュボードでご確認いただけます。",
+        "D2": "国・製品・理由・レポート期間ごとに集計された、コンテンツ削除を求める政府からの要請件数に関する Google の報告です。これは DSA に基づく提出ではなく、Google が長年にわたり自主的に公表してきた透明性レポートです。<a href=\"/removals\">Google の削除要請</a> ダッシュボードでご確認いただけます。",
         "P_CAT": "各プラットフォームが元となるレポートをどこで公開しているかは、<a href=\"/catalog\">レポートの掲載先</a>ページにカタログ化されており、ソースファイルのアーカイブコピーへのリンクも掲載しています。",
         "H_WHERE": "データの出所",
         "P_WHERE": "すべての数値は、それを公表したプラットフォームまたは企業に由来します。これらは <em>各社が</em> 報告した数値であり、報告された値を改変することなくそのまま再掲したものであって、本プロジェクトが算出した推計値ではありません。本プロジェクトの貢献は <strong>集約と構造化</strong> にあります。すなわち、個別に公表されたレポートを収集し、その表を抽出し、比較・検索できるよう一つのスキーマへ正規化することです。報告された値そのものは決して編集されません。変換はあくまで構造的なもの、つまり抽出、集計合計行のフラグ付け、複数言語にまたがるラベルの正規化、そして解析できない行の除外であり、以下で説明します。",
@@ -5462,10 +5462,10 @@ _METH = {
         "LC4": "デモンストレーション用サービス",
         "LD4": "これはポートフォリオ/デモ用のプロジェクトです。ソースに対しては正確ですが、公式な記録ではありません — 重要な事柄については必ずプラットフォーム自身が公開したレポート（<a href=\"/catalog\">レポートの掲載先</a>からリンク）と照合してください。",
         "H_SRC": "ソースとコード",
-        "P_SRC": "完全に公開レポートから構築されています。抽出、正規化、クロスウォーク、クエリレイヤーを含むパイプライン全体は、<a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a> でオープンソースとして公開されています。さっそく探索してみましょう：<a href=\"/reports\">DSA レポート</a> · <a href=\"/removals\">Google の削除</a> · <a href=\"/schema\">スキーマ</a>。",
+        "P_SRC": "完全に公開レポートから構築されています。抽出、正規化、クロスウォーク、クエリレイヤーを含むパイプライン全体は、<a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a> でオープンソースとして公開されています。さっそく探索してみましょう：<a href=\"/reports\">DSA レポート</a> · <a href=\"/removals\">Google の削除要請</a> · <a href=\"/schema\">スキーマ</a>。",
         "TLEGEND": "9つのレポートテーブルは次のように対応します。<code>t3</code> 加盟国による命令 · <code>t4</code> 通知（信頼できる通報者を含む） · <code>t5</code> / <code>t6</code> 自主的措置（違法コンテンツ / 利用規約） · <code>t7</code> 不服申立てと再犯 · <code>t8</code> 自動化手段の利用 · <code>t9</code> 人的リソース · <code>t10</code> 平均月間アクティブ利用者数 · <code>t11</code> 定性的な説明。",
         "CITE_RULE": "<strong>帰属表示：</strong>数値は、それを報告したプラットフォームに帰属させてください。本サイトはアクセスのためのツールとしてのみ引用してください。",
-        "CITE_EX": "例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> ライブスナップショットの正確なデータセットバージョンと対象期間は、<a href=\"/reports\">DSA レポート</a>および<a href=\"/removals\">Google の削除</a>ダッシュボードの「Cite as」の行に表示されます。"
+        "CITE_EX": "例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> ライブスナップショットの正確なデータセットバージョンと対象期間は、<a href=\"/reports\">DSA レポート</a>および<a href=\"/removals\">Google の削除要請</a>ダッシュボードの「Cite as」の行に表示されます。"
     },
     "zh": {
         "TITLE": "方法说明 · Transparency Report",
@@ -5477,7 +5477,7 @@ _METH = {
         "C1": "欧盟 DSA 透明度报告",
         "D1": "提供者依据欧盟《数字服务法》（DSA）发布的定期内容审核统计数据——即 DSA 第15条、第24条和第42条所要求的周期性透明度报告（分别针对中介服务、在线平台和超大型平台的报告义务），而非另行设立的、收录单条理由说明（Statements of Reasons）的实时 DSA 透明度数据库。报送方使用一份共享的分级欧盟模板：每家提供者只需填写其层级所要求的报告部分（本数据集在内部将这些部分编为 t3–t11 索引）。它涵盖超大型在线平台和搜索引擎（VLOPs / VLOSEs）——即因其在欧盟的影响范围而被欧盟委员会正式<em>指定</em>的平台——这些平台报送更为频繁、更为详尽，同时还涵盖数十家规模较小的平台。实时统计数和涵盖期间请见 <a href=\"/reports\">DSA 报告</a> 仪表板。",
         "C2": "Google 政府删除请求",
-        "D2": "Google 报告的各国政府要求删除内容的请求数量，按国家、产品、原因和报告周期划分——这是 Google 自身长期运行的自愿性透明度报告，而非 DSA 报告。可在<a href=\"/removals\">Google 删除</a>仪表板中探索。",
+        "D2": "Google 报告的各国政府要求删除内容的请求数量，按国家、产品、原因和报告周期划分——这是 Google 自身长期运行的自愿性透明度报告，而非 DSA 报告。可在<a href=\"/removals\">Google 删除请求</a>仪表板中探索。",
         "P_CAT": "每个平台在何处发布其原始报告，已编入<a href=\"/catalog\">报告位置</a>页面，并附有源文件存档副本的链接。",
         "H_WHERE": "数据来自何处",
         "P_WHERE": "每一项数据都源自发布它的平台或公司——这些是<em>它们</em>报告的数字，在不改动所报告数值的前提下予以转载，并非本项目所做的估算。本项目的贡献在于<strong>聚合与结构化</strong>：收集各自发布的报告，提取其中的表格，并将它们规范化为统一的模式，以便进行比较和查询。所报告的数值本身从不被编辑；所做的转换均属结构性的——提取、标记聚合总计行、跨语言规范化标签，以及删除无法解析的行——具体说明见下文。",
@@ -5503,10 +5503,10 @@ _METH = {
         "LC4": "演示服务",
         "LD4": "这是一个作品集/演示项目。它忠实于其来源，但并非官方记录——对于任何重要事项，请始终对照平台自己发布的报告（可从<a href=\"/catalog\">报告位置</a>链接进入）加以确认。",
         "H_SRC": "来源与代码",
-        "P_SRC": "完全基于公开报告构建。整个流程——提取、规范化、对照表和查询层——已在 <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a> 开源。开始探索：<a href=\"/reports\">DSA 报告</a> · <a href=\"/removals\">Google 删除</a> · <a href=\"/schema\">模式</a>。",
+        "P_SRC": "完全基于公开报告构建。整个流程——提取、规范化、对照表和查询层——已在 <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a> 开源。开始探索：<a href=\"/reports\">DSA 报告</a> · <a href=\"/removals\">Google 删除请求</a> · <a href=\"/schema\">模式</a>。",
         "TLEGEND": "这九张报告表的含义为：<code>t3</code> 成员国命令 · <code>t4</code> 通知（含可信举报者）· <code>t5</code> / <code>t6</code> 自主行动（非法内容 / 服务条款）· <code>t7</code> 申诉与累犯 · <code>t8</code> 自动化手段的使用 · <code>t9</code> 人力资源 · <code>t10</code> 平均月活跃接收者 · <code>t11</code> 定性描述。",
         "CITE_RULE": "<strong>署名：</strong>请将该数字归于报送它的平台；本站只应作为访问工具加以标注。",
-        "CITE_EX": "示例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href=\"/reports\">DSA 报告</a> 和 <a href=\"/removals\">Google 删除</a> 仪表板的“Cite as”一行中。"
+        "CITE_EX": "示例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href=\"/reports\">DSA 报告</a> 和 <a href=\"/removals\">Google 删除请求</a> 仪表板的“Cite as”一行中。"
     },
     "ko": {
         "TITLE": "방법론 · Transparency Report",
@@ -5518,7 +5518,7 @@ _METH = {
         "C1": "EU DSA 투명성 보고서",
         "D1": "유럽연합 디지털서비스법(DSA)에 따라 제공자가 게시하는 정기 콘텐츠 관리 통계로, DSA 제15조·제24조·제42조(각각 중개 서비스, 온라인 플랫폼, 초대형 플랫폼에 대한 보고 의무)가 요구하는 주기적 투명성 보고서입니다. 개별 처분 사유서(Statements of Reasons)를 다루는 별도의 실시간 DSA 투명성 데이터베이스와는 다릅니다. 제출자는 공통의 계층형 EU 템플릿을 사용하며, 각 제공자는 자신의 계층이 요구하는 보고 섹션만 작성합니다(이 데이터셋은 해당 섹션을 내부적으로 t3–t11로 색인합니다). 이는 EU 내 도달 범위로 인해 유럽연합 집행위원회가 공식적으로 <em>지정</em>한 초대형 온라인 플랫폼 및 검색 엔진(VLOPs / VLOSEs) — 더 자주, 더 상세히 보고하는 곳 — 과 함께 수십 개의 소규모 플랫폼을 아우릅니다. 실시간 집계와 대상 기간은 <a href=\"/reports\">DSA 보고서</a> 대시보드를 참조하십시오.",
         "C2": "Google 정부 삭제 요청",
-        "D2": "국가, 제품, 사유, 보고 기간별로 분류된, 콘텐츠 삭제를 요청하는 정부 요청에 대한 Google의 보고 집계치 — DSA 제출 자료가 아니라 Google이 오랫동안 자발적으로 작성해 온 자체 투명성 보고서입니다. <a href=\"/removals\">Google 삭제</a> 대시보드에서 살펴보세요.",
+        "D2": "국가, 제품, 사유, 보고 기간별로 분류된, 콘텐츠 삭제를 요청하는 정부 요청에 대한 Google의 보고 집계치 — DSA 제출 자료가 아니라 Google이 오랫동안 자발적으로 작성해 온 자체 투명성 보고서입니다. <a href=\"/removals\">Google 삭제 요청</a> 대시보드에서 살펴보세요.",
         "P_CAT": "각 플랫폼이 자체 기초 보고서를 어디에 공개하는지는 <a href=\"/catalog\">보고서 위치</a> 페이지에 정리되어 있으며, 원본 파일의 보관본 링크가 함께 제공됩니다.",
         "H_WHERE": "데이터의 출처",
         "P_WHERE": "모든 수치는 이를 공개한 플랫폼 또는 회사에서 비롯됩니다 — 이는 이 프로젝트가 산출한 추정치가 아니라 <em>그들이</em> 보고한 수치이며, 보고된 값을 변경하지 않고 그대로 재현한 것입니다. 여기에서의 기여는 <strong>집계와 구조화</strong>입니다. 개별적으로 공개된 보고서를 수집하고, 그 표를 추출하며, 비교와 질의가 가능하도록 하나의 스키마로 정규화하는 것입니다. 보고된 값 자체는 결코 수정되지 않습니다. 변환은 구조적인 것으로 — 추출, 집계 합계 행 표시, 언어 간 레이블 정규화, 파싱할 수 없는 행 제거 — 아래에 설명되어 있습니다.",
@@ -5544,10 +5544,10 @@ _METH = {
         "LC4": "시연용 서비스",
         "LD4": "이것은 포트폴리오/데모 프로젝트입니다. 출처에는 충실하지만 공식 기록은 아니므로 — 중요한 사안에 대해서는 항상 플랫폼이 직접 공개한 보고서(<a href=\"/catalog\">보고서 위치</a>에서 링크됨)와 대조하여 확인하세요.",
         "H_SRC": "출처 &amp; 코드",
-        "P_SRC": "전적으로 공개 보고 자료로 구축되었습니다. 추출, 정규화, 크로스워크, 쿼리 계층에 이르는 전체 파이프라인은 <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>에서 오픈 소스로 공개되어 있습니다. 탐색을 시작하세요: <a href=\"/reports\">DSA 보고서</a> · <a href=\"/removals\">Google 삭제</a> · <a href=\"/schema\">스키마</a>.",
+        "P_SRC": "전적으로 공개 보고 자료로 구축되었습니다. 추출, 정규화, 크로스워크, 쿼리 계층에 이르는 전체 파이프라인은 <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>에서 오픈 소스로 공개되어 있습니다. 탐색을 시작하세요: <a href=\"/reports\">DSA 보고서</a> · <a href=\"/removals\">Google 삭제 요청</a> · <a href=\"/schema\">스키마</a>.",
         "TLEGEND": "아홉 개의 보고서 표는 다음과 같이 해석됩니다: <code>t3</code> 회원국 명령 · <code>t4</code> 신고(신뢰할 수 있는 신고자 포함) · <code>t5</code> / <code>t6</code> 자체 발의 조치(불법 콘텐츠 / 서비스 약관) · <code>t7</code> 이의 제기 &amp; 재발 · <code>t8</code> 자동화 수단 사용 · <code>t9</code> 인적 자원 · <code>t10</code> 월평균 활성 수신자 · <code>t11</code> 정성적 설명.",
         "CITE_RULE": "<strong>출처 표기:</strong> 수치는 그것을 보고한 플랫폼에 귀속시키고, 이 사이트는 접근 도구로만 인용하십시오.",
-        "CITE_EX": "예: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 실시간 스냅샷의 정확한 데이터셋 버전과 대상 기간은 <a href=\"/reports\">DSA 보고서</a> 및 <a href=\"/removals\">Google 삭제</a> 대시보드의 “Cite as” 줄에 표시됩니다."
+        "CITE_EX": "예: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 실시간 스냅샷의 정확한 데이터셋 버전과 대상 기간은 <a href=\"/reports\">DSA 보고서</a> 및 <a href=\"/removals\">Google 삭제 요청</a> 대시보드의 “Cite as” 줄에 표시됩니다."
     },
     "it": {
         "TITLE": "Metodologia · Transparency Report",
