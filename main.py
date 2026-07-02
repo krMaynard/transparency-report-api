@@ -1136,6 +1136,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "korea_metrics": TableSpec(
+        "South Korea platform transparency reports — the half-yearly government data-request reports Naver and Kakao publish under Korea's network laws (Telecommunications Business Act + Protection of Communications Secrets Act): requests received / complied with / accounts provided, for the four legal request types (communications user information, communications confirmation data, communication-restricting measures, seizure warrants). A tidy-long table: one row per measured value, identified by platform × service × period × category × metric, with a `unit` (count/percent/average). Coverage 2012-H1 onward.",
+        "FROM korea_metrics f",
+        {
+            "platform": "f.platform",
+            "service":  "f.service",
+            "period":   "f.period",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3071,6 +3086,24 @@ def _leg_warnings(
                 "aggregate pins no 'section', so it may combine unrelated measures. "
                 "Filter or group by 'section'."
             )
+    # korea_metrics mixes counts, compliance-rate percents and per-request
+    # averages in one `value` column, and `requests`/`processed`/`accounts` are
+    # different quantities — pin both before aggregating.
+    if table == "korea_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "unit" not in pinned:
+            out.append(
+                "'korea_metrics' keeps counts, percent rates and averages in one "
+                "'value' column; this aggregate pins no 'unit', so it may sum a rate "
+                "with a count. Filter or group by 'unit'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'korea_metrics' reports requests, processed requests and accounts "
+                "provided as separate metrics; this aggregate pins no 'metric', so it "
+                "may add different quantities. Filter or group by 'metric'."
+            )
     return out
 
 
@@ -3506,7 +3539,9 @@ FIELD_HELP: dict[str, str] = {
     "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
     "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
     # ── India IT Rules (tidy-long india_metrics) ──
-    "unit": "What `value` measures in india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). Never SUM across different units; pin a unit before aggregating.",
+    "unit": "What `value` measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). Never SUM across different units; pin a unit before aggregating.",
+    # ── Korea transparency (tidy-long korea_metrics) ──
+    "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",
