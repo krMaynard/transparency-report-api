@@ -52,6 +52,8 @@ VENDORED_SNAP = os.path.join(REPO, "data", "snap-transparency.json")
 SNAP_SRC_REL = os.path.join("snap-transparency", "snap-transparency.json")
 VENDORED_INDIA = os.path.join(REPO, "data", "india-it-rules.json")
 INDIA_SRC_REL = os.path.join("india-it-rules", "india-it-rules.json")
+VENDORED_KOREA = os.path.join(REPO, "data", "korea-transparency.json")
+KOREA_SRC_REL = os.path.join("korea-transparency", "korea-transparency.json")
 RL_HEADER = "platform,company,category,confidence,harmonised_template,format_period,url_label,url,archived"
 
 
@@ -149,6 +151,8 @@ def main() -> int:
     snap_present = os.path.isfile(snap_src)
     india_src = os.path.join(args.data_repo, INDIA_SRC_REL)
     india_present = os.path.isfile(india_src)
+    korea_src = os.path.join(args.data_repo, KOREA_SRC_REL)
+    korea_present = os.path.isfile(korea_src)
 
     if not args.check:
         sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
@@ -161,6 +165,8 @@ def main() -> int:
             shutil.copyfile(snap_src, VENDORED_SNAP)
         if india_present:
             shutil.copyfile(india_src, VENDORED_INDIA)
+        if korea_present:
+            shutil.copyfile(korea_src, VENDORED_KOREA)
 
     verb = "Would re-vendor" if args.check else "Re-vendored"
     lines = [
@@ -174,6 +180,7 @@ def main() -> int:
         f"- `data/github-transparency.json` — {'present upstream' if github_present else '**missing upstream — skipped**'}",
         f"- `data/snap-transparency.json` — {'present upstream' if snap_present else '**missing upstream — skipped**'}",
         f"- `data/india-it-rules.json` — {'present upstream' if india_present else '**missing upstream — skipped**'}",
+        f"- `data/korea-transparency.json` — {'present upstream' if korea_present else '**missing upstream — skipped**'}",
         "",
     ]
     if uncurated:

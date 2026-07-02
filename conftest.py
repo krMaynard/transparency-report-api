@@ -151,6 +151,24 @@ _INDIA_FIXTURE = {
 }
 seed.build_india_db(_INDIA_FIXTURE, _DB)
 
+# A small slice of the Korea transparency dataset (korea-transparency.json shape).
+# [platform, service, period, category, metric, unit, value]
+_KOREA_FIXTURE = {
+    "columns": ["platform", "service", "period", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Naver", "", "2025-H2", "seizure_warrant", "requests", "count", 4355],
+        ["Naver", "", "2025-H2", "seizure_warrant", "processed", "count", 3028],
+        ["Naver", "", "2025-H2", "seizure_warrant", "accounts", "count", 371271],
+        ["Naver", "", "2025-H2", "seizure_warrant", "processed_rate", "percent", 70],
+        ["Naver", "", "2025-H2", "seizure_warrant", "accounts_per_processed", "average", 123],
+        ["Kakao", "Kakao", "2024-H2", "seizure_warrant", "requests", "count", 14596],
+        ["Kakao", "Daum", "2024-H2", "comm_confirmation_data", "requests", "count", 759],
+        # zero is reported data (both platforms stopped providing 통신자료 in 2012)
+        ["Kakao", "Kakao", "2024-H2", "comm_user_information", "processed", "count", 0],
+    ],
+}
+seed.build_korea_db(_KOREA_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /

@@ -2471,6 +2471,84 @@ class TestIndiaTable:
         assert all(len(r) == 7 for r in data["rows"][:50])
 
 
+class TestKoreaTable:
+    def test_korea_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "korea_metrics" in names
+
+    def test_korea_fields_endpoint(self):
+        body = client.get("/api/fields?table=korea_metrics", headers=MOMO).json()
+        assert {"platform", "service", "period", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_korea_warrant_value(self):
+        # Naver 2025-H2 seizure-warrant requests = 4355 (fixture).
+        job = _submit_and_wait({
+            "table": "korea_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["Naver"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["seizure_warrant"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 4355
+
+    def test_korea_service_split(self):
+        # Kakao splits by service corp; the Daum row is distinct from Kakao's.
+        job = _submit_and_wait({
+            "table": "korea_metrics",
+            "fields": ["service", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["Kakao"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["comm_confirmation_data"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["Daum", 759]]
+
+    def test_korea_warns_on_mixed_unit_aggregation(self):
+        # Summing `value` without pinning unit/metric mixes rates with counts.
+        q = {"table": "korea_metrics", "group_by": ["platform"],
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        warns = d.get("warnings", [])
+        assert any("unit" in w for w in warns)
+        assert any("metric" in w for w in warns)
+
+    def test_korea_no_warning_when_pinned(self):
+        q = {"table": "korea_metrics", "group_by": ["platform"],
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "unit", "field_values": ["count"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        assert "warnings" not in client.post("/api/explore", json=q).json()
+
+    def test_korea_warns_on_summing_percentages(self):
+        # Pinning unit=percent doesn't make a rate summable — SUM still warns.
+        q = {"table": "korea_metrics", "group_by": ["platform"],
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "unit", "field_values": ["percent"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["processed_rate"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("statistically meaningful" in w for w in d.get("warnings", []))
+
+    def test_vendored_korea_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("korea-transparency.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["platform", "service", "period", "category",
+                                    "metric", "unit", "value"]
+        assert all(len(r) == 7 for r in data["rows"][:50])
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:

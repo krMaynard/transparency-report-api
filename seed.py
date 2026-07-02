@@ -60,6 +60,11 @@ _DEFAULT_SNAP_SOURCE = os.getenv(
 _DEFAULT_INDIA_SOURCE = os.getenv(
     "SEED_INDIA_SOURCE_JSON", os.path.join(HERE, "data", "india-it-rules.json")
 )
+# Korea (Naver + Kakao) transparency reports — vendored in-repo (from the
+# sibling data repo's korea-transparency/build_korea.py).
+_DEFAULT_KOREA_SOURCE = os.getenv(
+    "SEED_KOREA_SOURCE_JSON", os.path.join(HERE, "data", "korea-transparency.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -314,6 +319,23 @@ CREATE TABLE india_metrics (
     value    REAL
 );
 CREATE INDEX idx_india_section ON india_metrics(section);
+
+-- Korea (Naver + Kakao) transparency reports (korea-transparency/build_korea.py).
+-- Tidy-long: one row per measured value from the half-yearly government
+-- data-request reports. `value` is REAL because Naver also reports compliance
+-- rates (percent) and accounts-per-request averages (see `unit`). Dims inline.
+CREATE TABLE korea_metrics (
+    platform TEXT NOT NULL,   -- Naver / Kakao (reporting company)
+    service  TEXT NOT NULL,   -- Kakao splits by corp (Daum/Kakao); Naver = ''
+    period   TEXT NOT NULL,   -- half-year, 'YYYY-H1' / 'YYYY-H2'
+    category TEXT NOT NULL,   -- comm_user_information / comm_confirmation_data /
+                              -- comm_restriction / seizure_warrant
+    metric   TEXT NOT NULL,   -- requests / processed / accounts / processed_rate /
+                              -- accounts_per_processed
+    unit     TEXT NOT NULL,   -- count / percent / average
+    value    REAL
+);
+CREATE INDEX idx_korea_category ON korea_metrics(category);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -737,6 +759,36 @@ def build_india_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_korea_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the korea_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long korea-transparency.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("korea dataset is None")
+    expected_cols = ["platform", "service", "period", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"korea dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("korea dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO korea_metrics (platform, service, period, category, "
+                "metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -802,6 +854,8 @@ def main() -> None:
                         help="Path to snap-transparency.json")
     parser.add_argument("--india-source", default=_DEFAULT_INDIA_SOURCE,
                         help="Path to india-it-rules.json")
+    parser.add_argument("--korea-source", default=_DEFAULT_KOREA_SOURCE,
+                        help="Path to korea-transparency.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -883,6 +937,16 @@ def main() -> None:
               f"{len({r[1] for r in india_data['rows']})} periods")
     else:
         print(f"  (skipping India IT Rules — not found: {args.india_source})")
+
+    if os.path.isfile(args.korea_source):
+        with open(args.korea_source, "r", encoding="utf-8") as f:
+            korea_data = json.load(f)
+        korea_rows = build_korea_db(korea_data, args.db)
+        print(f"  korea transparency: {korea_rows} metric rows across "
+              f"{len({r[0] for r in korea_data['rows']})} platforms, "
+              f"{len({r[2] for r in korea_data['rows']})} periods")
+    else:
+        print(f"  (skipping Korea transparency — not found: {args.korea_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).
