@@ -2528,6 +2528,17 @@ class TestKoreaTable:
              "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
         assert "warnings" not in client.post("/api/explore", json=q).json()
 
+    def test_korea_warns_on_summing_percentages(self):
+        # Pinning unit=percent doesn't make a rate summable — SUM still warns.
+        q = {"table": "korea_metrics", "group_by": ["platform"],
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "unit", "field_values": ["percent"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["processed_rate"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        assert any("statistically meaningful" in w for w in d.get("warnings", []))
+
     def test_vendored_korea_dataset_shape(self):
         import json
         import pathlib

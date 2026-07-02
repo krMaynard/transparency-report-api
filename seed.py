@@ -766,6 +766,8 @@ def build_korea_db(data: dict[str, Any], db_path: str) -> int:
     tidy-long korea-transparency.json (`columns` header + `rows` in column order).
     Returns the fact-row count.
     """
+    if data is None:
+        raise ValueError("korea dataset is None")
     expected_cols = ["platform", "service", "period", "category", "metric",
                      "unit", "value"]
     if data.get("columns") != expected_cols:

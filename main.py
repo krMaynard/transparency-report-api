@@ -3104,6 +3104,19 @@ def _leg_warnings(
                 "provided as separate metrics; this aggregate pins no 'metric', so it "
                 "may add different quantities. Filter or group by 'metric'."
             )
+        # Pinning doesn't make a rate or an average summable — warn when a SUM
+        # explicitly targets the non-additive units/metrics.
+        if any(a.function == "SUM" and a.field_name == "value" for a in aggregates):
+            filt = (*(query.and_ or ()), *(query.or_ or ()), *(query.not_ or ()))
+            pinned_units = {v for c in filt if c.field_name == "unit"
+                            for v in c.field_values}
+            pinned_metrics = {v for c in filt if c.field_name == "metric"
+                              for v in c.field_values}
+            if pinned_units & {"percent", "average"} or                     pinned_metrics & {"processed_rate", "accounts_per_processed"}:
+                out.append(
+                    "korea_metrics SUM over a 'percent'/'average' value isn't "
+                    "statistically meaningful — read it per row instead."
+                )
     return out
 
 
