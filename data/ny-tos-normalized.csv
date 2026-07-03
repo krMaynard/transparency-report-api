@@ -1,0 +1,1091 @@
+company,period,shha_category,original_label,content_format,grain,metric,submetric,value,unit,page
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Account Action Reason,Appeals Granted,0,count,15
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Account Action Reason,Appeals Submitted,0,count,15
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Accounts Disabled,,0,count,13
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Individual Accounts Warned,,5,count,12
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Server Member Warnings,,1,count,13
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Servers Removed Proactively,,1,count,13
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Servers Removed Reactively,,0,count,14
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Servers Warned,,0,count,13
+discord-inc,2025 Q3,disinformation_or_misinformation,(C) Disinformation or misinformation,,category_total,Total Servers Removed,,1,count,14
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Account Action Reason,Appeals Granted,10,count,15
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Account Action Reason,Appeals Submitted,6854,count,15
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Accounts Disabled,,10689,count,13
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Individual Accounts Warned,,755,count,12
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Server Member Warnings,,28494,count,13
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Servers Removed Proactively,,782,count,13
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Servers Removed Reactively,,63,count,14
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Servers Warned,,27,count,13
+discord-inc,2025 Q3,extremism_or_radicalization,(B) Extremism or radicalization,,category_total,Total Servers Removed,,845,count,14
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Account Action Reason,Appeals Granted,94,count,15
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Account Action Reason,Appeals Submitted,31836,count,15
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Accounts Disabled,,1429,count,13
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Individual Accounts Warned,,24441,count,12
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Server Member Warnings,,662,count,13
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Servers Removed Proactively,,423,count,13
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Servers Removed Reactively,,182,count,14
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Servers Warned,,130,count,13
+discord-inc,2025 Q3,harassment,(D) Harassment,,category_total,Total Servers Removed,,605,count,14
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Account Action Reason,Appeals Granted,644,count,15
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Account Action Reason,Appeals Submitted,10742,count,15
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Accounts Disabled,,279,count,13
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Individual Accounts Warned,,47795,count,12
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Server Member Warnings,,1164,count,13
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Servers Removed Proactively,,174,count,13
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Servers Removed Reactively,,22,count,14
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Servers Warned,,926,count,13
+discord-inc,2025 Q3,hate_speech_or_racism,(A) Hate speech or racism,,category_total,Total Servers Removed,,196,count,14
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,,,303655,count,7
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,,,11688655,count,7
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,,,7661,count,7
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,,,576,count,8
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,,,40,count,8
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,,Number of viewers,5551045,count,7
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,LinkedIn Policy5,,16601,count,7
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,LinkedIn Policy5,Number of actioned items of content,45156,count,7
+linkedin-corporation,2025 Q3,disinformation_or_misinformation,False and misleading,,category_total,LinkedIn Policy5,Number of items of content where LinkedIn applied Action 1,28555,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,,,47006,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,,,564810,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,,,226,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,,,77,count,8
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,,,1,count,8
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,,Number of viewers,6795042,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,LinkedIn Policy5,,0,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,LinkedIn Policy5,Number of actioned items of content,2100,count,7
+linkedin-corporation,2025 Q3,extremism_or_radicalization,Dangerous organizations or individuals,,category_total,LinkedIn Policy5,Number of items of content where LinkedIn applied Action 1,2100,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,,,109394,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,,,4500143,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,,,402,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,,,1272,count,8
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,,,11,count,8
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,,Number of viewers,2382676,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,LinkedIn Policy5,,0,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,LinkedIn Policy5,Number of actioned items of content,30359,count,7
+linkedin-corporation,2025 Q3,harassment,Harassment,,category_total,LinkedIn Policy5,Number of items of content where LinkedIn applied Action 1,30359,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,,,277925,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,,,12393945,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,,,5559,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,,,6051,count,8
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,,,161,count,8
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,,Number of viewers,6220983,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,LinkedIn Policy5,,0,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,LinkedIn Policy5,Number of actioned items of content,111857,count,7
+linkedin-corporation,2025 Q3,hate_speech_or_racism,Hateful and derogatory,,category_total,LinkedIn Policy5,Number of items of content where LinkedIn applied Action 1,111857,count,7
+naver-corporation,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,_ CATEGORY,2025 3Q,523,count,9
+naver-corporation,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,_ CATEGORY,2025 3Q,25,count,10
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Sanction Type,% of appeals that resulted in a reversal of action,0.5,percent,7
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Sanction Type,% of appeals that resulted in a reversal of action,0.5,percent,7
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Sanction Type,Appeals Volume,364,count,7
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Sanction Type,Appeals Volume,372,count,7
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Violation Type,Actionability (reported/falgged vs. removed),48.0,percent,6
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Violation Type,Flagged by Reddit automation,81.0,percent,6
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Violation Type,User Reports,19.0,percent,6
+reddit-inc,2025 Q3,extremism_or_radicalization,Terrorism,,category_total,Violation Type,Volume,980,count,6
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Sanction Type,% of appeals that resulted in a reversal of action,40.7,percent,7
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Sanction Type,% of appeals that resulted in a reversal of action,25.0,percent,7
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Sanction Type,Appeals Volume,71114,count,7
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Sanction Type,Appeals Volume,48970,count,7
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Violation Type,Actionability (reported/falgged vs. removed),0.6,percent,6
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Violation Type,Flagged by Reddit automation,58.6,percent,6
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Violation Type,User Reports,41.4,percent,6
+reddit-inc,2025 Q3,harassment,Harassment,,category_total,Violation Type,Volume,68550,count,6
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Sanction Type,% of appeals that resulted in a reversal of action,30.0,percent,7
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Sanction Type,% of appeals that resulted in a reversal of action,27.6,percent,7
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Sanction Type,Appeals Volume,53021,count,7
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Sanction Type,Appeals Volume,40987,count,7
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Violation Type,Actionability (reported/falgged vs. removed),0.9,percent,6
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Violation Type,Flagged by Reddit automation,77.2,percent,6
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Violation Type,User Reports,22.8,percent,6
+reddit-inc,2025 Q3,hate_speech_or_racism,Hateful content,,category_total,Violation Type,Volume,98798,count,6
+roblox-corporation,2025 Q3,extremism_or_radicalization,Terrorism and Violent Extremism,,category_total,Violation Category → Actions With User Consequences,Actions With User Consequences,286,count,7
+roblox-corporation,2025 Q3,extremism_or_radicalization,Terrorism and Violent Extremism,,category_total,Violation Category → Approved Appeals / Total Appeals,Approved Appeals,7056,count,10
+roblox-corporation,2025 Q3,extremism_or_radicalization,Terrorism and Violent Extremism,,category_total,Violation Category → Approved Appeals / Total Appeals,Total Appeals,20089,count,10
+roblox-corporation,2025 Q3,extremism_or_radicalization,Terrorism and Violent Extremism,,category_total,Violation Category → Content Removed,Content Removed,14037,count,9
+roblox-corporation,2025 Q3,extremism_or_radicalization,Terrorism and Violent Extremism,,category_total,Violation Category → Total Actions,Total Actions,14226,count,5
+roblox-corporation,2025 Q3,extremism_or_radicalization,Terrorism and Violent Extremism,,category_total,Violation Category → Total Flagged,Total Flagged,14226,count,4
+roblox-corporation,2025 Q3,harassment,"Threats, Bullying & Harassment",,category_total,Violation Category → Actions With User Consequences,Actions With User Consequences,16449409,count,7
+roblox-corporation,2025 Q3,harassment,"Threats, Bullying & Harassment",,category_total,Violation Category → Content Removed,Content Removed,96969,count,9
+roblox-corporation,2025 Q3,harassment,"Threats, Bullying & Harassment",,category_total,Violation Category → Total Actions,Total Actions,16514670,count,5
+roblox-corporation,2025 Q3,harassment,"Threats, Bullying, and Harassment",,category_total,Violation Category → Approved Appeals / Total Appeals,Approved Appeals,342452,count,10
+roblox-corporation,2025 Q3,harassment,"Threats, Bullying, and Harassment",,category_total,Violation Category → Approved Appeals / Total Appeals,Total Appeals,3979194,count,10
+roblox-corporation,2025 Q3,harassment,"Threats, Bullying, and Harassment",,category_total,Violation Category → Total Flagged,Total Flagged,16514670,count,4
+roblox-corporation,2025 Q3,hate_speech_or_racism,"Discrimination, Slurs, and Hate Speech",,category_total,Violation Category → Actions With User Consequences,Actions With User Consequences,3393157,count,7
+roblox-corporation,2025 Q3,hate_speech_or_racism,"Discrimination, Slurs, and Hate Speech",,category_total,Violation Category → Approved Appeals / Total Appeals,Approved Appeals,81350,count,10
+roblox-corporation,2025 Q3,hate_speech_or_racism,"Discrimination, Slurs, and Hate Speech",,category_total,Violation Category → Approved Appeals / Total Appeals,Total Appeals,582318,count,10
+roblox-corporation,2025 Q3,hate_speech_or_racism,"Discrimination, Slurs, and Hate Speech",,category_total,Violation Category → Content Removed,Content Removed,206530,count,9
+roblox-corporation,2025 Q3,hate_speech_or_racism,"Discrimination, Slurs, and Hate Speech",,category_total,Violation Category → Total Actions,Total Actions,3419816,count,5
+roblox-corporation,2025 Q3,hate_speech_or_racism,"Discrimination, Slurs, and Hate Speech",,category_total,Violation Category → Total Flagged,Total Flagged,3419816,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,accounts_enforced_automated,593,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,accounts_enforced_human,113,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,content_enforced_automated,593,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,content_enforced_human,145,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,flagged_total,386210,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,lock_appeals_automated,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,lock_appeals_human,1,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,reinstated_automated,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,reinstated_human,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,unique_viewer_rate_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,unique_viewer_rate_human_pct,0.01,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,vvr_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,human_report,vvr_human_pct,3e-06,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,accounts_enforced_automated,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,accounts_enforced_human,10,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,content_enforced_automated,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,content_enforced_human,10,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,flagged_total,262,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,lock_appeals_automated,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,lock_appeals_human,1,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,reinstated_automated,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,reinstated_human,0,count,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,unique_viewer_rate_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,unique_viewer_rate_human_pct,0.0,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,vvr_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,disinformation_or_misinformation,False Information,,category_total,proactive_detection,vvr_human_pct,0.0,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,accounts_enforced_automated,54,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,accounts_enforced_human,468,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,content_enforced_automated,54,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,content_enforced_human,559,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,flagged_total,199245,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,lock_appeals_automated,0,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,lock_appeals_human,199,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,reinstated_automated,0,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,reinstated_human,1,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,unique_viewer_rate_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,unique_viewer_rate_human_pct,0.07,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,vvr_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,human_report,vvr_human_pct,3.7e-05,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,accounts_enforced_automated,0,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,accounts_enforced_human,3754,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,content_enforced_automated,0,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,content_enforced_human,5901,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,flagged_total,12240,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,lock_appeals_automated,38,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,lock_appeals_human,11,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,reinstated_automated,6,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,reinstated_human,1,count,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,unique_viewer_rate_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,unique_viewer_rate_human_pct,0.0,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,vvr_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,extremism_or_radicalization,Terrorism & Violent Extremism,,category_total,proactive_detection,vvr_human_pct,0.0,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,accounts_enforced_automated,491972,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,accounts_enforced_human,624142,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,content_enforced_automated,604798,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,content_enforced_human,756736,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,flagged_total,3184734,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,lock_appeals_automated,0,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,lock_appeals_human,700,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,reinstated_automated,0,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,reinstated_human,17,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,unique_viewer_rate_automated_pct,0.35,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,unique_viewer_rate_human_pct,1.93,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,vvr_automated_pct,0.000168,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,human_report,vvr_human_pct,0.001135,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,accounts_enforced_automated,1428,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,accounts_enforced_human,7670,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,content_enforced_automated,1583,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,content_enforced_human,8972,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,flagged_total,12293,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,lock_appeals_automated,13442,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,lock_appeals_human,17,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,reinstated_automated,97,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,reinstated_human,1,count,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,unique_viewer_rate_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,unique_viewer_rate_human_pct,0.02,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,vvr_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,harassment,Harassment,,category_total,proactive_detection,vvr_human_pct,7e-06,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,accounts_enforced_automated,18343,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,accounts_enforced_human,123835,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,content_enforced_automated,20679,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,content_enforced_human,144389,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,flagged_total,482240,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,lock_appeals_automated,0,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,lock_appeals_human,94,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,reinstated_automated,0,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,reinstated_human,5,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,unique_viewer_rate_automated_pct,0.01,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,unique_viewer_rate_human_pct,0.41,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,vvr_automated_pct,4e-06,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,human_report,vvr_human_pct,0.000205,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,accounts_enforced_automated,29,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,accounts_enforced_human,2029,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,content_enforced_automated,32,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,content_enforced_human,2441,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,flagged_total,3073,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,lock_appeals_automated,1164,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,lock_appeals_human,7,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,reinstated_automated,15,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,reinstated_human,1,count,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,unique_viewer_rate_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,unique_viewer_rate_human_pct,0.0,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,vvr_automated_pct,0.0,percent,4
+snap-inc,2025 Q3,hate_speech_or_racism,Hate Speech,,category_total,proactive_detection,vvr_human_pct,2e-06,percent,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned,actioned_by_employees,18,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned,actioned_total,18,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned,flagged_by_users,18,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,flagged,actioned_by_employees,538,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,flagged,flagged_by_users,16465,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information,,category_total,flagged,flagged_total,16465,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned,actioned_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned,actioned_total,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned,flagged_by_users,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,flagged,actioned_by_employees,1,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,flagged,flagged_by_users,221,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Activity,Activity,breakdown,flagged,flagged_total,221,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned,actioned_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned,actioned_total,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned,flagged_by_users,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,flagged,actioned_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,flagged,flagged_by_users,574,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Club,Club,breakdown,flagged,flagged_total,574,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned,actioned_by_employees,3,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned,actioned_total,3,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned,flagged_by_users,3,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,flagged,actioned_by_employees,443,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,flagged,flagged_by_users,1229,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Comment,Comment,breakdown,flagged,flagged_total,1229,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned,actioned_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned,actioned_total,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned,flagged_by_users,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,flagged,actioned_by_employees,2,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,flagged,flagged_by_users,284,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Photo,Photo,breakdown,flagged,flagged_total,284,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned,actioned_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned,actioned_total,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned,flagged_by_users,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,flagged,actioned_by_employees,70,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,flagged,flagged_by_users,428,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Post,Post,breakdown,flagged,flagged_total,428,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned,actioned_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned,actioned_total,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned,flagged_by_users,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,flagged,actioned_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,flagged,flagged_by_users,7902,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Profile,Profile,breakdown,flagged,flagged_total,7902,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned,actioned_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned,actioned_total,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned,flagged_by_users,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,flagged,actioned_by_employees,1,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,flagged,flagged_by_users,10,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information - Video,Video,breakdown,flagged,flagged_total,10,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned,actioned_by_employees,15,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned,actioned_total,15,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned,flagged_by_users,15,count,6
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,flagged,actioned_by_employees,21,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,flagged,flagged_by_users,5817,count,4
+strava-inc,2025 Q3,disinformation_or_misinformation,False or misleading information- Segment,Segment,breakdown,flagged,flagged_total,5817,count,4
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned,actioned_by_employees,481,count,5
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned,actioned_by_technology,51,count,5
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned,actioned_total,532,count,5
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned,flagged_by_employees,3,count,5
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned,flagged_by_technology,51,count,5
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned,flagged_by_users,478,count,5
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_shared,actioned_by_employees,4,count,10
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_shared,flagged_by_users,4,count,10
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_shared,times_shared,4,count,10
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_user_action,actioned_by_employees,96,count,7
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_user_action,actions_against_users,96,count,7
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,harassment,Harassment,,category_total,actioned_user_action,flagged_by_users,96,count,7
+strava-inc,2025 Q3,harassment,Harassment,,category_total,appeals,appeals,3,count,13
+strava-inc,2025 Q3,harassment,Harassment,,category_total,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment,,category_total,appeals,reversed_content_not_restored,1,count,13
+strava-inc,2025 Q3,harassment,Harassment,,category_total,appeals,reversed_content_restored,2,count,13
+strava-inc,2025 Q3,harassment,Harassment,,category_total,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment,,category_total,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment,,category_total,flagged,actioned_by_employees,1040,count,3
+strava-inc,2025 Q3,harassment,Harassment,,category_total,flagged,actioned_by_technology,30,count,3
+strava-inc,2025 Q3,harassment,Harassment,,category_total,flagged,flagged_by_employees,7,count,3
+strava-inc,2025 Q3,harassment,Harassment,,category_total,flagged,flagged_by_technology,2845,count,3
+strava-inc,2025 Q3,harassment,Harassment,,category_total,flagged,flagged_by_users,10268,count,3
+strava-inc,2025 Q3,harassment,Harassment,,category_total,flagged,flagged_total,13120,count,3
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned,actioned_by_employees,7,count,5
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned,actioned_total,7,count,5
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned,flagged_by_users,7,count,5
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,flagged,actioned_by_employees,7,count,3
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,flagged,flagged_by_technology,778,count,3
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,flagged,flagged_by_users,9,count,3
+strava-inc,2025 Q3,harassment,Harassment - Activity,Activity,breakdown,flagged,flagged_total,787,count,3
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned,actioned_by_employees,1,count,5
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned,actioned_total,1,count,5
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned,flagged_by_users,1,count,5
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,flagged,actioned_by_employees,1,count,3
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,flagged,flagged_by_users,401,count,3
+strava-inc,2025 Q3,harassment,Harassment - Club,Club,breakdown,flagged,flagged_total,401,count,3
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned,actioned_by_employees,411,count,5
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned,actioned_total,411,count,5
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned,flagged_by_employees,3,count,5
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned,flagged_by_users,408,count,5
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_user_action,actioned_by_employees,86,count,8
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_user_action,actions_against_users,86,count,8
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,actioned_user_action,flagged_by_users,86,count,8
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,flagged,actioned_by_employees,965,count,3
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,flagged,flagged_by_employees,4,count,3
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,flagged,flagged_by_technology,1513,count,3
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,flagged,flagged_by_users,2712,count,3
+strava-inc,2025 Q3,harassment,Harassment - Comment,Comment,breakdown,flagged,flagged_total,4229,count,3
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned,actioned_by_employees,3,count,5
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned,actioned_total,3,count,5
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned,flagged_by_users,3,count,5
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,flagged,actioned_by_employees,3,count,3
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,flagged,flagged_by_users,3,count,3
+strava-inc,2025 Q3,harassment,Harassment - Other,Other,breakdown,flagged,flagged_total,3,count,3
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned,actioned_by_employees,4,count,5
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned,actioned_total,4,count,5
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned,flagged_by_users,4,count,5
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,appeals,appeals,1,count,13
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,appeals,reversed_content_restored,1,count,13
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,flagged,actioned_by_employees,3,count,3
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,flagged,flagged_by_users,187,count,3
+strava-inc,2025 Q3,harassment,Harassment - Photo,Photo,breakdown,flagged,flagged_total,187,count,3
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned,actioned_by_employees,11,count,5
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned,actioned_by_technology,51,count,5
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned,actioned_total,62,count,5
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned,flagged_by_technology,51,count,5
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned,flagged_by_users,11,count,5
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_shared,actioned_by_employees,3,count,11
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_shared,flagged_by_users,3,count,11
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_shared,times_shared,3,count,11
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_user_action,actioned_by_employees,2,count,8
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_user_action,actions_against_users,2,count,8
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,actioned_user_action,flagged_by_users,2,count,8
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,flagged,actioned_by_employees,26,count,3
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,flagged,actioned_by_technology,30,count,3
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,flagged,flagged_by_employees,2,count,3
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,flagged,flagged_by_technology,406,count,3
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,flagged,flagged_by_users,248,count,3
+strava-inc,2025 Q3,harassment,Harassment - Post,Post,breakdown,flagged,flagged_total,656,count,3
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned,actioned_by_employees,12,count,6
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned,actioned_total,12,count,6
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned,flagged_by_users,12,count,6
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,appeals,appeals,1,count,13
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,appeals,reversed_content_restored,1,count,13
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,flagged,actioned_by_employees,12,count,4
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,flagged,flagged_by_technology,143,count,4
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,flagged,flagged_by_users,6522,count,4
+strava-inc,2025 Q3,harassment,Harassment - Profile,Profile,breakdown,flagged,flagged_total,6665,count,4
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned,actioned_by_employees,30,count,6
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned,actioned_total,30,count,6
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned,flagged_by_users,30,count,6
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_shared,actioned_by_employees,1,count,11
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_shared,flagged_by_users,1,count,11
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_shared,times_shared,1,count,11
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_user_action,actioned_by_employees,8,count,8
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_user_action,actions_against_users,8,count,8
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,actioned_user_action,flagged_by_users,8,count,8
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,appeals,appeals,1,count,13
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,appeals,reversed_content_not_restored,1,count,13
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,flagged,actioned_by_employees,23,count,4
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,flagged,flagged_by_employees,1,count,4
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,flagged,flagged_by_technology,5,count,4
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,flagged,flagged_by_users,173,count,4
+strava-inc,2025 Q3,harassment,Harassment - Segment,Segment,breakdown,flagged,flagged_total,179,count,4
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned,actioned_by_employees,2,count,6
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned,actioned_by_technology,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned,actioned_total,2,count,6
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned,flagged_by_employees,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned,flagged_by_technology,0,count,6
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned,flagged_by_users,2,count,6
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_shared,actioned_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_shared,actioned_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_shared,flagged_by_employees,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_shared,flagged_by_technology,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_shared,flagged_by_users,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_shared,times_shared,0,count,11
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_user_action,actioned_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_user_action,actioned_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_user_action,actions_against_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_user_action,flagged_by_employees,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_user_action,flagged_by_technology,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,actioned_user_action,flagged_by_users,0,count,8
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,appeals,appeals,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,appeals,no_action,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,appeals,reversed_content_not_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,appeals,reversed_content_restored,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,appeals,upheld_changed_enforcement,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,appeals,upheld_no_change,0,count,13
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,flagged,actioned_by_employees,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,flagged,actioned_by_technology,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,flagged,flagged_by_employees,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,flagged,flagged_by_technology,0,count,4
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,flagged,flagged_by_users,13,count,4
+strava-inc,2025 Q3,harassment,Harassment - Video,Video,breakdown,flagged,flagged_total,13,count,4
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned,actioned_by_employees,83,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned,actioned_by_technology,27,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned,actioned_total,110,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned,flagged_by_employees,3,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned,flagged_by_technology,27,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned,flagged_by_users,80,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_shared,actioned_by_employees,237,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_shared,flagged_by_users,237,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_shared,times_shared,237,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_user_action,actioned_by_employees,47,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_user_action,actions_against_users,47,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_user_action,flagged_by_employees,2,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,actioned_user_action,flagged_by_users,45,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,appeals,appeals,6,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,appeals,reversed_content_restored,6,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,flagged,actioned_by_employees,431,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,flagged,actioned_by_technology,17,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,flagged,flagged_by_employees,4,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,flagged,flagged_by_technology,4732,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,flagged,flagged_by_users,3976,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content,,category_total,flagged,flagged_total,8712,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned,actioned_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned,actioned_total,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned,flagged_by_users,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,appeals,appeals,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,appeals,reversed_content_restored,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,flagged,actioned_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,flagged,flagged_by_technology,1355,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,flagged,flagged_by_users,3,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Activity,Activity,breakdown,flagged,flagged_total,1358,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned,actioned_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned,actioned_total,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned,flagged_by_users,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,appeals,appeals,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,appeals,reversed_content_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,flagged,actioned_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,flagged,flagged_by_users,434,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Club,Club,breakdown,flagged,flagged_total,434,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned,actioned_by_employees,48,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned,actioned_total,48,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned,flagged_by_employees,2,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned,flagged_by_users,46,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_user_action,actioned_by_employees,31,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_user_action,actions_against_users,31,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_user_action,flagged_by_employees,1,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,actioned_user_action,flagged_by_users,30,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,appeals,appeals,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,appeals,reversed_content_restored,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,flagged,actioned_by_employees,239,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,flagged,flagged_by_employees,1,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,flagged,flagged_by_technology,2165,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,flagged,flagged_by_users,1428,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Comment,Comment,breakdown,flagged,flagged_total,3594,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned,actioned_by_employees,1,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned,actioned_total,1,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned,flagged_by_users,1,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,appeals,appeals,2,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,appeals,reversed_content_restored,2,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,flagged,actioned_by_employees,1,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,flagged,flagged_by_users,1,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Other,Other,breakdown,flagged,flagged_total,1,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned,actioned_by_employees,9,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned,actioned_total,9,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned,flagged_by_users,9,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_user_action,actioned_by_employees,5,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_user_action,actions_against_users,5,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,actioned_user_action,flagged_by_users,5,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,appeals,appeals,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,appeals,reversed_content_restored,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,flagged,actioned_by_employees,7,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,flagged,flagged_by_users,78,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Photo,Photo,breakdown,flagged,flagged_total,78,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned,actioned_by_employees,14,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned,actioned_by_technology,26,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned,actioned_total,40,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned,flagged_by_employees,1,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned,flagged_by_technology,26,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned,flagged_by_users,13,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_shared,actioned_by_employees,237,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_shared,flagged_by_users,237,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_shared,times_shared,237,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_user_action,actioned_by_employees,10,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_user_action,actions_against_users,10,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_user_action,flagged_by_employees,1,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,actioned_user_action,flagged_by_users,9,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,appeals,appeals,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,appeals,reversed_content_restored,1,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,flagged,actioned_by_employees,131,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,flagged,actioned_by_technology,16,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,flagged,flagged_by_employees,1,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,flagged,flagged_by_technology,953,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,flagged,flagged_by_users,532,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Post,Post,breakdown,flagged,flagged_total,1486,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned,actioned_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned,actioned_total,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned,flagged_by_users,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,appeals,appeals,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,appeals,reversed_content_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,flagged,actioned_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,flagged,flagged_by_technology,248,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,flagged,flagged_by_users,1142,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Profile,Profile,breakdown,flagged,flagged_total,1390,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned,actioned_by_employees,11,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned,actioned_by_technology,1,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned,actioned_total,12,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned,flagged_by_technology,1,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned,flagged_by_users,11,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_user_action,actioned_by_employees,1,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_user_action,actions_against_users,1,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,actioned_user_action,flagged_by_users,1,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,appeals,appeals,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,appeals,reversed_content_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,flagged,actioned_by_employees,53,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,flagged,actioned_by_technology,1,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,flagged,flagged_by_employees,2,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,flagged,flagged_by_technology,11,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,flagged,flagged_by_users,354,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Segment,Segment,breakdown,flagged,flagged_total,367,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned,actioned_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned,actioned_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned,actioned_total,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned,flagged_by_employees,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned,flagged_by_technology,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned,flagged_by_users,0,count,5
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_shared,actioned_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_shared,actioned_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_shared,flagged_by_employees,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_shared,flagged_by_technology,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_shared,flagged_by_users,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_shared,times_shared,0,count,10
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_user_action,actioned_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_user_action,actioned_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_user_action,actions_against_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_user_action,flagged_by_employees,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_user_action,flagged_by_technology,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,actioned_user_action,flagged_by_users,0,count,7
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,appeals,appeals,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,appeals,no_action,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,appeals,reversed_content_not_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,appeals,reversed_content_restored,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,appeals,upheld_changed_enforcement,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,appeals,upheld_no_change,0,count,12
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,flagged,actioned_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,flagged,actioned_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,flagged,flagged_by_employees,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,flagged,flagged_by_technology,0,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,flagged,flagged_by_users,4,count,3
+strava-inc,2025 Q3,hate_speech_or_racism,Hateful Content - Video,Video,breakdown,flagged,flagged_total,4,count,3
