@@ -169,6 +169,19 @@ _KOREA_FIXTURE = {
 }
 seed.build_korea_db(_KOREA_FIXTURE, _DB)
 
+# A small slice of the Taiwan Anti-Fraud dataset (taiwan-anti-fraud.json shape).
+# [publisher, period, section, category, metric, unit, value]
+_TAIWAN_FIXTURE = {
+    "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["NPA-165", "2025-12", "dns_blocked_sites", "金融保險", "sites_blocked", "count", 7000],
+        ["NPA-165", "2025-12", "dns_blocked_sites", "電子商務", "sites_blocked", "count", 2100],
+        ["NPA-165", "2026-05", "dns_blocked_sites", "金融保險", "sites_blocked", "count", 6500],
+        ["NPA-165", "2026-05", "dns_blocked_sites", "釣魚網站", "sites_blocked", "count", 33],
+    ],
+}
+seed.build_taiwan_db(_TAIWAN_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /
