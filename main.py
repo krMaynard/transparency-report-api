@@ -1151,6 +1151,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "taiwan_metrics": TableSpec(
+        "Taiwan Anti-Fraud Act (詐欺犯罪危害防制條例) transparency data — currently the National Police Agency's Article 42 enforcement stream: fraud websites whose DNS resolution was suspended, aggregated to sites-blocked counts per month × official site-category (網站性質, e.g. 金融保險/電子商務/釣魚網站). A tidy-long table: one row per measured value, identified by publisher × period × section × category × metric. Publisher-keyed so the designated platforms' statutory transparency reports (Google/Meta/LINE/TikTok) can be added later.",
+        "FROM taiwan_metrics f",
+        {
+            "publisher": "f.publisher",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3555,6 +3570,8 @@ FIELD_HELP: dict[str, str] = {
     "unit": "What `value` measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). Never SUM across different units; pin a unit before aggregating.",
     # ── Korea transparency (tidy-long korea_metrics) ──
     "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
+    # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
+    "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream); the designated ad platforms (Google/Meta/LINE/TikTok) will appear here when their statutory reports are added.",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",
