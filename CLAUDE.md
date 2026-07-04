@@ -72,6 +72,9 @@ Built to demonstrate two things:
 | `static/india.html` | Public India IT Rules compliance-reports dataset page (served at `/india`) — Trends charts + overview tables over `POST /api/explore` (`india_metrics`) |
 | `static/korea.html` | Public Korea (Naver + Kakao) transparency dataset page (served at `/korea`) — Trends charts + overview tables over `POST /api/explore` (`korea_metrics`) |
 | `static/taiwan.html` | Public Taiwan Anti-Fraud Act dataset page (served at `/taiwan`) — Trends charts + overview tables over `POST /api/explore` (`taiwan_metrics`) |
+| `static/user-data.html` | Public Google user-data requests dataset page (served at `/user-data`) — Trends charts + overview tables over `POST /api/explore` (`google_userdata_metrics`) |
+| `static/microsoft.html` | Public Microsoft LERR dataset page (served at `/microsoft`) — Trends charts + overview tables over `POST /api/explore` (`microsoft_metrics`) |
+| `static/linkedin.html` | Public LinkedIn Government Requests dataset page (served at `/linkedin`) — Trends charts + overview tables over `POST /api/explore` (`linkedin_metrics`) |
 | `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
 | `data/ny-tos-normalized.csv` | Vendored snapshot of the **normalized NY ToS enforcement statistics** (sibling `dsa-transparency-data/ny-tos-reports/ny_tos_normalized.csv` — per-category figures mapped onto the Stop Hiding Hate Act's five categories; see that repo's `NORMALIZATION.md`) — seeded into the queryable `ny_tos_stats` table by `seed.build_ny_tos_stats` |
 | `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 8 tools, and host config; static, no page JS |
@@ -79,7 +82,7 @@ Built to demonstrate two things:
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
-| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the sixteen pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the nineteen pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -114,7 +117,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -559,6 +562,9 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/india` | — | Public India IT Rules compliance-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/korea` | — | Public Korea (Naver + Kakao) transparency dataset page (web UI over `POST /api/explore`) |
 | GET | `/taiwan` | — | Public Taiwan Anti-Fraud Act dataset page (web UI over `POST /api/explore`) |
+| GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
+| GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
+| GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/methodology` | — | Public methodology page (web UI; how the dataset is sourced/processed/cited) |
 | GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |
