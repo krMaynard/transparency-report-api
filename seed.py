@@ -888,7 +888,9 @@ def build_ny_tos_stats(rows: list[dict[str, str]], db_path: str) -> int:
                 "grain, metric, submetric, value, unit, page) "
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
                 [tuple(r.get(c, "") if c not in ("value", "page")
-                       else (r.get(c) or None) for c in _NY_STATS_COLUMNS)
+                       # explicit None/"" check so a genuine 0 is stored, not NULLed
+                       else (None if r.get(c) in (None, "") else r.get(c))
+                       for c in _NY_STATS_COLUMNS)
                  for r in rows],
             )
         return len(rows)

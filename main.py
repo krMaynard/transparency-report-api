@@ -3158,8 +3158,13 @@ def _leg_warnings(
             out.append(
                 "'ny_tos_stats' metrics are each company's own (flagged vs actioned vs "
                 "warned…), so an aggregate that pins neither 'metric' nor 'submetric' "
-                "adds unrelated measures — and sums across companies are never "
-                "comparable. Filter or group by 'metric'/'submetric' (and 'company')."
+                "adds unrelated measures. Filter or group by 'metric'/'submetric'."
+            )
+        if "company" not in pinned:
+            out.append(
+                "'ny_tos_stats' metrics are not comparable across companies; this "
+                "aggregate pins no 'company', so it may sum non-comparable values. "
+                "Filter or group by 'company'."
             )
     return out
 

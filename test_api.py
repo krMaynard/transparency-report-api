@@ -2570,16 +2570,17 @@ class TestNYTosStatsTable:
         assert body["rows"] == [["(A) Hate speech or racism", 279]]
 
     def test_ny_stats_warns_on_unpinned_aggregation(self):
-        # SUM(value) with nothing pinned mixes units, grains, and metrics.
+        # SUM(value) with nothing pinned mixes units, grains, metrics — and companies.
         q = {"table": "ny_tos_stats", "group_by": ["shha_category"],
              "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
         warns = client.post("/api/explore", json=q).json().get("warnings", [])
         assert any("unit" in w for w in warns)
         assert any("grain" in w for w in warns)
-        assert any("metric" in w for w in warns)
+        assert any("'metric'" in w for w in warns)
+        assert any("not comparable across companies" in w for w in warns)
 
     def test_ny_stats_no_warning_when_pinned(self):
-        q = {"table": "ny_tos_stats", "group_by": ["shha_category"],
+        q = {"table": "ny_tos_stats", "group_by": ["company", "shha_category"],
              "query": {"and": [
                  {"operation": "EQ", "field_name": "unit", "field_values": ["count"]},
                  {"operation": "EQ", "field_name": "grain",

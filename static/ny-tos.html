@@ -660,7 +660,8 @@ async function runStats() {
   const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
   const body = rows.map(r => {
     const [co, cat, label, metric, sub, unit, value] = r;
-    const val = unit === "percent" ? esc(String(value)) + "%" : fmt(value);
+    const val = value == null ? '<span class="na">N/A</span>'
+      : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
     const cells = [esc(co), nsCatLabel(cat), esc(label),
       esc(metric || ""), esc(sub || ""), val];
     return "<tr>" + cells.map((c, i) =>
