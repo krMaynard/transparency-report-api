@@ -2268,6 +2268,24 @@ def snap_page() -> FileResponse:
     return _serve_page("snap.html", "Snap transparency page")
 
 
+@app.get("/india", response_class=HTMLResponse)
+def india_page() -> FileResponse:
+    """Serve the India IT Rules compliance-reports dataset page (reads POST /api/explore)."""
+    return _serve_page("india.html", "India IT Rules page")
+
+
+@app.get("/korea", response_class=HTMLResponse)
+def korea_page() -> FileResponse:
+    """Serve the Korea (Naver + Kakao) transparency dataset page (reads POST /api/explore)."""
+    return _serve_page("korea.html", "Korea transparency page")
+
+
+@app.get("/taiwan", response_class=HTMLResponse)
+def taiwan_page() -> FileResponse:
+    """Serve the Taiwan Anti-Fraud Act dataset page (reads POST /api/explore)."""
+    return _serve_page("taiwan.html", "Taiwan anti-fraud page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2318,6 +2336,9 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "apple": ("apple.html", "Apple transparency page", {}),
     "github": ("github.html", "GitHub transparency page", {}),
     "snap": ("snap.html", "Snap transparency page", {}),
+    "india": ("india.html", "India IT Rules page", {}),
+    "korea": ("korea.html", "Korea transparency page", {}),
+    "taiwan": ("taiwan.html", "Taiwan anti-fraud page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
