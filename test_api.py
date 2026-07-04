@@ -2528,6 +2528,83 @@ class TestKoreaTable:
              "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
         assert "warnings" not in client.post("/api/explore", json=q).json()
 
+
+class TestNYTosStatsTable:
+    def test_ny_stats_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "ny_tos_stats" in names
+
+    def test_ny_stats_fields_endpoint(self):
+        body = client.get("/api/fields?table=ny_tos_stats", headers=MOMO).json()
+        assert {"company", "shha_category", "original_label", "content_format",
+                "grain", "metric", "submetric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_ny_stats_snap_value(self):
+        # Snap hate-speech flagged (human report) = 482,240 (fixture).
+        job = _submit_and_wait({
+            "table": "ny_tos_stats",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "company", "field_values": ["snap-inc"]},
+                {"operation": "EQ", "field_name": "shha_category",
+                 "field_values": ["hate_speech_or_racism"]},
+                {"operation": "EQ", "field_name": "submetric", "field_values": ["flagged_total"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 482240
+
+    def test_ny_stats_keeps_original_label(self):
+        # The normalized category never replaces the filed label — both queryable.
+        job = _submit_and_wait({
+            "table": "ny_tos_stats",
+            "fields": ["original_label", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "company", "field_values": ["discord-inc"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["(A) Hate speech or racism", 279]]
+
+    def test_ny_stats_warns_on_unpinned_aggregation(self):
+        # SUM(value) with nothing pinned mixes units, grains, metrics — and companies.
+        q = {"table": "ny_tos_stats", "group_by": ["shha_category"],
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        warns = client.post("/api/explore", json=q).json().get("warnings", [])
+        assert any("unit" in w for w in warns)
+        assert any("grain" in w for w in warns)
+        assert any("'metric'" in w for w in warns)
+        assert any("not comparable across companies" in w for w in warns)
+
+    def test_ny_stats_no_warning_when_pinned(self):
+        q = {"table": "ny_tos_stats", "group_by": ["company", "shha_category"],
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "unit", "field_values": ["count"]},
+                 {"operation": "EQ", "field_name": "grain",
+                  "field_values": ["category_total"]},
+                 {"operation": "EQ", "field_name": "submetric",
+                  "field_values": ["flagged_total"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        assert "warnings" not in client.post("/api/explore", json=q).json()
+
+    def test_ny_stats_grain_separates_total_from_breakdown(self):
+        # Strava's category_total (20000) must not absorb the Profile breakdown (6665).
+        job = _submit_and_wait({
+            "table": "ny_tos_stats",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "company", "field_values": ["strava-inc"]},
+                {"operation": "EQ", "field_name": "grain", "field_values": ["category_total"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 20000
+
     def test_korea_warns_on_summing_percentages(self):
         # Pinning unit=percent doesn't make a rate summable — SUM still warns.
         q = {"table": "korea_metrics", "group_by": ["platform"],

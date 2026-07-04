@@ -1151,6 +1151,24 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "ny_tos_stats": TableSpec(
+        "New York Social Media ToS reports (Stop Hiding Hate Act) — enforcement statistics extracted from the filings and normalized onto the statute's five categories (shha_category: hate_speech_or_racism, extremism_or_radicalization, disinformation_or_misinformation, harassment, foreign_political_interference). Only the category dimension is normalized: `metric`/`submetric` keep each company's own measure names, which are NOT comparable across companies — never sum across companies. `grain` separates category totals from Strava's per-format breakdown (summing both double counts); `unit` separates counts from percent rates. 2025 Q3; 7 filers. Methodology + caveats: dsa-transparency-data/ny-tos-reports/NORMALIZATION.md.",
+        "FROM ny_tos_stats f",
+        {
+            "company":        "f.company",
+            "period":         "f.period",
+            "shha_category":  "f.shha_category",
+            "original_label": "f.original_label",
+            "content_format": "f.content_format",
+            "grain":          "f.grain",
+            "metric":         "f.metric",
+            "submetric":      "f.submetric",
+            "unit":           "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "taiwan_metrics": TableSpec(
         "Taiwan Anti-Fraud Act (詐欺犯罪危害防制條例) transparency data — currently the National Police Agency's Article 42 enforcement stream: fraud websites whose DNS resolution was suspended, aggregated to sites-blocked counts per month × official site-category (網站性質, e.g. 金融保險/電子商務/釣魚網站). A tidy-long table: one row per measured value, identified by publisher × period × section × category × metric. Publisher-keyed so the designated platforms' statutory transparency reports (Google/Meta/LINE/TikTok) can be added later.",
         "FROM taiwan_metrics f",
@@ -3132,6 +3150,37 @@ def _leg_warnings(
                     "korea_metrics SUM over a 'percent'/'average' value isn't "
                     "statistically meaningful — read it per row instead."
                 )
+    # ny_tos_stats normalizes only the *category* dimension: metric/submetric
+    # stay in each company's own terms (flagged vs actioned vs warned…), counts
+    # and percent rates share one `value` column, and Strava's per-format
+    # breakdown rows coexist with their own category totals.
+    if table == "ny_tos_stats" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "unit" not in pinned:
+            out.append(
+                "'ny_tos_stats' keeps counts and percent rates in one 'value' column; "
+                "this aggregate pins no 'unit', so it may sum a rate with a count. "
+                "Filter unit='count' (or 'percent'), or group by 'unit'."
+            )
+        if "grain" not in pinned:
+            out.append(
+                "'ny_tos_stats' carries category totals alongside Strava's per-format "
+                "breakdown; this aggregate pins no 'grain', so it may double-count. "
+                "Filter grain='category_total' (or 'breakdown'), or group by 'grain'."
+            )
+        if not {"metric", "submetric"} & pinned:
+            out.append(
+                "'ny_tos_stats' metrics are each company's own (flagged vs actioned vs "
+                "warned…), so an aggregate that pins neither 'metric' nor 'submetric' "
+                "adds unrelated measures. Filter or group by 'metric'/'submetric'."
+            )
+        if "company" not in pinned:
+            out.append(
+                "'ny_tos_stats' metrics are not comparable across companies; this "
+                "aggregate pins no 'company', so it may sum non-comparable values. "
+                "Filter or group by 'company'."
+            )
     return out
 
 
@@ -3570,6 +3619,13 @@ FIELD_HELP: dict[str, str] = {
     "unit": "What `value` measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). Never SUM across different units; pin a unit before aggregating.",
     # ── Korea transparency (tidy-long korea_metrics) ──
     "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
+    # ── NY ToS normalized stats (tidy-long ny_tos_stats) ──
+    "company": "Filing company slug (e.g. 'snap-inc', 'roblox-corporation'). Metrics are each company's own — never compare or sum `value` across companies.",
+    "shha_category": "The Stop Hiding Hate Act category the filed label was normalized to: hate_speech_or_racism, extremism_or_radicalization, disinformation_or_misinformation, harassment, foreign_political_interference (no filer reports numbers for the last). Some mappings are broader/narrower than the statute — see the sibling repo's NORMALIZATION.md.",
+    "original_label": "The category label the company actually filed (e.g. Reddit's 'Terrorism', Roblox's 'Discrimination, Slurs, and Hate Speech') — always check it before citing a normalized figure.",
+    "content_format": "Strava's per-format breakdown (Activity, Photo, Post, …); empty for other filers.",
+    "grain": "'category_total' (the category's own row) or 'breakdown' (Strava's per-format rows). Summing both double-counts — pin one.",
+    "submetric": "The source column within `metric`, in the company's own terms (e.g. Snap's 'flagged_total', Strava's 'flagged_by_users').",
     # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
     "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream); the designated ad platforms (Google/Meta/LINE/TikTok) will appear here when their statutory reports are added.",
     # ── measures: DSA ──

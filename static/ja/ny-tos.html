@@ -479,6 +479,19 @@ display: flex; align-items: center;
     <div id="rl-out" aria-busy="true"></div>
     <p class="provenance" id="rl-prov" hidden><span class="prov-label">スナップショット：</span> <span id="rl-snap"></span> · <span class="prov-label">引用方法：</span> <span id="rl-cite"></span></p>
   </section>
+
+  <section class="card" id="stats-card">
+    <h2>執行統計</h2>
+    <p class="sub">提出書類から抽出し、同法の5つのカテゴリに正規化した数値。正規化されるのは<em>カテゴリ</em>のみで、各社は独自の指標を報告しているため、<strong>数値は企業間で比較できません</strong>。また一部のカテゴリ対応付けは法律の定義より広い、または狭い場合があります。<a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">方法論と注意事項</a>。<code>ny_tos_stats</code> テーブルとして <code>POST /api/explore</code> で照会できます。</p>
+    <div class="controls">
+      <label>カテゴリ <select id="ns-category"><option value="">すべて</option></select></label>
+      <label>企業 <select id="ns-company"><option value="">すべて</option></select></label>
+    </div>
+    <div class="error" id="ns-error" role="alert"></div>
+    <div id="ns-summary" class="sub" aria-live="polite"></div>
+    <div id="ns-out" aria-busy="true"></div>
+    <p class="hint">カテゴリ合計のみ（二重集計を避けるため、Strava の形式別内訳行はここでは除外しています）。外国による政治的干渉について数値を報告している企業はありません。</p>
+  </section>
  </main>
 
   <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/ja/privacy">プライバシー</a></footer>
@@ -594,7 +607,95 @@ async function setupLocations() {
   runLocations();
 }
 
+// ── Normalized enforcement statistics (ny_tos_stats via POST /api/explore) ──
+// Category-total grain only: Strava's per-format breakdown would double count.
+const NS_CATEGORIES = ["hate_speech_or_racism", "extremism_or_radicalization",
+  "disinformation_or_misinformation", "harassment", "foreign_political_interference"];
+const nsCatLabel = (k) => esc(k).replace(/_/g, " ");
+
+function nsQuery() {
+  const and = [
+    { operation: "EQ", field_name: "grain", field_values: ["category_total"] },
+  ];
+  const cat = $("#ns-category").value, co = $("#ns-company").value;
+  if (cat) and.push({ operation: "EQ", field_name: "shha_category", field_values: [cat] });
+  if (co) and.push({ operation: "EQ", field_name: "company", field_values: [co] });
+  return {
+    table: "ny_tos_stats",
+    fields: ["company", "shha_category", "original_label", "metric", "submetric", "unit", "value"],
+    query: { and },
+    sort: [{ field_name: "company", order: "asc" }],
+    max_count: 500,
+  };
+}
+
+let nsAbortController = null;
+
+async function runStats() {
+  if (nsAbortController) nsAbortController.abort();
+  nsAbortController = new AbortController();
+  const { signal } = nsAbortController;
+  $("#ns-error").textContent = "";
+  $("#ns-out").setAttribute("aria-busy", "true");
+  let d;
+  try {
+    const res = await fetch("/api/explore", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nsQuery()), signal,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
+  } catch (err) {
+    if (err.name === "AbortError") return;  // superseded by a newer request
+    $("#ns-error").textContent = "統計を読み込めませんでした: " + err.message;
+    $("#ns-out").setAttribute("aria-busy", "false");
+    return;
+  }
+  $("#ns-out").setAttribute("aria-busy", "false");
+  const rows = d.rows || [];
+  $("#ns-summary").textContent = `${fmt(rows.length)} 件の数値を表示中。`;
+  const head = '<tr><th scope="col">企業</th><th scope="col">カテゴリ</th>' +
+    '<th scope="col">提出時のラベル</th><th scope="col">指標</th>' +
+    '<th scope="col">測定項目</th><th scope="col">値</th></tr>';
+  const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
+  const body = rows.map(r => {
+    const [co, cat, label, metric, sub, unit, value] = r;
+    const val = value == null ? '<span class="na">N/A</span>'
+      : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
+    const cells = [esc(co), nsCatLabel(cat), esc(label),
+      esc(metric || ""), esc(sub || ""), val];
+    return "<tr>" + cells.map((c, i) =>
+      `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
+  }).join("");
+  $("#ns-out").innerHTML = rows.length
+    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    : "<p class='sub'>該当する数値はありません。</p>";
+}
+
+async function setupStats() {
+  const opt = (v, label) => `<option value="${esc(v)}">${label || esc(v)}</option>`;
+  $("#ns-category").insertAdjacentHTML("beforeend",
+    NS_CATEGORIES.map(c => opt(c, nsCatLabel(c))).join(""));
+  // Companies come from the data itself (one bounded grouped query).
+  try {
+    const res = await fetch("/api/explore", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ table: "ny_tos_stats", group_by: ["company"],
+        aggregates: [{ function: "COUNT", field_name: "value", alias: "n" }],
+        sort: [{ field_name: "company", order: "asc" }], max_count: 50 }),
+    });
+    if (res.ok) {
+      const d = await res.json();
+      $("#ns-company").insertAdjacentHTML("beforeend",
+        (d.rows || []).map(r => opt(r[0])).join(""));
+    }
+  } catch (err) { /* the selects just stay unpopulated */ }
+  ["#ns-category", "#ns-company"].forEach(s => $(s).addEventListener("change", runStats));
+  runStats();
+}
+
 document.addEventListener("DOMContentLoaded", setupLocations);
+document.addEventListener("DOMContentLoaded", setupStats);
 </script>
 <script>
   // Hamburger — mobile sidebar toggle

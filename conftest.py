@@ -214,6 +214,33 @@ _NY_TOS_FIXTURE = [
 ]
 seed.build_ny_tos_reports(_NY_TOS_FIXTURE, _DB)
 
+# A small slice of the normalized NY ToS stats (ny-tos-normalized.csv shape):
+# a count + a percent for Snap (unit mixing), a Strava category_total + its
+# format breakdown (grain double-count), and a Discord row (cross-company).
+_NY_STATS_FIXTURE = [
+    {"company": "snap-inc", "period": "2025 Q3", "shha_category": "hate_speech_or_racism",
+     "original_label": "Hate Speech", "content_format": "", "grain": "category_total",
+     "metric": "human_report", "submetric": "flagged_total", "value": "482240",
+     "unit": "count", "page": "4"},
+    {"company": "snap-inc", "period": "2025 Q3", "shha_category": "hate_speech_or_racism",
+     "original_label": "Hate Speech", "content_format": "", "grain": "category_total",
+     "metric": "human_report", "submetric": "vvr_human_pct", "value": "0.000205",
+     "unit": "percent", "page": "4"},
+    {"company": "strava-inc", "period": "2025 Q3", "shha_category": "harassment",
+     "original_label": "Harassment", "content_format": "", "grain": "category_total",
+     "metric": "flagged", "submetric": "flagged_total", "value": "20000",
+     "unit": "count", "page": "3"},
+    {"company": "strava-inc", "period": "2025 Q3", "shha_category": "harassment",
+     "original_label": "Harassment - Profile", "content_format": "Profile",
+     "grain": "breakdown", "metric": "flagged", "submetric": "flagged_total",
+     "value": "6665", "unit": "count", "page": "4"},
+    {"company": "discord-inc", "period": "2025 Q3", "shha_category": "hate_speech_or_racism",
+     "original_label": "(A) Hate speech or racism", "content_format": "",
+     "grain": "category_total", "metric": "Accounts Disabled", "submetric": "",
+     "value": "279", "unit": "count", "page": "13"},
+]
+seed.build_ny_tos_stats(_NY_STATS_FIXTURE, _DB)
+
 os.environ.setdefault("DB_PATH", _DB)
 os.environ.setdefault("API_KEYS_JSON", '{"momo":{"name":"momo"},"honggildong":{"name":"honggildong"}}')
 # Google sign-in config for the auth tests (token verification is monkeypatched).

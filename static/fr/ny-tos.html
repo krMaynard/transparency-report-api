@@ -479,6 +479,19 @@ display: flex; align-items: center;
     <div id="rl-out" aria-busy="true"></div>
     <p class="provenance" id="rl-prov" hidden><span class="prov-label">Instantané :</span> <span id="rl-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="rl-cite"></span></p>
   </section>
+
+  <section class="card" id="stats-card">
+    <h2>Statistiques d'application</h2>
+    <p class="sub">Chiffres extraits des dépôts et normalisés selon les cinq catégories de la loi. Seule la <em>catégorie</em> est normalisée — chaque entreprise déclare ses propres métriques, donc <strong>les chiffres ne sont pas comparables entre entreprises</strong>, et certaines correspondances de catégories sont plus larges ou plus étroites que la loi. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Méthodologie et mises en garde</a>. Interrogeable via la table <code>ny_tos_stats</code> avec <code>POST /api/explore</code>.</p>
+    <div class="controls">
+      <label>Catégorie <select id="ns-category"><option value="">Toutes</option></select></label>
+      <label>Entreprise <select id="ns-company"><option value="">Toutes</option></select></label>
+    </div>
+    <div class="error" id="ns-error" role="alert"></div>
+    <div id="ns-summary" class="sub" aria-live="polite"></div>
+    <div id="ns-out" aria-busy="true"></div>
+    <p class="hint">Totaux par catégorie uniquement (les lignes de ventilation par format de Strava sont exclues ici pour éviter le double comptage). Aucune entreprise ne déclare de données chiffrées sur l'ingérence politique étrangère.</p>
+  </section>
  </main>
 
   <footer>Powered by the Transparency Report API · <a href="/docs">Swagger UI</a> · <a href="/fr/privacy">Confidentialité</a></footer>
@@ -594,7 +607,95 @@ async function setupLocations() {
   runLocations();
 }
 
+// ── Normalized enforcement statistics (ny_tos_stats via POST /api/explore) ──
+// Category-total grain only: Strava's per-format breakdown would double count.
+const NS_CATEGORIES = ["hate_speech_or_racism", "extremism_or_radicalization",
+  "disinformation_or_misinformation", "harassment", "foreign_political_interference"];
+const nsCatLabel = (k) => esc(k).replace(/_/g, " ");
+
+function nsQuery() {
+  const and = [
+    { operation: "EQ", field_name: "grain", field_values: ["category_total"] },
+  ];
+  const cat = $("#ns-category").value, co = $("#ns-company").value;
+  if (cat) and.push({ operation: "EQ", field_name: "shha_category", field_values: [cat] });
+  if (co) and.push({ operation: "EQ", field_name: "company", field_values: [co] });
+  return {
+    table: "ny_tos_stats",
+    fields: ["company", "shha_category", "original_label", "metric", "submetric", "unit", "value"],
+    query: { and },
+    sort: [{ field_name: "company", order: "asc" }],
+    max_count: 500,
+  };
+}
+
+let nsAbortController = null;
+
+async function runStats() {
+  if (nsAbortController) nsAbortController.abort();
+  nsAbortController = new AbortController();
+  const { signal } = nsAbortController;
+  $("#ns-error").textContent = "";
+  $("#ns-out").setAttribute("aria-busy", "true");
+  let d;
+  try {
+    const res = await fetch("/api/explore", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nsQuery()), signal,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    d = await res.json();
+  } catch (err) {
+    if (err.name === "AbortError") return;  // superseded by a newer request
+    $("#ns-error").textContent = "Impossible de charger les statistiques : " + err.message;
+    $("#ns-out").setAttribute("aria-busy", "false");
+    return;
+  }
+  $("#ns-out").setAttribute("aria-busy", "false");
+  const rows = d.rows || [];
+  $("#ns-summary").textContent = `Affichage de ${fmt(rows.length)} chiffres.`;
+  const head = '<tr><th scope="col">Entreprise</th><th scope="col">Catégorie</th>' +
+    '<th scope="col">Libellé déposé</th><th scope="col">Métrique</th>' +
+    '<th scope="col">Mesure</th><th scope="col">Valeur</th></tr>';
+  const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
+  const body = rows.map(r => {
+    const [co, cat, label, metric, sub, unit, value] = r;
+    const val = value == null ? '<span class="na">N/A</span>'
+      : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
+    const cells = [esc(co), nsCatLabel(cat), esc(label),
+      esc(metric || ""), esc(sub || ""), val];
+    return "<tr>" + cells.map((c, i) =>
+      `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
+  }).join("");
+  $("#ns-out").innerHTML = rows.length
+    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    : "<p class='sub'>Aucun chiffre correspondant.</p>";
+}
+
+async function setupStats() {
+  const opt = (v, label) => `<option value="${esc(v)}">${label || esc(v)}</option>`;
+  $("#ns-category").insertAdjacentHTML("beforeend",
+    NS_CATEGORIES.map(c => opt(c, nsCatLabel(c))).join(""));
+  // Companies come from the data itself (one bounded grouped query).
+  try {
+    const res = await fetch("/api/explore", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ table: "ny_tos_stats", group_by: ["company"],
+        aggregates: [{ function: "COUNT", field_name: "value", alias: "n" }],
+        sort: [{ field_name: "company", order: "asc" }], max_count: 50 }),
+    });
+    if (res.ok) {
+      const d = await res.json();
+      $("#ns-company").insertAdjacentHTML("beforeend",
+        (d.rows || []).map(r => opt(r[0])).join(""));
+    }
+  } catch (err) { /* the selects just stay unpopulated */ }
+  ["#ns-category", "#ns-company"].forEach(s => $(s).addEventListener("change", runStats));
+  runStats();
+}
+
 document.addEventListener("DOMContentLoaded", setupLocations);
+document.addEventListener("DOMContentLoaded", setupStats);
 </script>
 <script>
   // Hamburger — mobile sidebar toggle

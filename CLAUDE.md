@@ -56,11 +56,12 @@ Built to demonstrate two things:
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
 | `static/index.html` | Public VLOP dashboard (served at `/reports`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
 | `static/catalog.html` | Public report-locations catalogue page (served at `/catalog`) — the "Where platforms publish their reports" filterable table over `GET /api/report-locations` |
-| `static/ny-tos.html` | Public NY Terms-of-Service reports catalogue page (served at `/ny-tos`) — filterable table over `GET /api/ny-tos-reports` (New York's Stop Hiding Hate Act filings) |
+| `static/ny-tos.html` | Public NY Terms-of-Service reports page (served at `/ny-tos`) — filterable filings catalogue over `GET /api/ny-tos-reports` + an "Enforcement statistics" panel over `POST /api/explore` (`ny_tos_stats`) |
 | `static/apple.html` | Public Apple Transparency Report dataset page (served at `/apple`) — overview tables over `POST /api/explore` (`apple_requests`) |
 | `static/github.html` | Public GitHub Transparency Report dataset page (served at `/github`) — overview tables over `POST /api/explore` (`github_metrics`) |
 | `static/snap.html` | Public Snap Transparency Report dataset page (served at `/snap`) — overview tables over `POST /api/explore` (`snap_metrics`) |
 | `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
+| `data/ny-tos-normalized.csv` | Vendored snapshot of the **normalized NY ToS enforcement statistics** (sibling `dsa-transparency-data/ny-tos-reports/ny_tos_normalized.csv` — per-category figures mapped onto the Stop Hiding Hate Act's five categories; see that repo's `NORMALIZATION.md`) — seeded into the queryable `ny_tos_stats` table by `seed.build_ny_tos_stats` |
 | `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 8 tools, and host config; static, no page JS |
 | `static/methodology.html` | Public methodology page (served at `/methodology`) — how the dataset is sourced, processed (double-count handling, cross-language keys), queried, and cited, plus known limitations; static, no page JS |
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
@@ -335,6 +336,21 @@ PDFs, not the 1–11 template). Seeded from `data/ny-tos-reports.csv` via
 `public` (PDF mirrored in the sibling data repo, with `archived` GitHub link) or
 `auth-required` (login-gated at the AG, catalogued with `source_url` only). It
 powers the public `GET /api/ny-tos-reports` endpoint and the `/ny-tos` page.
+
+The **`ny_tos_stats`** table carries the **normalized NY ToS enforcement
+statistics** — the figures extracted from those filings, with each company's
+category labels mapped onto the Stop Hiding Hate Act's five categories
+(`shha_category`; the filed text stays in `original_label`). Tidy-long, seeded
+from `data/ny-tos-normalized.csv` via `build_ny_tos_stats()`, and registered as
+a **queryable table** (`TableSpec`), so `/api/query`, `/api/explore` and
+`/api/ask` all reach it. Only the category dimension is normalized —
+`metric`/`submetric` keep each company's own measure names and are **not
+comparable across companies**; `_leg_warnings` warns when a SUM/AVG over
+`value` pins none of `unit` (count vs percent), `grain` (`category_total` vs
+Strava's per-format `breakdown` — summing both double counts), or
+`metric`/`submetric`. The `/ny-tos` page's "Enforcement statistics" panel reads
+it via `POST /api/explore` at the category_total grain. Methodology + caveats:
+the sibling repo's `ny-tos-reports/NORMALIZATION.md`.
 
 ## Query model
 

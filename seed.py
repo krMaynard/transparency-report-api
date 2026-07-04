@@ -40,6 +40,12 @@ _DEFAULT_RL_SOURCE = os.getenv(
 _DEFAULT_NY_TOS_SOURCE = os.getenv(
     "SEED_NY_TOS_CSV", os.path.join(HERE, "data", "ny-tos-reports.csv")
 )
+# Normalized NY ToS enforcement statistics (sibling
+# dsa-transparency-data/ny-tos-reports/ny_tos_normalized.csv) — the extracted
+# per-category figures mapped onto the Stop Hiding Hate Act's five categories.
+_DEFAULT_NY_STATS_SOURCE = os.getenv(
+    "SEED_NY_TOS_STATS_CSV", os.path.join(HERE, "data", "ny-tos-normalized.csv")
+)
 # Apple Transparency dataset — vendored in-repo (from the sibling data repo's
 # apple-transparency/build_apple.py); not in krMaynard.github.io like gr/vlop.
 _DEFAULT_APPLE_SOURCE = os.getenv(
@@ -393,6 +399,29 @@ CREATE TABLE ny_tos_reports (
 );
 CREATE INDEX idx_ny_period ON ny_tos_reports(period);
 CREATE INDEX idx_ny_access ON ny_tos_reports(access);
+
+-- Normalized NY ToS enforcement statistics: the per-category figures extracted
+-- from the archived filings, mapped onto the Stop Hiding Hate Act's five
+-- categories (sibling ny-tos-reports/NORMALIZATION.md documents the mapping and
+-- its caveats). Tidy-long: one row per numeric cell; `metric`/`submetric` keep
+-- each company's own measure names (NOT comparable across companies), `unit` is
+-- count|percent, `grain` is category_total|breakdown (summing both double
+-- counts Strava's format breakdowns with their own totals).
+CREATE TABLE ny_tos_stats (
+    company        TEXT NOT NULL,   -- filer slug, e.g. 'snap-inc'
+    period         TEXT NOT NULL,   -- e.g. '2025 Q3'
+    shha_category  TEXT NOT NULL,   -- hate_speech_or_racism | extremism_or_radicalization | …
+    original_label TEXT NOT NULL,   -- the category label the company actually filed
+    content_format TEXT NOT NULL,   -- Strava's per-format breakdown ('' elsewhere)
+    grain          TEXT NOT NULL,   -- category_total | breakdown
+    metric         TEXT NOT NULL,   -- source table / metric group (company's own terms)
+    submetric      TEXT NOT NULL,   -- source column within the metric
+    value          REAL,
+    unit           TEXT NOT NULL,   -- count | percent
+    page           INTEGER          -- page in the archived PDF (verifiability)
+);
+CREATE INDEX idx_nys_category ON ny_tos_stats(shha_category);
+CREATE INDEX idx_nys_company  ON ny_tos_stats(company);
 """
 
 _RL_COLUMNS = ("platform", "company", "category", "confidence",
@@ -886,6 +915,39 @@ def build_ny_tos_reports(rows: list[dict[str, str]], db_path: str) -> int:
         conn.close()
 
 
+_NY_STATS_COLUMNS = ("company", "period", "shha_category", "original_label",
+                     "content_format", "grain", "metric", "submetric",
+                     "value", "unit", "page")
+
+
+def build_ny_tos_stats(rows: list[dict[str, str]], db_path: str) -> int:
+    """Populate the ny_tos_stats table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). `rows` are dicts
+    keyed by `_NY_STATS_COLUMNS` (the ny_tos_normalized.csv header — validated
+    so a drifted vendored snapshot fails loudly). Returns the row count.
+    """
+    if rows and (missing := set(_NY_STATS_COLUMNS) - set(rows[0])):
+        raise ValueError(f"ny_tos_stats source is missing columns: {sorted(missing)}")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ny_tos_stats "
+                "(company, period, shha_category, original_label, content_format, "
+                "grain, metric, submetric, value, unit, page) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                [tuple(r.get(c, "") if c not in ("value", "page")
+                       # explicit None/"" check so a genuine 0 is stored, not NULLed
+                       else (None if r.get(c) in (None, "") else r.get(c))
+                       for c in _NY_STATS_COLUMNS)
+                 for r in rows],
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Seed demo.db from the VLOP DSA dataset.")
     parser.add_argument("--source", default=_DEFAULT_SOURCE, help="Path to vlop-dsa.json")
@@ -896,6 +958,8 @@ def main() -> None:
                         help="Path to report-locations.csv (non-VLOP catalogue)")
     parser.add_argument("--ny-tos", default=_DEFAULT_NY_TOS_SOURCE,
                         help="Path to ny-tos-reports.csv (NY ToS catalogue)")
+    parser.add_argument("--ny-stats", default=_DEFAULT_NY_STATS_SOURCE,
+                        help="Path to ny-tos-normalized.csv (normalized NY ToS stats)")
     parser.add_argument("--apple-source", default=_DEFAULT_APPLE_SOURCE,
                         help="Path to apple-transparency.json")
     parser.add_argument("--github-source", default=_DEFAULT_GITHUB_SOURCE,
@@ -948,6 +1012,13 @@ def main() -> None:
         print(f"  ny_tos_reports: {n} rows from {os.path.basename(args.ny_tos)}")
     else:
         print(f"  (skipping NY ToS reports — not found: {args.ny_tos})")
+
+    if os.path.isfile(args.ny_stats):
+        ny_stat_rows = _load_report_locations_csv(args.ny_stats)
+        n = build_ny_tos_stats(ny_stat_rows, args.db)
+        print(f"  ny_tos_stats: {n} rows from {os.path.basename(args.ny_stats)}")
+    else:
+        print(f"  (skipping NY ToS stats — not found: {args.ny_stats})")
 
     if os.path.isfile(args.apple_source):
         with open(args.apple_source, "r", encoding="utf-8") as f:
