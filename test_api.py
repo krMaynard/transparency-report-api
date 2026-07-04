@@ -1594,6 +1594,37 @@ class TestExplore:
              "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
         assert "warnings" not in client.post("/api/explore", json=q).json()
 
+    def test_explore_reserved_word_alias(self):
+        # Aliases are emitted double-quoted, so a SQL keyword like 'values' is a
+        # valid output-column name (regression: the /snap page's first panel used
+        # alias 'values' and got a 500 'near "values": syntax error').
+        q = {"table": "snap_metrics", "group_by": ["section"],
+             "aggregates": [{"function": "COUNT", "field_name": "value", "alias": "values"}],
+             "sort": [{"field_name": "values", "order": "desc"}], "max_count": 30}
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200
+        d = r.json()
+        assert d["columns"] == ["section", "values"]
+        assert d["rows"]
+
+    def test_explore_composite_reserved_word_aliases(self):
+        # The composite path quotes aliases in leg CTEs, the outer select, the
+        # having clause and ORDER BY — 'values' and 'order' all work end to end.
+        q = {"legs": {
+                 "a": {"table": "snap_metrics",
+                       "aggregates": [{"function": "SUM", "field_name": "value", "alias": "values"}]},
+                 "b": {"table": "snap_metrics",
+                       "aggregates": [{"function": "COUNT", "field_name": "value", "alias": "order"}]},
+             },
+             "join_on": ["period"],
+             "having": {"and": [{"operation": "GT", "field_name": "order", "field_values": [0]}]},
+             "sort": [{"field_name": "values", "order": "desc"}], "max_count": 5}
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200
+        d = r.json()
+        assert d["columns"] == ["period", "values", "order"]
+        assert d["rows"]
+
     def test_surface_is_total_grain_filterable(self):
         # t6/t7/t8 carry a cross-surface 'All' aggregate beside the per-surface
         # rows (Core/Ads/…). surface_is_total lets a query pick a single grain so

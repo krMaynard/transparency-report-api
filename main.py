@@ -1422,6 +1422,14 @@ def _safe_alias(alias: str) -> str:
     return alias
 
 
+def _quote_ident(name: str) -> str:
+    """Double-quote a validated identifier for SQL emission. Aliases are
+    caller-chosen text: the charset check (_safe_alias) makes quoting airtight,
+    and quoting keeps SQL keywords ('values', 'group', 'order', …) usable as
+    output-column names instead of blowing up the compiled statement."""
+    return f'"{name}"'
+
+
 # ── Derived-column expressions (composite queries) ────────────────────────────
 #
 # A tiny recursive-descent parser for four-function arithmetic over `leg.alias`
@@ -1558,15 +1566,15 @@ def _compile_output_condition(cond: Condition, col_types: dict[str, str]) -> tup
             raise QueryCompileError(f"Operation {op} is only valid on numeric output columns, not '{field}'.")
         if len(values) != 1:
             raise QueryCompileError(f"Operation {op} takes exactly one value.")
-        return f"{field} {_COMPARATORS[op]} ?", [_coerce_number(values[0], field)]
+        return f"{_quote_ident(field)} {_COMPARATORS[op]} ?", [_coerce_number(values[0], field)]
 
     if op == "EQ":
         if len(values) != 1:
             raise QueryCompileError("Operation EQ takes exactly one value; use IN for multiple.")
         if numeric:
-            return f"{field} = ?", [_coerce_number(values[0], field)]
+            return f"{_quote_ident(field)} = ?", [_coerce_number(values[0], field)]
         _require_string(values[0], field)
-        return f"{field} = ?", [values[0]]
+        return f"{_quote_ident(field)} = ?", [values[0]]
 
     if op == "IN":
         bound: list[Any] = []
@@ -1577,7 +1585,7 @@ def _compile_output_condition(cond: Condition, col_types: dict[str, str]) -> tup
                 _require_string(v, field)
                 bound.append(v)
         placeholders = ", ".join(["?"] * len(values))
-        return f"{field} IN ({placeholders})", bound
+        return f"{_quote_ident(field)} IN ({placeholders})", bound
 
     raise QueryCompileError(f"Unsupported operation '{op}'.")  # pragma: no cover
 
@@ -1652,10 +1660,10 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
                 )
             else:
                 expr = f"{agg.function}({spec.measures[agg.field_name]})"
-            select_parts.append(f"{expr} AS {alias}")
+            select_parts.append(f"{expr} AS {_quote_ident(alias)}")
             col_types[alias] = "numeric"
-            refs[f"{leg_name}.{alias}"] = f"l_{leg_name}.{alias}"
-            outer_cols.append(f"l_{leg_name}.{alias} AS {alias}")
+            refs[f"{leg_name}.{alias}"] = f"l_{leg_name}.{_quote_ident(alias)}"
+            outer_cols.append(f"l_{leg_name}.{_quote_ident(alias)} AS {_quote_ident(alias)}")
         where, leg_params = _compile_where(leg.query, spec)
         leg_sql = f"SELECT {', '.join(select_parts)} {spec.from_sql}"
         if where:
@@ -1668,7 +1676,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
         alias = _safe_alias(d.alias)
         if alias in col_types:
             raise QueryCompileError(f"Duplicate or clashing derived alias '{alias}'.")
-        outer_cols.append(f"{_compile_expr(d.expr, refs)} AS {alias}")
+        outer_cols.append(f"{_compile_expr(d.expr, refs)} AS {_quote_ident(alias)}")
         col_types[alias] = "numeric"
 
     key_cols = ", ".join(req.join_on)
@@ -1703,7 +1711,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
                 f"Cannot sort by '{s.field_name}'; it is not an output column "
                 f"(one of: {', '.join(col_types)})."
             )
-        order_parts.append(f"{s.field_name} {'DESC' if s.order == 'desc' else 'ASC'}")
+        order_parts.append(f"{_quote_ident(s.field_name)} {'DESC' if s.order == 'desc' else 'ASC'}")
         sorted_cols.add(s.field_name)
     # Deterministic tie-break, matching the single-table path: when the caller
     # sorts or paginates, append every remaining output column so the row order is
@@ -1712,7 +1720,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
     if req.sort or req.offset:
         for c in col_types:
             if c not in sorted_cols:
-                order_parts.append(f"{c} ASC")
+                order_parts.append(f"{_quote_ident(c)} ASC")
     if order_parts:
         sql += " ORDER BY " + ", ".join(order_parts)
     sql += f" LIMIT {min(req.max_count, ROW_LIMIT)}"
@@ -1771,7 +1779,7 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
                 )
             else:
                 expr = f"{agg.function}({spec.measures[agg.field_name]})"
-            select_parts.append(f"{expr} AS {alias}")
+            select_parts.append(f"{expr} AS {_quote_ident(alias)}")
             columns.append(alias)
             col_expr[alias] = expr
     else:
