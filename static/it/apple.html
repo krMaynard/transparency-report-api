@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/static/vendor/chart.umd.js" defer></script>
 <script>
   (function () {
     try {
@@ -157,6 +158,22 @@ display: flex; align-items: center; justify-content: space-between;
   }
   header h1 { margin: 0 0 6px; font-size: 26px; }
   header p { margin: 0; color: var(--muted); max-width: 680px; }
+
+  /* ── Charts ──────────────────────────────────────────────────── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px 14px;
+  }
+  .chart-card.wide { grid-column: 1 / -1; }
+  .chart-card h3 { margin: 0 0 4px; font-size: 15px; }
+  .chart-card .chart-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+  canvas { width: 100% !important; }
+  .chart-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+  @media (max-width: 900px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: 1; }
+  }
 
   /* ── Data section ────────────────────────────────────────────── */
   .data-section { margin-bottom: 28px; }
@@ -411,6 +428,54 @@ display: flex; align-items: center; justify-content: space-between;
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
+  <section class="data-section" aria-label="Charts">
+    <h2>Tendenze</h2>
+    <p class="sub">Viste interattive delle cifre dichiarate da Apple. Ogni grafico ha un'alternativa testuale per gli screen reader.</p>
+    <div class="chart-grid">
+
+      <div class="chart-card wide">
+        <h3>Richieste per periodo</h3>
+        <p class="chart-sub">Totale delle richieste ricevute da Apple in ciascun periodo di riferimento, in tutti i paesi e tipi di richiesta.</p>
+        <div class="chart-loading" id="ts-loading">Caricamento…</div>
+        <canvas id="chart-ts" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-ts-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>Quota di richieste con dati forniti</h3>
+        <p class="chart-sub">Richieste per cui Apple ha fornito dei dati, come quota delle richieste ricevute nel periodo — per i tipi di richiesta in cui la divulgazione si applica.</p>
+        <div class="chart-loading" id="rate-loading">Caricamento…</div>
+        <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-rate-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Top 10 paesi</h3>
+        <p class="chart-sub">Paesi ordinati per totale di richieste in tutti i periodi.</p>
+        <div class="chart-loading" id="cty-loading">Caricamento…</div>
+        <canvas id="chart-countries" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-countries-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Ripartizione per tipo di richiesta</h3>
+        <p class="chart-sub">Quota di tutte le richieste, per tipo (top 8).</p>
+        <div class="chart-loading" id="type-loading">Caricamento…</div>
+        <canvas id="chart-types" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-types-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>Rimozioni dall'App Store per periodo</h3>
+        <p class="chart-sub">App rimosse a seguito di richieste governative di rimozione, per periodo (dichiarato dal 2018 H2).</p>
+        <div class="chart-loading" id="apps-loading">Caricamento…</div>
+        <canvas id="chart-apps" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-apps-table" class="sr-only"></div>
+      </div>
+
+    </div>
+  </section>
+
   <section class="data-section">
     <h2>Richieste per tipo</h2>
     <p class="sub">Totale delle richieste ricevute per tipo di richiesta, sommate su tutti i periodi di riferimento e paesi.</p>
@@ -510,6 +575,117 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Validated /api/explore bodies ─────────────────────────────────────────
   var BY_TYPE = {"table":"apple_requests","group_by":["request_type"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"requests","order":"desc"}],"max_count":30};
   var BY_PERIOD = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"desc"}],"max_count":30};
+  // Chart queries. Rate: SUM(provided)/SUM(received) is derived client-side per
+  // period (measures not reported for a request type are NULL, so SUM skips them).
+  var TS_ASC = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
+  var RATE_ASC = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_data_provided","alias":"provided"},{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
+  var TOP_CTY = {"table":"apple_requests","group_by":["country_name"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"requests","order":"desc"}],"max_count":10};
+  var APPS_ASC = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"apps_removed","alias":"apps"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
+
+  // ── Chart helpers ─────────────────────────────────────────────────────────
+  function chartReady() { return typeof Chart !== 'undefined'; }
+
+  var PALETTE = [
+    '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
+    '#6a994e','#bc4749','#a7c957','#386641','#c9d6df','#52796f','#84a98c','#cad2c5'
+  ];
+
+  function showChart(canvasId, loadingId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    document.getElementById(canvasId).classList.remove('hidden');
+  }
+
+  // No-data state: keep the canvas hidden and reuse the loading slot for the
+  // message, so empty is distinguishable from loading and from broken.
+  function emptyChart(loadingId) {
+    document.getElementById(loadingId).textContent = 'No data available.';
+  }
+
+  // Accessible data-table mirror of a chart, written into a visually-hidden
+  // (.sr-only) container so screen-reader users get the numbers even though the
+  // canvas is aria-hidden (and even if Chart.js fails to load). The caption
+  // reuses the chart card's own (localized) <h3>.
+  function srTable(tableId, headers, rows) {
+    var el = document.getElementById(tableId);
+    if (!el) return;
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
+    el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
+      + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  function lineChart(id, loadId, labels, values) {
+    showChart(id, loadId);
+    if (!chartReady()) return;
+    new Chart(document.getElementById(id), {
+      type: 'line',
+      data: { labels: labels, datasets: [{ label: '', data: values, borderColor: PALETTE[0], backgroundColor: PALETTE[0] + '22', borderWidth: 2, pointRadius: 2.5, tension: 0.3, fill: true }] },
+      options: {
+        responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  function pctLineChart(id, loadId, labels, values) {
+    showChart(id, loadId);
+    if (!chartReady()) return;
+    new Chart(document.getElementById(id), {
+      type: 'line',
+      data: { labels: labels, datasets: [{ label: '', data: values, borderColor: PALETTE[6], backgroundColor: PALETTE[6] + '22', borderWidth: 2, pointRadius: 2.5, tension: 0.3, fill: true }] },
+      options: {
+        responsive: true, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return (ctx.raw * 100).toFixed(1) + '%'; } } } },
+        scales: { y: { min: 0, max: 1, ticks: { callback: function(v) { return (v * 100).toFixed(0) + '%'; } } } },
+      },
+    });
+  }
+
+  function hbarChart(id, loadId, labels, values) {
+    showChart(id, loadId);
+    if (!chartReady()) return;
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[0], borderRadius: 4 }] },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  function vbarChart(id, loadId, labels, values) {
+    showChart(id, loadId);
+    if (!chartReady()) return;
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[1], borderRadius: 4 }] },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  function doughnutChart(id, loadId, labels, values) {
+    showChart(id, loadId);
+    if (!chartReady()) return;
+    new Chart(document.getElementById(id), {
+      type: 'doughnut',
+      data: { labels: labels, datasets: [{ data: values, backgroundColor: PALETTE.slice(0, labels.length) }] },
+      options: {
+        responsive: true,
+        plugins: { legend: { position: 'right' }, tooltip: { callbacks: { label: function(ctx) { return ctx.label + ': ' + fmt(ctx.raw); } } } },
+      },
+    });
+  }
 
   // ── Render ────────────────────────────────────────────────────────────────
   // Render rows into an accessible HTML table inside `container`.
@@ -545,11 +721,67 @@ display: flex; align-items: center; justify-content: space-between;
     errEl.classList.remove('hidden');
   }
 
+  // ── Chart renders ─────────────────────────────────────────────────────────
+  function renderCharts(byType, ts, rate, cty, apps) {
+    // Richieste per periodo (rows: [period, period_ord, requests]).
+    if (!ts.rows.length) { emptyChart('ts-loading'); } else {
+      lineChart('chart-ts', 'ts-loading',
+        ts.rows.map(function(r){ return r[0]; }),
+        ts.rows.map(function(r){ return r[2]; }));
+      srTable('chart-ts-table', ['Periodo di riferimento', 'Richieste ricevute'],
+        ts.rows.map(function(r){ return [r[0], fmt(r[2])]; }));
+    }
+
+    // Disclosure share (rows: [period, period_ord, provided, requests]).
+    var rateRows = rate.rows.filter(function(r){ return r[2] != null && r[3]; });
+    if (!rateRows.length) { emptyChart('rate-loading'); } else {
+      pctLineChart('chart-rate', 'rate-loading',
+        rateRows.map(function(r){ return r[0]; }),
+        rateRows.map(function(r){ return r[2] / r[3]; }));
+      srTable('chart-rate-table', ['Periodo di riferimento', '%'],
+        rateRows.map(function(r){ return [r[0], (r[2] / r[3] * 100).toFixed(1) + '%']; }));
+    }
+
+    // Top countries (rows: [country_name, requests]).
+    if (!cty.rows.length) { emptyChart('cty-loading'); } else {
+      hbarChart('chart-countries', 'cty-loading',
+        cty.rows.map(function(r){ return r[0]; }),
+        cty.rows.map(function(r){ return r[1]; }));
+      srTable('chart-countries-table', ['Paese', 'Richieste ricevute'],
+        cty.rows.map(function(r){ return [r[0], fmt(r[1])]; }));
+    }
+
+    // Request-type doughnut (top 8 of the byType rows: [request_type, requests]).
+    var typeRows = byType.rows.slice(0, 8);
+    if (!typeRows.length) { emptyChart('type-loading'); } else {
+      doughnutChart('chart-types', 'type-loading',
+        typeRows.map(function(r){ return r[0]; }),
+        typeRows.map(function(r){ return r[1]; }));
+      srTable('chart-types-table', ['Tipo di richiesta', 'Richieste ricevute'],
+        typeRows.map(function(r){ return [r[0], fmt(r[1])]; }));
+    }
+
+    // App Store takedowns (rows: [period, period_ord, apps]; NULL = the period
+    // predates App Store takedown reporting, so drop those).
+    var appRows = apps.rows.filter(function(r){ return r[2] != null; });
+    if (!appRows.length) { emptyChart('apps-loading'); } else {
+      vbarChart('chart-apps', 'apps-loading',
+        appRows.map(function(r){ return r[0]; }),
+        appRows.map(function(r){ return r[2]; }));
+      srTable('chart-apps-table', ['Periodo di riferimento', 'App rimosse'],
+        appRows.map(function(r){ return [r[0], fmt(r[2])]; }));
+    }
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────────
   async function init() {
     try {
-      var results = await Promise.all([explore(BY_TYPE), explore(BY_PERIOD)]);
+      var results = await Promise.all([
+        explore(BY_TYPE), explore(BY_PERIOD),
+        explore(TS_ASC), explore(RATE_ASC), explore(TOP_CTY), explore(APPS_ASC),
+      ]);
       var byType = results[0], byPeriod = results[1];
+      renderCharts(byType, results[2], results[3], results[4], results[5]);
 
       // byType columns: [request_type, requests]
       renderTable('byType',
