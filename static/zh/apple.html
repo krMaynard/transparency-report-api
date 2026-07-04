@@ -170,6 +170,11 @@ display: flex; align-items: center; justify-content: space-between;
   .chart-card .chart-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
   canvas { width: 100% !important; }
   .chart-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+  /* When Chart.js is unavailable the sr-only mirror table is revealed instead. */
+  .chart-card .chart-fallback { overflow-x: auto; }
+  .chart-card .chart-fallback table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .chart-card .chart-fallback th, .chart-card .chart-fallback td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .chart-card .chart-fallback caption { text-align: left; color: var(--muted); font-size: 12px; padding-bottom: 6px; }
   @media (max-width: 900px) {
     .chart-grid { grid-template-columns: 1fr; }
     .chart-card.wide { grid-column: 1; }
@@ -595,6 +600,14 @@ display: flex; align-items: center; justify-content: space-between;
     document.getElementById(canvasId).classList.remove('hidden');
   }
 
+  // Chart.js unavailable: hide the loading slot and reveal the (already
+  // populated) sr-only mirror table so sighted users still get the numbers.
+  function fallbackTable(loadingId, tableId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    var t = document.getElementById(tableId);
+    if (t) { t.classList.remove('sr-only'); t.classList.add('chart-fallback'); }
+  }
+
   // No-data state: keep the canvas hidden and reuse the loading slot for the
   // message, so empty is distinguishable from loading and from broken.
   function emptyChart(loadingId) {
@@ -620,9 +633,9 @@ display: flex; align-items: center; justify-content: space-between;
       + '</tbody></table>';
   }
 
-  function lineChart(id, loadId, labels, values) {
+  function lineChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
-    if (!chartReady()) return;
     new Chart(document.getElementById(id), {
       type: 'line',
       data: { labels: labels, datasets: [{ label: '', data: values, borderColor: PALETTE[0], backgroundColor: PALETTE[0] + '22', borderWidth: 2, pointRadius: 2.5, tension: 0.3, fill: true }] },
@@ -633,9 +646,9 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function pctLineChart(id, loadId, labels, values) {
+  function pctLineChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
-    if (!chartReady()) return;
     new Chart(document.getElementById(id), {
       type: 'line',
       data: { labels: labels, datasets: [{ label: '', data: values, borderColor: PALETTE[6], backgroundColor: PALETTE[6] + '22', borderWidth: 2, pointRadius: 2.5, tension: 0.3, fill: true }] },
@@ -646,9 +659,9 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function hbarChart(id, loadId, labels, values) {
+  function hbarChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
-    if (!chartReady()) return;
     new Chart(document.getElementById(id), {
       type: 'bar',
       data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[0], borderRadius: 4 }] },
@@ -660,9 +673,9 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function vbarChart(id, loadId, labels, values) {
+  function vbarChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
-    if (!chartReady()) return;
     new Chart(document.getElementById(id), {
       type: 'bar',
       data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[1], borderRadius: 4 }] },
@@ -674,9 +687,9 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function doughnutChart(id, loadId, labels, values) {
+  function doughnutChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
-    if (!chartReady()) return;
     new Chart(document.getElementById(id), {
       type: 'doughnut',
       data: { labels: labels, datasets: [{ data: values, backgroundColor: PALETTE.slice(0, labels.length) }] },
@@ -725,60 +738,63 @@ display: flex; align-items: center; justify-content: space-between;
   function renderCharts(byType, ts, rate, cty, apps) {
     // 各时期的请求数 (rows: [period, period_ord, requests]).
     if (!ts.rows.length) { emptyChart('ts-loading'); } else {
-      lineChart('chart-ts', 'ts-loading',
-        ts.rows.map(function(r){ return r[0]; }),
-        ts.rows.map(function(r){ return r[2]; }));
       srTable('chart-ts-table', ['报告周期', '收到的请求数'],
         ts.rows.map(function(r){ return [r[0], fmt(r[2])]; }));
+      lineChart('chart-ts', 'ts-loading', 'chart-ts-table',
+        ts.rows.map(function(r){ return r[0]; }),
+        ts.rows.map(function(r){ return r[2]; }));
     }
 
     // Disclosure share (rows: [period, period_ord, provided, requests]).
     var rateRows = rate.rows.filter(function(r){ return r[2] != null && r[3]; });
     if (!rateRows.length) { emptyChart('rate-loading'); } else {
-      pctLineChart('chart-rate', 'rate-loading',
-        rateRows.map(function(r){ return r[0]; }),
-        rateRows.map(function(r){ return r[2] / r[3]; }));
       srTable('chart-rate-table', ['报告周期', '%'],
         rateRows.map(function(r){ return [r[0], (r[2] / r[3] * 100).toFixed(1) + '%']; }));
+      pctLineChart('chart-rate', 'rate-loading', 'chart-rate-table',
+        rateRows.map(function(r){ return r[0]; }),
+        rateRows.map(function(r){ return r[2] / r[3]; }));
     }
 
     // Top countries (rows: [country_name, requests]).
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
-      hbarChart('chart-countries', 'cty-loading',
-        cty.rows.map(function(r){ return r[0]; }),
-        cty.rows.map(function(r){ return r[1]; }));
       srTable('chart-countries-table', ['国家/地区', '收到的请求数'],
         cty.rows.map(function(r){ return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-countries', 'cty-loading', 'chart-countries-table',
+        cty.rows.map(function(r){ return r[0]; }),
+        cty.rows.map(function(r){ return r[1]; }));
     }
 
     // Request-type doughnut (top 8 of the byType rows: [request_type, requests]).
     var typeRows = byType.rows.slice(0, 8);
     if (!typeRows.length) { emptyChart('type-loading'); } else {
-      doughnutChart('chart-types', 'type-loading',
-        typeRows.map(function(r){ return r[0]; }),
-        typeRows.map(function(r){ return r[1]; }));
       srTable('chart-types-table', ['请求类型', '收到的请求数'],
         typeRows.map(function(r){ return [r[0], fmt(r[1])]; }));
+      doughnutChart('chart-types', 'type-loading', 'chart-types-table',
+        typeRows.map(function(r){ return r[0]; }),
+        typeRows.map(function(r){ return r[1]; }));
     }
 
     // App Store takedowns (rows: [period, period_ord, apps]; NULL = the period
     // predates App Store takedown reporting, so drop those).
     var appRows = apps.rows.filter(function(r){ return r[2] != null; });
     if (!appRows.length) { emptyChart('apps-loading'); } else {
-      vbarChart('chart-apps', 'apps-loading',
-        appRows.map(function(r){ return r[0]; }),
-        appRows.map(function(r){ return r[2]; }));
       srTable('chart-apps-table', ['报告周期', '移除的应用'],
         appRows.map(function(r){ return [r[0], fmt(r[2])]; }));
+      vbarChart('chart-apps', 'apps-loading', 'chart-apps-table',
+        appRows.map(function(r){ return r[0]; }),
+        appRows.map(function(r){ return r[2]; }));
     }
   }
 
   // ── Init ──────────────────────────────────────────────────────────────────
   async function init() {
     try {
+      // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
+      // single failure can't block the core tables from rendering.
+      var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
       var results = await Promise.all([
         explore(BY_TYPE), explore(BY_PERIOD),
-        explore(TS_ASC), explore(RATE_ASC), explore(TOP_CTY), explore(APPS_ASC),
+        soft(TS_ASC), soft(RATE_ASC), soft(TOP_CTY), soft(APPS_ASC),
       ]);
       var byType = results[0], byPeriod = results[1];
       renderCharts(byType, results[2], results[3], results[4], results[5]);
