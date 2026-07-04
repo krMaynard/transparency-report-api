@@ -16,10 +16,11 @@ automated detection, appeals, EU-DSA MAU), the **Snap Transparency Report**
 (T&S enforcements, government content/account-removal & information requests,
 DMCA takedowns, by country × violation category), **India's IT Rules 2021
 monthly compliance reports** (proactive content actioned, user grievances,
-accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat), and
-**South Korea's Naver + Kakao transparency reports** (government data requests
+accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat), **South Korea's Naver + Kakao transparency reports** (government data requests
 under the Telecommunications Business Act / Protection of Communications
-Secrets Act, half-yearly since 2012).
+Secrets Act, half-yearly since 2012), and **Taiwan's Anti-Fraud Act data**
+(NPA Art. 42 DNS-blocked fraud sites by month × category; the designated
+platforms' statutory reports to follow).
 
 Built to demonstrate two things:
 
@@ -39,7 +40,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), and the non-VLOP harmonised reports |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), and the non-VLOP harmonised reports |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -49,6 +50,7 @@ Built to demonstrate two things:
 | `data/snap-transparency.json` | Vendored snapshot of the Snap Transparency Report (sibling `dsa-transparency-data/snap-transparency/build_snap.py`) — a tidy-long `columns`+`rows` list; seeded into the `snap_metrics` table by `seed.build_snap_db` |
 | `data/india-it-rules.json` | Vendored snapshot of India's IT Rules 2021 monthly compliance reports (sibling `dsa-transparency-data/india-it-rules/build_india.py`) — a tidy-long `columns`+`rows` list across publishers; seeded into the `india_metrics` table by `seed.build_india_db` |
 | `data/korea-transparency.json` | Vendored snapshot of the Korea (Naver + Kakao) transparency reports (sibling `dsa-transparency-data/korea-transparency/build_korea.py`) — a tidy-long `columns`+`rows` list; seeded into the `korea_metrics` table by `seed.build_korea_db` |
+| `data/taiwan-anti-fraud.json` | Vendored snapshot of Taiwan's Anti-Fraud Act data (sibling `dsa-transparency-data/taiwan-anti-fraud/build_taiwan.py`) — a tidy-long `columns`+`rows` list; seeded into the `taiwan_metrics` table by `seed.build_taiwan_db` |
 | `data/template-crosswalk.json` | Vendored `{original-language label → canonical English}` map for the template's `sections`/`indicators`/`scopes`, applied by `seed.normalize_dimensions` to stamp each dim row's language-neutral `key`. Regenerate with `scripts/build_template_crosswalk.py` |
 | `scripts/build_template_crosswalk.py` | Learns `data/template-crosswalk.json` by aligning same-structure non-VLOP report sheets to an English reference (drops ambiguous labels) — reads the sibling repo's extracted CSVs |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
@@ -226,7 +228,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Six non-DSA datasets ride alongside, each exposed as an ordinary query table
+Seven non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -263,6 +265,14 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   (Daum/Kakao). `unit` is `count`, `percent` (Naver compliance rates) or
   `average` (Naver accounts-per-processed) — **never SUM non-count units**, and
   pin a `metric` (requests ≠ accounts) before aggregating.
+- **Taiwan Anti-Fraud Act** — a single **tidy-long** `taiwan_metrics` table
+  (one row per measured value: `publisher`/`period`/`section`/`category`/
+  `metric`/`unit` + a `value`; dims stored inline). Currently the NPA's
+  Art. 42 enforcement stream (`publisher='NPA-165'`, `section=
+  'dns_blocked_sites'`): fraud sites DNS-blocked per Gregorian month ×
+  official 網站性質 category (labels kept in Chinese). Publisher-keyed so the
+  designated platforms' statutory 透明度報告 (Google/Meta/LINE/TikTok) slot in
+  later — pin a `section` before aggregating once they do.
 
 **Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
 `build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an

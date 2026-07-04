@@ -1169,6 +1169,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "taiwan_metrics": TableSpec(
+        "Taiwan Anti-Fraud Act (詐欺犯罪危害防制條例) transparency data — currently the National Police Agency's Article 42 enforcement stream: fraud websites whose DNS resolution was suspended, aggregated to sites-blocked counts per month × official site-category (網站性質, e.g. 金融保險/電子商務/釣魚網站). A tidy-long table: one row per measured value, identified by publisher × period × section × category × metric. Publisher-keyed so the designated platforms' statutory transparency reports (Google/Meta/LINE/TikTok) can be added later.",
+        "FROM taiwan_metrics f",
+        {
+            "publisher": "f.publisher",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3611,6 +3626,8 @@ FIELD_HELP: dict[str, str] = {
     "content_format": "Strava's per-format breakdown (Activity, Photo, Post, …); empty for other filers.",
     "grain": "'category_total' (the category's own row) or 'breakdown' (Strava's per-format rows). Summing both double-counts — pin one.",
     "submetric": "The source column within `metric`, in the company's own terms (e.g. Snap's 'flagged_total', Strava's 'flagged_by_users').",
+    # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
+    "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream); the designated ad platforms (Google/Meta/LINE/TikTok) will appear here when their statutory reports are added.",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",

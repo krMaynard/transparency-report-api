@@ -71,6 +71,11 @@ _DEFAULT_INDIA_SOURCE = os.getenv(
 _DEFAULT_KOREA_SOURCE = os.getenv(
     "SEED_KOREA_SOURCE_JSON", os.path.join(HERE, "data", "korea-transparency.json")
 )
+# Taiwan Anti-Fraud Act dataset — vendored in-repo (from the sibling data
+# repo's taiwan-anti-fraud/build_taiwan.py).
+_DEFAULT_TAIWAN_SOURCE = os.getenv(
+    "SEED_TAIWAN_SOURCE_JSON", os.path.join(HERE, "data", "taiwan-anti-fraud.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -342,6 +347,21 @@ CREATE TABLE korea_metrics (
     value    REAL
 );
 CREATE INDEX idx_korea_category ON korea_metrics(category);
+
+-- Taiwan Anti-Fraud Act data (taiwan-anti-fraud/build_taiwan.py). Tidy-long:
+-- currently the NPA Art. 42 DNS-blocklist aggregate (sites blocked per month x
+-- site-category); publisher-keyed so the designated platforms' statutory
+-- transparency reports (Google/Meta/LINE/TikTok) slot in later. Dims inline.
+CREATE TABLE taiwan_metrics (
+    publisher TEXT NOT NULL,  -- NPA-165 (government stream); platforms later
+    period    TEXT NOT NULL,  -- Gregorian month, 'YYYY-MM'
+    section   TEXT NOT NULL,  -- dns_blocked_sites (per-publisher sections later)
+    category  TEXT NOT NULL,  -- official 網站性質 site-category label (Chinese)
+    metric    TEXT NOT NULL,  -- sites_blocked
+    unit      TEXT NOT NULL,  -- count
+    value     REAL
+);
+CREATE INDEX idx_taiwan_section ON taiwan_metrics(section);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -818,6 +838,36 @@ def build_korea_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_taiwan_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the taiwan_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long taiwan-anti-fraud.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("taiwan dataset is None")
+    expected_cols = ["publisher", "period", "section", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"taiwan dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("taiwan dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO taiwan_metrics (publisher, period, section, "
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -920,6 +970,8 @@ def main() -> None:
                         help="Path to india-it-rules.json")
     parser.add_argument("--korea-source", default=_DEFAULT_KOREA_SOURCE,
                         help="Path to korea-transparency.json")
+    parser.add_argument("--taiwan-source", default=_DEFAULT_TAIWAN_SOURCE,
+                        help="Path to taiwan-anti-fraud.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1018,6 +1070,16 @@ def main() -> None:
               f"{len({r[2] for r in korea_data['rows']})} periods")
     else:
         print(f"  (skipping Korea transparency — not found: {args.korea_source})")
+
+    if os.path.isfile(args.taiwan_source):
+        with open(args.taiwan_source, "r", encoding="utf-8") as f:
+            taiwan_data = json.load(f)
+        taiwan_rows = build_taiwan_db(taiwan_data, args.db)
+        print(f"  taiwan anti-fraud: {taiwan_rows} metric rows across "
+              f"{len({r[1] for r in taiwan_data['rows']})} periods, "
+              f"{len({r[3] for r in taiwan_data['rows']})} categories")
+    else:
+        print(f"  (skipping Taiwan anti-fraud — not found: {args.taiwan_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

@@ -2626,6 +2626,53 @@ class TestNYTosStatsTable:
         assert all(len(r) == 7 for r in data["rows"][:50])
 
 
+class TestTaiwanTable:
+    def test_taiwan_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "taiwan_metrics" in names
+
+    def test_taiwan_fields_endpoint(self):
+        body = client.get("/api/fields?table=taiwan_metrics", headers=MOMO).json()
+        assert {"publisher", "period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_taiwan_blocked_sites_value(self):
+        # 金融保險 blocked sites, 2025-12 = 7000 (fixture); the Chinese
+        # category label round-trips through the query boundary.
+        job = _submit_and_wait({
+            "table": "taiwan_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "period", "field_values": ["2025-12"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["金融保險"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 7000
+
+    def test_taiwan_group_by_period(self):
+        job = _submit_and_wait({
+            "table": "taiwan_metrics", "group_by": ["period"],
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2025-12", 9100], ["2026-05", 6533]]
+
+    def test_vendored_taiwan_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("taiwan-anti-fraud.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["publisher", "period", "section", "category",
+                                    "metric", "unit", "value"]
+        assert all(len(r) == 7 for r in data["rows"][:50])
+        # aggregate counts only — every current row is a count metric
+        assert all(r[5] == "count" for r in data["rows"])
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:
