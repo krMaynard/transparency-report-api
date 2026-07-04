@@ -1170,7 +1170,7 @@ TABLES: dict[str, TableSpec] = {
         },
     ),
     "taiwan_metrics": TableSpec(
-        "Taiwan Anti-Fraud Act (詐欺犯罪危害防制條例) transparency data — currently the National Police Agency's Article 42 enforcement stream: fraud websites whose DNS resolution was suspended, aggregated to sites-blocked counts per month × official site-category (網站性質, e.g. 金融保險/電子商務/釣魚網站). A tidy-long table: one row per measured value, identified by publisher × period × section × category × metric. Publisher-keyed so the designated platforms' statutory transparency reports (Google/Meta/LINE/TikTok) can be added later.",
+        "Taiwan Anti-Fraud Act (詐欺犯罪危害防制條例) transparency data — two streams. (1) The National Police Agency's Article 42 enforcement stream (publisher 'NPA-165', section 'dns_blocked_sites'): fraud websites whose DNS resolution was suspended, aggregated to sites-blocked counts per month × official site-category (網站性質, e.g. 金融保險/電子商務/釣魚網站). (2) The designated ad platforms' statutory 詐欺防制計畫透明度報告 (publishers 'Google'/'LINE'/'TikTok'; Meta's not yet retrievable): Art. 32/33 notification and enforcement statistics in section 'afa_transparency_report', plus TikTok's voluntary proactive figures in 'platform_enforcement'; platform periods are coverage windows ('YYYY-MM..YYYY-MM'), not months. A tidy-long table: one row per measured value, identified by publisher × period × section × category × metric. Pin a section AND a metric before aggregating — requests ≠ URLs ≠ accounts, and some platform metrics are parts/subsets of others.",
         "FROM taiwan_metrics f",
         {
             "publisher": "f.publisher",
@@ -3294,6 +3294,27 @@ def _leg_warnings(
                 "'metric', so it may add different quantities. Filter or group "
                 "by 'metric'."
             )
+    # taiwan_metrics spans the NPA monthly DNS-blocking stream and the ad
+    # platforms' statutory reports (whose periods are coverage windows and
+    # whose metrics count different quantities, some parts/subsets of others).
+    if table == "taiwan_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned and "publisher" not in pinned:
+            out.append(
+                "'taiwan_metrics' spans the NPA monthly DNS-blocking stream and "
+                "the platforms' statutory reports (different quantities over "
+                "different windows); this aggregate pins neither 'section' nor "
+                "'publisher'. Filter or group by one of them."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'taiwan_metrics' platform rows report requests, URLs and "
+                "accounts as separate metrics — some are parts or subsets of "
+                "others (urls_removed_legal/policy sum to urls_removed; the CIB "
+                "subset is inside art33_accounts_suspended); this aggregate pins "
+                "no 'metric'. Filter or group by 'metric'."
+            )
     # linkedin_metrics mixes counts, percentages and banded national-security
     # ranges in one value column, across three report datasets.
     if table == "linkedin_metrics" and any(
@@ -3796,7 +3817,7 @@ FIELD_HELP: dict[str, str] = {
     "grain": "'category_total' (the category's own row) or 'breakdown' (Strava's per-format rows). Summing both double-counts — pin one.",
     "submetric": "The source column within `metric`, in the company's own terms (e.g. Snap's 'flagged_total', Strava's 'flagged_by_users').",
     # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
-    "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream); the designated ad platforms (Google/Meta/LINE/TikTok) will appear here when their statutory reports are added.",
+    "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream, monthly periods) or a designated ad platform's statutory report ('Google'/'LINE'/'TikTok', coverage-window periods like '2024-07..2025-06'; Meta's report exists but isn't retrievable yet). Pin this before comparing values — each publisher reports different quantities over different windows.",
     # ── Google user-data / Microsoft LERR / LinkedIn (tidy-long, ranged) ──
     "legal_process": "Type of legal process behind the request (google_userdata_metrics) — 'All' (the only grain before 2012-H2, reported ALONGSIDE the split for 2012-H2..2014-H1: pin this field before summing), Subpoenas, Search Warrants, Emergency Disclosure Requests, Preservation Requests, CLOUD Act variants, ….",
     "assisting_country": "For the diplomatic/MLAT datasets (google_userdata_metrics): the country whose legal process assisted the originating country's request; empty elsewhere.",

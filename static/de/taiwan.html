@@ -502,7 +502,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Taiwan · Monatlich · 2025 – 2026</span>
     <h1>Daten zum Anti-Betrugs-Gesetz Taiwans</h1>
-    <p>Vollzugsdaten, veröffentlicht nach Taiwans Gesetz zur Verhütung von Schäden durch Betrugsdelikte (詐欺犯罪危害防制條例): das Register der Nationalen Polizeibehörde über Betrugswebsites, deren DNS-Auflösung nach Artikel 42 ausgesetzt wurde, aggregiert zu Zählungen gesperrter Sites pro Monat × offizieller Site-Kategorie (網站性質 — Bezeichnungen im chinesischen Original belassen). Der Datensatz ist nach Herausgeber indiziert, sodass die gesetzlichen Anti-Betrugs-Transparenzberichte der benannten Plattformen (Google, Meta, LINE, TikTok) später hinzukommen können.</p>
+    <p>Vollzugsdaten, veröffentlicht nach Taiwans Gesetz zur Verhütung von Schäden durch Betrugsdelikte (詐欺犯罪危害防制條例): das Register der Nationalen Polizeibehörde über Betrugswebsites, deren DNS-Auflösung nach Artikel 42 ausgesetzt wurde, aggregiert zu Zählungen gesperrter Sites pro Monat × offizieller Site-Kategorie (網站性質 — Bezeichnungen im chinesischen Original belassen). Der Datensatz ist nach Herausgeber indiziert: Die ersten gesetzlichen Anti-Betrugs-Transparenzberichte der benannten Plattformen (Google, LINE, TikTok — Metas Bericht ist noch nicht abrufbar) erscheinen nun unten neben dem Polizei-Datenstrom.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -549,11 +549,20 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
+  <!-- ── Gesetzliche Plattformberichte ─────────────────────────────── -->
+  <section class="data-section">
+    <h2>Gesetzliche Plattformberichte</h2>
+    <p class="sub">Die ersten Anti-Betrugs-Transparenzberichte der benannten Werbeplattformen nach dem Gesetz: eingegangene Behördenmeldungen sowie bearbeitete Anzeigen, URLs und Konten. Jede Plattform berichtet über ihr eigenes Zeitfenster — die Zahlen sind zwischen Plattformen nicht vergleichbar.</p>
+    <div class="results" id="platformReports" aria-busy="true">
+      <div class="results-loading">Wird geladen…</div>
+    </div>
+  </section>
+
   <p class="hint">Verfeinern oder erweitern Sie diese im <a href="/de/reports">Abfrage-Generator</a> (legen Sie vor dem Aggregieren eine <code>section</code> fest), durchsuchen Sie die vollständige Feldliste auf der Seite <a href="/de/schema">Schema</a> oder lesen Sie die <a href="/de/methodology">Methodik</a>.</p>
 </main>
 
 <footer>
-  <p>Quelle: Artikel-42-DNS-Sperrregister der Nationalen Polizeibehörde, über Taiwans Open-Data-Portal (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, Datensatz 176455</a>). Daten über die <a href="/api">Transparency Report API</a> · <a href="/de/methodology">Methodik</a> · <a href="/de/api-key">API-Schlüssel</a> · <a href="/de/privacy">Datenschutz</a></p>
+  <p>Quelle: Artikel-42-DNS-Sperrregister der Nationalen Polizeibehörde, über Taiwans Open-Data-Portal (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, Datensatz 176455</a>). Gesetzliche Plattformberichte: Google, LINE und TikTok (erste Runde 2025; Quellen im Datenrepository archiviert). Daten über die <a href="/api">Transparency Report API</a> · <a href="/de/methodology">Methodik</a> · <a href="/de/api-key">API-Schlüssel</a> · <a href="/de/privacy">Datenschutz</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Momentaufnahme:</span> <span id="prov-snap"></span> · <span class="prov-label">Zitieren als:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -761,6 +770,64 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
 
+
+  // Labels + display order for the platform-report metrics ("\u2014 " marks a
+  // sub-figure of the metric above it).
+  var METRIC_INFO = [
+    ['government_requests', "Eingegangene behördliche Entfernungsersuchen"],
+    ['moda_notifications', "Eingegangene MODA-Meldungen"],
+    ['notifications_ad_cases', "— bestätigte Werbefälle"],
+    ['notifications_ugc_cases', "— Fälle nutzergenerierter Inhalte"],
+    ['urls_named', "In den Ersuchen genannte URLs/Links"],
+    ['urls_removed', "Entfernte URLs (gesamt)"],
+    ['urls_removed_legal', "— wegen Verstoßes gegen eine rechtliche Anordnung"],
+    ['urls_removed_policy', "— wegen Verstoßes gegen Plattformrichtlinien"],
+    ['urls_not_actioned', "Nicht umsetzbare URLs"],
+    ['ads_removed', "Entfernte Anzeigen (Art. 32)"],
+    ['ad_accounts_suspended', "Gesperrte Werbekonten"],
+    ['advertiser_accounts_banned', "Gesperrte Werbetreibenden-Konten"],
+    ['art32_ad_dispositions', "Gültige Anordnungen zur Anzeigenentfernung (Art. 32)"],
+    ['art32_service_suspension_dispositions', "Gültige Anordnungen zur Dienstaussetzung (Art. 32)"],
+    ['sitc_removal_notices', "Entfernungsmitteilungen nach Wertpapierrecht"],
+    ['art33_accounts_suspended', "Nach Art. 33 gesperrte Konten"],
+    ['art33_accounts_suspended_cib_project', "— über die gemeinsame CIB-Operation"],
+    ['fraud_ads_removed_taiwan', "Proaktiv entfernte Betrugsanzeigen (auf Taiwan ausgerichtet)"],
+    ['advertisers_actioned_taiwan', "— belangte Werbetreibende"],
+    ['videos_removed_taiwan', "In Taiwan entfernte Videos (alle Verstöße)"],
+    ['fraud_videos_removed_taiwan', "— Betrugs- und Scam-Videos"],
+    ['videos_removed_global', "Weltweit entfernte Videos (alle Verstöße)"],
+  ];
+  function renderPlatformReports(rows) {
+    var el = document.getElementById('platformReports');
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
+      return;
+    }
+    var order = {};
+    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
+    rows = rows.slice().sort(function (a, b) {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      var oa = order[a[2]] != null ? order[a[2]] : 999;
+      var ob = order[b[2]] != null ? order[b[2]] : 999;
+      return oa - ob;
+    });
+    var heads = ["Plattform", "Zeitraum", "Statistik", "Wert"];
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("Statistiken der gesetzlichen Anti-Betrugs-Berichte der benannten Plattformen.") + '</caption>'
+      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
+          return '<tr>'
+            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
+            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
+            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
+            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Totals: SUM of blocked sites per month.
@@ -779,6 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
       showError('categoryTotals', "Summen nach Kategorie konnten nicht geladen werden: " + err.message);
+    }
+
+    // Gesetzliche Plattformberichte: every reported figure, publisher by publisher.
+    try {
+      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
+      renderPlatformReports(d3.rows || []);
+    } catch (err) {
+      showError('platformReports', "Plattformberichte konnten nicht geladen werden: " + err.message);
     }
   }
 

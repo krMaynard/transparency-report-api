@@ -502,7 +502,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Taiwán · Mensual · 2025 – 2026</span>
     <h1>Datos de la Ley Antifraude de Taiwán</h1>
-    <p>Datos de aplicación publicados conforme a la Ley de Prevención de Daños por Delitos de Fraude de Taiwán (詐欺犯罪危害防制條例): el registro de la Agencia Nacional de Policía de sitios web fraudulentos cuya resolución DNS fue suspendida en virtud del artículo 42, agregado a recuentos de sitios bloqueados por mes × categoría oficial del sitio (網站性質 — etiquetas conservadas en el chino original). El conjunto de datos está indexado por publicador, de modo que los informes de transparencia antifraude obligatorios de las plataformas designadas (Google, Meta, LINE, TikTok) puedan incorporarse más adelante.</p>
+    <p>Datos de aplicación publicados conforme a la Ley de Prevención de Daños por Delitos de Fraude de Taiwán (詐欺犯罪危害防制條例): el registro de la Agencia Nacional de Policía de sitios web fraudulentos cuya resolución DNS fue suspendida en virtud del artículo 42, agregado a recuentos de sitios bloqueados por mes × categoría oficial del sitio (網站性質 — etiquetas conservadas en el chino original). El conjunto de datos está indexado por publicador: los primeros informes de transparencia antifraude obligatorios de las plataformas designadas (Google, LINE, TikTok — el de Meta aún no está disponible) figuran ahora junto al flujo policial más abajo.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -549,11 +549,20 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
+  <!-- ── Informes obligatorios de las plataformas ─────────────────────────────── -->
+  <section class="data-section">
+    <h2>Informes obligatorios de las plataformas</h2>
+    <p class="sub">Los primeros informes de transparencia antifraude de las plataformas publicitarias designadas conforme a la ley: notificaciones gubernamentales recibidas y anuncios, URL y cuentas objeto de medidas. Cada plataforma informa sobre su propio periodo de cobertura, por lo que las cifras no son comparables entre plataformas.</p>
+    <div class="results" id="platformReports" aria-busy="true">
+      <div class="results-loading">Cargando…</div>
+    </div>
+  </section>
+
   <p class="hint">Refina o amplía estas consultas en el <a href="/es/reports">generador de consultas</a> (fija una <code>section</code> antes de agregar), explora la lista completa de campos en la página <a href="/es/schema">Schema</a> o lee la <a href="/es/methodology">Metodología</a>.</p>
 </main>
 
 <footer>
-  <p>Fuente: registro de suspensiones DNS del artículo 42 de la Agencia Nacional de Policía, vía el portal de datos abiertos de Taiwán (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, conjunto de datos 176455</a>). Datos vía <a href="/api">Transparency Report API</a> · <a href="/es/methodology">Metodología</a> · <a href="/es/api-key">Clave de API</a> · <a href="/es/privacy">Privacidad</a></p>
+  <p>Fuente: registro de suspensiones DNS del artículo 42 de la Agencia Nacional de Policía, vía el portal de datos abiertos de Taiwán (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, conjunto de datos 176455</a>). Informes obligatorios de las plataformas: Google, LINE y TikTok (primera ronda de 2025; fuentes archivadas en el repositorio de datos). Datos vía <a href="/api">Transparency Report API</a> · <a href="/es/methodology">Metodología</a> · <a href="/es/api-key">Clave de API</a> · <a href="/es/privacy">Privacidad</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantánea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citar como:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -761,6 +770,64 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
 
+
+  // Labels + display order for the platform-report metrics ("\u2014 " marks a
+  // sub-figure of the metric above it).
+  var METRIC_INFO = [
+    ['government_requests', "Solicitudes gubernamentales de retirada recibidas"],
+    ['moda_notifications', "Notificaciones del MODA recibidas"],
+    ['notifications_ad_cases', "— casos publicitarios confirmados"],
+    ['notifications_ugc_cases', "— casos de contenido generado por usuarios"],
+    ['urls_named', "URL/enlaces citados en las solicitudes"],
+    ['urls_removed', "URL retiradas (total)"],
+    ['urls_removed_legal', "— por infringir una orden legal"],
+    ['urls_removed_policy', "— por infringir la política de la plataforma"],
+    ['urls_not_actioned', "URL no procesables"],
+    ['ads_removed', "Anuncios retirados (art. 32)"],
+    ['ad_accounts_suspended', "Cuentas publicitarias suspendidas"],
+    ['advertiser_accounts_banned', "Cuentas de anunciantes bloqueadas"],
+    ['art32_ad_dispositions', "Resoluciones válidas de retirada de anuncios (art. 32)"],
+    ['art32_service_suspension_dispositions', "Resoluciones válidas de suspensión de servicio (art. 32)"],
+    ['sitc_removal_notices', "Avisos de retirada por la ley de valores"],
+    ['art33_accounts_suspended', "Cuentas suspendidas según el art. 33"],
+    ['art33_accounts_suspended_cib_project', "— mediante la operación conjunta con la CIB"],
+    ['fraud_ads_removed_taiwan', "Anuncios fraudulentos retirados proactivamente (dirigidos a Taiwán)"],
+    ['advertisers_actioned_taiwan', "— anunciantes sancionados"],
+    ['videos_removed_taiwan', "Vídeos eliminados en Taiwán (todas las infracciones)"],
+    ['fraud_videos_removed_taiwan', "— vídeos de fraude y estafa"],
+    ['videos_removed_global', "Vídeos eliminados a nivel mundial (todas las infracciones)"],
+  ];
+  function renderPlatformReports(rows) {
+    var el = document.getElementById('platformReports');
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
+      return;
+    }
+    var order = {};
+    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
+    rows = rows.slice().sort(function (a, b) {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      var oa = order[a[2]] != null ? order[a[2]] : 999;
+      var ob = order[b[2]] != null ? order[b[2]] : 999;
+      return oa - ob;
+    });
+    var heads = ["Plataforma", "Cobertura", "Estadística", "Valor"];
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("Estadísticas de los informes antifraude obligatorios de las plataformas designadas.") + '</caption>'
+      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
+          return '<tr>'
+            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
+            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
+            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
+            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Totals: SUM of blocked sites per month.
@@ -779,6 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
       showError('categoryTotals', "No se pudieron cargar los totales por categoría: " + err.message);
+    }
+
+    // Informes obligatorios de las plataformas: every reported figure, publisher by publisher.
+    try {
+      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
+      renderPlatformReports(d3.rows || []);
+    } catch (err) {
+      showError('platformReports', "No se pudieron cargar los informes de las plataformas: " + err.message);
     }
   }
 

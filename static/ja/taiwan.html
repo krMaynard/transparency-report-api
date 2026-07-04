@@ -502,7 +502,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">台湾 · 月次 · 2025 – 2026</span>
     <h1>台湾詐欺防止法データ</h1>
-    <p>台湾の詐欺犯罪危害防制條例に基づき公表される執行データ：第42条に基づき DNS 解決が停止された詐欺サイトに関する国家警察庁（NPA）の登録簿を、月 × 公式サイトカテゴリ（網站性質 — ラベルは中国語原文のまま）ごとのブロック件数に集計したものです。データセットは公表主体で索引付けされており、指定プラットフォーム（Google、Meta、LINE、TikTok）の法定詐欺防止透明性レポートを後から追加できます。</p>
+    <p>台湾の詐欺犯罪危害防制條例に基づき公表される執行データ：第42条に基づき DNS 解決が停止された詐欺サイトに関する国家警察庁（NPA）の登録簿を、月 × 公式サイトカテゴリ（網站性質 — ラベルは中国語原文のまま）ごとのブロック件数に集計したものです。データセットは公表主体で索引付けされており、指定プラットフォーム（Google、LINE、TikTok — Meta のレポートは未取得）の第1回法定詐欺防止透明性レポートが、下記の警察データとともに掲載されています。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -549,11 +549,20 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
+  <!-- ── プラットフォームの法定レポート ─────────────────────────────── -->
+  <section class="data-section">
+    <h2>プラットフォームの法定レポート</h2>
+    <p class="sub">指定広告プラットフォームによる同法に基づく初回の詐欺防止透明性レポート：受領した政府通報と、対応した広告・URL・アカウントの件数。対象期間はプラットフォームごとに異なるため、数値はプラットフォーム間で比較できません。</p>
+    <div class="results" id="platformReports" aria-busy="true">
+      <div class="results-loading">読み込み中…</div>
+    </div>
+  </section>
+
   <p class="hint">これらは<a href="/ja/reports">クエリビルダー</a>で絞り込みまたは拡張でき（集計の前に <code>section</code> を固定してください）、<a href="/ja/schema">Schema</a> ページで全フィールド一覧を閲覧したり、<a href="/ja/methodology">方法論</a>を読んだりできます。</p>
 </main>
 
 <footer>
-  <p>出典：国家警察庁の第42条 DNS 停止登録簿（台湾のオープンデータポータル <a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw データセット 176455</a> 経由）。データは <a href="/api">Transparency Report API</a> 経由 · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">APIキー</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p>出典：国家警察庁の第42条 DNS 停止登録簿（台湾のオープンデータポータル <a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw データセット 176455</a> 経由）。プラットフォームの法定レポート：Google、LINE、TikTok（2025年第1回。原本はデータリポジトリに保存）。データは <a href="/api">Transparency Report API</a> 経由 · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">APIキー</a> · <a href="/ja/privacy">プライバシー</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -761,6 +770,64 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
 
+
+  // Labels + display order for the platform-report metrics ("\u2014 " marks a
+  // sub-figure of the metric above it).
+  var METRIC_INFO = [
+    ['government_requests', "受領した政府の削除要請"],
+    ['moda_notifications', "受領したデジタル発展部（MODA）通報"],
+    ['notifications_ad_cases', "— 広告案件と確認された件数"],
+    ['notifications_ugc_cases', "— ユーザー生成コンテンツの件数"],
+    ['urls_named', "要請に列挙された URL・リンク数"],
+    ['urls_removed', "削除された URL（合計）"],
+    ['urls_removed_legal', "— 法的命令違反によるもの"],
+    ['urls_removed_policy', "— プラットフォームポリシー違反によるもの"],
+    ['urls_not_actioned', "対応不能だった URL"],
+    ['ads_removed', "削除された広告（第32条）"],
+    ['ad_accounts_suspended', "停止された広告アカウント"],
+    ['advertiser_accounts_banned', "禁止された広告主アカウント"],
+    ['art32_ad_dispositions', "有効な広告削除処分（第32条）"],
+    ['art32_service_suspension_dispositions', "有効なサービス停止処分（第32条）"],
+    ['sitc_removal_notices', "証券法に基づく削除通知"],
+    ['art33_accounts_suspended', "第33条に基づき停止されたアカウント"],
+    ['art33_accounts_suspended_cib_project', "— 刑事警察局との合同作戦分"],
+    ['fraud_ads_removed_taiwan', "能動的に削除された詐欺広告（台湾向け）"],
+    ['advertisers_actioned_taiwan', "— 処置された広告主"],
+    ['videos_removed_taiwan', "台湾で削除された動画（全違反）"],
+    ['fraud_videos_removed_taiwan', "— 詐欺関連動画"],
+    ['videos_removed_global', "全世界で削除された動画（全違反）"],
+  ];
+  function renderPlatformReports(rows) {
+    var el = document.getElementById('platformReports');
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
+      return;
+    }
+    var order = {};
+    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
+    rows = rows.slice().sort(function (a, b) {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      var oa = order[a[2]] != null ? order[a[2]] : 999;
+      var ob = order[b[2]] != null ? order[b[2]] : 999;
+      return oa - ob;
+    });
+    var heads = ["プラットフォーム", "対象期間", "統計項目", "値"];
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("指定プラットフォームの法定詐欺防止レポートの統計。") + '</caption>'
+      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
+          return '<tr>'
+            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
+            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
+            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
+            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Totals: SUM of blocked sites per month.
@@ -779,6 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
       showError('categoryTotals', "カテゴリ別合計の読み込みに失敗しました: " + err.message);
+    }
+
+    // プラットフォームの法定レポート: every reported figure, publisher by publisher.
+    try {
+      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
+      renderPlatformReports(d3.rows || []);
+    } catch (err) {
+      showError('platformReports', "プラットフォームレポートの読み込みに失敗しました: " + err.message);
     }
   }
 

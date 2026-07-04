@@ -502,7 +502,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">台湾 · 月度 · 2025 – 2026</span>
     <h1>台湾反诈骗法数据</h1>
-    <p>依据台湾《诈欺犯罪危害防制条例》发布的执法数据：警政署依第42条暂停 DNS 解析的诈骗网站登记册，汇总为按月份 × 官方网站类别（網站性質——标签保留繁体原文）的封锁网站计数。数据集按发布者索引，因此指定平台（Google、Meta、LINE、TikTok）的法定反诈骗透明度报告日后可以并入。</p>
+    <p>依据台湾《诈欺犯罪危害防制条例》发布的执法数据：警政署依第42条暂停 DNS 解析的诈骗网站登记册，汇总为按月份 × 官方网站类别（網站性質——标签保留繁体原文）的封锁网站计数。数据集按发布者索引：指定平台（Google、LINE、TikTok——Meta 的报告尚无法获取）的首份法定反诈骗透明度报告现已与下方的警政数据并列收录。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -549,11 +549,20 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
+  <!-- ── 平台法定报告 ─────────────────────────────── -->
+  <section class="data-section">
+    <h2>平台法定报告</h2>
+    <p class="sub">指定广告平台依该条例发布的首份反诈骗透明度报告：收到的政府通报，以及处置的广告、网址和账号数量。各平台的涵盖期间不同，因此数字不可跨平台比较。</p>
+    <div class="results" id="platformReports" aria-busy="true">
+      <div class="results-loading">加载中…</div>
+    </div>
+  </section>
+
   <p class="hint">可在<a href="/zh/reports">查询构建器</a>中细化或扩展这些查询（在聚合前固定一个 <code>section</code>），在 <a href="/zh/schema">Schema</a> 页面浏览完整字段列表，或阅读<a href="/zh/methodology">方法论</a>。</p>
 </main>
 
 <footer>
-  <p>来源：警政署第42条 DNS 暂停登记册，经台湾开放数据平台（<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw 数据集 176455</a>）。数据经由 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">方法论</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
+  <p>来源：警政署第42条 DNS 暂停登记册，经台湾开放数据平台（<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw 数据集 176455</a>）。平台法定报告：Google、LINE、TikTok（2025年首轮；来源已存档于数据仓库）。数据经由 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">方法论</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">快照：</span> <span id="prov-snap"></span> · <span class="prov-label">引用格式：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -761,6 +770,64 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
 
+
+  // Labels + display order for the platform-report metrics ("\u2014 " marks a
+  // sub-figure of the metric above it).
+  var METRIC_INFO = [
+    ['government_requests', "收到的政府移除要求"],
+    ['moda_notifications', "收到的数位发展部通报"],
+    ['notifications_ad_cases', "— 确认为广告的案件"],
+    ['notifications_ugc_cases', "— 用户生成内容的案件"],
+    ['urls_named', "要求中列出的网址/链接"],
+    ['urls_removed', "移除的网址（总计）"],
+    ['urls_removed_legal', "— 因违反法律命令"],
+    ['urls_removed_policy', "— 因违反平台政策"],
+    ['urls_not_actioned', "无法处理的网址"],
+    ['ads_removed', "下架的广告（第32条）"],
+    ['ad_accounts_suspended', "被中止的广告账号"],
+    ['advertiser_accounts_banned', "被禁用的广告主账号"],
+    ['art32_ad_dispositions', "有效的广告下架行政处分（第32条）"],
+    ['art32_service_suspension_dispositions', "有效的暂停服务行政处分（第32条）"],
+    ['sitc_removal_notices', "依证券投信投顾法的移除通知"],
+    ['art33_accounts_suspended', "依第33条暂停服务的账号"],
+    ['art33_accounts_suspended_cib_project', "— 其中与刑事警察局专案合作"],
+    ['fraud_ads_removed_taiwan', "主动移除的诈骗广告（针对台湾投放）"],
+    ['advertisers_actioned_taiwan', "— 受处置的广告主"],
+    ['videos_removed_taiwan', "在台湾移除的影片（所有违规）"],
+    ['fraud_videos_removed_taiwan', "— 诈骗相关影片"],
+    ['videos_removed_global', "全球移除的影片（所有违规）"],
+  ];
+  function renderPlatformReports(rows) {
+    var el = document.getElementById('platformReports');
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
+      return;
+    }
+    var order = {};
+    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
+    rows = rows.slice().sort(function (a, b) {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      var oa = order[a[2]] != null ? order[a[2]] : 999;
+      var ob = order[b[2]] != null ? order[b[2]] : 999;
+      return oa - ob;
+    });
+    var heads = ["平台", "涵盖期间", "统计项目", "数值"];
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("指定平台法定反诈骗报告的统计数据。") + '</caption>'
+      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
+          return '<tr>'
+            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
+            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
+            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
+            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Totals: SUM of blocked sites per month.
@@ -779,6 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
       showError('categoryTotals', "加载类别总计失败：" + err.message);
+    }
+
+    // 平台法定报告: every reported figure, publisher by publisher.
+    try {
+      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
+      renderPlatformReports(d3.rows || []);
+    } catch (err) {
+      showError('platformReports', "加载平台报告失败：" + err.message);
     }
   }
 

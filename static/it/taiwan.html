@@ -502,7 +502,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Taiwan · Mensile · 2025 – 2026</span>
     <h1>Dati della legge antifrode di Taiwan</h1>
-    <p>Dati di applicazione pubblicati ai sensi della legge taiwanese sulla prevenzione dei danni da reati di frode (詐欺犯罪危害防制條例): il registro dell'Agenzia nazionale di polizia dei siti web fraudolenti la cui risoluzione DNS è stata sospesa ai sensi dell'articolo 42, aggregato in conteggi di siti bloccati per mese × categoria ufficiale del sito (網站性質 — etichette mantenute nel cinese originale). Il set di dati è indicizzato per editore, così i report di trasparenza antifrode obbligatori delle piattaforme designate (Google, Meta, LINE, TikTok) potranno aggiungersi in seguito.</p>
+    <p>Dati di applicazione pubblicati ai sensi della legge taiwanese sulla prevenzione dei danni da reati di frode (詐欺犯罪危害防制條例): il registro dell'Agenzia nazionale di polizia dei siti web fraudolenti la cui risoluzione DNS è stata sospesa ai sensi dell'articolo 42, aggregato in conteggi di siti bloccati per mese × categoria ufficiale del sito (網站性質 — etichette mantenute nel cinese originale). Il set di dati è indicizzato per editore: i primi report di trasparenza antifrode obbligatori delle piattaforme designate (Google, LINE, TikTok — quello di Meta non è ancora recuperabile) compaiono ora accanto al flusso di polizia qui sotto.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -549,11 +549,20 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
+  <!-- ── Report obbligatori delle piattaforme ─────────────────────────────── -->
+  <section class="data-section">
+    <h2>Report obbligatori delle piattaforme</h2>
+    <p class="sub">I primi report di trasparenza antifrode delle piattaforme pubblicitarie designate ai sensi della legge: notifiche governative ricevute e annunci, URL e account oggetto di provvedimenti. Ogni piattaforma copre una propria finestra temporale, quindi le cifre non sono comparabili tra piattaforme.</p>
+    <div class="results" id="platformReports" aria-busy="true">
+      <div class="results-loading">Caricamento…</div>
+    </div>
+  </section>
+
   <p class="hint">Affina o estendi queste query nel <a href="/it/reports">generatore di query</a> (fissa una <code>section</code> prima di aggregare), sfoglia l'elenco completo dei campi nella pagina <a href="/it/schema">Schema</a> o leggi la <a href="/it/methodology">Metodologia</a>.</p>
 </main>
 
 <footer>
-  <p>Fonte: registro delle sospensioni DNS ex articolo 42 dell'Agenzia nazionale di polizia, tramite il portale open data di Taiwan (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, set di dati 176455</a>). Dati tramite la <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Metodologia</a> · <a href="/it/api-key">Chiave API</a> · <a href="/it/privacy">Privacy</a></p>
+  <p>Fonte: registro delle sospensioni DNS ex articolo 42 dell'Agenzia nazionale di polizia, tramite il portale open data di Taiwan (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, set di dati 176455</a>). Report obbligatori delle piattaforme: Google, LINE e TikTok (prima tornata 2025; fonti archiviate nel repository dei dati). Dati tramite la <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Metodologia</a> · <a href="/it/api-key">Chiave API</a> · <a href="/it/privacy">Privacy</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Istantanea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citare come:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -761,6 +770,64 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
 
+
+  // Labels + display order for the platform-report metrics ("\u2014 " marks a
+  // sub-figure of the metric above it).
+  var METRIC_INFO = [
+    ['government_requests', "Richieste governative di rimozione ricevute"],
+    ['moda_notifications', "Notifiche MODA ricevute"],
+    ['notifications_ad_cases', "— casi pubblicitari confermati"],
+    ['notifications_ugc_cases', "— casi di contenuti generati dagli utenti"],
+    ['urls_named', "URL/link citati nelle richieste"],
+    ['urls_removed', "URL rimossi (totale)"],
+    ['urls_removed_legal', "— per violazione di un ordine legale"],
+    ['urls_removed_policy', "— per violazione delle policy della piattaforma"],
+    ['urls_not_actioned', "URL non processabili"],
+    ['ads_removed', "Annunci rimossi (art. 32)"],
+    ['ad_accounts_suspended', "Account pubblicitari sospesi"],
+    ['advertiser_accounts_banned', "Account inserzionisti bannati"],
+    ['art32_ad_dispositions', "Provvedimenti validi di rimozione annunci (art. 32)"],
+    ['art32_service_suspension_dispositions', "Provvedimenti validi di sospensione del servizio (art. 32)"],
+    ['sitc_removal_notices', "Notifiche di rimozione ai sensi della legge sui titoli"],
+    ['art33_accounts_suspended', "Account sospesi ai sensi dell'art. 33"],
+    ['art33_accounts_suspended_cib_project', "— tramite l'operazione congiunta con il CIB"],
+    ['fraud_ads_removed_taiwan', "Annunci fraudolenti rimossi proattivamente (mirati a Taiwan)"],
+    ['advertisers_actioned_taiwan', "— inserzionisti sanzionati"],
+    ['videos_removed_taiwan', "Video rimossi a Taiwan (tutte le violazioni)"],
+    ['fraud_videos_removed_taiwan', "— video di frode e truffa"],
+    ['videos_removed_global', "Video rimossi a livello globale (tutte le violazioni)"],
+  ];
+  function renderPlatformReports(rows) {
+    var el = document.getElementById('platformReports');
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
+      return;
+    }
+    var order = {};
+    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
+    rows = rows.slice().sort(function (a, b) {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      var oa = order[a[2]] != null ? order[a[2]] : 999;
+      var ob = order[b[2]] != null ? order[b[2]] : 999;
+      return oa - ob;
+    });
+    var heads = ["Piattaforma", "Copertura", "Statistica", "Valore"];
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("Statistiche dei report antifrode obbligatori delle piattaforme designate.") + '</caption>'
+      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
+          return '<tr>'
+            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
+            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
+            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
+            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Totals: SUM of blocked sites per month.
@@ -779,6 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
       showError('categoryTotals', "Impossibile caricare i totali per categoria: " + err.message);
+    }
+
+    // Report obbligatori delle piattaforme: every reported figure, publisher by publisher.
+    try {
+      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
+      renderPlatformReports(d3.rows || []);
+    } catch (err) {
+      showError('platformReports', "Impossibile caricare i report delle piattaforme: " + err.message);
     }
   }
 

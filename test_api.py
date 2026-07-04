@@ -2772,12 +2772,53 @@ class TestTaiwanTable:
     def test_taiwan_group_by_period(self):
         job = _submit_and_wait({
             "table": "taiwan_metrics", "group_by": ["period"],
+            "query": {"and": [{"operation": "EQ", "field_name": "publisher",
+                               "field_values": ["NPA-165"]}]},
             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
             "sort": [{"field_name": "period", "order": "asc"}],
         })
         assert job["status"] == "done"
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"] == [["2025-12", 9100], ["2026-05", 6533]]
+
+    def test_taiwan_platform_report_value(self):
+        # Google's statutory report (fixture, matches the filed PDF): 3,564
+        # URLs removed over the 2024-07..2025-06 coverage window.
+        job = _submit_and_wait({
+            "table": "taiwan_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "publisher", "field_values": ["Google"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["urls_removed"]},
+            ]},
+            "group_by": ["period"],
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2024-07..2025-06", 3564]]
+
+    def test_taiwan_unpinned_sum_warns(self):
+        # A SUM pinning neither section/publisher nor metric would mix the NPA
+        # stream with the platform reports and add unrelated quantities.
+        r = client.post("/api/explore", json={
+            "table": "taiwan_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "publisher" in warnings and "metric" in warnings
+
+    def test_taiwan_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "taiwan_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["dns_blocked_sites"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["sites_blocked"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
 
     def test_vendored_taiwan_dataset_shape(self):
         import json
@@ -2786,9 +2827,16 @@ class TestTaiwanTable:
                           .joinpath("taiwan-anti-fraud.json").read_text(encoding="utf-8"))
         assert data["columns"] == ["publisher", "period", "section", "category",
                                     "metric", "unit", "value"]
-        assert all(len(r) == 7 for r in data["rows"][:50])
+        assert all(len(r) == 7 for r in data["rows"])
         # aggregate counts only — every current row is a count metric
         assert all(r[5] == "count" for r in data["rows"])
+        # both streams present: the NPA registry and the three extracted
+        # platform statutory reports (Meta's is not yet retrievable).
+        assert {r[0] for r in data["rows"]} == {"NPA-165", "Google", "LINE", "TikTok"}
+        plat = [r for r in data["rows"] if r[0] != "NPA-165"]
+        assert all(".." in r[1] for r in plat)  # coverage windows, not months
+        assert ["Google", "2024-07..2025-06", "afa_transparency_report", "",
+                "urls_removed", "count", 3564] in plat
 
 
 class TestGoogleUserDataTable:
