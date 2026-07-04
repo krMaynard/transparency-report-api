@@ -2084,7 +2084,8 @@ class TestAccessibility:
 class TestLocalization:
     LOCALES = ("es", "fr", "de", "it", "ja", "zh", "ko")
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
-                "github", "snap", "schema", "api-key", "privacy")
+                "github", "snap", "india", "korea", "taiwan",
+                "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.
@@ -2434,6 +2435,52 @@ class TestSnapTable:
                           .joinpath("snap-transparency.json").read_text(encoding="utf-8"))
         assert data["columns"][0] == "period" and len(data["columns"]) == 7
         assert all(len(r) == 7 for r in data["rows"][:50])
+
+
+# ── India / Korea / Taiwan dataset pages ──────────────────────────────────────
+
+class TestDatasetPages:
+    def test_india_page_served(self):
+        r = client.get("/india")
+        assert r.status_code == 200
+        assert "India IT Rules Compliance Reports" in r.text
+        assert '"table":"india_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_korea_page_served(self):
+        r = client.get("/korea")
+        assert r.status_code == 200
+        assert "Korea Transparency Reports" in r.text
+        assert '"table":"korea_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_taiwan_page_served(self):
+        r = client.get("/taiwan")
+        assert r.status_code == 200
+        assert "Taiwan Anti-Fraud Act Data" in r.text
+        assert '"table":"taiwan_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_new_dataset_pages_in_sidebar_nav(self):
+        # The three new pages are linked from every page's sidebar nav.
+        for path in ("/", "/reports", "/schema", "/apple"):
+            t = client.get(path).text
+            assert 'href="/india"' in t, path
+            assert 'href="/korea"' in t, path
+            assert 'href="/taiwan"' in t, path
+
+    def test_localized_dataset_pages(self):
+        # Chrome/heading is localized (Korean korea h1; Chinese taiwan h1;
+        # Spanish india h1) and the strict per-page CSP holds.
+        cases = {"/ko/korea": "한국 투명성 보고서",
+                 "/zh/taiwan": "台湾反诈骗法数据",
+                 "/es/india": "Informes de cumplimiento de las Reglas de TI de la India"}
+        for path, marker in cases.items():
+            r = client.get(path)
+            assert r.status_code == 200, path
+            assert marker in r.text, path
+            csp = r.headers.get("Content-Security-Policy", "")
+            assert "script-src 'self'" in csp, path
 
 
 class TestIndiaTable:
