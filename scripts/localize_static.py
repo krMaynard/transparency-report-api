@@ -6440,8 +6440,8 @@ PAGES["ja"]["github.html"] = [
     (r"'Failed to load categories: '", r"'カテゴリの読み込みに失敗しました: '"),
     (r"'“GitHub Transparency Report, via the Transparency Report API ('",
      r"'“GitHub 透明性レポート（Transparency Report API 経由、'"),
-    (r"' snapshot'", r" のスナップショット"),
-    (r"', dataset version '", r"、データセットバージョン "),
+    (r"' snapshot'", r"' のスナップショット'"),
+    (r"', dataset version '", r"'、データセットバージョン '"),
     ("Interactive views of GitHub's reported figures. Each chart has a text alternative for screen readers.",
      '''GitHubが報告した数値のインタラクティブ表示。各グラフにはスクリーンリーダー向けのテキスト代替があります。'''),
     ('Requests received vs. accounts disclosed under legal process (exact counts, reported since 2021).',
@@ -6500,8 +6500,8 @@ PAGES["zh"]["github.html"] = [
     (r"'Failed to load categories: '", r"'加载类别失败：'"),
     (r"'“GitHub Transparency Report, via the Transparency Report API ('",
      r"'“GitHub 透明度报告，经由 Transparency Report API（'"),
-    (r"' snapshot'", r" 快照"),
-    (r"', dataset version '", r"，数据集版本 "),
+    (r"' snapshot'", r"' 快照'"),
+    (r"', dataset version '", r"'，数据集版本 '"),
     ("Interactive views of GitHub's reported figures. Each chart has a text alternative for screen readers.",
      '''GitHub 报告数据的交互式视图。每个图表都有面向屏幕阅读器的文字替代。'''),
     ('Requests received vs. accounts disclosed under legal process (exact counts, reported since 2021).',
@@ -6560,8 +6560,8 @@ PAGES["ko"]["github.html"] = [
     (r"'Failed to load categories: '", r"'분류를 불러오지 못했습니다: '"),
     (r"'“GitHub Transparency Report, via the Transparency Report API ('",
      r"'“GitHub 투명성 보고서, Transparency Report API 경유 ('"),
-    (r"' snapshot'", r" 스냅샷"),
-    (r"', dataset version '", r", 데이터셋 버전 "),
+    (r"' snapshot'", r"' 스냅샷'"),
+    (r"', dataset version '", r"', 데이터셋 버전 '"),
     ("Interactive views of GitHub's reported figures. Each chart has a text alternative for screen readers.",
      '''GitHub가 보고한 수치의 인터랙티브 보기입니다. 각 차트에는 스크린 리더용 텍스트 대체가 제공됩니다.'''),
     ('Requests received vs. accounts disclosed under legal process (exact counts, reported since 2021).',
@@ -6968,6 +6968,38 @@ PAGES["ko"]["snap.html"] = [
      '''기간'''),
 ]
 
+def check_inline_js(path: str, text: str) -> None:
+    """Syntax-check every inline <script> of a written page with `node --check`.
+
+    A translation containing an apostrophe (e.g. "Catégorie d'infraction")
+    dropped into a single-quoted JS literal kills the page's entire script —
+    this happened to fr/apple, fr/snap and (via quote-eating pairs) ja/zh/ko
+    github before this guard existed. Skips quietly when node isn't installed.
+    """
+    import re as _re
+    import shutil as _shutil
+    import subprocess as _subprocess
+    import tempfile as _tempfile
+    if not _shutil.which("node"):
+        return
+    for script in _re.findall(r"<script>\n([\s\S]*?)</script>", text):
+        with _tempfile.NamedTemporaryFile("w", suffix=".js", delete=False,
+                                          encoding="utf-8") as f:
+            f.write(script)
+            tmp = f.name
+        try:
+            r = _subprocess.run(["node", "--check", tmp],
+                                capture_output=True, text=True)
+            if r.returncode != 0:
+                raise SystemExit(
+                    f"{path}: localized inline script has a JS syntax error "
+                    f"(a translation likely broke a quoted literal):\n"
+                    + r.stderr.replace(tmp, path)
+                )
+        finally:
+            os.unlink(tmp)
+
+
 def main(argv: list[str]) -> int:
     targets = argv[1:] or [code for code, _ in LANGS if code != "en"]
     # Always re-emit English in place so the in-site switcher stays in sync.
@@ -6986,6 +7018,7 @@ def main(argv: list[str]) -> int:
                 dest = os.path.join(dest_dir, page)
             with open(dest, "w", encoding="utf-8") as f:
                 f.write(out)
+            check_inline_js(dest, out)
             print(f"wrote {os.path.relpath(dest, ROOT)}")
     return 0
 

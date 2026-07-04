@@ -532,7 +532,7 @@ display: flex; align-items: center; justify-content: space-between;
 
 <script>
 (function () {
-  'use strict';
+  "use strict";
 
   // ── Dark mode + hamburger ─────────────────────────────────────────────────
   var themeBtn = document.querySelector('[data-theme-toggle]');
@@ -589,7 +589,7 @@ display: flex; align-items: center; justify-content: space-between;
       body: JSON.stringify(body),
     });
     var d = await r.json();
-    if (!r.ok) throw new Error(d.detail || 'HTTP ' + r.status);
+    if (!r.ok) throw new Error(d.detail || "HTTP " + r.status);
     return d;
   }
 
@@ -627,7 +627,7 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      '“Snap Transparency Report, via the Transparency Report API (' + generated + ' snapshot'
+      "“Snap Transparency Report, via the Transparency Report API (" + generated + ' snapshot'
       + (version ? ', dataset version ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
@@ -656,7 +656,7 @@ display: flex; align-items: center; justify-content: space-between;
   // No-data state: keep the canvas hidden and reuse the loading slot for the
   // message, so empty is distinguishable from loading and from broken.
   function emptyChart(loadingId) {
-    document.getElementById(loadingId).textContent = 'No data available.';
+    document.getElementById(loadingId).textContent = "No data available.";
   }
 
   // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
@@ -713,9 +713,9 @@ display: flex; align-items: center; justify-content: space-between;
   // pass can never rewrite a query value — only page prose is translated.
   var CAT_COUNTRY = 'Coun' + 'try';
   var CAT_GLOBAL = 'Glo' + 'bal';
-  var SEC_TS = 'Overview of Our T&S Enforce' + 'ments';
-  var SEC_INTL = 'International Government Information ' + 'Requests';
-  var SEC_ADS = 'Ads ' + 'Moderation';
+  var SEC_TS = "Overview of Our T&S Enforce" + 'ments';
+  var SEC_INTL = "International Government Information " + 'Requests';
+  var SEC_ADS = "Ads " + 'Moderation';
   function VIO_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_GLOBAL]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}],"not":[{"operation":"EQ","field_name":"sub_category_1","field_values":["Reactive and Proactive"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20}; }
   function CTY_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_COUNTRY]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function GOV_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_INTL]},{"operation":"EQ","field_name":"metric","field_values":["other_information_requests"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
@@ -723,21 +723,21 @@ display: flex; align-items: center; justify-content: space-between;
 
   function renderCharts(vio, cty, gov, ads) {
     if (!vio.rows.length) { emptyChart('vio-loading'); } else {
-      srTable('chart-vio-table', ['Violation category', 'Enforcements'],
+      srTable('chart-vio-table', ["Violation category", "Enforcements"],
         vio.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       hbarChart('chart-vio', 'vio-loading', 'chart-vio-table',
         vio.rows.map(function (r) { return r[0]; }),
         vio.rows.map(function (r) { return r[1]; }));
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
-      srTable('chart-cty-table', ['Country', 'Enforcements'],
+      srTable('chart-cty-table', ["Country", "Enforcements"],
         cty.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       hbarChart('chart-cty', 'cty-loading', 'chart-cty-table',
         cty.rows.map(function (r) { return r[0]; }),
         cty.rows.map(function (r) { return r[1]; }));
     }
     if (!gov.rows.length) { emptyChart('gov-loading'); } else {
-      srTable('chart-gov-table', ['Country', 'Information requests'],
+      srTable('chart-gov-table', ["Country", "Information requests"],
         gov.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       hbarChart('chart-gov', 'gov-loading', 'chart-gov-table',
         gov.rows.map(function (r) { return r[0]; }),
@@ -751,7 +751,7 @@ display: flex; align-items: center; justify-content: space-between;
         (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
       });
       var metrics = Object.keys(byMetric).sort().reverse(); // reported before removed
-      srTable('chart-ads-table', ['Period'].concat(metrics),
+      srTable('chart-ads-table', ["Period"].concat(metrics),
         periods.map(function (p) { return [p].concat(metrics.map(function (m) { return fmt(byMetric[m][p]); })); }));
       vbarsChart('chart-ads', 'ads-loading', 'chart-ads-table', periods,
         metrics.map(function (m) { return { label: m, data: periods.map(function (p) { return byMetric[m][p] == null ? null : byMetric[m][p]; }) }; }));
@@ -763,19 +763,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per section.
     try {
       var d = await explore({"table":"snap_metrics","group_by":["section"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"values"}],"sort":[{"field_name":"values","order":"desc"}],"max_count":30});
-      renderTable('sectionCoverage', d.rows || [], 'Reported values in each section of the Snap Transparency Report.', 'Section', 'Reported values');
+      renderTable('sectionCoverage', d.rows || [], "Reported values in each section of the Snap Transparency Report.", 'Section', "Reported values");
       fillProvenance(d.generated, d.version);
     } catch (err) {
-      showError('sectionCoverage', 'Failed to load section coverage: ' + err.message);
+      showError('sectionCoverage', "Failed to load section coverage: " + err.message);
     }
 
     // US government information requests: SUM per metric within that section.
     try {
       var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
-      renderTable('usGov', d2.rows || [], 'US government information requests to Snap, totalled per metric.', 'Metric', 'Total');
+      renderTable('usGov', d2.rows || [], "US government information requests to Snap, totalled per metric.", 'Metric', 'Total');
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usGov', 'Failed to load US government requests: ' + err.message);
+      showError('usGov', "Failed to load US government requests: " + err.message);
     }
   }
 

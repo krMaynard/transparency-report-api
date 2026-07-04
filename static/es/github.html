@@ -501,7 +501,7 @@ display: flex; align-items: center; justify-content: space-between;
 
 <script>
 (function () {
-  'use strict';
+  "use strict";
 
   // ── Dark mode + hamburger ─────────────────────────────────────────────────
   var themeBtn = document.querySelector('[data-theme-toggle]');
@@ -558,7 +558,7 @@ display: flex; align-items: center; justify-content: space-between;
       body: JSON.stringify(body),
     });
     var d = await r.json();
-    if (!r.ok) throw new Error(d.detail || 'HTTP ' + r.status);
+    if (!r.ok) throw new Error(d.detail || "HTTP " + r.status);
     return d;
   }
 
@@ -619,7 +619,7 @@ display: flex; align-items: center; justify-content: space-between;
   // No-data state: keep the canvas hidden and reuse the loading slot for the
   // message, so empty is distinguishable from loading and from broken.
   function emptyChart(loadingId) {
-    document.getElementById(loadingId).textContent = 'No data available.';
+    document.getElementById(loadingId).textContent = "No data available.";
   }
 
   // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
@@ -716,14 +716,14 @@ display: flex; align-items: center; justify-content: space-between;
           (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
         });
         var metrics = Object.keys(byMetric).sort().reverse(); // received before disclosed
-        srTable('chart-ui-table', ['Año'].concat(metrics),
+        srTable('chart-ui-table', ["Año"].concat(metrics),
           years.map(function (y) { return [y].concat(metrics.map(function (m) { return fmt(byMetric[m][y]); })); }));
         linesChart('chart-ui', 'ui-loading', 'chart-ui-table', years,
           metrics.map(function (m) { return { label: m, data: years.map(function (y) { return byMetric[m][y] == null ? null : byMetric[m][y]; }) }; }));
       }
 
       if (!gt.rows.length) { emptyChart('gt-loading'); } else {
-        srTable('chart-gt-table', ['Año', 'Solicitudes de retirada'],
+        srTable('chart-gt-table', ["Año", "Solicitudes de retirada"],
           gt.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
         linesChart('chart-gt', 'gt-loading', 'chart-gt-table',
           gt.rows.map(function (r) { return r[0]; }),
@@ -731,7 +731,7 @@ display: flex; align-items: center; justify-content: space-between;
       }
 
       if (!gov.rows.length) { emptyChart('gov-loading'); } else {
-        srTable('chart-gov-table', ['Gobierno', 'Solicitudes de retirada'],
+        srTable('chart-gov-table', ["Gobierno", "Solicitudes de retirada"],
           gov.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
         hbarChart('chart-gov', 'gov-loading', 'chart-gov-table',
           gov.rows.map(function (r) { return r[0]; }),
@@ -739,7 +739,7 @@ display: flex; align-items: center; justify-content: space-between;
       }
 
       if (!dmca.rows.length) { emptyChart('dmca-loading'); } else {
-        srTable('chart-dmca-table', ['Año', 'Avisos DMCA'],
+        srTable('chart-dmca-table', ["Año", "Avisos DMCA"],
           dmca.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
         vbarsChart('chart-dmca', 'dmca-loading', 'chart-dmca-table',
           dmca.rows.map(function (r) { return r[0]; }),
@@ -753,25 +753,25 @@ display: flex; align-items: center; justify-content: space-between;
       provFilled = true;
       document.getElementById('prov-snap').textContent = d.generated;
       document.getElementById('prov-cite').textContent =
-        '“Informe de transparencia de GitHub, vía la Transparency Report API (' + d.generated + ' instantánea' +
+        "“GitHub Transparency Report, via the Transparency Report API (" + d.generated + ' instantánea' +
         (d.version ? ', versión del conjunto de datos ' + d.version : '') + ').”';
       document.getElementById('provenance').hidden = false;
     }
 
     try {
       var d = await explore(byDataset);
-      renderTable('byDataset', 'Área del informe', 'Valores notificados por área del informe.', d);
+      renderTable('byDataset', "Report area", "Reported values by report area.", d);
       fillProvenance(d);
     } catch (err) {
-      showError('byDataset', 'No se pudieron cargar las áreas del informe: ' + err.message);
+      showError('byDataset', "Failed to load report areas: " + err.message);
     }
 
     try {
       var d2 = await explore(byCategory);
-      renderTable('byCategory', 'Categoría', 'Principales categorías por volumen notificado.', d2);
+      renderTable('byCategory', 'Category', "Top categories by reported volume.", d2);
       fillProvenance(d2);
     } catch (err) {
-      showError('byCategory', 'No se pudieron cargar las categorías: ' + err.message);
+      showError('byCategory', "Failed to load categories: " + err.message);
     }
   }
 
