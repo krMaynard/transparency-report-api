@@ -502,7 +502,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">대만 · 월간 · 2025 – 2026</span>
     <h1>대만 사기방지법 데이터</h1>
-    <p>대만 사기범죄피해방지조례(詐欺犯罪危害防制條例)에 따라 공개되는 집행 데이터: 제42조에 따라 DNS 확인이 중단된 사기 웹사이트에 대한 경찰청(NPA) 등록부를 월 × 공식 사이트 카테고리(網站性質 — 라벨은 중국어 원문 유지)별 차단 사이트 수로 집계한 것입니다. 데이터셋은 발행 주체로 색인되어 있어 지정 플랫폼(Google, Meta, LINE, TikTok)의 법정 사기방지 투명성 보고서를 나중에 추가할 수 있습니다.</p>
+    <p>대만 사기범죄피해방지조례(詐欺犯罪危害防制條例)에 따라 공개되는 집행 데이터: 제42조에 따라 DNS 확인이 중단된 사기 웹사이트에 대한 경찰청(NPA) 등록부를 월 × 공식 사이트 카테고리(網站性質 — 라벨은 중국어 원문 유지)별 차단 사이트 수로 집계한 것입니다. 데이터셋은 발행 주체로 색인되어 있으며, 지정 플랫폼(Google, LINE, TikTok — Meta 보고서는 아직 확보되지 않음)의 첫 법정 사기방지 투명성 보고서가 아래의 경찰 데이터와 함께 수록되어 있습니다.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -549,11 +549,20 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
+  <!-- ── 플랫폼 법정 보고서 ─────────────────────────────── -->
+  <section class="data-section">
+    <h2>플랫폼 법정 보고서</h2>
+    <p class="sub">지정 광고 플랫폼이 이 법에 따라 발표한 첫 사기방지 투명성 보고서: 접수된 정부 통보와 조치된 광고·URL·계정 수. 플랫폼마다 대상 기간이 다르므로 수치는 플랫폼 간 비교할 수 없습니다.</p>
+    <div class="results" id="platformReports" aria-busy="true">
+      <div class="results-loading">불러오는 중…</div>
+    </div>
+  </section>
+
   <p class="hint">이를 <a href="/ko/reports">쿼리 빌더</a>에서 세분화하거나 확장하고(집계 전에 <code>section</code>을 고정하세요), <a href="/ko/schema">Schema</a> 페이지에서 전체 필드 목록을 살펴보거나 <a href="/ko/methodology">방법론</a>을 읽어 보세요.</p>
 </main>
 
 <footer>
-  <p>출처: 경찰청 제42조 DNS 중단 등록부, 대만 오픈데이터 포털(<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw 데이터셋 176455</a>) 경유. 데이터는 <a href="/api">Transparency Report API</a> 경유 · <a href="/ko/methodology">방법론</a> · <a href="/ko/api-key">API 키</a> · <a href="/ko/privacy">개인정보</a></p>
+  <p>출처: 경찰청 제42조 DNS 중단 등록부, 대만 오픈데이터 포털(<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw 데이터셋 176455</a>) 경유. 플랫폼 법정 보고서: Google, LINE, TikTok(2025년 첫 회차; 원본은 데이터 저장소에 보관). 데이터는 <a href="/api">Transparency Report API</a> 경유 · <a href="/ko/methodology">방법론</a> · <a href="/ko/api-key">API 키</a> · <a href="/ko/privacy">개인정보</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -761,6 +770,64 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
 
+
+  // Labels + display order for the platform-report metrics ("\u2014 " marks a
+  // sub-figure of the metric above it).
+  var METRIC_INFO = [
+    ['government_requests', "접수된 정부 삭제 요청"],
+    ['moda_notifications', "접수된 디지털발전부(MODA) 통보"],
+    ['notifications_ad_cases', "— 광고 사안으로 확인된 건"],
+    ['notifications_ugc_cases', "— 이용자 제작 콘텐츠 건"],
+    ['urls_named', "요청에 적시된 URL/링크"],
+    ['urls_removed', "삭제된 URL(총계)"],
+    ['urls_removed_legal', "— 법적 명령 위반"],
+    ['urls_removed_policy', "— 플랫폼 정책 위반"],
+    ['urls_not_actioned', "조치 불가 URL"],
+    ['ads_removed', "내려진 광고(제32조)"],
+    ['ad_accounts_suspended', "정지된 광고 계정"],
+    ['advertiser_accounts_banned', "차단된 광고주 계정"],
+    ['art32_ad_dispositions', "유효한 광고 삭제 처분(제32조)"],
+    ['art32_service_suspension_dispositions', "유효한 서비스 정지 처분(제32조)"],
+    ['sitc_removal_notices', "증권법상 삭제 통지"],
+    ['art33_accounts_suspended', "제33조에 따라 정지된 계정"],
+    ['art33_accounts_suspended_cib_project', "— 형사경찰국 합동 작전분"],
+    ['fraud_ads_removed_taiwan', "선제적으로 삭제된 사기 광고(대만 대상)"],
+    ['advertisers_actioned_taiwan', "— 조치된 광고주"],
+    ['videos_removed_taiwan', "대만에서 삭제된 동영상(전체 위반)"],
+    ['fraud_videos_removed_taiwan', "— 사기 관련 동영상"],
+    ['videos_removed_global', "전 세계에서 삭제된 동영상(전체 위반)"],
+  ];
+  function renderPlatformReports(rows) {
+    var el = document.getElementById('platformReports');
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
+      return;
+    }
+    var order = {};
+    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
+    rows = rows.slice().sort(function (a, b) {
+      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
+      var oa = order[a[2]] != null ? order[a[2]] : 999;
+      var ob = order[b[2]] != null ? order[b[2]] : 999;
+      return oa - ob;
+    });
+    var heads = ["플랫폼", "대상 기간", "통계 항목", "값"];
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("지정 플랫폼 법정 사기방지 보고서 통계.") + '</caption>'
+      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
+      + rows.map(function (r) {
+          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
+          return '<tr>'
+            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
+            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
+            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
+            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Totals: SUM of blocked sites per month.
@@ -779,6 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
       showError('categoryTotals', "카테고리별 합계를 불러오지 못했습니다: " + err.message);
+    }
+
+    // 플랫폼 법정 보고서: every reported figure, publisher by publisher.
+    try {
+      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
+      renderPlatformReports(d3.rows || []);
+    } catch (err) {
+      showError('platformReports', "플랫폼 보고서를 불러오지 못했습니다: " + err.message);
     }
   }
 

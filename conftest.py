@@ -178,6 +178,11 @@ _TAIWAN_FIXTURE = {
         ["NPA-165", "2025-12", "dns_blocked_sites", "電子商務", "sites_blocked", "count", 2100],
         ["NPA-165", "2026-05", "dns_blocked_sites", "金融保險", "sites_blocked", "count", 6500],
         ["NPA-165", "2026-05", "dns_blocked_sites", "釣魚網站", "sites_blocked", "count", 33],
+        # Platform statutory reports: coverage-window periods, empty category.
+        ["Google", "2024-07..2025-06", "afa_transparency_report", "", "government_requests", "count", 236],
+        ["Google", "2024-07..2025-06", "afa_transparency_report", "", "urls_removed", "count", 3564],
+        ["LINE", "2024-08..2025-09", "afa_transparency_report", "", "art33_accounts_suspended", "count", 102359],
+        ["TikTok", "2025-01..2025-09", "platform_enforcement", "", "fraud_ads_removed_taiwan", "count", 23164],
     ],
 }
 seed.build_taiwan_db(_TAIWAN_FIXTURE, _DB)

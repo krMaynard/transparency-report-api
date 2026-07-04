@@ -19,8 +19,9 @@ monthly compliance reports** (proactive content actioned, user grievances,
 accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat), **South Korea's Naver + Kakao transparency reports** (government data requests
 under the Telecommunications Business Act / Protection of Communications
 Secrets Act, half-yearly since 2012), **Taiwan's Anti-Fraud Act data**
-(NPA Art. 42 DNS-blocked fraud sites by month × category; the designated
-platforms' statutory reports to follow), **Google government requests for user
+(NPA Art. 42 DNS-blocked fraud sites by month × category, plus the designated
+platforms' statutory fraud-prevention reports — Google/LINE/TikTok 2025;
+Meta's not yet retrievable), **Google government requests for user
 information** (the biannual bulk export: global/diplomatic/enterprise requests
 + banded US national-security ranges, 2009 H2 onward), the **Microsoft Law
 Enforcement Requests Report** (per-country demands + disclosure outcomes,
@@ -71,7 +72,7 @@ Built to demonstrate two things:
 | `static/snap.html` | Public Snap Transparency Report dataset page (served at `/snap`) — overview tables over `POST /api/explore` (`snap_metrics`) |
 | `static/india.html` | Public India IT Rules compliance-reports dataset page (served at `/india`) — Trends charts + overview tables over `POST /api/explore` (`india_metrics`) |
 | `static/korea.html` | Public Korea (Naver + Kakao) transparency dataset page (served at `/korea`) — Trends charts + overview tables over `POST /api/explore` (`korea_metrics`) |
-| `static/taiwan.html` | Public Taiwan Anti-Fraud Act dataset page (served at `/taiwan`) — Trends charts + overview tables over `POST /api/explore` (`taiwan_metrics`) |
+| `static/taiwan.html` | Public Taiwan Anti-Fraud Act dataset page (served at `/taiwan`) — Trends charts + overview tables + the "Platform statutory reports" panel over `POST /api/explore` (`taiwan_metrics`) |
 | `static/user-data.html` | Public Google user-data requests dataset page (served at `/user-data`) — Trends charts + overview tables over `POST /api/explore` (`google_userdata_metrics`) |
 | `static/microsoft.html` | Public Microsoft LERR dataset page (served at `/microsoft`) — Trends charts + overview tables over `POST /api/explore` (`microsoft_metrics`) |
 | `static/linkedin.html` | Public LinkedIn Government Requests dataset page (served at `/linkedin`) — Trends charts + overview tables over `POST /api/explore` (`linkedin_metrics`) |
@@ -282,12 +283,19 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   pin a `metric` (requests ≠ accounts) before aggregating.
 - **Taiwan Anti-Fraud Act** — a single **tidy-long** `taiwan_metrics` table
   (one row per measured value: `publisher`/`period`/`section`/`category`/
-  `metric`/`unit` + a `value`; dims stored inline). Currently the NPA's
+  `metric`/`unit` + a `value`; dims stored inline). Two streams: the NPA's
   Art. 42 enforcement stream (`publisher='NPA-165'`, `section=
   'dns_blocked_sites'`): fraud sites DNS-blocked per Gregorian month ×
-  official 網站性質 category (labels kept in Chinese). Publisher-keyed so the
-  designated platforms' statutory 透明度報告 (Google/Meta/LINE/TikTok) slot in
-  later — pin a `section` before aggregating once they do.
+  official 網站性質 category (labels kept in Chinese); and the designated
+  platforms' statutory 透明度報告 (`publisher` `Google`/`LINE`/`TikTok`;
+  Meta's exists but isn't retrievable yet) — Art. 32/33 statistics in
+  `section='afa_transparency_report'` + TikTok's voluntary proactive figures
+  in `'platform_enforcement'`, with **coverage-window periods**
+  (`YYYY-MM..YYYY-MM`, different per publisher). Pin a `section` (or
+  `publisher`) **and a `metric`** before aggregating — requests ≠ URLs ≠
+  accounts, and some metrics are parts/subsets of others
+  (`urls_removed_legal`/`_policy` sum to `urls_removed`; the CIB figure is
+  inside `art33_accounts_suspended`); `_leg_warnings` warns on both.
 - **Google government requests for user information** — a single **tidy-long**
   `google_userdata_metrics` table (one row per measured value: `dataset`/
   `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
