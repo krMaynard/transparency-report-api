@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/static/vendor/chart.umd.js" defer></script>
 <script>
   (function () {
     try {
@@ -157,6 +158,27 @@ display: flex; align-items: center; justify-content: space-between;
   }
   header h1 { margin: 0 0 6px; font-size: 26px; }
   header p { margin: 0; color: var(--muted); max-width: 680px; }
+
+  /* ── Charts ──────────────────────────────────────────────────── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px 14px;
+  }
+  .chart-card.wide { grid-column: 1 / -1; }
+  .chart-card h3 { margin: 0 0 4px; font-size: 15px; }
+  .chart-card .chart-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+  canvas { width: 100% !important; }
+  .chart-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+  /* When Chart.js is unavailable the sr-only mirror table is revealed instead. */
+  .chart-card .chart-fallback { overflow-x: auto; }
+  .chart-card .chart-fallback table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .chart-card .chart-fallback th, .chart-card .chart-fallback td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .chart-card .chart-fallback caption { text-align: left; color: var(--muted); font-size: 12px; padding-bottom: 6px; }
+  @media (max-width: 900px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: 1; }
+  }
 
   /* ── Data section ────────────────────────────────────────────── */
   .data-section { margin-bottom: 26px; }
@@ -408,6 +430,46 @@ display: flex; align-items: center; justify-content: space-between;
     <p>GitHub 报告的政府删除请求、披露用户信息的请求（包括国家安全信函）、DMCA 删除及规避主张、自动检测、申诉与恢复，以及 EU-DSA 月活跃用户。一个 tidy-long 数据集：每一行是一个测量值，由 dataset × 年份 × 期间 × 政府 × 类别 × 指标标识。精确计数的上下限相等；国家安全信函/命令和 EU-DSA MAU 以分段范围发布（下限 ≠ 上限）——因此对上限求和是最大估计值。</p>
   </header>
 
+  <section class="data-section" aria-label="Charts">
+    <h2>趋势</h2>
+    <p class="sub">GitHub 报告数据的交互式视图。每个图表都有面向屏幕阅读器的文字替代。</p>
+    <div class="chart-grid">
+
+      <div class="chart-card wide">
+        <h3>每年的用户信息请求</h3>
+        <p class="chart-sub">收到的请求数与依法律程序披露的账户数(精确计数,自 2021 年起报告)。</p>
+        <div class="chart-loading" id="ui-loading">加载中…</div>
+        <canvas id="chart-ui" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-ui-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>每年的政府下架请求</h3>
+        <p class="chart-sub">GitHub 收到的政府下架请求。</p>
+        <div class="chart-loading" id="gt-loading">加载中…</div>
+        <canvas id="chart-gt" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-gt-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>下架请求最多的政府</h3>
+        <p class="chart-sub">按历年收到的下架请求总数排名的政府。</p>
+        <div class="chart-loading" id="gov-loading">加载中…</div>
+        <canvas id="chart-gov" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-gov-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>每年的 DMCA 下架通知</h3>
+        <p class="chart-sub">GitHub 依据 DMCA 处理的版权下架通知。</p>
+        <div class="chart-loading" id="dmca-loading">加载中…</div>
+        <canvas id="chart-dmca" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-dmca-table" class="sr-only"></div>
+      </div>
+
+    </div>
+  </section>
+
   <div class="data-section">
     <h2>按报告领域划分的报告值</h2>
     <div class="results" id="byDataset" aria-busy="true">
@@ -533,10 +595,157 @@ display: flex; align-items: center; justify-content: space-between;
     el.innerHTML = '<p class="error" role="alert">' + esc(message) + '</p>';
   }
 
+  // ── Chart helpers ─────────────────────────────────────────────────────────
+  function chartReady() { return typeof Chart !== 'undefined'; }
+
+  var PALETTE = [
+    '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
+    '#6a994e','#bc4749','#a7c957','#386641','#c9d6df','#52796f','#84a98c','#cad2c5'
+  ];
+
+  function showChart(canvasId, loadingId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    document.getElementById(canvasId).classList.remove('hidden');
+  }
+
+  // Chart.js unavailable: hide the loading slot and reveal the (already
+  // populated) sr-only mirror table so sighted users still get the numbers.
+  function fallbackTable(loadingId, tableId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    var t = document.getElementById(tableId);
+    if (t) { t.classList.remove('sr-only'); t.classList.add('chart-fallback'); }
+  }
+
+  // No-data state: keep the canvas hidden and reuse the loading slot for the
+  // message, so empty is distinguishable from loading and from broken.
+  function emptyChart(loadingId) {
+    document.getElementById(loadingId).textContent = 'No data available.';
+  }
+
+  // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
+  // get the numbers even though the canvas is aria-hidden (and even if
+  // Chart.js fails to load). Caption = the card's own (localized) <h3>.
+  function srTable(tableId, headers, rows) {
+    var el = document.getElementById(tableId);
+    if (!el) return;
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
+    el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
+      + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  function linesChart(id, loadId, tableId, labels, dsets) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'line',
+      data: { labels: labels, datasets: dsets.map(function (ds, i) {
+        return { label: ds.label, data: ds.data, borderColor: PALETTE[i % PALETTE.length],
+                 backgroundColor: PALETTE[i % PALETTE.length] + '22', borderWidth: 2,
+                 pointRadius: 2.5, tension: 0.3, fill: dsets.length === 1 };
+      }) },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  function hbarChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[0], borderRadius: 4 }] },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  function vbarsChart(id, loadId, tableId, labels, dsets) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: dsets.map(function (ds, i) {
+        return { label: ds.label, data: ds.data, backgroundColor: PALETTE[(i + 1) % PALETTE.length], borderRadius: 4 };
+      }) },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
   // ── Init ──────────────────────────────────────────────────────────────────
   async function init() {
     var byDataset = {"table":"github_metrics","group_by":["dataset"],"aggregates":[{"function":"SUM","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":30};
     var byCategory = {"table":"github_metrics","group_by":["category"],"aggregates":[{"function":"SUM","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":15};
+
+    // Chart queries — each pins one dataset (metrics are not comparable across
+    // report areas). These datasets carry exact counts, so count_low == count_high.
+    var UI_Q   = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["user_info_requests"]}]},"group_by":["year","metric"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
+    var GT_Q   = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["government_takedowns_received"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
+    var GOV_Q  = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["government_takedowns_received"]}]},"group_by":["government"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10};
+    var DMCA_Q = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["dmca_takedowns"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
+
+    // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
+    // single failure can't block the rest of the page.
+    var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
+    Promise.all([soft(UI_Q), soft(GT_Q), soft(GOV_Q), soft(DMCA_Q)]).then(function (cs) {
+      var ui = cs[0], gt = cs[1], gov = cs[2], dmca = cs[3];
+
+      // User-information requests: pivot [year, metric, n] into one line per metric.
+      if (!ui.rows.length) { emptyChart('ui-loading'); } else {
+        var years = [], byMetric = {};
+        ui.rows.forEach(function (r) {
+          if (years.indexOf(r[0]) < 0) years.push(r[0]);
+          (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
+        });
+        var metrics = Object.keys(byMetric).sort().reverse(); // received before disclosed
+        srTable('chart-ui-table', ['年份'].concat(metrics),
+          years.map(function (y) { return [y].concat(metrics.map(function (m) { return fmt(byMetric[m][y]); })); }));
+        linesChart('chart-ui', 'ui-loading', 'chart-ui-table', years,
+          metrics.map(function (m) { return { label: m, data: years.map(function (y) { return byMetric[m][y] == null ? null : byMetric[m][y]; }) }; }));
+      }
+
+      if (!gt.rows.length) { emptyChart('gt-loading'); } else {
+        srTable('chart-gt-table', ['年份', '下架请求'],
+          gt.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+        linesChart('chart-gt', 'gt-loading', 'chart-gt-table',
+          gt.rows.map(function (r) { return r[0]; }),
+          [{ label: '', data: gt.rows.map(function (r) { return r[1]; }) }]);
+      }
+
+      if (!gov.rows.length) { emptyChart('gov-loading'); } else {
+        srTable('chart-gov-table', ['政府', '下架请求'],
+          gov.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+        hbarChart('chart-gov', 'gov-loading', 'chart-gov-table',
+          gov.rows.map(function (r) { return r[0]; }),
+          gov.rows.map(function (r) { return r[1]; }));
+      }
+
+      if (!dmca.rows.length) { emptyChart('dmca-loading'); } else {
+        srTable('chart-dmca-table', ['年份', 'DMCA 通知'],
+          dmca.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+        vbarsChart('chart-dmca', 'dmca-loading', 'chart-dmca-table',
+          dmca.rows.map(function (r) { return r[0]; }),
+          [{ label: '', data: dmca.rows.map(function (r) { return r[1]; }) }]);
+      }
+    });
 
     var provFilled = false;
     function fillProvenance(d) {

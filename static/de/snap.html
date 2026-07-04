@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/static/vendor/chart.umd.js" defer></script>
 <script>
   (function () {
     try {
@@ -157,6 +158,27 @@ display: flex; align-items: center; justify-content: space-between;
   }
   header h1 { margin: 0 0 6px; font-size: 26px; }
   header p { margin: 0; color: var(--muted); max-width: 680px; }
+
+  /* ── Charts ──────────────────────────────────────────────────── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px 14px;
+  }
+  .chart-card.wide { grid-column: 1 / -1; }
+  .chart-card h3 { margin: 0 0 4px; font-size: 15px; }
+  .chart-card .chart-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+  canvas { width: 100% !important; }
+  .chart-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+  /* When Chart.js is unavailable the sr-only mirror table is revealed instead. */
+  .chart-card .chart-fallback { overflow-x: auto; }
+  .chart-card .chart-fallback table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .chart-card .chart-fallback th, .chart-card .chart-fallback td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .chart-card .chart-fallback caption { text-align: left; color: var(--muted); font-size: 12px; padding-bottom: 6px; }
+  @media (max-width: 900px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: 1; }
+  }
 
   /* ── Data section ────────────────────────────────────────────── */
   .data-section { margin-bottom: 26px; }
@@ -437,6 +459,46 @@ display: flex; align-items: center; justify-content: space-between;
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
+  <section class="data-section" aria-label="Charts">
+    <h2>Trends</h2>
+    <p class="sub">Interaktive Ansichten der von Snap gemeldeten Zahlen. Jedes Diagramm hat eine Textalternative für Screenreader.</p>
+    <div class="chart-grid">
+
+      <div class="chart-card wide">
+        <h3>Maßnahmen nach Verstoßkategorie</h3>
+        <p class="chart-sub">Weltweite Trust-&amp;-Safety-Maßnahmen je Verstoßkategorie, beide Halbjahre 2024 kombiniert.</p>
+        <div class="chart-loading" id="vio-loading">Wird geladen…</div>
+        <canvas id="chart-vio" height="180" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-vio-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Top-10-Länder nach Maßnahmen</h3>
+        <p class="chart-sub">Länder, sortiert nach der Gesamtzahl der Trust-&amp;-Safety-Maßnahmen.</p>
+        <div class="chart-loading" id="cty-loading">Wird geladen…</div>
+        <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-cty-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Top-Länder nach Auskunftsersuchen</h3>
+        <p class="chart-sub">Länder, sortiert nach regulären (Nicht-Notfall-)Auskunftsersuchen von Behörden.</p>
+        <div class="chart-loading" id="gov-loading">Wird geladen…</div>
+        <canvas id="chart-gov" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-gov-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>Gemeldete und entfernte Anzeigen</h3>
+        <p class="chart-sub">Weltweit gemeldete vs. entfernte Anzeigen, pro Halbjahr.</p>
+        <div class="chart-loading" id="ads-loading">Wird geladen…</div>
+        <canvas id="chart-ads" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-ads-table" class="sr-only"></div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- ── Was der Bericht abdeckt ─────────────────────────────────── -->
   <section class="data-section">
     <h2>Was der Bericht abdeckt</h2>
@@ -570,6 +632,132 @@ display: flex; align-items: center; justify-content: space-between;
     document.getElementById('provenance').hidden = false;
   }
 
+  // ── Chart helpers ─────────────────────────────────────────────────────────
+  function chartReady() { return typeof Chart !== 'undefined'; }
+
+  var PALETTE = [
+    '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
+    '#6a994e','#bc4749','#a7c957','#386641','#c9d6df','#52796f','#84a98c','#cad2c5'
+  ];
+
+  function showChart(canvasId, loadingId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    document.getElementById(canvasId).classList.remove('hidden');
+  }
+
+  // Chart.js unavailable: hide the loading slot and reveal the (already
+  // populated) sr-only mirror table so sighted users still get the numbers.
+  function fallbackTable(loadingId, tableId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    var t = document.getElementById(tableId);
+    if (t) { t.classList.remove('sr-only'); t.classList.add('chart-fallback'); }
+  }
+
+  // No-data state: keep the canvas hidden and reuse the loading slot for the
+  // message, so empty is distinguishable from loading and from broken.
+  function emptyChart(loadingId) {
+    document.getElementById(loadingId).textContent = 'No data available.';
+  }
+
+  // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
+  // get the numbers even though the canvas is aria-hidden (and even if
+  // Chart.js fails to load). Caption = the card's own (localized) <h3>.
+  function srTable(tableId, headers, rows) {
+    var el = document.getElementById(tableId);
+    if (!el) return;
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
+    el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
+      + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  function hbarChart(id, loadId, tableId, labels, values) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[0], borderRadius: 4 }] },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  function vbarsChart(id, loadId, tableId, labels, dsets) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: dsets.map(function (ds, i) {
+        return { label: ds.label, data: ds.data, backgroundColor: PALETTE[(i + 1) % PALETTE.length], borderRadius: 4 };
+      }) },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
+  }
+
+  // Chart queries. String-valued data literals that look like natural language
+  // ("Land", "Global") are split so the localization generator's find/replace
+  // pass can never rewrite a query value — only page prose is translated.
+  var CAT_COUNTRY = 'Coun' + 'try';
+  var CAT_GLOBAL = 'Glo' + 'bal';
+  var SEC_TS = 'Overview of Our T&S Enforce' + 'ments';
+  var SEC_INTL = 'International Government Information ' + 'Requests';
+  var SEC_ADS = 'Ads ' + 'Moderation';
+  function VIO_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_GLOBAL]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}],"not":[{"operation":"EQ","field_name":"sub_category_1","field_values":["Reactive and Proactive"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20}; }
+  function CTY_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_COUNTRY]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  function GOV_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_INTL]},{"operation":"EQ","field_name":"metric","field_values":["other_information_requests"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  function ADS_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_ADS]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":20}; }
+
+  function renderCharts(vio, cty, gov, ads) {
+    if (!vio.rows.length) { emptyChart('vio-loading'); } else {
+      srTable('chart-vio-table', ['Verstoßkategorie', 'Maßnahmen'],
+        vio.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-vio', 'vio-loading', 'chart-vio-table',
+        vio.rows.map(function (r) { return r[0]; }),
+        vio.rows.map(function (r) { return r[1]; }));
+    }
+    if (!cty.rows.length) { emptyChart('cty-loading'); } else {
+      srTable('chart-cty-table', ['Land', 'Maßnahmen'],
+        cty.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-cty', 'cty-loading', 'chart-cty-table',
+        cty.rows.map(function (r) { return r[0]; }),
+        cty.rows.map(function (r) { return r[1]; }));
+    }
+    if (!gov.rows.length) { emptyChart('gov-loading'); } else {
+      srTable('chart-gov-table', ['Land', 'Auskunftsersuchen'],
+        gov.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-gov', 'gov-loading', 'chart-gov-table',
+        gov.rows.map(function (r) { return r[0]; }),
+        gov.rows.map(function (r) { return r[1]; }));
+    }
+    // Ads: pivot [period, metric, n] into one bar series per metric.
+    if (!ads.rows.length) { emptyChart('ads-loading'); } else {
+      var periods = [], byKennzahl = {};
+      ads.rows.forEach(function (r) {
+        if (periods.indexOf(r[0]) < 0) periods.push(r[0]);
+        (byKennzahl[r[1]] = byKennzahl[r[1]] || {})[r[0]] = r[2];
+      });
+      var metrics = Object.keys(byKennzahl).sort().reverse(); // reported before removed
+      srTable('chart-ads-table', ['Zeitraum'].concat(metrics),
+        periods.map(function (p) { return [p].concat(metrics.map(function (m) { return fmt(byKennzahl[m][p]); })); }));
+      vbarsChart('chart-ads', 'ads-loading', 'chart-ads-table', periods,
+        metrics.map(function (m) { return { label: m, data: periods.map(function (p) { return byKennzahl[m][p] == null ? null : byKennzahl[m][p]; }) }; }));
+    }
+  }
+
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     // Coverage: COUNT of reported values per section.
@@ -592,6 +780,13 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   load();
+
+  // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
+  // single failure can't block the rest of the page.
+  var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
+  Promise.all([soft(VIO_Q()), soft(CTY_Q()), soft(GOV_Q()), soft(ADS_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3]);
+  });
 })();
 </script>
 </body>
