@@ -182,6 +182,62 @@ _TAIWAN_FIXTURE = {
 }
 seed.build_taiwan_db(_TAIWAN_FIXTURE, _DB)
 
+# A small slice of the Google user-data dataset (google-user-data.json shape).
+# [dataset, period, country, iso2, product, legal_process, assisting_country,
+#  metric, unit, value_low, value_high]
+_GOOGLE_UD_FIXTURE = {
+    "columns": ["dataset", "period", "country", "iso2", "product", "legal_process",
+                "assisting_country", "metric", "unit", "value_low", "value_high"],
+    "rows": [
+        ["global", "2011-H2", "Brazil", "BR", "", "All", "", "requests", "count", 1615, 1615],
+        ["global", "2011-H2", "Brazil", "BR", "", "All", "", "pct_disclosed", "percent", 90, 90],
+        ["global", "2011-H2", "Brazil", "BR", "", "All", "", "accounts", "count", 2222, 2222],
+        ["global", "2024-H1", "United States", "US", "", "Search Warrants", "", "requests", "count", 31839, 31839],
+        ["global", "2024-H1", "United States", "US", "", "Subpoenas", "", "requests", "count", 20006, 20006],
+        ["global_diplomatic", "2024-H1", "Brazil", "BR", "", "", "United States", "requests", "count", 12, 12],
+        ["enterprise", "2024-H1", "United States", "US", "Google Workspace", "Search Warrants", "", "requests", "count", 77, 77],
+        # US national-security figures are banded ranges (non-additive).
+        ["us_nsl", "2009-H1", "United States", "US", "", "", "", "requests", "count", 0, 499],
+        ["us_nsl", "2009-H1", "United States", "US", "", "", "", "accounts", "count", 500, 999],
+    ],
+}
+seed.build_google_userdata_db(_GOOGLE_UD_FIXTURE, _DB)
+
+# A small slice of the Microsoft LERR dataset (microsoft-lerr.json shape).
+# [period, section, country, metric, unit, value]
+_MICROSOFT_FIXTURE = {
+    "columns": ["period", "section", "country", "metric", "unit", "value"],
+    "rows": [
+        ["2013-H1", "combined", "Argentina", "requests", "count", 455],
+        ["2013-H1", "combined", "Argentina", "accounts_specified", "count", 675],
+        ["2013-H1", "skype", "Argentina", "requests", "count", 12],
+        ["2024-H2", "criminal", "Germany", "requests", "count", 5924],
+        ["2024-H2", "criminal", "Germany", "disclosed_noncontent", "count", 4433],
+        ["2024-H2", "emergencies", "Germany", "requests", "count", 29],
+        ["2024-H2", "civil", "United States", "requests", "count", 110],
+    ],
+}
+seed.build_microsoft_db(_MICROSOFT_FIXTURE, _DB)
+
+# A small slice of the LinkedIn dataset (linkedin-transparency.json shape).
+# [dataset, period, country, metric, unit, value_low, value_high]
+_LINKEDIN_FIXTURE = {
+    "columns": ["dataset", "period", "country", "metric", "unit",
+                "value_low", "value_high"],
+    "rows": [
+        ["member_data_requests", "2025-H2", "United States", "requests", "count", 443, 443],
+        ["member_data_requests", "2025-H2", "United States", "pct_disclosed", "percent", 80, 80],
+        ["member_data_requests", "2025-H2", "Australia", "requests", "count", 11, 11],
+        ["us_breakdown", "2025-H2", "United States", "requests", "count", 443, 443],
+        ["us_breakdown", "2025-H2", "United States", "pct_subpoenas", "percent", 66, 66],
+        # National-security figures are banded ranges (non-additive).
+        ["us_breakdown", "2025-H2", "United States", "nsl_received", "count", 0, 499],
+        ["content_removal_requests", "2025-H2", "Australia", "requests", "count", 4, 4],
+        ["content_removal_requests", "2025-H2", "Australia", "action_taken", "count", 2, 2],
+    ],
+}
+seed.build_linkedin_db(_LINKEDIN_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /
@@ -253,6 +309,7 @@ os.environ.setdefault("ANTHROPIC_API_KEY", "sk-ant-test-not-real")
 # TestClient IP / API key). The 429 paths are exercised with isolated stores.
 os.environ.setdefault("PORTAL_REGISTER_MAX_PER_WINDOW", "10000")
 os.environ.setdefault("QUERY_RATE_MAX_PER_WINDOW", "100000")
+os.environ.setdefault("EXPLORE_RATE_MAX_PER_WINDOW", "100000")
 os.environ.setdefault("LOG_FORMAT", "text")  # readable pytest output
 # Allow webhook callbacks to loopback so the end-to-end test can hit a local
 # capture server. The SSRF guard itself is unit-tested with the flag off.
