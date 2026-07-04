@@ -2334,6 +2334,24 @@ def taiwan_page() -> FileResponse:
     return _serve_page("taiwan.html", "Taiwan anti-fraud page")
 
 
+@app.get("/user-data", response_class=HTMLResponse)
+def user_data_page() -> FileResponse:
+    """Serve the Google user-data requests dataset page (reads POST /api/explore)."""
+    return _serve_page("user-data.html", "Google user data page")
+
+
+@app.get("/microsoft", response_class=HTMLResponse)
+def microsoft_page() -> FileResponse:
+    """Serve the Microsoft LERR dataset page (reads POST /api/explore)."""
+    return _serve_page("microsoft.html", "Microsoft requests page")
+
+
+@app.get("/linkedin", response_class=HTMLResponse)
+def linkedin_page() -> FileResponse:
+    """Serve the LinkedIn Government Requests dataset page (reads POST /api/explore)."""
+    return _serve_page("linkedin.html", "LinkedIn requests page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2387,6 +2405,9 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "india": ("india.html", "India IT Rules page", {}),
     "korea": ("korea.html", "Korea transparency page", {}),
     "taiwan": ("taiwan.html", "Taiwan anti-fraud page", {}),
+    "user-data": ("user-data.html", "Google user data page", {}),
+    "microsoft": ("microsoft.html", "Microsoft requests page", {}),
+    "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),

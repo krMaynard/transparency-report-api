@@ -2085,6 +2085,7 @@ class TestLocalization:
     LOCALES = ("es", "fr", "de", "it", "ja", "zh", "ko")
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
+                "user-data", "microsoft", "linkedin",
                 "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
@@ -2460,6 +2461,45 @@ class TestDatasetPages:
         assert "Taiwan Anti-Fraud Act Data" in r.text
         assert '"table":"taiwan_metrics"' in r.text
         assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_user_data_page_served(self):
+        r = client.get("/user-data")
+        assert r.status_code == 200
+        assert "Google User Data Requests" in r.text
+        assert '"table":"google_userdata_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_microsoft_page_served(self):
+        r = client.get("/microsoft")
+        assert r.status_code == 200
+        assert "Microsoft Law Enforcement Requests" in r.text
+        assert '"table":"microsoft_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_linkedin_page_served(self):
+        r = client.get("/linkedin")
+        assert r.status_code == 200
+        assert "LinkedIn Government Requests" in r.text
+        assert '"table":"linkedin_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_request_report_pages_in_sidebar_nav(self):
+        for path in ("/", "/reports", "/schema", "/apple"):
+            t = client.get(path).text
+            assert 'href="/user-data"' in t, path
+            assert 'href="/microsoft"' in t, path
+            assert 'href="/linkedin"' in t, path
+
+    def test_localized_request_report_pages(self):
+        cases = {"/es/user-data": "Solicitudes de datos de usuarios de Google",
+                 "/fr/microsoft": "Demandes des forces de l'ordre à Microsoft",
+                 "/ko/linkedin": "LinkedIn 정부 요청"}
+        for path, marker in cases.items():
+            r = client.get(path)
+            assert r.status_code == 200, path
+            assert marker in r.text, path
+            csp = r.headers.get("Content-Security-Policy", "")
+            assert "script-src 'self'" in csp, path
 
     def test_new_dataset_pages_in_sidebar_nav(self):
         # The three new pages are linked from every page's sidebar nav.
