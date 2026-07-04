@@ -18,9 +18,15 @@ DMCA takedowns, by country × violation category), **India's IT Rules 2021
 monthly compliance reports** (proactive content actioned, user grievances,
 accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat), **South Korea's Naver + Kakao transparency reports** (government data requests
 under the Telecommunications Business Act / Protection of Communications
-Secrets Act, half-yearly since 2012), and **Taiwan's Anti-Fraud Act data**
+Secrets Act, half-yearly since 2012), **Taiwan's Anti-Fraud Act data**
 (NPA Art. 42 DNS-blocked fraud sites by month × category; the designated
-platforms' statutory reports to follow).
+platforms' statutory reports to follow), **Google government requests for user
+information** (the biannual bulk export: global/diplomatic/enterprise requests
++ banded US national-security ranges, 2009 H2 onward), the **Microsoft Law
+Enforcement Requests Report** (per-country demands + disclosure outcomes,
+half-yearly since 2013), and the **LinkedIn Government Requests Report**
+(member-data requests, the US legal-process breakdown, and content-removal
+requests).
 
 Built to demonstrate two things:
 
@@ -40,7 +46,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), and the non-VLOP harmonised reports |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), and the non-VLOP harmonised reports |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -51,6 +57,9 @@ Built to demonstrate two things:
 | `data/india-it-rules.json` | Vendored snapshot of India's IT Rules 2021 monthly compliance reports (sibling `dsa-transparency-data/india-it-rules/build_india.py`) — a tidy-long `columns`+`rows` list across publishers; seeded into the `india_metrics` table by `seed.build_india_db` |
 | `data/korea-transparency.json` | Vendored snapshot of the Korea (Naver + Kakao) transparency reports (sibling `dsa-transparency-data/korea-transparency/build_korea.py`) — a tidy-long `columns`+`rows` list; seeded into the `korea_metrics` table by `seed.build_korea_db` |
 | `data/taiwan-anti-fraud.json` | Vendored snapshot of Taiwan's Anti-Fraud Act data (sibling `dsa-transparency-data/taiwan-anti-fraud/build_taiwan.py`) — a tidy-long `columns`+`rows` list; seeded into the `taiwan_metrics` table by `seed.build_taiwan_db` |
+| `data/google-user-data.json` | Vendored snapshot of Google's government requests for user information (sibling `dsa-transparency-data/google-user-data/build_userdata.py`) — a tidy-long `columns`+`rows` list; seeded into the `google_userdata_metrics` table by `seed.build_google_userdata_db` |
+| `data/microsoft-lerr.json` | Vendored snapshot of the Microsoft Law Enforcement Requests Report (sibling `dsa-transparency-data/microsoft-lerr/build_microsoft.py`) — a tidy-long `columns`+`rows` list; seeded into the `microsoft_metrics` table by `seed.build_microsoft_db` |
+| `data/linkedin-transparency.json` | Vendored snapshot of the LinkedIn Government Requests Report (sibling `dsa-transparency-data/linkedin-transparency/build_linkedin.py`) — a tidy-long `columns`+`rows` list; seeded into the `linkedin_metrics` table by `seed.build_linkedin_db` |
 | `data/template-crosswalk.json` | Vendored `{original-language label → canonical English}` map for the template's `sections`/`indicators`/`scopes`, applied by `seed.normalize_dimensions` to stamp each dim row's language-neutral `key`. Regenerate with `scripts/build_template_crosswalk.py` |
 | `scripts/build_template_crosswalk.py` | Learns `data/template-crosswalk.json` by aligning same-structure non-VLOP report sheets to an English reference (drops ambiguous labels) — reads the sibling repo's extracted CSVs |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
@@ -231,7 +240,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Seven non-DSA datasets ride alongside, each exposed as an ordinary query table
+Ten non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -276,6 +285,32 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   official 網站性質 category (labels kept in Chinese). Publisher-keyed so the
   designated platforms' statutory 透明度報告 (Google/Meta/LINE/TikTok) slot in
   later — pin a `section` before aggregating once they do.
+- **Google government requests for user information** — a single **tidy-long**
+  `google_userdata_metrics` table (one row per measured value: `dataset`/
+  `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
+  `metric`/`unit` + `value_low`/`value_high`; dims stored inline). The biannual
+  bulk-CSV export (2009-H2 onward): global requests (requests/accounts/
+  `pct_disclosed` per country × legal process), the diplomatic/MLAT slice,
+  Enterprise Cloud (GCP/Workspace), and the US national-security datasets
+  (FISA content / FISA non-content / NSLs) as **banded ranges**
+  (`value_low != value_high`, non-additive). **2012-H2..2014-H1 report an
+  `All` legal_process aggregate alongside the per-process split** — pin
+  `legal_process` before summing, and never SUM `percent` rows.
+- **Microsoft Law Enforcement Requests Report** — a single **tidy-long**
+  `microsoft_metrics` table (one row per measured value: `period`/`section`/
+  `country`/`metric`/`unit` + a `value`; dims stored inline). Per-country
+  demands + the four disclosure outcomes, half-yearly since 2013. The report
+  split changes across eras (`combined` 2013–2016; `criminal`/`emergencies`
+  from 2017; `civil` from 2017-H1; `skype` overlaps `combined` in 2013) — pin
+  a `section` before aggregating; on civil sheets the outcome metrics count
+  accounts, not requests.
+- **LinkedIn Government Requests Report** — a single **tidy-long**
+  `linkedin_metrics` table (one row per measured value: `dataset`/`period`/
+  `country`/`metric`/`unit` + `value_low`/`value_high`; dims stored inline).
+  Member-data requests per country (2016-H1→), the US legal-process breakdown
+  (2015-H1→; `pct_*` metrics are percentages of requests, and the
+  national-security rows are banded ranges), and government content-removal
+  requests (2018-H1→). Scraped from the server-rendered report page.
 
 **Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
 `build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an

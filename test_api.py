@@ -2751,6 +2751,152 @@ class TestTaiwanTable:
         assert all(r[5] == "count" for r in data["rows"])
 
 
+class TestGoogleUserDataTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "google_userdata_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=google_userdata_metrics", headers=MOMO).json()
+        assert {"dataset", "period", "country", "iso2", "product", "legal_process",
+                "assisting_country", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert {"value_low", "value_high"} <= set(body["measures"]["fields"])
+
+    def test_metric_value(self):
+        # Brazil 2011-H2 'All' requests = 1615 (fixture, matches the bulk CSV).
+        job = _submit_and_wait({
+            "table": "google_userdata_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "dataset", "field_values": ["global"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2011-H2"]},
+                {"operation": "EQ", "field_name": "iso2", "field_values": ["BR"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value_low", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 1615
+
+    def test_ns_ranges_are_bands(self):
+        # National-security rows carry value_low != value_high.
+        job = _submit_and_wait({
+            "table": "google_userdata_metrics",
+            "fields": ["value_low", "value_high"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "dataset", "field_values": ["us_nsl"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0] == [0, 499]
+
+    def test_explore_warns_on_unpinned_aggregation(self):
+        q = {"table": "google_userdata_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value_low", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        text = " ".join(d.get("warnings", []))
+        assert "unit" in text and "dataset" in text and "legal_process" in text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("google-user-data.json").read_text(encoding="utf-8"))
+        assert data["columns"][0] == "dataset" and len(data["columns"]) == 11
+        assert all(len(r) == 11 for r in data["rows"][:50])
+        assert {r[0] for r in data["rows"]} >= {"global", "us_nsl", "enterprise"}
+
+
+class TestMicrosoftTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "microsoft_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=microsoft_metrics", headers=MOMO).json()
+        assert {"period", "section", "country", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_metric_value(self):
+        # Argentina 2013-H1 combined requests = 455 (fixture, matches the workbook).
+        job = _submit_and_wait({
+            "table": "microsoft_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "period", "field_values": ["2013-H1"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["combined"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 455
+
+    def test_explore_warns_on_unpinned_aggregation(self):
+        q = {"table": "microsoft_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        text = " ".join(d.get("warnings", []))
+        assert "section" in text and "metric" in text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("microsoft-lerr.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["period", "section", "country", "metric", "unit", "value"]
+        assert all(len(r) == 6 for r in data["rows"][:50])
+        assert {r[1] for r in data["rows"]} == {"combined", "skype", "criminal",
+                                                "emergencies", "civil"}
+
+
+class TestLinkedInTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "linkedin_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=linkedin_metrics", headers=MOMO).json()
+        assert {"dataset", "period", "country", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert {"value_low", "value_high"} <= set(body["measures"]["fields"])
+
+    def test_metric_value(self):
+        # US 2025-H2 member-data requests = 443 (fixture, matches the page).
+        job = _submit_and_wait({
+            "table": "linkedin_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "dataset", "field_values": ["member_data_requests"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2025-H2"]},
+                {"operation": "EQ", "field_name": "country", "field_values": ["United States"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value_low", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 443
+
+    def test_explore_warns_on_unpinned_aggregation(self):
+        q = {"table": "linkedin_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value_high", "alias": "v"}]}
+        d = client.post("/api/explore", json=q).json()
+        text = " ".join(d.get("warnings", []))
+        assert "unit" in text and "dataset" in text and "metric" in text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("linkedin-transparency.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["dataset", "period", "country", "metric", "unit",
+                                   "value_low", "value_high"]
+        assert all(len(r) == 7 for r in data["rows"][:50])
+        assert {r[0] for r in data["rows"]} == {"member_data_requests", "us_breakdown",
+                                                "content_removal_requests"}
+
+
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
 
 class TestHarmonisedFacts:

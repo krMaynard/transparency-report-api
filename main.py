@@ -1184,6 +1184,54 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "google_userdata_metrics": TableSpec(
+        "Google government requests for user information — the biannual bulk export of Google's Transparency Report user-data section (2009-H2 onward): requests, accounts and percentage-disclosed per country × legal process (dataset 'global'), the diplomatic/MLAT slice, Enterprise Cloud (GCP / Google Workspace) requests, and the US national-security figures (FISA content / FISA non-content / NSLs), which are banded ranges (value_low != value_high, non-additive). A tidy-long table: one row per measured value. Caution: 2012-H2..2014-H1 report an 'All' legal_process aggregate alongside the per-process split — pin legal_process before summing, and never SUM percent rows.",
+        "FROM google_userdata_metrics f",
+        {
+            "dataset":           "f.dataset",
+            "period":            "f.period",
+            "country":           "f.country",
+            "iso2":              "f.iso2",
+            "product":           "f.product",
+            "legal_process":     "f.legal_process",
+            "assisting_country": "f.assisting_country",
+            "metric":            "f.metric",
+            "unit":              "f.unit",
+        },
+        {
+            "value_low":  "f.value_low",
+            "value_high": "f.value_high",
+        },
+    ),
+    "microsoft_metrics": TableSpec(
+        "Microsoft Law Enforcement Requests Report — per-country legal demands for customer data, half-yearly since 2013: requests received, accounts/users specified, and the four disclosure outcomes (content / only non-content data / no data found / rejected). A tidy-long table: one row per measured value, identified by period × section × country × metric. The report split changes across eras (section 'combined' runs 2013-2016; 'criminal'/'emergencies' from 2017; 'civil' from 2017-H1; 'skype' overlaps 'combined' in 2013) — pin a section before aggregating. On civil sheets the outcome metrics count accounts, not requests.",
+        "FROM microsoft_metrics f",
+        {
+            "period":  "f.period",
+            "section": "f.section",
+            "country": "f.country",
+            "metric":  "f.metric",
+            "unit":    "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
+    "linkedin_metrics": TableSpec(
+        "LinkedIn Government Requests Report — member-data requests per country (requests, accounts subject, percentage disclosed, accounts disclosed; 2016-H1 onward), the US legal-process breakdown (counts, percentage splits and banded national-security ranges; 2015-H1 onward), and government content-removal requests per country (2018-H1 onward). A tidy-long table: one row per measured value, identified by dataset × period × country × metric. Exact figures have value_low == value_high; national-security rows are non-additive ranges; pct_* metrics are percentages (never SUM them).",
+        "FROM linkedin_metrics f",
+        {
+            "dataset": "f.dataset",
+            "period":  "f.period",
+            "country": "f.country",
+            "metric":  "f.metric",
+            "unit":    "f.unit",
+        },
+        {
+            "value_low":  "f.value_low",
+            "value_high": "f.value_high",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -3179,6 +3227,77 @@ def _leg_warnings(
                     "korea_metrics SUM over a 'percent'/'average' value isn't "
                     "statistically meaningful — read it per row instead."
                 )
+    # google_userdata_metrics mixes counts and percentages in one value column,
+    # carries non-additive national-security ranges, and (2012-H2..2014-H1)
+    # reports an 'All' legal-process aggregate alongside the per-process split.
+    if table == "google_userdata_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name in ("value_low", "value_high")
+        for a in aggregates
+    ):
+        if "unit" not in pinned:
+            out.append(
+                "'google_userdata_metrics' keeps counts and percentages in one "
+                "value column; this aggregate pins no 'unit', so it may sum a "
+                "disclosure percentage with a count. Filter or group by 'unit'."
+            )
+        if "dataset" not in pinned:
+            out.append(
+                "'google_userdata_metrics' spans several report datasets (global, "
+                "diplomatic, enterprise, and the banded US national-security "
+                "ranges, which are not additive); this aggregate pins no "
+                "'dataset'. Filter or group by 'dataset'."
+            )
+        if "legal_process" not in pinned:
+            out.append(
+                "'google_userdata_metrics' reports an 'All' legal_process "
+                "aggregate alongside the per-process split for 2012-H2..2014-H1, "
+                "so an unpinned SUM double-counts those periods. Filter or group "
+                "by 'legal_process'."
+            )
+    # microsoft_metrics' report split changes across eras (combined -> criminal/
+    # emergencies/civil, with skype overlapping combined in 2013).
+    if table == "microsoft_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'microsoft_metrics' spans report sections that overlap across "
+                "eras ('skype' is included in 'combined'; 'criminal'/"
+                "'emergencies'/'civil' replace 'combined' from 2017); this "
+                "aggregate pins no 'section'. Filter or group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'microsoft_metrics' reports requests, accounts and the four "
+                "disclosure outcomes as separate metrics; this aggregate pins no "
+                "'metric', so it may add different quantities. Filter or group "
+                "by 'metric'."
+            )
+    # linkedin_metrics mixes counts, percentages and banded national-security
+    # ranges in one value column, across three report datasets.
+    if table == "linkedin_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name in ("value_low", "value_high")
+        for a in aggregates
+    ):
+        if "unit" not in pinned:
+            out.append(
+                "'linkedin_metrics' keeps counts and percentages in one value "
+                "column; this aggregate pins no 'unit', so it may sum a "
+                "percentage with a count. Filter or group by 'unit'."
+            )
+        if "dataset" not in pinned:
+            out.append(
+                "'linkedin_metrics' spans member-data requests, the US breakdown "
+                "(with non-additive national-security ranges) and content-removal "
+                "requests; this aggregate pins no 'dataset'. Filter or group by "
+                "'dataset'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'linkedin_metrics' reports requests, accounts and percentage "
+                "splits as separate metrics; this aggregate pins no 'metric', so "
+                "it may add different quantities. Filter or group by 'metric'."
+            )
     # ny_tos_stats normalizes only the *category* dimension: metric/submetric
     # stay in each company's own terms (flagged vs actioned vs warned…), counts
     # and percent rates share one `value` column, and Strava's per-format
@@ -3608,7 +3727,7 @@ FIELD_HELP: dict[str, str] = {
     "country_code": "Requesting country's ISO code (Google government removals).",
     "country_name": "Requesting country (Google government removals).",
     "requestor": "Type of government body making the removal request.",
-    "product": "Google product the request targets (Web Search, YouTube, …).",
+    "product": "Product the request targets. gr_removals: the Google product (Web Search, YouTube, …). google_userdata_metrics: the Enterprise Cloud product (GCP / Google Workspace / GSUITE) on the enterprise datasets; empty elsewhere.",
     "reason": "Government's stated reason for the removal request.",
     # ── Apple transparency dims/measures ──
     "request_type": "Apple request category — e.g. device / account / financial_identifier / push_token / emergency / account_preservation / account_restriction_deletion / digital_content_provider / app_takedown_legal_violation / app_takedown_platform_policy (apple_requests), or the national-security/IPA type (apple_national_security).",
@@ -3633,19 +3752,19 @@ FIELD_HELP: dict[str, str] = {
     "accounts_low": "Lower bound of the reported accounts/users range (apple_national_security).",
     "accounts_high": "Upper bound of the reported accounts/users range (apple_national_security).",
     # ── GitHub transparency (tidy-long github_metrics) ──
-    "dataset": "Which GitHub transparency series the row belongs to — e.g. government_takedowns_received / government_takedowns_processed / user_info_requests / cross_border_data_requests / national_security / dmca_takedowns / dmca_circumvention_claims / automated_detection / appeals_abuse_related / appeals_trade_controls / eu_dsa_mau. Pin a dataset before aggregating; metrics aren't comparable across datasets.",
+    "dataset": "Which series within the table the row belongs to. github_metrics: e.g. government_takedowns_received / user_info_requests / national_security / dmca_takedowns / eu_dsa_mau. google_userdata_metrics: global / global_diplomatic / enterprise / enterprise_diplomatic / us_fisa_content / us_fisa_non_content / us_nsl. linkedin_metrics: member_data_requests / us_breakdown / content_removal_requests. Pin a dataset before aggregating; metrics aren't comparable across datasets.",
     "category": "In-row breakdown within a github_metrics dataset — request type, abuse type, takedown type, etc. (empty when the dataset has no sub-breakdown).",
     "metric": "Which reported count the row is, when a github_metrics dataset has several (e.g. received / disclosed; repos_affected / pages_affected / accounts_affected); otherwise 'count'.",
     "count_low": "Reported value (github_metrics). Equals count_high for exact counts; for national_security and eu_dsa_mau the value is a banded range, so this is the lower bound.",
     "count_high": "Upper bound of the reported value (github_metrics); equals count_low for exact counts.",
     "year": "Calendar year of the github_metrics row.",
-    "iso2": "Requesting government's ISO-3166 alpha-2 code (country-keyed github_metrics datasets).",
+    "iso2": "Requesting government's two-letter territory code (github_metrics: ISO-3166 alpha-2; google_userdata_metrics: CLDR, empty when unlisted).",
     # ── Snap transparency (tidy-long snap_metrics) — `section` and `value` reuse
     # the generic DSA help above; only these two are Snap-specific. ──
     "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
     "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
     # ── India IT Rules (tidy-long india_metrics) ──
-    "unit": "What `value` measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). Never SUM across different units; pin a unit before aggregating.",
+    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics: 'count' or 'percent'. microsoft_metrics: 'count'. Never SUM across different units; pin a unit before aggregating.",
     # ── Korea transparency (tidy-long korea_metrics) ──
     "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
     # ── NY ToS normalized stats (tidy-long ny_tos_stats) ──
@@ -3657,6 +3776,11 @@ FIELD_HELP: dict[str, str] = {
     "submetric": "The source column within `metric`, in the company's own terms (e.g. Snap's 'flagged_total', Strava's 'flagged_by_users').",
     # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
     "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream); the designated ad platforms (Google/Meta/LINE/TikTok) will appear here when their statutory reports are added.",
+    # ── Google user-data / Microsoft LERR / LinkedIn (tidy-long, ranged) ──
+    "legal_process": "Type of legal process behind the request (google_userdata_metrics) — 'All' (the only grain before 2012-H2, reported ALONGSIDE the split for 2012-H2..2014-H1: pin this field before summing), Subpoenas, Search Warrants, Emergency Disclosure Requests, Preservation Requests, CLOUD Act variants, ….",
+    "assisting_country": "For the diplomatic/MLAT datasets (google_userdata_metrics): the country whose legal process assisted the originating country's request; empty elsewhere.",
+    "value_low": "Reported value. Equals value_high for exact figures; for banded national-security ranges (google_userdata_metrics us_fisa_*/us_nsl; linkedin_metrics nsl_*/ns_*/fisa_requests) this is the lower bound — ranges are NOT additive.",
+    "value_high": "Upper bound of the reported value; equals value_low for exact figures.",
     # ── measures: DSA ──
     "notices": "Article 16 notices of allegedly illegal content received (Table 4).",
     "tf_notices": "Of those notices, the count submitted by trusted flaggers.",

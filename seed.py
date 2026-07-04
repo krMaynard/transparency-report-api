@@ -76,6 +76,21 @@ _DEFAULT_KOREA_SOURCE = os.getenv(
 _DEFAULT_TAIWAN_SOURCE = os.getenv(
     "SEED_TAIWAN_SOURCE_JSON", os.path.join(HERE, "data", "taiwan-anti-fraud.json")
 )
+# Google government requests for user information — vendored in-repo (from the
+# sibling data repo's google-user-data/build_userdata.py).
+_DEFAULT_GOOGLE_UD_SOURCE = os.getenv(
+    "SEED_GOOGLE_UD_SOURCE_JSON", os.path.join(HERE, "data", "google-user-data.json")
+)
+# Microsoft Law Enforcement Requests Report — vendored in-repo (from the
+# sibling data repo's microsoft-lerr/build_microsoft.py).
+_DEFAULT_MICROSOFT_SOURCE = os.getenv(
+    "SEED_MICROSOFT_SOURCE_JSON", os.path.join(HERE, "data", "microsoft-lerr.json")
+)
+# LinkedIn Government Requests Report — vendored in-repo (from the sibling
+# data repo's linkedin-transparency/build_linkedin.py).
+_DEFAULT_LINKEDIN_SOURCE = os.getenv(
+    "SEED_LINKEDIN_SOURCE_JSON", os.path.join(HERE, "data", "linkedin-transparency.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -362,6 +377,65 @@ CREATE TABLE taiwan_metrics (
     value     REAL
 );
 CREATE INDEX idx_taiwan_section ON taiwan_metrics(section);
+
+-- Google government requests for user information (google-user-data/
+-- build_userdata.py). Tidy-long: one row per measured value from the biannual
+-- bulk-CSV export (2009-H2 onward). Exact figures have value_low == value_high;
+-- the US national-security datasets (FISA/NSL) are banded ranges
+-- (value_low != value_high, non-additive). 2012-H2..2014-H1 report an 'All'
+-- legal_process aggregate ALONGSIDE the per-process split — pin legal_process
+-- before summing. Dims inline.
+CREATE TABLE google_userdata_metrics (
+    dataset           TEXT NOT NULL,  -- global / global_diplomatic / enterprise /
+                                      -- enterprise_diplomatic / us_fisa_content /
+                                      -- us_fisa_non_content / us_nsl
+    period            TEXT NOT NULL,  -- half-year the window ends in, 'YYYY-H1/H2'
+    country           TEXT NOT NULL,  -- requesting country (origin for diplomatic)
+    iso2              TEXT NOT NULL,  -- CLDR territory code ('' when unlisted)
+    product           TEXT NOT NULL,  -- GCP / Google Workspace / GSUITE ('' = all)
+    legal_process     TEXT NOT NULL,  -- All / Subpoenas / Search Warrants / ...
+    assisting_country TEXT NOT NULL,  -- diplomatic datasets only ('' elsewhere)
+    metric            TEXT NOT NULL,  -- requests / accounts / customers / pct_disclosed
+    unit              TEXT NOT NULL,  -- count / percent
+    value_low         REAL,
+    value_high        REAL
+);
+CREATE INDEX idx_google_ud_dataset ON google_userdata_metrics(dataset);
+
+-- Microsoft Law Enforcement Requests Report (microsoft-lerr/build_microsoft.py).
+-- Tidy-long: one row per measured value from the per-half-year workbooks
+-- (2013-H1 onward). The report split changes across eras (combined 2013-2016;
+-- criminal/emergencies from 2017; civil from 2017-H1) — pin a section before
+-- aggregating, and never sum sections with 'combined' (skype overlaps combined
+-- in 2013). Dims inline.
+CREATE TABLE microsoft_metrics (
+    period  TEXT NOT NULL,   -- half-year, 'YYYY-H1' / 'YYYY-H2'
+    section TEXT NOT NULL,   -- combined / skype / criminal / emergencies / civil
+    country TEXT NOT NULL,
+    metric  TEXT NOT NULL,   -- requests / accounts_specified / disclosed_content /
+                             -- disclosed_noncontent / no_data_found / rejected
+    unit    TEXT NOT NULL,   -- count
+    value   REAL
+);
+CREATE INDEX idx_microsoft_section ON microsoft_metrics(section);
+
+-- LinkedIn Government Requests Report (linkedin-transparency/build_linkedin.py).
+-- Tidy-long: one row per measured value scraped from the server-rendered
+-- report page. Exact figures have value_low == value_high; the US
+-- national-security rows are banded ranges (non-additive). The us_breakdown
+-- legal-process rows (pct_*) are percentages of requests, not counts. Dims
+-- inline.
+CREATE TABLE linkedin_metrics (
+    dataset    TEXT NOT NULL,  -- member_data_requests / us_breakdown /
+                               -- content_removal_requests
+    period     TEXT NOT NULL,  -- half-year, 'YYYY-H1' / 'YYYY-H2'
+    country    TEXT NOT NULL,
+    metric     TEXT NOT NULL,  -- requests / accounts_subject / pct_disclosed / ...
+    unit       TEXT NOT NULL,  -- count / percent
+    value_low  REAL,
+    value_high REAL
+);
+CREATE INDEX idx_linkedin_dataset ON linkedin_metrics(dataset);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -868,6 +942,97 @@ def build_taiwan_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_google_userdata_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the google_userdata_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is
+    the tidy-long google-user-data.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("google user-data dataset is None")
+    expected_cols = ["dataset", "period", "country", "iso2", "product",
+                     "legal_process", "assisting_country", "metric", "unit",
+                     "value_low", "value_high"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"google user-data dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("google user-data dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO google_userdata_metrics (dataset, period, country, "
+                "iso2, product, legal_process, assisting_country, metric, unit, "
+                "value_low, value_high) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
+def build_microsoft_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the microsoft_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is
+    the tidy-long microsoft-lerr.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("microsoft dataset is None")
+    expected_cols = ["period", "section", "country", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"microsoft dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("microsoft dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO microsoft_metrics (period, section, country, "
+                "metric, unit, value) VALUES (?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
+def build_linkedin_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the linkedin_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is
+    the tidy-long linkedin-transparency.json (`columns` header + `rows` in
+    column order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("linkedin dataset is None")
+    expected_cols = ["dataset", "period", "country", "metric", "unit",
+                     "value_low", "value_high"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"linkedin dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("linkedin dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO linkedin_metrics (dataset, period, country, "
+                "metric, unit, value_low, value_high) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -972,6 +1137,12 @@ def main() -> None:
                         help="Path to korea-transparency.json")
     parser.add_argument("--taiwan-source", default=_DEFAULT_TAIWAN_SOURCE,
                         help="Path to taiwan-anti-fraud.json")
+    parser.add_argument("--google-ud-source", default=_DEFAULT_GOOGLE_UD_SOURCE,
+                        help="Path to google-user-data.json")
+    parser.add_argument("--microsoft-source", default=_DEFAULT_MICROSOFT_SOURCE,
+                        help="Path to microsoft-lerr.json")
+    parser.add_argument("--linkedin-source", default=_DEFAULT_LINKEDIN_SOURCE,
+                        help="Path to linkedin-transparency.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1080,6 +1251,36 @@ def main() -> None:
               f"{len({r[3] for r in taiwan_data['rows']})} categories")
     else:
         print(f"  (skipping Taiwan anti-fraud — not found: {args.taiwan_source})")
+
+    if os.path.isfile(args.google_ud_source):
+        with open(args.google_ud_source, "r", encoding="utf-8") as f:
+            gud_data = json.load(f)
+        gud_rows = build_google_userdata_db(gud_data, args.db)
+        print(f"  google user data: {gud_rows} metric rows across "
+              f"{len({r[1] for r in gud_data['rows']})} periods, "
+              f"{len({r[0] for r in gud_data['rows']})} datasets")
+    else:
+        print(f"  (skipping Google user data — not found: {args.google_ud_source})")
+
+    if os.path.isfile(args.microsoft_source):
+        with open(args.microsoft_source, "r", encoding="utf-8") as f:
+            ms_data = json.load(f)
+        ms_rows = build_microsoft_db(ms_data, args.db)
+        print(f"  microsoft LERR: {ms_rows} metric rows across "
+              f"{len({r[0] for r in ms_data['rows']})} periods, "
+              f"{len({r[1] for r in ms_data['rows']})} sections")
+    else:
+        print(f"  (skipping Microsoft LERR — not found: {args.microsoft_source})")
+
+    if os.path.isfile(args.linkedin_source):
+        with open(args.linkedin_source, "r", encoding="utf-8") as f:
+            li_data = json.load(f)
+        li_rows = build_linkedin_db(li_data, args.db)
+        print(f"  linkedin transparency: {li_rows} metric rows across "
+              f"{len({r[1] for r in li_data['rows']})} periods, "
+              f"{len({r[0] for r in li_data['rows']})} datasets")
+    else:
+        print(f"  (skipping LinkedIn transparency — not found: {args.linkedin_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).
