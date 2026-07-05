@@ -111,6 +111,11 @@ _DEFAULT_TRAFFIC_SOURCE = os.getenv(
 _DEFAULT_ANDROID_SOURCE = os.getenv(
     "SEED_ANDROID_SOURCE_JSON", os.path.join(HERE, "data", "android-security.json")
 )
+# NY ToS report narratives (full text) — vendored in-repo (from the sibling data
+# repo's ny-tos-reports/extract_narrative.py).
+_DEFAULT_NARRATIVES_SOURCE = os.getenv(
+    "SEED_NARRATIVES_SOURCE_JSON", os.path.join(HERE, "data", "ny-tos-narratives.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -590,6 +595,22 @@ CREATE TABLE ny_tos_stats (
 );
 CREATE INDEX idx_nys_category ON ny_tos_stats(shha_category);
 CREATE INDEX idx_nys_company  ON ny_tos_stats(company);
+
+-- Narrative full text of the NY ToS filings: one row per page of prose, indexed
+-- for full-text search (SQLite FTS5). Prose, not numbers — the language each
+-- platform uses to describe its hate-speech/extremism/disinformation/harassment/
+-- foreign-interference policies. `heading`/`text` are tokenized (searchable);
+-- company/platform/period/page are UNINDEXED (filter/return only). Powers the
+-- public GET /api/narratives full-text search endpoint + the /narratives page.
+CREATE VIRTUAL TABLE ny_tos_narratives USING fts5(
+    company   UNINDEXED,
+    platform  UNINDEXED,
+    period    UNINDEXED,
+    page      UNINDEXED,
+    heading,
+    text,
+    tokenize = 'porter unicode61'
+);
 """
 
 _RL_COLUMNS = ("platform", "company", "category", "confidence",
@@ -1298,6 +1319,35 @@ _NY_STATS_COLUMNS = ("company", "period", "shha_category", "original_label",
                      "value", "unit", "page")
 
 
+def build_ny_tos_narratives(data: dict[str, Any], db_path: str) -> int:
+    """Populate the ny_tos_narratives FTS5 table in an existing DB at db_path.
+
+    The DB must already contain the virtual table (created by SCHEMA). The dataset
+    is the tidy-long ny-tos-narratives.json (`columns` header + `rows` in column
+    order: company, platform, period, page, heading, text). Returns the row count.
+    """
+    if data is None:
+        raise ValueError("narratives dataset is None")
+    expected_cols = ["company", "platform", "period", "page", "heading", "text"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"narratives dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("narratives dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ny_tos_narratives (company, platform, period, page, "
+                "heading, text) VALUES (?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_ny_tos_stats(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the ny_tos_stats table in an existing DB at db_path.
 
@@ -1364,6 +1414,8 @@ def main() -> None:
                         help="Path to google-traffic.json")
     parser.add_argument("--android-source", default=_DEFAULT_ANDROID_SOURCE,
                         help="Path to android-security.json")
+    parser.add_argument("--narratives-source", default=_DEFAULT_NARRATIVES_SOURCE,
+                        help="Path to ny-tos-narratives.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1542,6 +1594,15 @@ def main() -> None:
               f"{len({r[1] for r in an_data['rows']})} periods")
     else:
         print(f"  (skipping Android security — not found: {args.android_source})")
+
+    if os.path.isfile(args.narratives_source):
+        with open(args.narratives_source, "r", encoding="utf-8") as f:
+            nar_data = json.load(f)
+        nar_rows = build_ny_tos_narratives(nar_data, args.db)
+        print(f"  ny tos narratives: {nar_rows} pages across "
+              f"{len({r[0] for r in nar_data['rows']})} companies")
+    else:
+        print(f"  (skipping NY ToS narratives — not found: {args.narratives_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

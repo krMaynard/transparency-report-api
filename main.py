@@ -2418,6 +2418,12 @@ def android_page() -> FileResponse:
     return _serve_page("android.html", "Android security page")
 
 
+@app.get("/narratives", response_class=HTMLResponse)
+def narratives_page() -> FileResponse:
+    """Serve the NY ToS narrative full-text search page (reads GET /api/narratives)."""
+    return _serve_page("narratives.html", "NY ToS narratives search page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2478,6 +2484,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "discord": ("discord.html", "Discord transparency page", {}),
     "disruptions": ("disruptions.html", "Traffic disruptions page", {}),
     "android": ("android.html", "Android security page", {}),
+    "narratives": ("narratives.html", "NY ToS narratives search page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
@@ -3064,6 +3071,102 @@ def ny_tos_reports(
         "facets": data["facets"],
         "rows": out,
     }, headers=prov_headers)
+
+
+# Full-text search over the narrative NY ToS filings (seeded into the FTS5
+# `ny_tos_narratives` table by seed.build_ny_tos_narratives). Prose, not the
+# structured `ny_tos_stats` numbers — the language each platform uses to describe
+# its policies. Matches are highlighted with private-use sentinels the client
+# HTML-escapes then swaps for <mark>, so raw DB text can never inject markup.
+_FTS_TERM = re.compile(r"[0-9A-Za-z]+")
+_MARK_OPEN = chr(0xE000)
+_MARK_CLOSE = chr(0xE001)
+
+
+def _fts_match(q: str) -> str:
+    """Compile a user query into a safe FTS5 MATCH string: keep only word tokens,
+    quote each (implicit AND). Quoting neutralises every FTS5 operator, so no
+    user input reaches the query grammar and a malformed `q` can't raise."""
+    return " ".join(f'"{t}"' for t in _FTS_TERM.findall(q or "")[:12])
+
+
+@api_router.get("/narratives", response_model=None)
+def narratives(
+    request: Request,
+    q: str = Query("", max_length=200),
+    company: str | None = None,
+    period: str | None = None,
+    limit: int = Query(30, ge=1, le=100),
+) -> JSONResponse:
+    """Public full-text search over the **narrative** NY Terms-of-Service filings
+    — the prose in which platforms describe how they define and enforce their
+    hate-speech / extremism / disinformation / harassment / foreign-interference
+    policies. One result per matching page, ranked by relevance (BM25), with a
+    highlighted snippet and a deep link into the archived PDF. Filter by
+    `company` / `period`. IP-rate-limited (the query is user-driven), no auth."""
+    if _key_store.incr(f"narratives:{_client_ip(request)}", EXPLORE_RATE_WINDOW) > EXPLORE_RATE_MAX:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many searches from here. Please slow down.",
+            headers={"Retry-After": str(EXPLORE_RATE_WINDOW)},
+        )
+    match = _fts_match(q)
+    conn = _connect_ro()
+    try:
+        companies = [r[0] for r in conn.execute(
+            "SELECT DISTINCT company FROM ny_tos_narratives ORDER BY company COLLATE NOCASE")]
+        periods = [r[0] for r in conn.execute(
+            "SELECT DISTINCT period FROM ny_tos_narratives ORDER BY period")]
+        page_total = conn.execute("SELECT count(*) FROM ny_tos_narratives").fetchone()[0]
+
+        results: list[dict[str, Any]] = []
+        total = 0
+        if match:
+            where = ["ny_tos_narratives MATCH ?"]
+            params: list[Any] = [match]
+            if company:
+                where.append("ny_tos_narratives.company = ?"); params.append(company)
+            if period:
+                where.append("ny_tos_narratives.period = ?"); params.append(period)
+            wc = " AND ".join(where)
+            total = conn.execute(
+                f"SELECT count(*) FROM ny_tos_narratives WHERE {wc}", params).fetchone()[0]
+            # The FTS table stays unaliased so snippet()/bm25() resolve; the
+            # catalogue join (for the archived-PDF link) is aliased.
+            sql = (
+                "SELECT ny_tos_narratives.company, ny_tos_narratives.platform, "
+                "ny_tos_narratives.period, ny_tos_narratives.page, "
+                "ny_tos_narratives.heading, "
+                "snippet(ny_tos_narratives, 5, ?, ?, '…', 14), r.archived "
+                "FROM ny_tos_narratives "
+                "LEFT JOIN ny_tos_reports r ON r.company = ny_tos_narratives.company "
+                "AND r.period = ny_tos_narratives.period "
+                f"WHERE {wc} ORDER BY bm25(ny_tos_narratives) LIMIT ?"
+            )
+            rows = conn.execute(sql, [_MARK_OPEN, _MARK_CLOSE] + params + [limit]).fetchall()
+            for co, plat, per, pg, head, snip, arch in rows:
+                url = (arch + (f"#page={pg}" if pg else "")) if arch else None
+                results.append({
+                    "company": co, "platform": plat or None, "period": per,
+                    "page": pg, "heading": head or None, "snippet": snip,
+                    "archived_url": url,
+                })
+    finally:
+        conn.close()
+
+    return JSONResponse({
+        "q": q,
+        "searched": bool(match),
+        "count": len(results),
+        "total": total,
+        "page_total": page_total,
+        "companies": companies,
+        "periods": periods,
+        "mark_open": _MARK_OPEN,
+        "mark_close": _MARK_CLOSE,
+        "generated": _dataset_meta().get("generated"),
+        "results": results,
+    })
 
 
 @api_router.get("/explore/options")

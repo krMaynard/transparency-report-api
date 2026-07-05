@@ -363,6 +363,23 @@ _NY_TOS_FIXTURE = [
 ]
 seed.build_ny_tos_reports(_NY_TOS_FIXTURE, _DB)
 
+# A tiny slice of the NY ToS report narratives (ny-tos-narratives.json shape),
+# seeded into the FTS5 table. The Snap page matches the archived Snap filing so
+# the archived-PDF deep link (#page=) is exercised; the TikTok page has no
+# public archive. [company, platform, period, page, heading, text]
+_NARRATIVES_FIXTURE = {
+    "columns": ["company", "platform", "period", "page", "heading", "text"],
+    "rows": [
+        ["Snap Inc", "", "2025 Q3", 5, "Hateful Content",
+         "Snap prohibits hate speech and removes content that demeans a protected group."],
+        ["Snap Inc", "", "2025 Q3", 7, "",
+         "We disclose the number of appeals received and how many were granted."],
+        ["TikTok Inc", "", "2025 Q4", 3, "",
+         "This report describes our approach to misinformation and coordinated harassment."],
+    ],
+}
+seed.build_ny_tos_narratives(_NARRATIVES_FIXTURE, _DB)
+
 # A small slice of the normalized NY ToS stats (ny-tos-normalized.csv shape):
 # a count + a percent for Snap (unit mixing), a Strava category_total + its
 # format breakdown (grain double-count), and a Discord row (cross-company).

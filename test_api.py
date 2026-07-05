@@ -1593,6 +1593,67 @@ class TestNYTosReports:
         assert "/api/ny-tos-reports" in r.text and 'id="rl-period"' in r.text
 
 
+# ── Public NY ToS narrative full-text search (GET /api/narratives) ───────────
+
+class TestNarratives:
+    def test_public_index(self):
+        # No query: returns the facet lists + how much prose is searchable.
+        d = client.get("/api/narratives").json()  # no X-API-Key
+        assert d["searched"] is False
+        assert d["page_total"] == 3
+        assert set(d["companies"]) == {"Snap Inc", "TikTok Inc"}
+        assert d["results"] == []
+        assert d["mark_open"] and d["mark_close"]  # highlight sentinels present
+
+    def test_full_text_search_ranks_and_links(self):
+        d = client.get("/api/narratives", params={"q": "hate speech"}).json()
+        assert d["searched"] is True and d["total"] == 1
+        hit = d["results"][0]
+        assert hit["company"] == "Snap Inc" and hit["page"] == 5
+        # The match is wrapped in the highlight sentinels for the client to swap.
+        assert d["mark_open"] in hit["snippet"] and d["mark_close"] in hit["snippet"]
+        # Deep link into the archived PDF at the matching page.
+        assert hit["archived_url"].endswith("2025-q3-snap-inc.pdf#page=5")
+
+    def test_stemming(self):
+        # The porter tokenizer stems, so "appeal" matches "appeals".
+        assert client.get("/api/narratives", params={"q": "appeal"}).json()["total"] == 1
+
+    def test_company_filter(self):
+        d = client.get("/api/narratives",
+                       params={"q": "harassment", "company": "TikTok Inc"}).json()
+        assert d["total"] == 1 and d["results"][0]["company"] == "TikTok Inc"
+        # No public archive for the TikTok filing → no deep link.
+        assert d["results"][0]["archived_url"] is None
+        # Same query pinned to the other company returns nothing.
+        assert client.get("/api/narratives",
+                          params={"q": "harassment", "company": "Snap Inc"}).json()["total"] == 0
+
+    def test_no_match(self):
+        d = client.get("/api/narratives", params={"q": "cryptocurrency"}).json()
+        assert d["searched"] is True and d["total"] == 0 and d["results"] == []
+
+    def test_malformed_query_is_safe(self):
+        # FTS5 operators / unbalanced quotes must not 500 — only word tokens survive.
+        for bad in ['"OR hate* (AND', 'NEAR("x"', 'a AND b OR', '""', '* * *']:
+            r = client.get("/api/narratives", params={"q": bad})
+            assert r.status_code == 200, bad
+
+    def test_page_served(self):
+        r = client.get("/narratives")
+        assert r.status_code == 200
+        assert "/api/narratives" in r.text and 'id="nout"' in r.text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("ny-tos-narratives.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["company", "platform", "period", "page", "heading", "text"]
+        assert all(len(r) == 6 for r in data["rows"])
+        assert all(isinstance(r[3], int) for r in data["rows"])  # page is an int
+
+
 # ── Public interactive query (POST /api/explore) ─────────────────────────────
 
 class TestExplore:
@@ -2156,7 +2217,7 @@ class TestLocalization:
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
                 "user-data", "microsoft", "linkedin", "tiktok", "discord",
-                "disruptions", "android", "mcp", "methodology", "schema", "api-key", "privacy")
+                "disruptions", "android", "narratives", "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.

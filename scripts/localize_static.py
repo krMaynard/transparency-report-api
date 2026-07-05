@@ -34,7 +34,7 @@ PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-t
                "apple.html", "github.html", "snap.html",
                "india.html", "korea.html", "taiwan.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
-               "disruptions.html", "android.html",
+               "disruptions.html", "android.html", "narratives.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
@@ -56,6 +56,7 @@ SUFFIX = {
     "discord.html": "discord",
     "disruptions.html": "disruptions",
     "android.html": "android",
+    "narratives.html": "narratives",
     "mcp.html": "mcp",
     "methodology.html": "methodology",
     "schema.html": "schema",
@@ -116,7 +117,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -10579,6 +10580,179 @@ for _loc in _AN_NAV:
         if _o in _an_text and _o not in _an_own:
             PAGES[_loc]["android.html"].append((_o, _n))
             _an_own.add(_o)
+
+# ── narratives.html localization (self-contained; authored + pool inherit) ──
+# Derived from catalog.html, so its chrome + shared strings (Search label,
+# Snapshot:/Cite as: provenance labels) pool-inherit from catalog.html; only the
+# narrative-search-specific strings are authored here.
+_NAR_NAV = {
+    "es": "Búsqueda de textos",
+    "fr": "Recherche de textes",
+    "de": "Volltextsuche",
+    "it": "Ricerca nei testi",
+    "ja": "本文検索",
+    "zh": "全文检索",
+    "ko": "본문 검색",
+}
+_NAR_CARD_DESC_EN = "Full-text search across the prose of New York's Terms-of-Service filings — the language platforms use to describe how they define and enforce hate speech, extremism, disinformation and harassment."
+_NAR_CARD_DESC = {
+    "es": "Búsqueda de texto completo en la prosa de los informes de condiciones de servicio de Nueva York: el lenguaje que usan las plataformas para describir cómo definen y aplican las normas sobre discurso de odio, extremismo, desinformación y acoso.",
+    "fr": "Recherche plein texte dans la prose des dépôts de conditions d'utilisation de New York : le langage que les plateformes emploient pour décrire comment elles définissent et appliquent leurs règles sur le discours de haine, l'extrémisme, la désinformation et le harcèlement.",
+    "de": "Volltextsuche im Fließtext der New Yorker Nutzungsbedingungen-Berichte — die Sprache, mit der Plattformen beschreiben, wie sie Hassrede, Extremismus, Desinformation und Belästigung definieren und durchsetzen.",
+    "it": "Ricerca full-text nella prosa dei report sulle condizioni di servizio di New York: il linguaggio con cui le piattaforme descrivono come definiscono e applicano le regole su incitamento all'odio, estremismo, disinformazione e molestie.",
+    "ja": "ニューヨークの利用規約報告書の本文に対する全文検索。各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメントをどのように定義し執行するかを説明する文章を検索できます。",
+    "zh": "对纽约《服务条款》报告正文的全文检索——各平台用来描述其如何界定和执行仇恨言论、极端主义、虚假信息和骚扰规则的措辞。",
+    "ko": "뉴욕 서비스 약관 보고서 본문에 대한 전문 검색. 각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘을 어떻게 정의하고 집행하는지 설명하는 문구를 검색할 수 있습니다.",
+}
+_NAR_PAGE = {
+    "Narrative search · Transparency Report": {
+        "es": "Búsqueda de textos · Transparency Report",
+        "fr": "Recherche de textes · Transparency Report",
+        "de": "Volltextsuche · Transparency Report",
+        "it": "Ricerca nei testi · Transparency Report",
+        "ja": "本文検索 · Transparency Report",
+        "zh": "全文检索 · Transparency Report",
+        "ko": "본문 검색 · Transparency Report",
+    },
+    "Full-text search": {
+        "es": "Búsqueda de texto completo",
+        "fr": "Recherche plein texte",
+        "de": "Volltextsuche",
+        "it": "Ricerca full-text",
+        "ja": "全文検索",
+        "zh": "全文检索",
+        "ko": "전문 검색",
+    },
+    "Search the ToS report narratives": {
+        "es": "Busca en el texto de los informes de condiciones de servicio",
+        "fr": "Rechercher dans le texte des rapports de conditions d'utilisation",
+        "de": "Den Text der Nutzungsbedingungen-Berichte durchsuchen",
+        "it": "Cerca nel testo dei report sulle condizioni di servizio",
+        "ja": "利用規約報告書の本文を検索",
+        "zh": "检索《服务条款》报告正文",
+        "ko": "서비스 약관 보고서 본문 검색",
+    },
+    "Search the prose of New York's Social Media Terms-of-Service filings — the language platforms use to describe how they define and enforce hate speech, extremism, disinformation, harassment and foreign political interference.": {
+        "es": "Busca en la prosa de los informes de condiciones de servicio de redes sociales de Nueva York: el lenguaje que usan las plataformas para describir cómo definen y aplican las normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera.",
+        "fr": "Recherchez dans la prose des dépôts de conditions d'utilisation des réseaux sociaux de New York : le langage que les plateformes emploient pour décrire comment elles définissent et appliquent leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère.",
+        "de": "Durchsuchen Sie den Fließtext der New Yorker Social-Media-Nutzungsbedingungen-Berichte — die Sprache, mit der Plattformen beschreiben, wie sie Hassrede, Extremismus, Desinformation, Belästigung und ausländische politische Einflussnahme definieren und durchsetzen.",
+        "it": "Cerca nella prosa dei report sulle condizioni di servizio dei social media di New York: il linguaggio con cui le piattaforme descrivono come definiscono e applicano le regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera.",
+        "ja": "ニューヨークのソーシャルメディア利用規約報告書の本文を検索します。各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉をどのように定義し執行するかを説明する文章です。",
+        "zh": "检索纽约社交媒体《服务条款》报告的正文——各平台用来描述其如何界定和执行仇恨言论、极端主义、虚假信息、骚扰以及外国政治干预规则的措辞。",
+        "ko": "뉴욕 소셜미디어 서비스 약관 보고서의 본문을 검색하세요. 각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명하는 문구입니다.",
+    },
+    "Full-text search across the <strong>prose</strong> of New York's Social Media Terms-of-Service filings — the language platforms use to describe how they define and enforce hate speech, extremism, disinformation, harassment and foreign political interference. Each result is one page of a filing, ranked by relevance, with a link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).": {
+        "es": "Búsqueda de texto completo en la <strong>prosa</strong> de los informes de condiciones de servicio de redes sociales de Nueva York: el lenguaje que usan las plataformas para describir cómo definen y aplican las normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera. Cada resultado es una página de un informe, ordenada por relevancia, con un enlace al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).",
+        "fr": "Recherche plein texte dans la <strong>prose</strong> des dépôts de conditions d'utilisation des réseaux sociaux de New York : le langage que les plateformes emploient pour décrire comment elles définissent et appliquent leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère. Chaque résultat est une page d'un dépôt, classée par pertinence, avec un lien vers le PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).",
+        "de": "Volltextsuche im <strong>Fließtext</strong> der New Yorker Social-Media-Nutzungsbedingungen-Berichte — die Sprache, mit der Plattformen beschreiben, wie sie Hassrede, Extremismus, Desinformation, Belästigung und ausländische politische Einflussnahme definieren und durchsetzen. Jedes Ergebnis ist eine Seite eines Berichts, nach Relevanz sortiert, mit einem Link zum archivierten PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).",
+        "it": "Ricerca full-text nella <strong>prosa</strong> dei report sulle condizioni di servizio dei social media di New York: il linguaggio con cui le piattaforme descrivono come definiscono e applicano le regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera. Ogni risultato è una pagina di un report, ordinata per pertinenza, con un link al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).",
+        "ja": "ニューヨークのソーシャルメディア利用規約報告書の<strong>本文</strong>に対する全文検索です。各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉をどのように定義し執行するかを説明する文章です。各結果は報告書の 1 ページで、関連度順に並び、アーカイブ済み PDF へのリンクが付いています。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。",
+        "zh": "对纽约社交媒体《服务条款》报告<strong>正文</strong>的全文检索——各平台用来描述其如何界定和执行仇恨言论、极端主义、虚假信息、骚扰以及外国政治干预规则的措辞。每条结果是报告的一页，按相关度排序，并附有指向已存档 PDF 的链接。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。",
+        "ko": "뉴욕 소셜미디어 서비스 약관 보고서 <strong>본문</strong>에 대한 전문 검색입니다. 각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 각 결과는 보고서의 한 페이지이며, 관련도순으로 정렬되고 보관된 PDF로 연결되는 링크가 있습니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.",
+    },
+    "<label>Company <select": {
+        "es": "<label>Empresa <select", "fr": "<label>Entreprise <select",
+        "de": "<label>Unternehmen <select", "it": "<label>Azienda <select",
+        "ja": "<label>企業 <select", "zh": "<label>公司 <select", "ko": "<label>회사 <select",
+    },
+    "<label>Period <select": {
+        "es": "<label>Período <select", "fr": "<label>Période <select",
+        "de": "<label>Zeitraum <select", "it": "<label>Periodo <select",
+        "ja": "<label>期間 <select", "zh": "<label>报告期 <select", "ko": "<label>기간 <select",
+    },
+    'placeholder="e.g. hate speech, appeals, algorithm"': {
+        "es": 'placeholder="p. ej. discurso de odio, apelaciones, algoritmo"',
+        "fr": 'placeholder="ex. discours de haine, appels, algorithme"',
+        "de": 'placeholder="z. B. Hassrede, Einsprüche, Algorithmus"',
+        "it": 'placeholder="es. incitamento all\'odio, ricorsi, algoritmo"',
+        "ja": 'placeholder="例：ヘイトスピーチ、異議申立、アルゴリズム"',
+        "zh": 'placeholder="例如：仇恨言论、申诉、算法"',
+        "ko": 'placeholder="예: 혐오 표현, 이의 제기, 알고리즘"',
+    },
+    '<button id="nbtn" type="button">Search</button>': {
+        "es": '<button id="nbtn" type="button">Buscar</button>',
+        "fr": '<button id="nbtn" type="button">Rechercher</button>',
+        "de": '<button id="nbtn" type="button">Suchen</button>',
+        "it": '<button id="nbtn" type="button">Cerca</button>',
+        "ja": '<button id="nbtn" type="button">検索</button>',
+        "zh": '<button id="nbtn" type="button">搜索</button>',
+        "ko": '<button id="nbtn" type="button">검색</button>',
+    },
+    "`Searching ${fmt(d.page_total)} pages across ${fmt(d.companies.length)} filings. Type a word or phrase above.`": {
+        "es": "`Se buscan ${fmt(d.page_total)} páginas en ${fmt(d.companies.length)} informes. Escribe una palabra o frase arriba.`",
+        "fr": "`Recherche dans ${fmt(d.page_total)} pages de ${fmt(d.companies.length)} dépôts. Saisissez un mot ou une expression ci-dessus.`",
+        "de": "`Durchsucht ${fmt(d.page_total)} Seiten aus ${fmt(d.companies.length)} Berichten. Geben Sie oben ein Wort oder eine Wendung ein.`",
+        "it": "`Ricerca in ${fmt(d.page_total)} pagine di ${fmt(d.companies.length)} report. Digita una parola o una frase qui sopra.`",
+        "ja": "`${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} ページを検索します。上に単語やフレーズを入力してください。`",
+        "zh": "`可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 页中检索。请在上方输入词语或短语。`",
+        "ko": "`${fmt(d.companies.length)}개 보고서의 ${fmt(d.page_total)}페이지를 검색합니다. 위에 단어나 구를 입력하세요.`",
+    },
+    "`Showing ${fmt(d.count)} of ${fmt(d.total)} matching pages for “${esc(q)}”, ranked by relevance.`": {
+        "es": "`Mostrando ${fmt(d.count)} de ${fmt(d.total)} páginas coincidentes para “${esc(q)}”, ordenadas por relevancia.`",
+        "fr": "`Affichage de ${fmt(d.count)} pages correspondantes sur ${fmt(d.total)} pour « ${esc(q)} », classées par pertinence.`",
+        "de": "`${fmt(d.count)} von ${fmt(d.total)} passenden Seiten für „${esc(q)}“, nach Relevanz sortiert.`",
+        "it": "`Visualizzazione di ${fmt(d.count)} di ${fmt(d.total)} pagine corrispondenti per “${esc(q)}”, ordinate per pertinenza.`",
+        "ja": "`「${esc(q)}」に一致する ${fmt(d.total)} ページ中 ${fmt(d.count)} ページを関連度順に表示しています。`",
+        "zh": "`显示与“${esc(q)}”匹配的 ${fmt(d.total)} 页中的 ${fmt(d.count)} 页，按相关度排序。`",
+        "ko": "`“${esc(q)}”과(와) 일치하는 ${fmt(d.total)}페이지 중 ${fmt(d.count)}페이지를 관련도순으로 표시합니다.`",
+    },
+    "`No pages match “${esc(q)}”.`": {
+        "es": "`Ninguna página coincide con “${esc(q)}”.`",
+        "fr": "`Aucune page ne correspond à « ${esc(q)} ».`",
+        "de": "`Keine Seite passt zu „${esc(q)}“.`",
+        "it": "`Nessuna pagina corrisponde a “${esc(q)}”.`",
+        "ja": "`「${esc(q)}」に一致するページはありません。`",
+        "zh": "`没有页面匹配“${esc(q)}”。`",
+        "ko": "`“${esc(q)}”과(와) 일치하는 페이지가 없습니다.`",
+    },
+    "“New York ToS report narratives, via the Transparency Report API (": {
+        "es": "“Textos de los informes de condiciones de servicio de Nueva York, vía la Transparency Report API (",
+        "fr": "“Textes des rapports de conditions d'utilisation de New York, via la Transparency Report API (",
+        "de": "“Texte der New Yorker Nutzungsbedingungen-Berichte, über die Transparency Report API (",
+        "it": "“Testi dei report sulle condizioni di servizio di New York, tramite la Transparency Report API (",
+        "ja": "“ニューヨークの利用規約報告書の本文、Transparency Report API 経由 (",
+        "zh": "“纽约《服务条款》报告正文，经由 Transparency Report API (",
+        "ko": "“뉴욕 서비스 약관 보고서 본문, Transparency Report API 경유 (",
+    },
+    "Open in the archived PDF →": {
+        "es": "Abrir en el PDF archivado →", "fr": "Ouvrir dans le PDF archivé →",
+        "de": "Im archivierten PDF öffnen →", "it": "Apri nel PDF archiviato →",
+        "ja": "アーカイブ済み PDF で開く →", "zh": "在已存档 PDF 中打开 →", "ko": "보관된 PDF에서 열기 →",
+    },
+    "Open in the archived PDF (opens in new tab)": {
+        "es": "Abrir en el PDF archivado (se abre en una pestaña nueva)",
+        "fr": "Ouvrir dans le PDF archivé (ouvre un nouvel onglet)",
+        "de": "Im archivierten PDF öffnen (öffnet in neuem Tab)",
+        "it": "Apri nel PDF archiviato (si apre in una nuova scheda)",
+        "ja": "アーカイブ済み PDF で開く（新しいタブで開きます）",
+        "zh": "在已存档 PDF 中打开（在新标签页中打开）",
+        "ko": "보관된 PDF에서 열기(새 탭에서 열림)",
+    },
+    "Could not run the search: ": {
+        "es": "No se pudo ejecutar la búsqueda: ", "fr": "Impossible d'exécuter la recherche : ",
+        "de": "Die Suche konnte nicht ausgeführt werden: ", "it": "Impossibile eseguire la ricerca: ",
+        "ja": "検索を実行できませんでした: ", "zh": "无法执行搜索：", "ko": "검색을 실행하지 못했습니다: ",
+    },
+    "Could not load the search index: ": {
+        "es": "No se pudo cargar el índice de búsqueda: ", "fr": "Impossible de charger l'index de recherche : ",
+        "de": "Der Suchindex konnte nicht geladen werden: ", "it": "Impossibile caricare l'indice di ricerca: ",
+        "ja": "検索インデックスを読み込めませんでした: ", "zh": "无法加载搜索索引：", "ko": "검색 색인을 불러오지 못했습니다: ",
+    },
+}
+for _loc in _NAR_NAV:
+    COMMON[_loc].append(("      Narrative search\n    </a>", f"      {_NAR_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Narrative search</h3>", f"<h3>{_NAR_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append(("Search the reports", {"es": "Buscar en los informes", "fr": "Rechercher dans les rapports", "de": "Berichte durchsuchen", "it": "Cerca nei report", "ja": "レポートを検索", "zh": "检索报告", "ko": "보고서 검색"}[_loc]))
+    PAGES[_loc]["home.html"].append((_NAR_CARD_DESC_EN, _NAR_CARD_DESC[_loc]))
+    PAGES[_loc]["narratives.html"] = [(_en, _tr[_loc]) for _en, _tr in _NAR_PAGE.items()]
+    _nar_text = open(os.path.join(STATIC, "narratives.html"), encoding="utf-8").read()
+    _nar_own = {_o for _o, _ in PAGES[_loc]["narratives.html"]}
+    # Derived from catalog.html: inherit its chrome + shared strings (Search
+    # label, Snapshot:/Cite as: provenance labels) for anything still present.
+    for _o, _n in PAGES[_loc]["catalog.html"]:
+        if _o in _nar_text and _o not in _nar_own:
+            PAGES[_loc]["narratives.html"].append((_o, _n))
+            _nar_own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
