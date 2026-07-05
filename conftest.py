@@ -243,6 +243,27 @@ _LINKEDIN_FIXTURE = {
 }
 seed.build_linkedin_db(_LINKEDIN_FIXTURE, _DB)
 
+# A small slice of the TikTok Government & Legal Requests dataset
+# (tiktok-transparency.json shape). [dataset, period, country, metric, unit, value]
+_TIKTOK_FIXTURE = {
+    "columns": ["dataset", "period", "country", "metric", "unit", "value"],
+    "rows": [
+        # government_removals — per-country rows plus the global 'All' aggregate.
+        ["government_removals", "2025-H2", "United States", "total_requests_received", "count", 28],
+        ["government_removals", "2025-H2", "United States", "content_specified", "count", 15],
+        ["government_removals", "2025-H2", "United States", "removal_rate", "percent", 0.875],
+        ["government_removals", "2025-H2", "All", "total_requests_received", "count", 5000],
+        ["government_removals", "2019-H1", "United States", "total_requests_received", "count", 99],
+        # information_requests
+        ["information_requests", "2025-H2", "United States", "legal_requests", "count", 100],
+        ["information_requests", "2025-H2", "United States", "pct_legal_disclosed", "percent", 0.5],
+        # ip_removals — global-only.
+        ["ip_removals", "2025-H2", "All", "total_ip_requests", "count", 476553],
+        ["ip_removals", "2025-H2", "All", "pct_successful", "percent", 0.636682594],
+    ],
+}
+seed.build_tiktok_db(_TIKTOK_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /

@@ -2085,7 +2085,7 @@ class TestLocalization:
     LOCALES = ("es", "fr", "de", "it", "ja", "zh", "ko")
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
-                "user-data", "microsoft", "linkedin",
+                "user-data", "microsoft", "linkedin", "tiktok",
                 "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
@@ -2483,17 +2483,26 @@ class TestDatasetPages:
         assert '"table":"linkedin_metrics"' in r.text
         assert "/static/vendor/chart.umd.js" in r.text
 
+    def test_tiktok_page_served(self):
+        r = client.get("/tiktok")
+        assert r.status_code == 200
+        assert "TikTok Government &amp; Legal Requests" in r.text
+        assert '"table":"tiktok_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
     def test_request_report_pages_in_sidebar_nav(self):
         for path in ("/", "/reports", "/schema", "/apple"):
             t = client.get(path).text
             assert 'href="/user-data"' in t, path
             assert 'href="/microsoft"' in t, path
             assert 'href="/linkedin"' in t, path
+            assert 'href="/tiktok"' in t, path
 
     def test_localized_request_report_pages(self):
         cases = {"/es/user-data": "Solicitudes de datos de usuarios de Google",
                  "/fr/microsoft": "Demandes des forces de l'ordre à Microsoft",
-                 "/ko/linkedin": "LinkedIn 정부 요청"}
+                 "/ko/linkedin": "LinkedIn 정부 요청",
+                 "/zh/tiktok": "对 TikTok 的政府与法律请求"}
         for path, marker in cases.items():
             r = client.get(path)
             assert r.status_code == 200, path
@@ -2983,6 +2992,83 @@ class TestLinkedInTable:
         assert all(len(r) == 7 for r in data["rows"][:50])
         assert {r[0] for r in data["rows"]} == {"member_data_requests", "us_breakdown",
                                                 "content_removal_requests"}
+
+
+class TestTikTokTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "tiktok_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=tiktok_metrics", headers=MOMO).json()
+        assert {"dataset", "period", "country", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_metric_value(self):
+        # US 2025-H2 government-removal requests received = 28 (fixture, matches
+        # the filed CLIGR CSV).
+        job = _submit_and_wait({
+            "table": "tiktok_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "dataset", "field_values": ["government_removals"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2025-H2"]},
+                {"operation": "EQ", "field_name": "country", "field_values": ["United States"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["total_requests_received"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 28
+
+    def test_percent_is_fraction(self):
+        # Rates/percentages are carried as fractions of 1 (unit=percent).
+        job = _submit_and_wait({
+            "table": "tiktok_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric", "field_values": ["removal_rate"]},
+                {"operation": "EQ", "field_name": "unit", "field_values": ["percent"]},
+            ]},
+            "sort": [{"field_name": "value", "order": "desc"}],
+        })
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] and 0.0 <= body["rows"][0][-1] <= 1.0
+
+    def test_explore_warns_on_unpinned_aggregation(self):
+        q = {"table": "tiktok_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        text = " ".join(client.post("/api/explore", json=q).json().get("warnings", []))
+        assert ("unit" in text and "dataset" in text
+                and "metric" in text and "country" in text)
+
+    def test_explore_pinned_no_warning(self):
+        q = {"table": "tiktok_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "dataset", "field_values": ["government_removals"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["total_requests_received"]},
+                 {"operation": "EQ", "field_name": "unit", "field_values": ["count"]},
+                 {"operation": "EQ", "field_name": "country", "field_values": ["United States"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        assert not client.post("/api/explore", json=q).json().get("warnings")
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("tiktok-transparency.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["dataset", "period", "country", "metric", "unit", "value"]
+        assert all(len(r) == 6 for r in data["rows"])
+        assert {r[0] for r in data["rows"]} == {"government_removals",
+                                                "information_requests", "ip_removals"}
+        # every percent value is a fraction of 1; counts are whole numbers.
+        for r in data["rows"]:
+            if r[4] == "percent":
+                assert 0.0 <= r[5] <= 1.0
+            else:
+                assert r[5] == int(r[5])
+        # ip_removals is global-only; the other two carry a global 'All' row.
+        assert {r[2] for r in data["rows"] if r[0] == "ip_removals"} == {"All"}
 
 
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────
