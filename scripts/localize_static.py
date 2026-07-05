@@ -34,6 +34,7 @@ PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-t
                "apple.html", "github.html", "snap.html",
                "india.html", "korea.html", "taiwan.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
+               "disruptions.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
@@ -53,6 +54,7 @@ SUFFIX = {
     "linkedin.html": "linkedin",
     "tiktok.html": "tiktok",
     "discord.html": "discord",
+    "disruptions.html": "disruptions",
     "mcp.html": "mcp",
     "methodology.html": "methodology",
     "schema.html": "schema",
@@ -113,7 +115,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -10056,6 +10058,227 @@ for _loc in _DC_NAV:
     _dc_snap = dict(PAGES[_loc]["snap.html"])
     if _HINT_SECTION in _dc_snap and _HINT_SECTION not in {_o for _o, _ in PAGES[_loc]["discord.html"]}:
         PAGES[_loc]["discord.html"].append((_HINT_SECTION, _dc_snap[_HINT_SECTION]))
+
+# ── disruptions.html localization (self-contained; authored + pool inherit) ──
+# A flat catalogue page derived from catalog.html, so its chrome and shared
+# catalogue body strings (Download CSV, Snapshot:/Cite as:, "What the columns
+# mean", "Could not load catalogue: ", Search label, Catalogue badge) pool-inherit
+# straight from catalog.html; only the disruptions-specific strings are authored.
+_GT_NAV = {
+    "es": "Interrupciones de tráfico",
+    "fr": "Interruptions de trafic",
+    "de": "Verkehrsstörungen",
+    "it": "Interruzioni del traffico",
+    "ja": "トラフィック障害",
+    "zh": "流量中断",
+    "ko": "트래픽 중단",
+}
+_GT_CARD_DESC_EN = "Google's Traffic &amp; Disruptions catalogue — government-ordered internet shutdowns, blocks and outages affecting Google products, with news-source citations, 2009 – 2021."
+_GT_CARD_DESC = {
+    "es": "El catálogo de tráfico e interrupciones de Google: cierres de internet, bloqueos e interrupciones ordenados por gobiernos que afectaron a productos de Google, con citas de fuentes periodísticas, 2009 – 2021.",
+    "fr": "Le catalogue Trafic et interruptions de Google : coupures d'internet, blocages et pannes ordonnés par des gouvernements affectant les produits Google, avec citations de sources journalistiques, 2009 – 2021.",
+    "de": "Googles Katalog zu Datenverkehr und Störungen: staatlich angeordnete Internet-Abschaltungen, Sperren und Ausfälle, die Google-Produkte betrafen, mit Belegen aus Nachrichtenquellen, 2009 – 2021.",
+    "it": "Il catalogo Traffico e interruzioni di Google: blackout di internet, blocchi e interruzioni ordinati dai governi che hanno colpito i prodotti Google, con citazioni di fonti giornalistiche, 2009 – 2021.",
+    "ja": "Google のトラフィックと障害のカタログ：政府命令によるインターネット遮断・ブロック・停止のうち Google 製品に影響したもの。報道ソースの出典付き、2009 – 2021 年。",
+    "zh": "Google 的流量与中断目录：影响 Google 产品的、由政府下令的互联网关闭、封锁和中断，附新闻来源引用，2009 – 2021 年。",
+    "ko": "Google의 트래픽·중단 카탈로그: Google 제품에 영향을 준 정부 명령에 의한 인터넷 차단·봉쇄·중단, 뉴스 출처 인용 포함, 2009 – 2021년.",
+}
+_GT_PAGE = {
+    "Traffic disruptions · Transparency Report": {
+        "es": "Interrupciones de tráfico · Transparency Report",
+        "fr": "Interruptions de trafic · Transparency Report",
+        "de": "Verkehrsstörungen · Transparency Report",
+        "it": "Interruzioni del traffico · Transparency Report",
+        "ja": "トラフィック障害 · Transparency Report",
+        "zh": "流量中断 · Transparency Report",
+        "ko": "트래픽 중단 · Transparency Report",
+    },
+    "Google Traffic &amp; Disruptions": {
+        "es": "Tráfico e interrupciones de Google",
+        "fr": "Trafic et interruptions de Google",
+        "de": "Google – Datenverkehr und Störungen",
+        "it": "Traffico e interruzioni di Google",
+        "ja": "Google のトラフィックと障害",
+        "zh": "Google 流量与中断",
+        "ko": "Google 트래픽·중단",
+    },
+    "Government-ordered internet shutdowns, blocks and outages that disrupted Google products — a historical catalogue Google tracked from 2009 to 2021.": {
+        "es": "Cierres de internet, bloqueos e interrupciones ordenados por gobiernos que afectaron a productos de Google: un catálogo histórico que Google registró de 2009 a 2021.",
+        "fr": "Coupures d'internet, blocages et pannes ordonnés par des gouvernements ayant perturbé les produits Google : un catalogue historique que Google a tenu de 2009 à 2021.",
+        "de": "Staatlich angeordnete Internet-Abschaltungen, Sperren und Ausfälle, die Google-Produkte störten – ein historischer Katalog, den Google von 2009 bis 2021 führte.",
+        "it": "Blackout di internet, blocchi e interruzioni ordinati dai governi che hanno perturbato i prodotti Google: un catalogo storico che Google ha tenuto dal 2009 al 2021.",
+        "ja": "政府命令によるインターネット遮断・ブロック・停止で Google 製品を妨げたもの — Google が 2009 年から 2021 年まで記録した歴史的カタログです。",
+        "zh": "由政府下令、扰乱 Google 产品的互联网关闭、封锁和中断——这是 Google 在 2009 至 2021 年间记录的历史目录。",
+        "ko": "Google 제품을 방해한 정부 명령에 의한 인터넷 차단·봉쇄·중단 — Google이 2009년부터 2021년까지 기록한 역사적 카탈로그입니다.",
+    },
+    "A catalogue of disruptions to the availability of Google's products — government-ordered internet shutdowns, network blocks and outages — each with the news-source citation that documented it. Google froze this dataset in 2021. Served by the public, read-only <code>GET /api/traffic-disruptions</code>.": {
+        "es": "Un catálogo de interrupciones en la disponibilidad de los productos de Google —cierres de internet, bloqueos de red e interrupciones ordenados por gobiernos—, cada uno con la cita de la fuente periodística que lo documentó. Google congeló este conjunto de datos en 2021. Servido por el endpoint público de solo lectura <code>GET /api/traffic-disruptions</code>.",
+        "fr": "Un catalogue des interruptions de disponibilité des produits Google — coupures d'internet, blocages de réseau et pannes ordonnés par des gouvernements —, chacune accompagnée de la citation de la source journalistique qui l'a documentée. Google a figé ce jeu de données en 2021. Fourni par l'endpoint public en lecture seule <code>GET /api/traffic-disruptions</code>.",
+        "de": "Ein Katalog von Störungen der Verfügbarkeit von Google-Produkten – staatlich angeordnete Internet-Abschaltungen, Netzsperren und Ausfälle –, jeweils mit dem Beleg der Nachrichtenquelle, die sie dokumentierte. Google hat diesen Datensatz 2021 eingefroren. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/traffic-disruptions</code>.",
+        "it": "Un catalogo delle interruzioni della disponibilità dei prodotti Google — blackout di internet, blocchi di rete e interruzioni ordinati dai governi —, ciascuna con la citazione della fonte giornalistica che l'ha documentata. Google ha congelato questo set di dati nel 2021. Servito dall'endpoint pubblico di sola lettura <code>GET /api/traffic-disruptions</code>.",
+        "ja": "Google 製品の可用性の障害のカタログ — 政府命令によるインターネット遮断、ネットワーク・ブロック、停止 — で、各項目にはそれを記録した報道ソースの出典が付いています。Google は 2021 年にこのデータセットを凍結しました。公開・読み取り専用の <code>GET /api/traffic-disruptions</code> が提供します。",
+        "zh": "一份 Google 产品可用性中断的目录——由政府下令的互联网关闭、网络封锁和中断——每条都附有记录该事件的新闻来源引用。Google 于 2021 年冻结了该数据集。由公开的只读 <code>GET /api/traffic-disruptions</code> 提供。",
+        "ko": "Google 제품 가용성 중단의 카탈로그 — 정부 명령에 의한 인터넷 차단, 네트워크 봉쇄, 중단 — 이며, 각 항목에는 이를 기록한 뉴스 출처 인용이 포함됩니다. Google은 2021년에 이 데이터셋을 동결했습니다. 공개 읽기 전용 <code>GET /api/traffic-disruptions</code>가 제공합니다.",
+    },
+    "<strong>Product</strong> — the Google product whose traffic was disrupted (Web Search, YouTube, Gmail, …). <strong>Start / End</strong> — the approximate dates the disruption began and ended (Pacific time; some rows carry only an end date).": {
+        "es": "<strong>Producto</strong> — el producto de Google cuyo tráfico se interrumpió (Búsqueda web, YouTube, Gmail, …). <strong>Inicio / Fin</strong> — las fechas aproximadas en que comenzó y terminó la interrupción (hora del Pacífico; algunas filas solo tienen fecha de fin).",
+        "fr": "<strong>Produit</strong> — le produit Google dont le trafic a été perturbé (Recherche Web, YouTube, Gmail, …). <strong>Début / Fin</strong> — les dates approximatives de début et de fin de l'interruption (heure du Pacifique ; certaines lignes n'ont qu'une date de fin).",
+        "de": "<strong>Produkt</strong> — das Google-Produkt, dessen Datenverkehr gestört wurde (Websuche, YouTube, Gmail, …). <strong>Beginn / Ende</strong> — die ungefähren Daten von Beginn und Ende der Störung (Pazifikzeit; einige Zeilen haben nur ein Enddatum).",
+        "it": "<strong>Prodotto</strong> — il prodotto Google il cui traffico è stato interrotto (Ricerca web, YouTube, Gmail, …). <strong>Inizio / Fine</strong> — le date approssimative di inizio e fine dell'interruzione (ora del Pacifico; alcune righe hanno solo la data di fine).",
+        "ja": "<strong>製品</strong> — トラフィックが妨げられた Google 製品（ウェブ検索、YouTube、Gmail など）。<strong>開始／終了</strong> — 障害が始まり・終わったおおよその日付（太平洋時間。一部の行には終了日のみ）。",
+        "zh": "<strong>产品</strong> — 流量受到中断的 Google 产品（网页搜索、YouTube、Gmail 等）。<strong>开始／结束</strong> — 中断开始和结束的大致日期（太平洋时间；部分行只有结束日期）。",
+        "ko": "<strong>제품</strong> — 트래픽이 중단된 Google 제품(웹 검색, YouTube, Gmail 등). <strong>시작／종료</strong> — 중단이 시작·종료된 대략적인 날짜(태평양 시간, 일부 행은 종료일만 있음).",
+    },
+    "<strong>Source</strong> — the news outlet Google cited as corroboration; <strong>Report</strong> links to that article. <strong>Chart</strong> links back to Google's interactive traffic view for the event.": {
+        "es": "<strong>Fuente</strong> — el medio periodístico que Google citó como corroboración; <strong>Informe</strong> enlaza a ese artículo. <strong>Gráfico</strong> enlaza de vuelta a la vista de tráfico interactiva de Google para el evento.",
+        "fr": "<strong>Source</strong> — le média que Google a cité comme corroboration ; <strong>Rapport</strong> renvoie à cet article. <strong>Graphique</strong> renvoie à la vue de trafic interactive de Google pour l'événement.",
+        "de": "<strong>Quelle</strong> — das Nachrichtenmedium, das Google als Beleg anführte; <strong>Bericht</strong> verlinkt auf diesen Artikel. <strong>Diagramm</strong> verlinkt zurück auf Googles interaktive Datenverkehrsansicht für das Ereignis.",
+        "it": "<strong>Fonte</strong> — la testata giornalistica che Google ha citato come conferma; <strong>Report</strong> rimanda a quell'articolo. <strong>Grafico</strong> rimanda alla vista interattiva del traffico di Google per l'evento.",
+        "ja": "<strong>ソース</strong> — Google が裏付けとして引用した報道機関。<strong>レポート</strong> はその記事へのリンクです。<strong>チャート</strong> はその事象に関する Google のインタラクティブなトラフィック表示へのリンクです。",
+        "zh": "<strong>来源</strong> — Google 引用作为佐证的新闻媒体；<strong>报道</strong> 链接到该文章。<strong>图表</strong> 链接回 Google 针对该事件的交互式流量视图。",
+        "ko": "<strong>출처</strong> — Google이 확증으로 인용한 언론사. <strong>보도</strong>는 해당 기사로 연결됩니다. <strong>차트</strong>는 해당 사건에 대한 Google의 대화형 트래픽 보기로 연결됩니다.",
+    },
+    "<label>Country <select": {
+        "es": "<label>País <select",
+        "fr": "<label>Pays <select",
+        "de": "<label>Land <select",
+        "it": "<label>Paese <select",
+        "ja": "<label>国 <select",
+        "zh": "<label>国家/地区 <select",
+        "ko": "<label>국가 <select",
+    },
+    "<label>Product <select": {
+        "es": "<label>Producto <select",
+        "fr": "<label>Produit <select",
+        "de": "<label>Produkt <select",
+        "it": "<label>Prodotto <select",
+        "ja": "<label>製品 <select",
+        "zh": "<label>产品 <select",
+        "ko": "<label>제품 <select",
+    },
+    "<label>Year <select": {
+        "es": "<label>Año <select",
+        "fr": "<label>Année <select",
+        "de": "<label>Jahr <select",
+        "it": "<label>Anno <select",
+        "ja": "<label>年 <select",
+        "zh": "<label>年份 <select",
+        "ko": "<label>연도 <select",
+    },
+    'placeholder="country, product, title, source"': {
+        "es": 'placeholder="país, producto, título, fuente"',
+        "fr": 'placeholder="pays, produit, titre, source"',
+        "de": 'placeholder="Land, Produkt, Titel, Quelle"',
+        "it": 'placeholder="paese, prodotto, titolo, fonte"',
+        "ja": 'placeholder="国、製品、タイトル、ソース"',
+        "zh": 'placeholder="国家/地区、产品、标题、来源"',
+        "ko": 'placeholder="국가, 제품, 제목, 출처"',
+    },
+    '<th scope="col">Country</th>': {
+        "es": '<th scope="col">País</th>',
+        "fr": '<th scope="col">Pays</th>',
+        "de": '<th scope="col">Land</th>',
+        "it": '<th scope="col">Paese</th>',
+        "ja": '<th scope="col">国</th>',
+        "zh": '<th scope="col">国家/地区</th>',
+        "ko": '<th scope="col">국가</th>',
+    },
+    '<th scope="col">Product</th>': {
+        "es": '<th scope="col">Producto</th>',
+        "fr": '<th scope="col">Produit</th>',
+        "de": '<th scope="col">Produkt</th>',
+        "it": '<th scope="col">Prodotto</th>',
+        "ja": '<th scope="col">製品</th>',
+        "zh": '<th scope="col">产品</th>',
+        "ko": '<th scope="col">제품</th>',
+    },
+    '<th scope="col">Start</th>': {
+        "es": '<th scope="col">Inicio</th>',
+        "fr": '<th scope="col">Début</th>',
+        "de": '<th scope="col">Beginn</th>',
+        "it": '<th scope="col">Inizio</th>',
+        "ja": '<th scope="col">開始</th>',
+        "zh": '<th scope="col">开始</th>',
+        "ko": '<th scope="col">시작</th>',
+    },
+    '<th scope="col">End</th>': {
+        "es": '<th scope="col">Fin</th>',
+        "fr": '<th scope="col">Fin</th>',
+        "de": '<th scope="col">Ende</th>',
+        "it": '<th scope="col">Fine</th>',
+        "ja": '<th scope="col">終了</th>',
+        "zh": '<th scope="col">结束</th>',
+        "ko": '<th scope="col">종료</th>',
+    },
+    '<th scope="col">Source</th>': {
+        "es": '<th scope="col">Fuente</th>',
+        "fr": '<th scope="col">Source</th>',
+        "de": '<th scope="col">Quelle</th>',
+        "it": '<th scope="col">Fonte</th>',
+        "ja": '<th scope="col">ソース</th>',
+        "zh": '<th scope="col">来源</th>',
+        "ko": '<th scope="col">출처</th>',
+    },
+    '<th scope="col">Report</th>': {
+        "es": '<th scope="col">Informe</th>',
+        "fr": '<th scope="col">Rapport</th>',
+        "de": '<th scope="col">Bericht</th>',
+        "it": '<th scope="col">Report</th>',
+        "ja": '<th scope="col">レポート</th>',
+        "zh": '<th scope="col">报道</th>',
+        "ko": '<th scope="col">보도</th>',
+    },
+    '<th scope="col">Chart</th>': {
+        "es": '<th scope="col">Gráfico</th>',
+        "fr": '<th scope="col">Graphique</th>',
+        "de": '<th scope="col">Diagramm</th>',
+        "it": '<th scope="col">Grafico</th>',
+        "ja": '<th scope="col">チャート</th>',
+        "zh": '<th scope="col">图表</th>',
+        "ko": '<th scope="col">차트</th>',
+    },
+    "`Showing ${fmt(d.count)} of ${fmt(d.total)} disruptions across ${fmt(d.country_count)} countries and ${fmt(d.product_count)} products.`": {
+        "es": "`Mostrando ${fmt(d.count)} de ${fmt(d.total)} interrupciones en ${fmt(d.country_count)} países y ${fmt(d.product_count)} productos.`",
+        "fr": "`Affichage de ${fmt(d.count)} interruptions sur ${fmt(d.total)}, dans ${fmt(d.country_count)} pays et ${fmt(d.product_count)} produits.`",
+        "de": "`${fmt(d.count)} von ${fmt(d.total)} Störungen in ${fmt(d.country_count)} Ländern und ${fmt(d.product_count)} Produkten.`",
+        "it": "`Visualizzazione di ${fmt(d.count)} di ${fmt(d.total)} interruzioni in ${fmt(d.country_count)} paesi e ${fmt(d.product_count)} prodotti.`",
+        "ja": "`${fmt(d.total)} 件中 ${fmt(d.count)} 件の障害を表示（${fmt(d.country_count)} か国、${fmt(d.product_count)} 製品）。`",
+        "zh": "`正在显示 ${fmt(d.total)} 项中断中的 ${fmt(d.count)} 项，涉及 ${fmt(d.country_count)} 个国家/地区和 ${fmt(d.product_count)} 个产品。`",
+        "ko": "`전체 ${fmt(d.total)}건 중 ${fmt(d.count)}건의 중단 표시(${fmt(d.country_count)}개국, ${fmt(d.product_count)}개 제품).`",
+    },
+    "“Google Traffic & Disruptions, via the Transparency Report API (catalogue version ${d.version}).”": {
+        "es": "“Google Traffic & Disruptions, vía la Transparency Report API (versión del catálogo ${d.version}).”",
+        "fr": "“Google Traffic & Disruptions, via la Transparency Report API (version du catalogue ${d.version}).”",
+        "de": "“Google Traffic & Disruptions, über die Transparency Report API (Katalogversion ${d.version}).”",
+        "it": "“Google Traffic & Disruptions, tramite la Transparency Report API (versione del catalogo ${d.version}).”",
+        "ja": "“Google Traffic & Disruptions、Transparency Report API 経由（カタログ版 ${d.version}）。”",
+        "zh": "“Google Traffic & Disruptions，经由 Transparency Report API（目录版本 ${d.version}）。”",
+        "ko": "“Google Traffic & Disruptions, Transparency Report API 경유(카탈로그 버전 ${d.version}).”",
+    },
+    "\"<p class='sub'>No matching disruptions.</p>\"": {
+        "es": "\"<p class='sub'>No hay interrupciones coincidentes.</p>\"",
+        "fr": "\"<p class='sub'>Aucune interruption correspondante.</p>\"",
+        "de": "\"<p class='sub'>Keine passenden Störungen.</p>\"",
+        "it": "\"<p class='sub'>Nessuna interruzione corrispondente.</p>\"",
+        "ja": "\"<p class='sub'>一致する障害はありません。</p>\"",
+        "zh": "\"<p class='sub'>没有匹配的中断。</p>\"",
+        "ko": "\"<p class='sub'>일치하는 중단이 없습니다.</p>\"",
+    },
+}
+for _loc in _GT_NAV:
+    COMMON[_loc].append(("      Traffic Disruptions\n    </a>", f"      {_GT_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Traffic Disruptions</h3>", f"<h3>{_GT_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_GT_CARD_DESC_EN, _GT_CARD_DESC[_loc]))
+    PAGES[_loc]["disruptions.html"] = [(_en, _tr[_loc]) for _en, _tr in _GT_PAGE.items()]
+    _gt_text = open(os.path.join(STATIC, "disruptions.html"), encoding="utf-8").read()
+    _gt_own = {_o for _o, _ in PAGES[_loc]["disruptions.html"]}
+    # Derived from catalog.html, so inherit its shared catalogue/chrome strings
+    # for anything still present verbatim (Download CSV, Snapshot:/Cite as:,
+    # "What the columns mean", "Could not load catalogue: ", Search label, badge).
+    for _o, _n in PAGES[_loc]["catalog.html"]:
+        if _o in _gt_text and _o not in _gt_own:
+            PAGES[_loc]["disruptions.html"].append((_o, _n))
+            _gt_own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

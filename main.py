@@ -2392,6 +2392,12 @@ def discord_page() -> FileResponse:
     return _serve_page("discord.html", "Discord transparency page")
 
 
+@app.get("/disruptions", response_class=HTMLResponse)
+def disruptions_page() -> FileResponse:
+    """Serve the Google Traffic & Disruptions catalogue page (reads GET /api/traffic-disruptions)."""
+    return _serve_page("disruptions.html", "Traffic disruptions page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2450,6 +2456,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
     "tiktok": ("tiktok.html", "TikTok requests page", {}),
     "discord": ("discord.html", "Discord transparency page", {}),
+    "disruptions": ("disruptions.html", "Traffic disruptions page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
@@ -2789,6 +2796,129 @@ def report_locations(
         "count": len(out),
         "total": data["total"],
         "platform_count": data["platform_count"],
+        "version": version,
+        "generated": generated,
+        "facets": data["facets"],
+        "rows": out,
+    }, headers=prov_headers)
+
+
+# Google Traffic & Disruptions catalogue (seeded from data/google-traffic.json
+# into the read-only `google_traffic` table). Same memoise-and-filter-in-memory
+# pattern as /report-locations — the historical table never changes at runtime.
+_GT_OUT_COLUMNS = (
+    "country", "iso2", "product", "start_date", "end_date", "year",
+    "source", "source_url", "title", "excerpt", "disruption_url",
+)
+_traffic_cache: dict[str, Any] | None = None
+_traffic_cache_lock = threading.Lock()
+
+
+def _compute_traffic_disruptions() -> dict[str, Any]:
+    conn = _connect_ro()
+    try:
+        rows = [
+            dict(zip(_GT_OUT_COLUMNS, r))
+            for r in conn.execute(
+                "SELECT country, iso2, product, start_date, end_date, year, "
+                "source, source_url, title, excerpt, disruption_url "
+                "FROM google_traffic "
+                "ORDER BY start_date IS NULL, start_date, country COLLATE NOCASE, id"
+            ).fetchall()
+        ]
+    finally:
+        conn.close()
+
+    def _facet(key: str) -> list[str]:
+        return sorted({r[key] for r in rows if r.get(key)}, key=str.lower)
+
+    version = hashlib.sha256(
+        json.dumps(rows, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()[:12]
+
+    return {
+        "rows": rows,
+        "total": len(rows),
+        "country_count": len({r["country"] for r in rows}),
+        "product_count": len({r["product"] for r in rows}),
+        "version": version,
+        "facets": {
+            "country": _facet("country"),
+            "product": _facet("product"),
+            "year": sorted({r["year"] for r in rows if r["year"]}),
+        },
+    }
+
+
+def _traffic_disruptions_data() -> dict[str, Any]:
+    global _traffic_cache
+    if _traffic_cache is None:
+        with _traffic_cache_lock:
+            if _traffic_cache is None:
+                _traffic_cache = _compute_traffic_disruptions()
+    return _traffic_cache
+
+
+@api_router.get("/traffic-disruptions", response_model=None)
+def traffic_disruptions(
+    country: str | None = None,
+    product: str | None = None,
+    year: str | None = None,
+    q: str | None = Query(None, max_length=200),
+    format: Literal["json", "csv"] = "json",
+) -> JSONResponse | PlainTextResponse:
+    """Public catalogue of Google's tracked Traffic & Disruptions — government
+    internet shutdowns/blocks/outages affecting Google products (2009–2021, a
+    historical dataset Google froze) — no auth. Filter by `country`, `product`,
+    `year`, and a free-text `q` (matches country/product/title/source). Returns
+    JSON (`{count, total, facets, rows}`) or `format=csv`. Memoised: the
+    read-only table is static, so rows are loaded once and filtered in memory
+    (no user input reaches SQL)."""
+    data = _traffic_disruptions_data()
+    rows = data["rows"]
+
+    needle = q.strip().lower() if q and q.strip() else None
+    out = [
+        r for r in rows
+        if (country is None or r["country"] == country)
+        and (product is None or r["product"] == product)
+        and (year is None or r["year"] == year)
+        and (
+            needle is None
+            or needle in (r["country"] or "").lower()
+            or needle in (r["product"] or "").lower()
+            or needle in (r["title"] or "").lower()
+            or needle in (r["source"] or "").lower()
+        )
+    ]
+
+    version = data["version"]
+    generated = _dataset_meta().get("generated")
+    prov_headers = {"X-Catalogue-Version": version}
+    if generated:
+        prov_headers["X-Dataset-Generated"] = generated
+
+    if format == "csv":
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(_GT_OUT_COLUMNS)
+        writer.writerows(
+            [[_csv_safe(r[c] or "") for c in _GT_OUT_COLUMNS] for r in out]
+        )
+        return PlainTextResponse(
+            buf.getvalue(),
+            media_type="text/csv",
+            headers={
+                **prov_headers,
+                "Content-Disposition": f'attachment; filename="traffic-disruptions-{version}.csv"',
+            },
+        )
+
+    return JSONResponse({
+        "count": len(out),
+        "total": data["total"],
+        "country_count": data["country_count"],
+        "product_count": data["product_count"],
         "version": version,
         "generated": generated,
         "facets": data["facets"],

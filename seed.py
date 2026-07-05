@@ -101,6 +101,11 @@ _DEFAULT_TIKTOK_SOURCE = os.getenv(
 _DEFAULT_DISCORD_SOURCE = os.getenv(
     "SEED_DISCORD_SOURCE_JSON", os.path.join(HERE, "data", "discord-transparency.json")
 )
+# Google Traffic & Disruptions catalogue — vendored in-repo (from the sibling
+# data repo's google-traffic/build_traffic.py).
+_DEFAULT_TRAFFIC_SOURCE = os.getenv(
+    "SEED_TRAFFIC_SOURCE_JSON", os.path.join(HERE, "data", "google-traffic.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -498,6 +503,29 @@ CREATE TABLE report_locations (
 );
 CREATE INDEX idx_rl_category   ON report_locations(category);
 CREATE INDEX idx_rl_confidence ON report_locations(confidence);
+
+-- Google Traffic & Disruptions catalogue (google-traffic/build_traffic.py):
+-- one row per observed disruption of a Google product in a country (government
+-- internet shutdowns / blocks / outages), with the news-source citation. A flat
+-- catalogue like report_locations, not part of the DSA star schema. Historical
+-- (Google froze it at 2021); `year` is null for two end-date-only rows.
+CREATE TABLE google_traffic (
+    id             INTEGER PRIMARY KEY,
+    country        TEXT NOT NULL,
+    iso2           TEXT,
+    product        TEXT NOT NULL,
+    start_date     TEXT,
+    end_date       TEXT,
+    year           TEXT,
+    source         TEXT,
+    source_url     TEXT,
+    title          TEXT,
+    excerpt        TEXT,
+    disruption_url TEXT
+);
+CREATE INDEX idx_gt_country ON google_traffic(country);
+CREATE INDEX idx_gt_product ON google_traffic(product);
+CREATE INDEX idx_gt_year    ON google_traffic(year);
 
 -- New York's Social Media Terms-of-Service reports (Stop Hiding Hate Act): one
 -- row per filing the AG publishes. A flat catalogue like report_locations, not
@@ -1136,6 +1164,38 @@ def build_discord_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_google_traffic_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the google_traffic table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    flat-catalogue google-traffic.json (`columns` header + `rows` in column
+    order). Returns the row count.
+    """
+    if data is None:
+        raise ValueError("google traffic dataset is None")
+    expected_cols = ["country", "iso2", "product", "start_date", "end_date",
+                     "year", "source", "source_url", "title", "excerpt",
+                     "disruption_url"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"google traffic dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("google traffic dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO google_traffic (country, iso2, product, start_date, "
+                "end_date, year, source, source_url, title, excerpt, "
+                "disruption_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -1250,6 +1310,8 @@ def main() -> None:
                         help="Path to tiktok-transparency.json")
     parser.add_argument("--discord-source", default=_DEFAULT_DISCORD_SOURCE,
                         help="Path to discord-transparency.json")
+    parser.add_argument("--traffic-source", default=_DEFAULT_TRAFFIC_SOURCE,
+                        help="Path to google-traffic.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1408,6 +1470,16 @@ def main() -> None:
               f"{len({r[1] for r in dc_data['rows']})} sections")
     else:
         print(f"  (skipping Discord transparency — not found: {args.discord_source})")
+
+    if os.path.isfile(args.traffic_source):
+        with open(args.traffic_source, "r", encoding="utf-8") as f:
+            gt_data = json.load(f)
+        gt_rows = build_google_traffic_db(gt_data, args.db)
+        print(f"  google traffic: {gt_rows} disruptions across "
+              f"{len({r[0] for r in gt_data['rows']})} countries, "
+              f"{len({r[2] for r in gt_data['rows']})} products")
+    else:
+        print(f"  (skipping Google traffic — not found: {args.traffic_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

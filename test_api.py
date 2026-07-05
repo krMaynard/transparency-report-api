@@ -1462,6 +1462,76 @@ class TestReportLocations:
         assert len(lines) == 4  # header + 3 rows
 
 
+# ── Public Google Traffic & Disruptions catalogue (GET /api/traffic-disruptions) ──
+
+class TestTrafficDisruptions:
+    def test_public_and_populated(self):
+        r = client.get("/api/traffic-disruptions")  # no X-API-Key
+        assert r.status_code == 200
+        d = r.json()
+        assert d["count"] == d["total"] == 4
+        assert d["country_count"] == 4 and d["product_count"] == 2
+        assert set(d["facets"]) == {"country", "product", "year"}
+        # Years are the non-null start-date years, sorted.
+        assert d["facets"]["year"] == ["2009", "2021"]
+        assert d["facets"]["product"] == ["Web Search", "YouTube"]
+        # Ordered by start_date with nulls last, so Syria (no start date) is last.
+        assert [row["country"] for row in d["rows"]] == \
+            ["Bangladesh", "Sudan", "Burkina Faso", "Syria"]
+        # The Syria row's missing start date surfaces as JSON null, not a crash.
+        syria = next(row for row in d["rows"] if row["country"] == "Syria")
+        assert syria["start_date"] is None and syria["year"] is None
+        assert syria["end_date"] == "2011-02-08"
+
+    def test_catalogue_carries_provenance(self):
+        r = client.get("/api/traffic-disruptions")
+        d = r.json()
+        assert d.get("version") and "generated" in d
+        assert r.headers.get("X-Catalogue-Version") == d["version"]
+        cv = client.get("/api/traffic-disruptions", params={"format": "csv"})
+        assert cv.headers.get("X-Catalogue-Version") == d["version"]
+        assert f'traffic-disruptions-{d["version"]}.csv' in cv.headers.get("content-disposition", "")
+
+    def test_filter_by_product_and_year(self):
+        r = client.get("/api/traffic-disruptions", params={"product": "YouTube"})
+        d = r.json()
+        assert d["count"] == 2 and d["total"] == 4
+        assert all(row["product"] == "YouTube" for row in d["rows"])
+        r2 = client.get("/api/traffic-disruptions", params={"year": "2021"})
+        assert r2.json()["count"] == 2
+
+    def test_filter_by_country(self):
+        r = client.get("/api/traffic-disruptions", params={"country": "Sudan"})
+        d = r.json()
+        assert d["count"] == 1 and d["rows"][0]["product"] == "Web Search"
+
+    def test_free_text_search(self):
+        # Matches country / product / title / source, case-insensitively.
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "sudan"}).json()["count"] == 1
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "bloomberg"}).json()["count"] == 1
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "youtube"}).json()["count"] == 2
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "nomatch-xyz"}).json()["count"] == 0
+
+    def test_combined_filters(self):
+        r = client.get("/api/traffic-disruptions",
+                       params={"product": "Web Search", "year": "2009"})
+        assert r.json()["count"] == 0  # the 2009 event is a YouTube one
+
+    def test_csv_export(self):
+        r = client.get("/api/traffic-disruptions", params={"format": "csv"})
+        assert r.status_code == 200
+        assert "text/csv" in r.headers["content-type"]
+        assert "attachment" in r.headers.get("content-disposition", "")
+        lines = r.text.splitlines()
+        assert lines[0] == ("country,iso2,product,start_date,end_date,year,"
+                            "source,source_url,title,excerpt,disruption_url")
+        assert len(lines) == 5  # header + 4 rows
+
+
 # ── Public NY ToS-reports catalogue (GET /api/ny-tos-reports) ────────────────
 
 class TestNYTosReports:
@@ -2086,7 +2156,7 @@ class TestLocalization:
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
                 "user-data", "microsoft", "linkedin", "tiktok", "discord",
-                "mcp", "methodology", "schema", "api-key", "privacy")
+                "disruptions", "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.
@@ -2497,6 +2567,19 @@ class TestDatasetPages:
         assert '"table":"discord_metrics"' in r.text
         assert "/static/vendor/chart.umd.js" in r.text
 
+    def test_disruptions_page_served(self):
+        r = client.get("/disruptions")
+        assert r.status_code == 200
+        assert "Google Traffic" in r.text
+        # Reads the dedicated flat-catalogue endpoint, like /catalog.
+        assert "/api/traffic-disruptions" in r.text
+        assert 'id="gt-out"' in r.text
+
+    def test_localized_disruptions_page(self):
+        r = client.get("/es/disruptions")
+        assert r.status_code == 200
+        assert "Interrupciones de tráfico" in r.text  # nav label / chrome localized
+
     def test_request_report_pages_in_sidebar_nav(self):
         for path in ("/", "/reports", "/schema", "/apple"):
             t = client.get(path).text
@@ -2505,6 +2588,7 @@ class TestDatasetPages:
             assert 'href="/linkedin"' in t, path
             assert 'href="/tiktok"' in t, path
             assert 'href="/discord"' in t, path
+            assert 'href="/disruptions"' in t, path
 
     def test_localized_request_report_pages(self):
         cases = {"/es/user-data": "Solicitudes de datos de usuarios de Google",
