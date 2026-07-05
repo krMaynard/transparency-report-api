@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rapports de conformité aux Règles TI de l'Inde — Transparency Report API</title>
-<meta name="description" content="India IT Rules 2021 monthly compliance reports — content actioned proactively, user grievances, accounts actioned and law-enforcement requests, as filed by Facebook, Instagram, Twitter/X, Moj and ShareChat." />
+<meta name="description" content="India IT Rules 2021 monthly compliance reports — content actioned proactively, user grievances, accounts actioned and law-enforcement requests, as filed by Facebook, Instagram, Twitter/X, Moj, ShareChat and Roblox." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -539,9 +539,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Inde · Rapports mensuels · 2021 – 2023</span>
+    <span class="badge">Inde · Rapports mensuels · 2021 – 2026</span>
     <h1>Rapports de conformité aux Règles TI de l'Inde</h1>
-    <p>Les rapports de conformité mensuels que les Règles TI de 2021 de l'Inde imposent aux grands intermédiaires de médias sociaux, déposés par Facebook, Instagram, Twitter/X, Moj et ShareChat : contenus traités proactivement (par domaine de politique), plaintes d'utilisateurs reçues et traitées, comptes sanctionnés et demandes des forces de l'ordre. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par plateforme × mois × section × catégorie × métrique. Les chiffres ne sont <strong>pas comparables entre sections</strong> et les unités mélangent des comptages exacts, les <strong>comptages approximatifs</strong> de Meta et des pourcentages — cette page fixe une section et une métrique uniques pour chaque vue.</p>
+    <p>Les rapports de conformité mensuels que les Règles TI de 2021 de l'Inde imposent aux grands intermédiaires de médias sociaux, déposés par Facebook, Instagram, Twitter/X, Moj, ShareChat et Roblox : contenus traités proactivement (par domaine de politique), plaintes d'utilisateurs reçues et traitées, comptes sanctionnés et demandes des forces de l'ordre. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par plateforme × mois × section × catégorie × métrique. Les chiffres ne sont <strong>pas comparables entre sections</strong> et les unités mélangent des comptages exacts, les <strong>comptages approximatifs</strong> de Meta et des pourcentages — cette page fixe une section et une métrique uniques pour chaque vue.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -583,6 +583,14 @@ display: flex; align-items: center; justify-content: space-between;
         <div id="chart-sus-table" class="sr-only"></div>
       </div>
 
+      <div class="chart-card wide">
+        <h3>Plaintes et mesures d'application de Roblox</h3>
+        <p class="chart-sub">Plaintes que Roblox a reçues via son canal d'Officier des plaintes pour l'Inde par rapport aux mesures d'application prises, par mois (les rapports ont débuté en mars 2025 ; la taxonomie des catégories a été révisée en 2026).</p>
+        <div class="chart-loading" id="rbx-loading">Chargement…</div>
+        <canvas id="chart-rbx" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-rbx-table" class="sr-only"></div>
+      </div>
+
     </div>
   </section>
 
@@ -608,7 +616,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>Sources : rapports de conformité mensuels aux Règles TI de 2021 publiés par <a href="https://transparency.meta.com/reports/india-monthly-reports/" target="_blank" rel="noopener noreferrer">Meta</a>, <a href="https://transparency.x.com/" target="_blank" rel="noopener noreferrer">X</a>, Moj et ShareChat, archivés dans <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Données via la <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Méthodologie</a> · <a href="/fr/api-key">Clé d'API</a> · <a href="/fr/privacy">Confidentialité</a></p>
+  <p>Sources : rapports de conformité mensuels aux Règles TI de 2021 publiés par <a href="https://transparency.meta.com/reports/india-monthly-reports/" target="_blank" rel="noopener noreferrer">Meta</a>, <a href="https://transparency.x.com/" target="_blank" rel="noopener noreferrer">X</a>, Moj, ShareChat et <a href="https://about.roblox.com/" target="_blank" rel="noopener noreferrer">Roblox</a>, archivés dans <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Données via la <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Méthodologie</a> · <a href="/fr/api-key">Clé d'API</a> · <a href="/fr/privacy">Confidentialité</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -838,12 +846,14 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries. Filter values are snake_case dataset codes, so the
   // localization generator's prose find/replace can never rewrite them.
   var GRV_METRICS = { "grievances_received": "Plaintes reçues", "urls_actioned": "URL traitées" };
+  var RBX_METRICS = { "grievances_received": "Plaintes reçues", "enforcement_actions": "Mesures d'application" };
   function PRO_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["content_actioned_proactive"]},{"operation":"EQ","field_name":"metric","field_values":["content_actioned"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":12}; }
   function GRV_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["grievances_received"]},{"operation":"EQ","field_name":"metric","field_values":["reports"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
   function TWG_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["grievances"]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
   function SUS_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["accounts_actioned"]},{"operation":"EQ","field_name":"metric","field_values":["accounts_suspended"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
+  function RBX_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Roblox"]},{"operation":"EQ","field_name":"section","field_values":["grievances"]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
 
-  function renderCharts(pro, grv, twg, sus) {
+  function renderCharts(pro, grv, twg, sus, rbx) {
     if (!pro.rows.length) { emptyChart('pro-loading'); } else {
       srTable('chart-pro-table', ["Domaine de politique", "Contenus traités"],
         pro.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
@@ -867,6 +877,11 @@ display: flex; align-items: center; justify-content: space-between;
       vbarsChart('chart-sus', 'sus-loading', 'chart-sus-table',
         sus.rows.map(function (r) { return r[0]; }),
         [{ label: "Comptes suspendus", data: sus.rows.map(function (r) { return r[1]; }) }]);
+    }
+    if (!rbx.rows.length) { emptyChart('rbx-loading'); } else {
+      var pr = pivot(rbx.rows, RBX_METRICS);
+      seriesTable('chart-rbx-table', "Mois", pr);
+      linesChart('chart-rbx', 'rbx-loading', 'chart-rbx-table', pr.labels, pr.dsets);
     }
   }
 
@@ -896,8 +911,8 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(PRO_Q()), soft(GRV_Q()), soft(TWG_Q()), soft(SUS_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2], cs[3]);
+  Promise.all([soft(PRO_Q()), soft(GRV_Q()), soft(TWG_Q()), soft(SUS_Q()), soft(RBX_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4]);
   });
 })();
 </script>
