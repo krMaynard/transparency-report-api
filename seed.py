@@ -1383,11 +1383,12 @@ def build_dsa_narratives(db_path: str) -> int:
             (_DSA_NARRATIVE_MIN_CHARS,),
         ).fetchall()
         with conn:
+            # `rows` is already the (company, platform, period, heading, text)
+            # 5-tuples the INSERT's five placeholders expect.
             conn.executemany(
                 "INSERT INTO report_narratives (source, company, platform, period, "
                 "page, heading, text) VALUES ('dsa',?,?,?,NULL,?,?)",
-                [(name, platform, period, indicator, text)
-                 for name, platform, period, indicator, text in rows],
+                rows,
             )
         return len(rows)
     finally:

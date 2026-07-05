@@ -705,7 +705,9 @@ async function setupNarratives() {
     const src = $("#nsrc").value;
     try {
       const res = await fetch("/api/narratives" + (src ? "?source=" + encodeURIComponent(src) : ""));
-      if (res.ok) fillFacets(await res.json());
+      // Guard against out-of-order responses: only apply if the dropdown still
+      // holds the source we fetched for (rapid toggling can resolve out of order).
+      if (res.ok && $("#nsrc").value === src) fillFacets(await res.json());
     } catch (e) { /* keep the existing facets on error */ }
     if ($("#nq").value.trim()) runSearch();
   });

@@ -3155,7 +3155,7 @@ def narratives(
                 "SELECT report_narratives.source, report_narratives.company, "
                 "report_narratives.platform, report_narratives.period, "
                 "report_narratives.page, report_narratives.heading, "
-                "snippet(report_narratives, 6, ?, ?, '…', 14), r.archived "
+                "snippet(report_narratives, -1, ?, ?, '…', 14), r.archived "
                 "FROM report_narratives "
                 "LEFT JOIN ny_tos_reports r "
                 "ON report_narratives.source = 'ny-tos' "
