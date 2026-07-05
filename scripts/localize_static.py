@@ -10818,5 +10818,30 @@ for _loc in _NAR_NAV:
             PAGES[_loc]["narratives.html"].append((_o, _n))
             _nar_own.add(_o)
 
+# ── Standardized sidebar nav labels (added) ───────────────────────────────────
+# The sidebar was restandardized: single-dataset platforms show just their name
+# (proper nouns — no translation needed); Google's four datasets are grouped as
+# "Google — X"; the regulator group is renamed to the regulation. Only the
+# descriptive renamed nav labels need a (nav-scoped) translation. The prior
+# nav tuples for the old labels ("Google User Data", "Korea Transparency", …)
+# stay in place — now dead for the nav, but still translating the home cards.
+_NAV_STD = {
+    #        Google — Removals / — User Data / — Disruptions        Korea
+    "es": ("Retiradas", "Datos de usuario", "Interrupciones", "Corea"),
+    "fr": ("Retraits", "Données utilisateur", "Perturbations", "Corée"),
+    "de": ("Entfernungen", "Nutzerdaten", "Störungen", "Korea"),
+    "it": ("Rimozioni", "Dati utente", "Interruzioni", "Corea"),
+    "ja": ("削除", "ユーザーデータ", "障害", "韓国"),
+    "zh": ("删除", "用户数据", "中断", "韩国"),
+    "ko": ("삭제", "사용자 데이터", "중단", "한국"),
+}
+for _loc, (_g_rem, _g_ud, _g_dis, _kor) in _NAV_STD.items():
+    COMMON[_loc].extend([
+        ("      Google — Removals\n    </a>", f"      Google — {_g_rem}\n    </a>"),
+        ("      Google — User Data\n    </a>", f"      Google — {_g_ud}\n    </a>"),
+        ("      Google — Disruptions\n    </a>", f"      Google — {_g_dis}\n    </a>"),
+        ("      Korea\n    </a>", f"      {_kor}\n    </a>"),
+    ])
+
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
