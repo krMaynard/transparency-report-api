@@ -16,7 +16,7 @@ automated detection, appeals, EU-DSA MAU), the **Snap Transparency Report**
 (T&S enforcements, government content/account-removal & information requests,
 DMCA takedowns, by country × violation category), **India's IT Rules 2021
 monthly compliance reports** (proactive content actioned, user grievances,
-accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat), **South Korea's Naver + Kakao transparency reports** (government data requests
+accounts actioned, GAC orders — Facebook/Instagram/Twitter/Moj/ShareChat/Roblox), **South Korea's Naver + Kakao transparency reports** (government data requests
 under the Telecommunications Business Act / Protection of Communications
 Secrets Act, half-yearly since 2012), **Taiwan's Anti-Fraud Act data**
 (NPA Art. 42 DNS-blocked fraud sites by month × category, plus the designated
@@ -285,8 +285,9 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **India IT Rules 2021 monthly compliance reports** — a single **tidy-long**
   `india_metrics` table (one row per measured value: `platform`/`period`/
   `section`/`category`/`metric`/`unit` + a `value`; dims stored inline, no lookup
-  tables). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat (+ `Meta` for
-  report-level GAC orders). `value` is `REAL` and `unit` is `count` (exact),
+  tables). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat, Roblox (+ `Meta`
+  for report-level GAC orders; Roblox 2025-03→2026-05, with a redesigned layout +
+  revised category taxonomy from 2026). `value` is `REAL` and `unit` is `count` (exact),
   `approx_count` (Meta's abbreviated proactive figures like `2.3M` — rounded
   best-estimates) or `percent` (proactive-detection rates) — **never SUM across
   units**, and pin a `section` before aggregating.
