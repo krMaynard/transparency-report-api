@@ -574,7 +574,7 @@ display: flex; align-items: center; justify-content: space-between;
   <section class="data-section">
     <h2>미국 정부 정보 요청</h2>
     <p class="sub">미국 법적 절차 요청(유형별, 2024-H1) — 법원 명령, 소환장, 수색 영장 등.</p>
-    <div class="results" id="us요청 수" aria-busy="true">
+    <div class="results" id="us-gov-info" aria-busy="true">
       <div class="results-loading">불러오는 중…</div>
     </div>
   </section>
@@ -861,10 +861,10 @@ display: flex; align-items: center; justify-content: space-between;
     // 회원 데이터 요청 대상 계정, per half-year.
     try {
       var d2 = await explore({"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
-      renderTable('us요청 수', d2.rows || [], "미국 정부 정보 요청(유형별, 2024-H1).", "요청 유형", "요청 수");
+      renderTable('us-gov-info', d2.rows || [], "미국 정부 정보 요청(유형별, 2024-H1).", "요청 유형", "요청 수");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('us요청 수', "미국 요청을 불러오지 못했습니다: " + err.message);
+      showError('us-gov-info', "미국 요청을 불러오지 못했습니다: " + err.message);
     }
   }
 

@@ -574,7 +574,7 @@ display: flex; align-items: center; justify-content: space-between;
   <section class="data-section">
     <h2>Demandes gouvernementales d'informations des États-Unis</h2>
     <p class="sub">Demandes de procédure légale américaines par type (2024-H1) : ordonnances, assignations, mandats de perquisition et plus.</p>
-    <div class="results" id="usDemandes" aria-busy="true">
+    <div class="results" id="us-gov-info" aria-busy="true">
       <div class="results-loading">Chargement…</div>
     </div>
   </section>
@@ -861,10 +861,10 @@ display: flex; align-items: center; justify-content: space-between;
     // Comptes visés par les demandes de données de membres, per half-year.
     try {
       var d2 = await explore({"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
-      renderTable('usDemandes', d2.rows || [], "Demandes gouvernementales d'informations des États-Unis par type (2024-H1).", "Type de demande", "Demandes");
+      renderTable('us-gov-info', d2.rows || [], "Demandes gouvernementales d'informations des États-Unis par type (2024-H1).", "Type de demande", "Demandes");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usDemandes', "Échec du chargement des demandes américaines : " + err.message);
+      showError('us-gov-info', "Échec du chargement des demandes américaines : " + err.message);
     }
   }
 

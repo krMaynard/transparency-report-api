@@ -574,7 +574,7 @@ display: flex; align-items: center; justify-content: space-between;
   <section class="data-section">
     <h2>US-behördliche Informationsanfragen</h2>
     <p class="sub">US-Rechtsverfahrensanfragen nach Art (2024-H1) — gerichtliche Anordnungen, Vorladungen, Durchsuchungsbefehle und mehr.</p>
-    <div class="results" id="usAnfragen" aria-busy="true">
+    <div class="results" id="us-gov-info" aria-busy="true">
       <div class="results-loading">Wird geladen…</div>
     </div>
   </section>
@@ -861,10 +861,10 @@ display: flex; align-items: center; justify-content: space-between;
     // Von Mitgliederdaten-Anfragen betroffene Konten, per half-year.
     try {
       var d2 = await explore({"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
-      renderTable('usAnfragen', d2.rows || [], "US-behördliche Informationsanfragen nach Art (2024-H1).", "Anfrageart", "Anfragen");
+      renderTable('us-gov-info', d2.rows || [], "US-behördliche Informationsanfragen nach Art (2024-H1).", "Anfrageart", "Anfragen");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usAnfragen', "US-Anfragen konnten nicht geladen werden: " + err.message);
+      showError('us-gov-info', "US-Anfragen konnten nicht geladen werden: " + err.message);
     }
   }
 

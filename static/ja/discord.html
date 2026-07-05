@@ -574,7 +574,7 @@ display: flex; align-items: center; justify-content: space-between;
   <section class="data-section">
     <h2>米国政府による情報要請</h2>
     <p class="sub">米国の法的手続き要請（種類別、2024-H1）— 裁判所命令、召喚状、捜索令状など。</p>
-    <div class="results" id="us要請数" aria-busy="true">
+    <div class="results" id="us-gov-info" aria-busy="true">
       <div class="results-loading">読み込み中…</div>
     </div>
   </section>
@@ -861,10 +861,10 @@ display: flex; align-items: center; justify-content: space-between;
     // メンバーデータ要請の対象アカウント, per half-year.
     try {
       var d2 = await explore({"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
-      renderTable('us要請数', d2.rows || [], "米国政府による情報要請（種類別、2024-H1）。", "要請の種類", "要請数");
+      renderTable('us-gov-info', d2.rows || [], "米国政府による情報要請（種類別、2024-H1）。", "要請の種類", "要請数");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('us要請数', "米国の要請の読み込みに失敗しました: " + err.message);
+      showError('us-gov-info', "米国の要請の読み込みに失敗しました: " + err.message);
     }
   }
 

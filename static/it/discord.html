@@ -574,7 +574,7 @@ display: flex; align-items: center; justify-content: space-between;
   <section class="data-section">
     <h2>Richieste governative di informazioni degli USA</h2>
     <p class="sub">Richieste di procedura legale USA per tipo (2024-H1): ordini del tribunale, citazioni, mandati di perquisizione e altro.</p>
-    <div class="results" id="usRichieste" aria-busy="true">
+    <div class="results" id="us-gov-info" aria-busy="true">
       <div class="results-loading">Caricamento…</div>
     </div>
   </section>
@@ -861,10 +861,10 @@ display: flex; align-items: center; justify-content: space-between;
     // Account interessati dalle richieste di dati dei membri, per half-year.
     try {
       var d2 = await explore({"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
-      renderTable('usRichieste', d2.rows || [], "Richieste governative di informazioni degli USA per tipo (2024-H1).", "Tipo di richiesta", "Richieste");
+      renderTable('us-gov-info', d2.rows || [], "Richieste governative di informazioni degli USA per tipo (2024-H1).", "Tipo di richiesta", "Richieste");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('usRichieste', "Impossibile caricare le richieste USA: " + err.message);
+      showError('us-gov-info', "Impossibile caricare le richieste USA: " + err.message);
     }
   }
 
