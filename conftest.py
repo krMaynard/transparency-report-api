@@ -46,7 +46,12 @@ _FIXTURE = {
     # t11: [svc, indicator, value_text] — the second row's leading "=" exercises
     # the CSV formula-injection escaping (test_csv_download_escapes_formula_cells).
     "t11": [[0, 1, "YouTube qualitative summary text."],
-            [1, 1, '=HYPERLINK("http://evil.example/x")']],
+            [1, 1, '=HYPERLINK("http://evil.example/x")'],
+            # A substantial description so build_dsa_narratives indexes it (short
+            # cells like the two above are below the prose threshold and skipped).
+            [0, 1, "YouTube uses automated tools supplemented by human review to "
+                   "moderate content across its products, and reports the outcome "
+                   "of appeals against those content-moderation decisions."]],
 }
 
 seed.build_db(_FIXTURE, _DB)
@@ -379,6 +384,9 @@ _NARRATIVES_FIXTURE = {
     ],
 }
 seed.build_ny_tos_narratives(_NARRATIVES_FIXTURE, _DB)
+# Index the DSA Table-11 qualitative prose (source='dsa') from the seeded t11
+# rows — the same code path seed.main() runs after the harmonised append.
+seed.build_dsa_narratives(_DB)
 
 # A small slice of the normalized NY ToS stats (ny-tos-normalized.csv shape):
 # a count + a percent for Snap (unit mixing), a Strava category_total + its

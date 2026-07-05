@@ -596,13 +596,19 @@ CREATE TABLE ny_tos_stats (
 CREATE INDEX idx_nys_category ON ny_tos_stats(shha_category);
 CREATE INDEX idx_nys_company  ON ny_tos_stats(company);
 
--- Narrative full text of the NY ToS filings: one row per page of prose, indexed
--- for full-text search (SQLite FTS5). Prose, not numbers — the language each
--- platform uses to describe its hate-speech/extremism/disinformation/harassment/
--- foreign-interference policies. `heading`/`text` are tokenized (searchable);
--- company/platform/period/page are UNINDEXED (filter/return only). Powers the
--- public GET /api/narratives full-text search endpoint + the /narratives page.
-CREATE VIRTUAL TABLE ny_tos_narratives USING fts5(
+-- Narrative full text across the report corpora, indexed for full-text search
+-- (SQLite FTS5). Prose, not numbers. Two `source`s ride in one table:
+--   'ny-tos' — one row per page of a NY ToS filing (the language each platform
+--     uses to describe its hate-speech/extremism/disinformation/harassment
+--     policies), keyed to the archived PDF by page.
+--   'dsa'    — one row per DSA Table-11 qualitative description (how each
+--     service describes its content-moderation approach, per indicator),
+--     derived at seed time from t11_qualitative (no page — `page` is NULL).
+-- `heading`/`text` are tokenized (searchable); source/company/platform/period/
+-- page are UNINDEXED (filter/return only). Powers the public GET /api/narratives
+-- full-text search endpoint + the /narratives page.
+CREATE VIRTUAL TABLE report_narratives USING fts5(
+    source    UNINDEXED,
     company   UNINDEXED,
     platform  UNINDEXED,
     period    UNINDEXED,
@@ -1320,7 +1326,8 @@ _NY_STATS_COLUMNS = ("company", "period", "shha_category", "original_label",
 
 
 def build_ny_tos_narratives(data: dict[str, Any], db_path: str) -> int:
-    """Populate the ny_tos_narratives FTS5 table in an existing DB at db_path.
+    """Populate the report_narratives FTS5 table with the NY ToS filing prose
+    (source='ny-tos') in an existing DB at db_path.
 
     The DB must already contain the virtual table (created by SCHEMA). The dataset
     is the tidy-long ny-tos-narratives.json (`columns` header + `rows` in column
@@ -1339,8 +1346,48 @@ def build_ny_tos_narratives(data: dict[str, Any], db_path: str) -> int:
     try:
         with conn:
             conn.executemany(
-                "INSERT INTO ny_tos_narratives (company, platform, period, page, "
-                "heading, text) VALUES (?,?,?,?,?,?)",
+                "INSERT INTO report_narratives (source, company, platform, period, "
+                "page, heading, text) VALUES ('ny-tos',?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
+# A qualitative cell shorter than this (after trimming) is a placeholder — a bare
+# "N/A", a dash, a "-", a lone URL fragment — not searchable prose, so it's skipped.
+_DSA_NARRATIVE_MIN_CHARS = 60
+
+
+def build_dsa_narratives(db_path: str) -> int:
+    """Populate the report_narratives FTS5 table with the DSA Table-11 qualitative
+    descriptions (source='dsa') from the already-loaded star schema.
+
+    Must run AFTER every t11_qualitative row is loaded (both the VLOP load and the
+    non-VLOP harmonised append), since it reads straight from that table. One row
+    per description: company = service name, heading = indicator, text = the prose.
+    Trivial/placeholder cells (< _DSA_NARRATIVE_MIN_CHARS) are skipped. Returns the
+    row count inserted.
+    """
+    conn = sqlite3.connect(db_path)
+    try:
+        rows = conn.execute(
+            "SELECT svc.name, svc.platform, rpt.period, ind.name, f.value_text "
+            "FROM t11_qualitative f "
+            "JOIN reports rpt    ON rpt.id = f.report_id "
+            "JOIN services svc   ON svc.id = f.service_id "
+            "JOIN indicators ind ON ind.id = f.indicator_id "
+            "WHERE f.value_text IS NOT NULL "
+            "AND length(trim(f.value_text)) >= ?",
+            (_DSA_NARRATIVE_MIN_CHARS,),
+        ).fetchall()
+        with conn:
+            # `rows` is already the (company, platform, period, heading, text)
+            # 5-tuples the INSERT's five placeholders expect.
+            conn.executemany(
+                "INSERT INTO report_narratives (source, company, platform, period, "
+                "page, heading, text) VALUES ('dsa',?,?,?,NULL,?,?)",
                 rows,
             )
         return len(rows)
@@ -1613,6 +1660,11 @@ def main() -> None:
               f"{h['facts']} fact rows")
     else:
         print("  (skipping harmonised reports — no snapshot or extracted dir found)")
+
+    # Index the DSA Table-11 qualitative prose for full-text search — LAST, so it
+    # covers both the VLOP t11 rows and the non-VLOP harmonised ones just appended.
+    dsa_nar = build_dsa_narratives(args.db)
+    print(f"  dsa narratives: {dsa_nar} qualitative descriptions indexed")
 
 
 if __name__ == "__main__":

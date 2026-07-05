@@ -270,6 +270,8 @@ display: flex; align-items: center;
   .hit-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
   .hit-meta > span[aria-hidden] { opacity: .5; }
   .hit-co { font-weight: 700; color: var(--fg); font-size: 13.5px; }
+  .hit-badge { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-dark); border-radius: 5px; padding: 1px 6px; }
+  [data-theme="dark"] .hit-badge { color: var(--accent); }
   .hit-snippet { font-size: 14px; line-height: 1.55; }
   .hit-snippet mark { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; padding: 0 2px; border-radius: 3px; }
   .hit-link { font-size: 12.5px; margin-top: 6px; display: inline-block; color: var(--accent); text-decoration: none; }
@@ -553,15 +555,16 @@ display: flex; align-items: center;
 <div class="wrap">
   <header>
     <span class="badge">全文检索</span>
-    <h1>检索《服务条款》报告正文</h1>
-    <p>检索纽约社交媒体《服务条款》报告的正文——各平台用来描述其如何界定和执行仇恨言论、极端主义、虚假信息、骚扰以及外国政治干预规则的措辞。</p>
+    <h1>检索透明度报告正文</h1>
+    <p>对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约《服务条款》报告和欧盟 DSA 报告的定性部分。</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">对纽约社交媒体《服务条款》报告<strong>正文</strong>的全文检索——各平台用来描述其如何界定和执行仇恨言论、极端主义、虚假信息、骚扰以及外国政治干预规则的措辞。每条结果是报告的一页，按相关度排序，并附有指向已存档 PDF 的链接。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。</p>
+    <p class="sub">对两个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）以及欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式）。每条结果是一页或一条描述，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。</p>
     <div class="controls">
       <label>搜索 <input id="nq" type="search" placeholder="例如：仇恨言论、申诉、算法" autocomplete="off" /></label>
+      <label>来源 <select id="nsrc"><option value="">全部</option><option value="ny-tos">纽约 ToS 报告</option><option value="dsa">DSA 报告</option></select></label>
       <label>公司 <select id="nco"><option value="">全部</option></select></label>
       <label>报告期 <select id="nper"><option value="">全部</option></select></label>
       <button id="nbtn" type="button">搜索</button>
@@ -599,14 +602,28 @@ function highlight(snippet) {
 
 function nParams() {
   const p = new URLSearchParams();
-  const q = $("#nq").value.trim(), co = $("#nco").value, per = $("#nper").value;
+  const q = $("#nq").value.trim(), src = $("#nsrc").value,
+        co = $("#nco").value, per = $("#nper").value;
   if (q) p.set("q", q);
+  if (src) p.set("source", src);
   if (co) p.set("company", co);
   if (per) p.set("period", per);
   return p;
 }
 
+// Corpus badge shown on each result. Values are the API's source codes, so the
+// localization generator's prose find/replace can't rewrite them.
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+
 let nAbort = null;
+
+function fillProvenance(d) {
+  if (!d.generated) return;
+  $("#nsnap").textContent = d.generated;
+  $("#ncite").textContent =
+    "“透明度报告正文，经由 Transparency Report API (" + d.generated + " snapshot).”";
+  $("#nprov").hidden = false;
+}
 
 async function runSearch() {
   if (nAbort) nAbort.abort();
@@ -629,31 +646,26 @@ async function runSearch() {
   $("#nout").setAttribute("aria-busy", "false");
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“纽约《服务条款》报告正文，经由 Transparency Report API (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+  fillProvenance(d);
 
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 页中检索。请在上方输入词语或短语。`;
+      `可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 段文字中检索。请在上方输入词语或短语。`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `显示与“${esc(q)}”匹配的 ${fmt(d.total)} 页中的 ${fmt(d.count)} 页，按相关度排序。`
-    : `没有页面匹配“${esc(q)}”。`;
+    ? `显示与“${esc(q)}”匹配的 ${fmt(d.total)} 段中的 ${fmt(d.count)} 段，按相关度排序。`
+    : `没有段落匹配“${esc(q)}”。`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
-    const bits = [`<span class="hit-co">${esc(r.company)}</span>`];
+    const bits = [`<span class="hit-badge">${esc(SOURCE_LABELS[r.source] || r.source)}</span>`,
+      `<span class="hit-co">${esc(r.company)}</span>`];
     if (r.platform) bits.push(esc(r.platform));
     bits.push(esc(r.period));
-    bits.push("p. " + esc(r.page));
+    if (r.page != null) bits.push("p. " + esc(r.page));  // dsa entries have no page
     if (r.heading) bits.push("<em>" + esc(r.heading) + "</em>");
     const link = href
       ? `<a class="hit-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("在已存档 PDF 中打开（在新标签页中打开）")}">在已存档 PDF 中打开 →</a>`
@@ -661,6 +673,14 @@ async function runSearch() {
     return `<div class="hit"><div class="hit-meta">${bits.join('<span aria-hidden="true">·</span>')}</div>`
       + `<div class="hit-snippet">${highlight(r.snippet)}</div>${link}</div>`;
   }).join("") + "</div>";
+}
+
+// Source scopes the company/period facets (11 NY ToS filers vs. ~70 DSA
+// services), so they're repopulated whenever the source changes.
+function fillFacets(d) {
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  $("#nco").innerHTML = '<option value="">全部</option>' + (d.companies || []).map(opt).join("");
+  $("#nper").innerHTML = '<option value="">全部</option>' + (d.periods || []).map(opt).join("");
 }
 
 async function setupNarratives() {
@@ -675,19 +695,22 @@ async function setupNarratives() {
   }
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  $("#nco").insertAdjacentHTML("beforeend", (d.companies || []).map(opt).join(""));
-  $("#nper").insertAdjacentHTML("beforeend", (d.periods || []).map(opt).join(""));
+  fillFacets(d);
   $("#nsummary").textContent =
-    `可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 页中检索。请在上方输入词语或短语。`;
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“纽约《服务条款》报告正文，经由 Transparency Report API (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+    `可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 段文字中检索。请在上方输入词语或短语。`;
+  fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+  $("#nsrc").addEventListener("change", async () => {
+    const src = $("#nsrc").value;
+    try {
+      const res = await fetch("/api/narratives" + (src ? "?source=" + encodeURIComponent(src) : ""));
+      // Guard against out-of-order responses: only apply if the dropdown still
+      // holds the source we fetched for (rapid toggling can resolve out of order).
+      if (res.ok && $("#nsrc").value === src) fillFacets(await res.json());
+    } catch (e) { /* keep the existing facets on error */ }
+    if ($("#nq").value.trim()) runSearch();
+  });
   ["#nco", "#nper"].forEach((s) => $(s).addEventListener("change", () => { if ($("#nq").value.trim()) runSearch(); }));
   // Debounce free typing so we don't fire a search per keystroke.
   let t = null;

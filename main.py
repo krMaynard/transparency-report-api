@@ -3073,14 +3073,17 @@ def ny_tos_reports(
     }, headers=prov_headers)
 
 
-# Full-text search over the narrative NY ToS filings (seeded into the FTS5
-# `ny_tos_narratives` table by seed.build_ny_tos_narratives). Prose, not the
-# structured `ny_tos_stats` numbers — the language each platform uses to describe
-# its policies. Matches are highlighted with private-use sentinels the client
-# HTML-escapes then swaps for <mark>, so raw DB text can never inject markup.
+# Full-text search over the report narratives (seeded into the FTS5
+# `report_narratives` table by seed.build_ny_tos_narratives + build_dsa_narratives).
+# Two `source`s: 'ny-tos' (one row per page of a NY ToS filing, deep-linkable into
+# the archived PDF) and 'dsa' (one row per DSA Table-11 qualitative description).
+# Prose, not the structured numbers. Matches are highlighted with private-use
+# sentinels the client HTML-escapes then swaps for <mark>, so raw DB text can
+# never inject markup.
 _FTS_TERM = re.compile(r"[0-9A-Za-z]+")
 _MARK_OPEN = chr(0xE000)
 _MARK_CLOSE = chr(0xE001)
+_NARRATIVE_SOURCES = ("ny-tos", "dsa")
 
 
 def _fts_match(q: str) -> str:
@@ -3094,72 +3097,91 @@ def _fts_match(q: str) -> str:
 def narratives(
     request: Request,
     q: str = Query("", max_length=200),
+    source: str | None = None,
     company: str | None = None,
     period: str | None = None,
     limit: int = Query(30, ge=1, le=100),
 ) -> JSONResponse:
-    """Public full-text search over the **narrative** NY Terms-of-Service filings
-    — the prose in which platforms describe how they define and enforce their
-    hate-speech / extremism / disinformation / harassment / foreign-interference
-    policies. One result per matching page, ranked by relevance (BM25), with a
-    highlighted snippet and a deep link into the archived PDF. Filter by
-    `company` / `period`. IP-rate-limited (the query is user-driven), no auth."""
+    """Public full-text search over the **narrative** report text — the prose,
+    not the numbers. Two corpora (`source`): `ny-tos` (New York Terms-of-Service
+    filings — how platforms describe defining/enforcing their hate-speech /
+    extremism / disinformation / harassment / foreign-interference policies) and
+    `dsa` (the EU DSA reports' Table-11 qualitative descriptions — how each
+    service describes its content-moderation approach). One result per matching
+    page (ny-tos) or description (dsa), ranked by relevance (BM25), with a
+    highlighted snippet; ny-tos results deep-link into the archived PDF. Filter by
+    `source` / `company` / `period`. IP-rate-limited (query is user-driven), no auth."""
     if _key_store.incr(f"narratives:{_client_ip(request)}", EXPLORE_RATE_WINDOW) > EXPLORE_RATE_MAX:
         raise HTTPException(
             status_code=429,
             detail="Too many searches from here. Please slow down.",
             headers={"Retry-After": str(EXPLORE_RATE_WINDOW)},
         )
+    if source is not None and source not in _NARRATIVE_SOURCES:
+        raise HTTPException(status_code=422, detail=f"unknown source '{source}'")
     match = _fts_match(q)
     conn = _connect_ro()
     try:
+        # Facets are scoped to the chosen source (companies differ per corpus:
+        # 11 NY ToS filers vs. ~70 DSA services), so the dropdowns stay coherent.
+        facet_where = "WHERE source = ?" if source else ""
+        facet_params = [source] if source else []
         companies = [r[0] for r in conn.execute(
-            "SELECT DISTINCT company FROM ny_tos_narratives ORDER BY company COLLATE NOCASE")]
+            f"SELECT DISTINCT company FROM report_narratives {facet_where} "
+            "ORDER BY company COLLATE NOCASE", facet_params)]
         periods = [r[0] for r in conn.execute(
-            "SELECT DISTINCT period FROM ny_tos_narratives ORDER BY period")]
-        page_total = conn.execute("SELECT count(*) FROM ny_tos_narratives").fetchone()[0]
+            f"SELECT DISTINCT period FROM report_narratives {facet_where} "
+            "ORDER BY period", facet_params)]
+        page_total = conn.execute(
+            f"SELECT count(*) FROM report_narratives {facet_where}", facet_params).fetchone()[0]
 
         results: list[dict[str, Any]] = []
         total = 0
         if match:
-            where = ["ny_tos_narratives MATCH ?"]
+            where = ["report_narratives MATCH ?"]
             params: list[Any] = [match]
+            if source:
+                where.append("report_narratives.source = ?"); params.append(source)
             if company:
-                where.append("ny_tos_narratives.company = ?"); params.append(company)
+                where.append("report_narratives.company = ?"); params.append(company)
             if period:
-                where.append("ny_tos_narratives.period = ?"); params.append(period)
+                where.append("report_narratives.period = ?"); params.append(period)
             wc = " AND ".join(where)
             total = conn.execute(
-                f"SELECT count(*) FROM ny_tos_narratives WHERE {wc}", params).fetchone()[0]
+                f"SELECT count(*) FROM report_narratives WHERE {wc}", params).fetchone()[0]
             # The FTS table stays unaliased so snippet()/bm25() resolve; the
-            # catalogue join (for the archived-PDF link) is aliased.
+            # catalogue join (for the archived-PDF link, ny-tos only) is aliased.
             sql = (
-                "SELECT ny_tos_narratives.company, ny_tos_narratives.platform, "
-                "ny_tos_narratives.period, ny_tos_narratives.page, "
-                "ny_tos_narratives.heading, "
-                "snippet(ny_tos_narratives, 5, ?, ?, '…', 14), r.archived "
-                "FROM ny_tos_narratives "
-                "LEFT JOIN ny_tos_reports r ON r.company = ny_tos_narratives.company "
-                "AND r.period = ny_tos_narratives.period "
-                f"WHERE {wc} ORDER BY bm25(ny_tos_narratives) LIMIT ?"
+                "SELECT report_narratives.source, report_narratives.company, "
+                "report_narratives.platform, report_narratives.period, "
+                "report_narratives.page, report_narratives.heading, "
+                "snippet(report_narratives, -1, ?, ?, '…', 14), r.archived "
+                "FROM report_narratives "
+                "LEFT JOIN ny_tos_reports r "
+                "ON report_narratives.source = 'ny-tos' "
+                "AND r.company = report_narratives.company "
+                "AND r.period = report_narratives.period "
+                f"WHERE {wc} ORDER BY bm25(report_narratives) LIMIT ?"
             )
             rows = conn.execute(sql, [_MARK_OPEN, _MARK_CLOSE] + params + [limit]).fetchall()
-            for co, plat, per, pg, head, snip, arch in rows:
+            for src, co, plat, per, pg, head, snip, arch in rows:
                 url = (arch + (f"#page={pg}" if pg else "")) if arch else None
                 results.append({
-                    "company": co, "platform": plat or None, "period": per,
-                    "page": pg, "heading": head or None, "snippet": snip,
-                    "archived_url": url,
+                    "source": src, "company": co, "platform": plat or None,
+                    "period": per, "page": pg, "heading": head or None,
+                    "snippet": snip, "archived_url": url,
                 })
     finally:
         conn.close()
 
     return JSONResponse({
         "q": q,
+        "source": source,
         "searched": bool(match),
         "count": len(results),
         "total": total,
         "page_total": page_total,
+        "sources": list(_NARRATIVE_SOURCES),
         "companies": companies,
         "periods": periods,
         "mark_open": _MARK_OPEN,

@@ -270,6 +270,8 @@ display: flex; align-items: center;
   .hit-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
   .hit-meta > span[aria-hidden] { opacity: .5; }
   .hit-co { font-weight: 700; color: var(--fg); font-size: 13.5px; }
+  .hit-badge { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-dark); border-radius: 5px; padding: 1px 6px; }
+  [data-theme="dark"] .hit-badge { color: var(--accent); }
   .hit-snippet { font-size: 14px; line-height: 1.55; }
   .hit-snippet mark { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; padding: 0 2px; border-radius: 3px; }
   .hit-link { font-size: 12.5px; margin-top: 6px; display: inline-block; color: var(--accent); text-decoration: none; }
@@ -553,15 +555,16 @@ display: flex; align-items: center;
 <div class="wrap">
   <header>
     <span class="badge">전문 검색</span>
-    <h1>서비스 약관 보고서 본문 검색</h1>
-    <p>뉴욕 소셜미디어 서비스 약관 보고서의 본문을 검색하세요. 각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명하는 문구입니다.</p>
+    <h1>투명성 보고서 본문 검색</h1>
+    <p>플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕 서비스 약관 보고서와 EU DSA 보고서의 정성적 섹션을 아우릅니다.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">뉴욕 소셜미디어 서비스 약관 보고서 <strong>본문</strong>에 대한 전문 검색입니다. 각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 각 결과는 보고서의 한 페이지이며, 관련도순으로 정렬되고 보관된 PDF로 연결되는 링크가 있습니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.</p>
+    <p class="sub">두 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명)와 EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지). 각 결과는 한 페이지 또는 하나의 기술이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.</p>
     <div class="controls">
       <label>검색 <input id="nq" type="search" placeholder="예: 혐오 표현, 이의 제기, 알고리즘" autocomplete="off" /></label>
+      <label>출처 <select id="nsrc"><option value="">전체</option><option value="ny-tos">뉴욕 ToS 보고서</option><option value="dsa">DSA 보고서</option></select></label>
       <label>회사 <select id="nco"><option value="">전체</option></select></label>
       <label>기간 <select id="nper"><option value="">전체</option></select></label>
       <button id="nbtn" type="button">검색</button>
@@ -599,14 +602,28 @@ function highlight(snippet) {
 
 function nParams() {
   const p = new URLSearchParams();
-  const q = $("#nq").value.trim(), co = $("#nco").value, per = $("#nper").value;
+  const q = $("#nq").value.trim(), src = $("#nsrc").value,
+        co = $("#nco").value, per = $("#nper").value;
   if (q) p.set("q", q);
+  if (src) p.set("source", src);
   if (co) p.set("company", co);
   if (per) p.set("period", per);
   return p;
 }
 
+// Corpus badge shown on each result. Values are the API's source codes, so the
+// localization generator's prose find/replace can't rewrite them.
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+
 let nAbort = null;
+
+function fillProvenance(d) {
+  if (!d.generated) return;
+  $("#nsnap").textContent = d.generated;
+  $("#ncite").textContent =
+    "“투명성 보고서 본문, Transparency Report API 경유 (" + d.generated + " snapshot).”";
+  $("#nprov").hidden = false;
+}
 
 async function runSearch() {
   if (nAbort) nAbort.abort();
@@ -629,31 +646,26 @@ async function runSearch() {
   $("#nout").setAttribute("aria-busy", "false");
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“뉴욕 서비스 약관 보고서 본문, Transparency Report API 경유 (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+  fillProvenance(d);
 
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `${fmt(d.companies.length)}개 보고서의 ${fmt(d.page_total)}페이지를 검색합니다. 위에 단어나 구를 입력하세요.`;
+      `${fmt(d.companies.length)}개 보고서의 ${fmt(d.page_total)}개 구절을 검색합니다. 위에 단어나 구를 입력하세요.`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `“${esc(q)}”과(와) 일치하는 ${fmt(d.total)}페이지 중 ${fmt(d.count)}페이지를 관련도순으로 표시합니다.`
-    : `“${esc(q)}”과(와) 일치하는 페이지가 없습니다.`;
+    ? `“${esc(q)}”과(와) 일치하는 ${fmt(d.total)}개 구절 중 ${fmt(d.count)}개를 관련도순으로 표시합니다.`
+    : `“${esc(q)}”과(와) 일치하는 구절이 없습니다.`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
-    const bits = [`<span class="hit-co">${esc(r.company)}</span>`];
+    const bits = [`<span class="hit-badge">${esc(SOURCE_LABELS[r.source] || r.source)}</span>`,
+      `<span class="hit-co">${esc(r.company)}</span>`];
     if (r.platform) bits.push(esc(r.platform));
     bits.push(esc(r.period));
-    bits.push("p. " + esc(r.page));
+    if (r.page != null) bits.push("p. " + esc(r.page));  // dsa entries have no page
     if (r.heading) bits.push("<em>" + esc(r.heading) + "</em>");
     const link = href
       ? `<a class="hit-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("보관된 PDF에서 열기(새 탭에서 열림)")}">보관된 PDF에서 열기 →</a>`
@@ -661,6 +673,14 @@ async function runSearch() {
     return `<div class="hit"><div class="hit-meta">${bits.join('<span aria-hidden="true">·</span>')}</div>`
       + `<div class="hit-snippet">${highlight(r.snippet)}</div>${link}</div>`;
   }).join("") + "</div>";
+}
+
+// Source scopes the company/period facets (11 NY ToS filers vs. ~70 DSA
+// services), so they're repopulated whenever the source changes.
+function fillFacets(d) {
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  $("#nco").innerHTML = '<option value="">전체</option>' + (d.companies || []).map(opt).join("");
+  $("#nper").innerHTML = '<option value="">전체</option>' + (d.periods || []).map(opt).join("");
 }
 
 async function setupNarratives() {
@@ -675,19 +695,22 @@ async function setupNarratives() {
   }
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  $("#nco").insertAdjacentHTML("beforeend", (d.companies || []).map(opt).join(""));
-  $("#nper").insertAdjacentHTML("beforeend", (d.periods || []).map(opt).join(""));
+  fillFacets(d);
   $("#nsummary").textContent =
-    `${fmt(d.companies.length)}개 보고서의 ${fmt(d.page_total)}페이지를 검색합니다. 위에 단어나 구를 입력하세요.`;
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“뉴욕 서비스 약관 보고서 본문, Transparency Report API 경유 (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+    `${fmt(d.companies.length)}개 보고서의 ${fmt(d.page_total)}개 구절을 검색합니다. 위에 단어나 구를 입력하세요.`;
+  fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+  $("#nsrc").addEventListener("change", async () => {
+    const src = $("#nsrc").value;
+    try {
+      const res = await fetch("/api/narratives" + (src ? "?source=" + encodeURIComponent(src) : ""));
+      // Guard against out-of-order responses: only apply if the dropdown still
+      // holds the source we fetched for (rapid toggling can resolve out of order).
+      if (res.ok && $("#nsrc").value === src) fillFacets(await res.json());
+    } catch (e) { /* keep the existing facets on error */ }
+    if ($("#nq").value.trim()) runSearch();
+  });
   ["#nco", "#nper"].forEach((s) => $(s).addEventListener("change", () => { if ($("#nq").value.trim()) runSearch(); }));
   // Debounce free typing so we don't fire a search per keystroke.
   let t = null;
