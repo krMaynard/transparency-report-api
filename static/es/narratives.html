@@ -270,6 +270,8 @@ display: flex; align-items: center;
   .hit-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
   .hit-meta > span[aria-hidden] { opacity: .5; }
   .hit-co { font-weight: 700; color: var(--fg); font-size: 13.5px; }
+  .hit-badge { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-dark); border-radius: 5px; padding: 1px 6px; }
+  [data-theme="dark"] .hit-badge { color: var(--accent); }
   .hit-snippet { font-size: 14px; line-height: 1.55; }
   .hit-snippet mark { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; padding: 0 2px; border-radius: 3px; }
   .hit-link { font-size: 12.5px; margin-top: 6px; display: inline-block; color: var(--accent); text-decoration: none; }
@@ -553,15 +555,16 @@ display: flex; align-items: center;
 <div class="wrap">
   <header>
     <span class="badge">Búsqueda de texto completo</span>
-    <h1>Busca en el texto de los informes de condiciones de servicio</h1>
-    <p>Busca en la prosa de los informes de condiciones de servicio de redes sociales de Nueva York: el lenguaje que usan las plataformas para describir cómo definen y aplican las normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera.</p>
+    <h1>Busca en el texto de los informes de transparencia</h1>
+    <p>Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y las secciones cualitativas de los informes de la DSA de la UE.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Búsqueda de texto completo en la <strong>prosa</strong> de los informes de condiciones de servicio de redes sociales de Nueva York: el lenguaje que usan las plataformas para describir cómo definen y aplican las normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera. Cada resultado es una página de un informe, ordenada por relevancia, con un enlace al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Búsqueda de texto completo en la <strong>prosa</strong> de dos corpus: los informes de condiciones de servicio de redes sociales de Nueva York (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera) y las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos). Cada resultado es una página o descripción, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Buscar <input id="nq" type="search" placeholder="p. ej. discurso de odio, apelaciones, algoritmo" autocomplete="off" /></label>
+      <label>Fuente <select id="nsrc"><option value="">Todas</option><option value="ny-tos">Informes ToS de NY</option><option value="dsa">Informes DSA</option></select></label>
       <label>Empresa <select id="nco"><option value="">Todas</option></select></label>
       <label>Período <select id="nper"><option value="">Todas</option></select></label>
       <button id="nbtn" type="button">Buscar</button>
@@ -599,14 +602,28 @@ function highlight(snippet) {
 
 function nParams() {
   const p = new URLSearchParams();
-  const q = $("#nq").value.trim(), co = $("#nco").value, per = $("#nper").value;
+  const q = $("#nq").value.trim(), src = $("#nsrc").value,
+        co = $("#nco").value, per = $("#nper").value;
   if (q) p.set("q", q);
+  if (src) p.set("source", src);
   if (co) p.set("company", co);
   if (per) p.set("period", per);
   return p;
 }
 
+// Corpus badge shown on each result. Values are the API's source codes, so the
+// localization generator's prose find/replace can't rewrite them.
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+
 let nAbort = null;
+
+function fillProvenance(d) {
+  if (!d.generated) return;
+  $("#nsnap").textContent = d.generated;
+  $("#ncite").textContent =
+    "“Textos de los informes de transparencia, vía la Transparency Report API (" + d.generated + " snapshot).”";
+  $("#nprov").hidden = false;
+}
 
 async function runSearch() {
   if (nAbort) nAbort.abort();
@@ -629,31 +646,26 @@ async function runSearch() {
   $("#nout").setAttribute("aria-busy", "false");
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“Textos de los informes de condiciones de servicio de Nueva York, vía la Transparency Report API (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+  fillProvenance(d);
 
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `Se buscan ${fmt(d.page_total)} páginas en ${fmt(d.companies.length)} informes. Escribe una palabra o frase arriba.`;
+      `Se buscan ${fmt(d.page_total)} pasajes en ${fmt(d.companies.length)} informes. Escribe una palabra o frase arriba.`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `Mostrando ${fmt(d.count)} de ${fmt(d.total)} páginas coincidentes para “${esc(q)}”, ordenadas por relevancia.`
-    : `Ninguna página coincide con “${esc(q)}”.`;
+    ? `Mostrando ${fmt(d.count)} de ${fmt(d.total)} pasajes coincidentes para “${esc(q)}”, ordenados por relevancia.`
+    : `Ningún pasaje coincide con “${esc(q)}”.`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
-    const bits = [`<span class="hit-co">${esc(r.company)}</span>`];
+    const bits = [`<span class="hit-badge">${esc(SOURCE_LABELS[r.source] || r.source)}</span>`,
+      `<span class="hit-co">${esc(r.company)}</span>`];
     if (r.platform) bits.push(esc(r.platform));
     bits.push(esc(r.period));
-    bits.push("p. " + esc(r.page));
+    if (r.page != null) bits.push("p. " + esc(r.page));  // dsa entries have no page
     if (r.heading) bits.push("<em>" + esc(r.heading) + "</em>");
     const link = href
       ? `<a class="hit-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("Abrir en el PDF archivado (se abre en una pestaña nueva)")}">Abrir en el PDF archivado →</a>`
@@ -661,6 +673,14 @@ async function runSearch() {
     return `<div class="hit"><div class="hit-meta">${bits.join('<span aria-hidden="true">·</span>')}</div>`
       + `<div class="hit-snippet">${highlight(r.snippet)}</div>${link}</div>`;
   }).join("") + "</div>";
+}
+
+// Source scopes the company/period facets (11 NY ToS filers vs. ~70 DSA
+// services), so they're repopulated whenever the source changes.
+function fillFacets(d) {
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  $("#nco").innerHTML = '<option value="">Todas</option>' + (d.companies || []).map(opt).join("");
+  $("#nper").innerHTML = '<option value="">Todas</option>' + (d.periods || []).map(opt).join("");
 }
 
 async function setupNarratives() {
@@ -675,19 +695,20 @@ async function setupNarratives() {
   }
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  $("#nco").insertAdjacentHTML("beforeend", (d.companies || []).map(opt).join(""));
-  $("#nper").insertAdjacentHTML("beforeend", (d.periods || []).map(opt).join(""));
+  fillFacets(d);
   $("#nsummary").textContent =
-    `Se buscan ${fmt(d.page_total)} páginas en ${fmt(d.companies.length)} informes. Escribe una palabra o frase arriba.`;
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“Textos de los informes de condiciones de servicio de Nueva York, vía la Transparency Report API (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+    `Se buscan ${fmt(d.page_total)} pasajes en ${fmt(d.companies.length)} informes. Escribe una palabra o frase arriba.`;
+  fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+  $("#nsrc").addEventListener("change", async () => {
+    const src = $("#nsrc").value;
+    try {
+      const res = await fetch("/api/narratives" + (src ? "?source=" + encodeURIComponent(src) : ""));
+      if (res.ok) fillFacets(await res.json());
+    } catch (e) { /* keep the existing facets on error */ }
+    if ($("#nq").value.trim()) runSearch();
+  });
   ["#nco", "#nper"].forEach((s) => $(s).addEventListener("change", () => { if ($("#nq").value.trim()) runSearch(); }));
   // Debounce free typing so we don't fire a search per keystroke.
   let t = null;

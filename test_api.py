@@ -1596,42 +1596,73 @@ class TestNYTosReports:
 # ── Public NY ToS narrative full-text search (GET /api/narratives) ───────────
 
 class TestNarratives:
-    def test_public_index(self):
-        # No query: returns the facet lists + how much prose is searchable.
+    def test_public_index_spans_both_sources(self):
+        # No query: returns the facet lists + how much prose is searchable across
+        # both corpora (3 NY ToS pages + 1 DSA description from the fixtures).
         d = client.get("/api/narratives").json()  # no X-API-Key
         assert d["searched"] is False
-        assert d["page_total"] == 3
-        assert set(d["companies"]) == {"Snap Inc", "TikTok Inc"}
+        assert d["page_total"] == 4
+        assert d["sources"] == ["ny-tos", "dsa"]
+        assert {"Snap Inc", "TikTok Inc", "YouTube"} <= set(d["companies"])
         assert d["results"] == []
         assert d["mark_open"] and d["mark_close"]  # highlight sentinels present
+
+    def test_source_scopes_facets(self):
+        ny = client.get("/api/narratives", params={"source": "ny-tos"}).json()
+        assert set(ny["companies"]) == {"Snap Inc", "TikTok Inc"} and ny["page_total"] == 3
+        dsa = client.get("/api/narratives", params={"source": "dsa"}).json()
+        assert dsa["companies"] == ["YouTube"] and dsa["page_total"] == 1
 
     def test_full_text_search_ranks_and_links(self):
         d = client.get("/api/narratives", params={"q": "hate speech"}).json()
         assert d["searched"] is True and d["total"] == 1
         hit = d["results"][0]
-        assert hit["company"] == "Snap Inc" and hit["page"] == 5
+        assert hit["source"] == "ny-tos" and hit["company"] == "Snap Inc" and hit["page"] == 5
         # The match is wrapped in the highlight sentinels for the client to swap.
         assert d["mark_open"] in hit["snippet"] and d["mark_close"] in hit["snippet"]
         # Deep link into the archived PDF at the matching page.
         assert hit["archived_url"].endswith("2025-q3-snap-inc.pdf#page=5")
 
+    def test_dsa_source_indexed_from_t11(self):
+        # The DSA description (source='dsa') is indexed from t11_qualitative; it
+        # has no page and no archived-PDF link.
+        d = client.get("/api/narratives",
+                       params={"q": "automated review", "source": "dsa"}).json()
+        assert d["total"] >= 1
+        hit = d["results"][0]
+        assert hit["source"] == "dsa" and hit["company"] == "YouTube"
+        assert hit["page"] is None and hit["archived_url"] is None
+
+    def test_source_filter_partitions_results(self):
+        # "automated" appears only in the DSA description; "misinformation" only in
+        # a NY ToS page — the source filter keeps each to its own corpus.
+        assert client.get("/api/narratives",
+                          params={"q": "automated", "source": "ny-tos"}).json()["total"] == 0
+        assert client.get("/api/narratives",
+                          params={"q": "automated", "source": "dsa"}).json()["total"] >= 1
+        assert client.get("/api/narratives",
+                          params={"q": "misinformation", "source": "dsa"}).json()["total"] == 0
+        assert client.get("/api/narratives",
+                          params={"q": "misinformation", "source": "ny-tos"}).json()["total"] >= 1
+
     def test_stemming(self):
         # The porter tokenizer stems, so "appeal" matches "appeals".
-        assert client.get("/api/narratives", params={"q": "appeal"}).json()["total"] == 1
+        assert client.get("/api/narratives", params={"q": "appeal"}).json()["total"] >= 1
 
     def test_company_filter(self):
         d = client.get("/api/narratives",
                        params={"q": "harassment", "company": "TikTok Inc"}).json()
         assert d["total"] == 1 and d["results"][0]["company"] == "TikTok Inc"
-        # No public archive for the TikTok filing → no deep link.
-        assert d["results"][0]["archived_url"] is None
-        # Same query pinned to the other company returns nothing.
+        assert d["results"][0]["archived_url"] is None  # no public archive
         assert client.get("/api/narratives",
                           params={"q": "harassment", "company": "Snap Inc"}).json()["total"] == 0
 
     def test_no_match(self):
         d = client.get("/api/narratives", params={"q": "cryptocurrency"}).json()
         assert d["searched"] is True and d["total"] == 0 and d["results"] == []
+
+    def test_bad_source_rejected(self):
+        assert client.get("/api/narratives", params={"source": "xyz"}).status_code == 422
 
     def test_malformed_query_is_safe(self):
         # FTS5 operators / unbalanced quotes must not 500 — only word tokens survive.
@@ -1642,7 +1673,7 @@ class TestNarratives:
     def test_page_served(self):
         r = client.get("/narratives")
         assert r.status_code == 200
-        assert "/api/narratives" in r.text and 'id="nout"' in r.text
+        assert "/api/narratives" in r.text and 'id="nout"' in r.text and 'id="nsrc"' in r.text
 
     def test_vendored_dataset_shape(self):
         import json

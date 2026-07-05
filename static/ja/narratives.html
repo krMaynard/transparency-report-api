@@ -270,6 +270,8 @@ display: flex; align-items: center;
   .hit-meta { font-size: 12px; color: var(--muted); margin-bottom: 6px; display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: baseline; }
   .hit-meta > span[aria-hidden] { opacity: .5; }
   .hit-co { font-weight: 700; color: var(--fg); font-size: 13.5px; }
+  .hit-badge { font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent-dark); border-radius: 5px; padding: 1px 6px; }
+  [data-theme="dark"] .hit-badge { color: var(--accent); }
   .hit-snippet { font-size: 14px; line-height: 1.55; }
   .hit-snippet mark { background: color-mix(in srgb, var(--accent) 30%, transparent); color: inherit; padding: 0 2px; border-radius: 3px; }
   .hit-link { font-size: 12.5px; margin-top: 6px; display: inline-block; color: var(--accent); text-decoration: none; }
@@ -553,15 +555,16 @@ display: flex; align-items: center;
 <div class="wrap">
   <header>
     <span class="badge">全文検索</span>
-    <h1>利用規約報告書の本文を検索</h1>
-    <p>ニューヨークのソーシャルメディア利用規約報告書の本文を検索します。各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉をどのように定義し執行するかを説明する文章です。</p>
+    <h1>透明性レポートの本文を検索</h1>
+    <p>プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークの利用規約報告書と、EU DSA 報告書の定性的セクションを対象とします。</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">ニューヨークのソーシャルメディア利用規約報告書の<strong>本文</strong>に対する全文検索です。各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉をどのように定義し執行するかを説明する文章です。各結果は報告書の 1 ページで、関連度順に並び、アーカイブ済み PDF へのリンクが付いています。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。</p>
+    <p class="sub">2 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）と、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）です。各結果は 1 ページまたは 1 件の記述で、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。</p>
     <div class="controls">
       <label>検索 <input id="nq" type="search" placeholder="例：ヘイトスピーチ、異議申立、アルゴリズム" autocomplete="off" /></label>
+      <label>ソース <select id="nsrc"><option value="">すべて</option><option value="ny-tos">NY ToS 報告書</option><option value="dsa">DSA 報告書</option></select></label>
       <label>企業 <select id="nco"><option value="">すべて</option></select></label>
       <label>期間 <select id="nper"><option value="">すべて</option></select></label>
       <button id="nbtn" type="button">検索</button>
@@ -599,14 +602,28 @@ function highlight(snippet) {
 
 function nParams() {
   const p = new URLSearchParams();
-  const q = $("#nq").value.trim(), co = $("#nco").value, per = $("#nper").value;
+  const q = $("#nq").value.trim(), src = $("#nsrc").value,
+        co = $("#nco").value, per = $("#nper").value;
   if (q) p.set("q", q);
+  if (src) p.set("source", src);
   if (co) p.set("company", co);
   if (per) p.set("period", per);
   return p;
 }
 
+// Corpus badge shown on each result. Values are the API's source codes, so the
+// localization generator's prose find/replace can't rewrite them.
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+
 let nAbort = null;
+
+function fillProvenance(d) {
+  if (!d.generated) return;
+  $("#nsnap").textContent = d.generated;
+  $("#ncite").textContent =
+    "“透明性レポートの本文、Transparency Report API 経由 (" + d.generated + " snapshot).”";
+  $("#nprov").hidden = false;
+}
 
 async function runSearch() {
   if (nAbort) nAbort.abort();
@@ -629,31 +646,26 @@ async function runSearch() {
   $("#nout").setAttribute("aria-busy", "false");
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“ニューヨークの利用規約報告書の本文、Transparency Report API 経由 (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+  fillProvenance(d);
 
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} ページを検索します。上に単語やフレーズを入力してください。`;
+      `${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `「${esc(q)}」に一致する ${fmt(d.total)} ページ中 ${fmt(d.count)} ページを関連度順に表示しています。`
-    : `「${esc(q)}」に一致するページはありません。`;
+    ? `「${esc(q)}」に一致する ${fmt(d.total)} 箇所中 ${fmt(d.count)} 箇所を関連度順に表示しています。`
+    : `「${esc(q)}」に一致する箇所はありません。`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
-    const bits = [`<span class="hit-co">${esc(r.company)}</span>`];
+    const bits = [`<span class="hit-badge">${esc(SOURCE_LABELS[r.source] || r.source)}</span>`,
+      `<span class="hit-co">${esc(r.company)}</span>`];
     if (r.platform) bits.push(esc(r.platform));
     bits.push(esc(r.period));
-    bits.push("p. " + esc(r.page));
+    if (r.page != null) bits.push("p. " + esc(r.page));  // dsa entries have no page
     if (r.heading) bits.push("<em>" + esc(r.heading) + "</em>");
     const link = href
       ? `<a class="hit-link" href="${esc(href)}" target="_blank" rel="noopener noreferrer" aria-label="${esc("アーカイブ済み PDF で開く（新しいタブで開きます）")}">アーカイブ済み PDF で開く →</a>`
@@ -661,6 +673,14 @@ async function runSearch() {
     return `<div class="hit"><div class="hit-meta">${bits.join('<span aria-hidden="true">·</span>')}</div>`
       + `<div class="hit-snippet">${highlight(r.snippet)}</div>${link}</div>`;
   }).join("") + "</div>";
+}
+
+// Source scopes the company/period facets (11 NY ToS filers vs. ~70 DSA
+// services), so they're repopulated whenever the source changes.
+function fillFacets(d) {
+  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
+  $("#nco").innerHTML = '<option value="">すべて</option>' + (d.companies || []).map(opt).join("");
+  $("#nper").innerHTML = '<option value="">すべて</option>' + (d.periods || []).map(opt).join("");
 }
 
 async function setupNarratives() {
@@ -675,19 +695,20 @@ async function setupNarratives() {
   }
   if (d.mark_open) MARK_OPEN = d.mark_open;
   if (d.mark_close) MARK_CLOSE = d.mark_close;
-  const opt = (v) => `<option value="${esc(v)}">${esc(v)}</option>`;
-  $("#nco").insertAdjacentHTML("beforeend", (d.companies || []).map(opt).join(""));
-  $("#nper").insertAdjacentHTML("beforeend", (d.periods || []).map(opt).join(""));
+  fillFacets(d);
   $("#nsummary").textContent =
-    `${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} ページを検索します。上に単語やフレーズを入力してください。`;
-  if (d.generated) {
-    $("#nsnap").textContent = d.generated;
-    $("#ncite").textContent =
-      "“ニューヨークの利用規約報告書の本文、Transparency Report API 経由 (" + d.generated + " snapshot).”";
-    $("#nprov").hidden = false;
-  }
+    `${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
+  fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });
+  $("#nsrc").addEventListener("change", async () => {
+    const src = $("#nsrc").value;
+    try {
+      const res = await fetch("/api/narratives" + (src ? "?source=" + encodeURIComponent(src) : ""));
+      if (res.ok) fillFacets(await res.json());
+    } catch (e) { /* keep the existing facets on error */ }
+    if ($("#nq").value.trim()) runSearch();
+  });
   ["#nco", "#nper"].forEach((s) => $(s).addEventListener("change", () => { if ($("#nq").value.trim()) runSearch(); }));
   // Debounce free typing so we don't fire a search per keystroke.
   let t = null;
