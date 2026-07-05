@@ -106,6 +106,11 @@ _DEFAULT_DISCORD_SOURCE = os.getenv(
 _DEFAULT_TRAFFIC_SOURCE = os.getenv(
     "SEED_TRAFFIC_SOURCE_JSON", os.path.join(HERE, "data", "google-traffic.json")
 )
+# Google Android ecosystem security (PHA rates) — vendored in-repo (from the
+# sibling data repo's android-security/build_android.py).
+_DEFAULT_ANDROID_SOURCE = os.getenv(
+    "SEED_ANDROID_SOURCE_JSON", os.path.join(HERE, "data", "android-security.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -486,6 +491,22 @@ CREATE TABLE discord_metrics (
     value     REAL
 );
 CREATE INDEX idx_discord_section ON discord_metrics(section);
+
+-- Google Android ecosystem security — Potentially Harmful Application (PHA)
+-- rates (android-security/build_android.py). Tidy-long: one row per measured
+-- value across five cuts (`section`). `period` is a YYYY-MM-DD date (12-month
+-- rolling end date for the rolling cuts; quarter end date for the quarterly
+-- cuts). `value` is REAL: a PHA rate (unit='rate', a fraction of 1 — never SUM)
+-- or the by-category share (unit='percent', sums to ~100/quarter). Dims inline.
+CREATE TABLE android_metrics (
+    section   TEXT NOT NULL,  -- devices_with_pha / devices_by_version / installs / installs_by_country / installs_by_category
+    period    TEXT NOT NULL,  -- YYYY-MM-DD (rolling end date / quarter end date)
+    category  TEXT NOT NULL,  -- market type, Android version, source, country ISO-2, or PHA category
+    metric    TEXT NOT NULL,  -- pha_rate / category_share
+    unit      TEXT NOT NULL,  -- rate / percent
+    value     REAL
+);
+CREATE INDEX idx_android_section ON android_metrics(section);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -1164,6 +1185,35 @@ def build_discord_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_android_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the android_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long android-security.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("android dataset is None")
+    expected_cols = ["section", "period", "category", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"android dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("android dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO android_metrics (section, period, category, metric, "
+                "unit, value) VALUES (?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_google_traffic_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the google_traffic table in an existing DB at db_path.
 
@@ -1312,6 +1362,8 @@ def main() -> None:
                         help="Path to discord-transparency.json")
     parser.add_argument("--traffic-source", default=_DEFAULT_TRAFFIC_SOURCE,
                         help="Path to google-traffic.json")
+    parser.add_argument("--android-source", default=_DEFAULT_ANDROID_SOURCE,
+                        help="Path to android-security.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1480,6 +1532,16 @@ def main() -> None:
               f"{len({r[2] for r in gt_data['rows']})} products")
     else:
         print(f"  (skipping Google traffic — not found: {args.traffic_source})")
+
+    if os.path.isfile(args.android_source):
+        with open(args.android_source, "r", encoding="utf-8") as f:
+            an_data = json.load(f)
+        an_rows = build_android_db(an_data, args.db)
+        print(f"  android security: {an_rows} metric rows across "
+              f"{len({r[0] for r in an_data['rows']})} sections, "
+              f"{len({r[1] for r in an_data['rows']})} periods")
+    else:
+        print(f"  (skipping Android security — not found: {args.android_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

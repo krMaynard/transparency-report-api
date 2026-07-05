@@ -2156,7 +2156,7 @@ class TestLocalization:
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
                 "user-data", "microsoft", "linkedin", "tiktok", "discord",
-                "disruptions", "mcp", "methodology", "schema", "api-key", "privacy")
+                "disruptions", "android", "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.
@@ -2580,6 +2580,18 @@ class TestDatasetPages:
         assert r.status_code == 200
         assert "Interrupciones de tráfico" in r.text  # nav label / chrome localized
 
+    def test_android_page_served(self):
+        r = client.get("/android")
+        assert r.status_code == 200
+        assert "Android Ecosystem Security" in r.text
+        assert '"table":"android_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_localized_android_page(self):
+        r = client.get("/de/android")
+        assert r.status_code == 200
+        assert "Android-Sicherheit" in r.text  # nav label / chrome localized
+
     def test_request_report_pages_in_sidebar_nav(self):
         for path in ("/", "/reports", "/schema", "/apple"):
             t = client.get(path).text
@@ -2589,6 +2601,7 @@ class TestDatasetPages:
             assert 'href="/tiktok"' in t, path
             assert 'href="/discord"' in t, path
             assert 'href="/disruptions"' in t, path
+            assert 'href="/android"' in t, path
 
     def test_localized_request_report_pages(self):
         cases = {"/es/user-data": "Solicitudes de datos de usuarios de Google",
@@ -3221,6 +3234,71 @@ class TestDiscordTable:
         assert not any(r[2].strip() == "" for r in data["rows"])
         assert ["2023-Q3", "accounts_disabled", "Child Safety", "accounts_disabled",
                 "count", 128153] in data["rows"]
+
+
+class TestAndroidTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "android_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=android_metrics", headers=MOMO).json()
+        assert {"section", "period", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_metric_value(self):
+        # devices_with_pha / All Devices / 2024-12-31 pha_rate = 0.00099 (fixture).
+        job = _submit_and_wait({
+            "table": "android_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["devices_with_pha"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["All Devices"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["pha_rate"]},
+            ]},
+            "aggregates": [{"function": "MAX", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert abs(body["rows"][0][0] - 0.00099) < 1e-9
+
+    def test_two_metrics_from_categories(self):
+        # installs_by_category carries both pha_rate and category_share.
+        q = {"table": "android_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["installs_by_category"]}]},
+             "group_by": ["metric"],
+             "aggregates": [{"function": "COUNT", "field_name": "value", "alias": "n"}]}
+        rows = client.post("/api/explore", json=q).json()["rows"]
+        metrics = {r[0] for r in rows}
+        assert metrics == {"pha_rate", "category_share"}
+
+    def test_explore_warns_on_sum(self):
+        # These are rates — a SUM is meaningless and must warn.
+        q = {"table": "android_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        text = " ".join(client.post("/api/explore", json=q).json().get("warnings", []))
+        assert "SUM" in text and "section" in text and "metric" in text
+
+    def test_explore_avg_pinned_no_warning(self):
+        q = {"table": "android_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["devices_with_pha"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["pha_rate"]}]},
+             "group_by": ["category"],
+             "aggregates": [{"function": "AVG", "field_name": "value", "alias": "v"}]}
+        assert not client.post("/api/explore", json=q).json().get("warnings")
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("android-security.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["section", "period", "category", "metric", "unit", "value"]
+        assert all(len(r) == 6 for r in data["rows"])
+        # units are only 'rate' or 'percent'; every category_share is a percent.
+        assert {r[4] for r in data["rows"]} == {"rate", "percent"}
+        assert all(r[4] == "percent" for r in data["rows"] if r[3] == "category_share")
+        assert all(r[4] == "rate" for r in data["rows"] if r[3] == "pha_rate")
 
 
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────

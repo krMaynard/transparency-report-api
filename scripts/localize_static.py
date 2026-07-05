@@ -34,7 +34,7 @@ PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-t
                "apple.html", "github.html", "snap.html",
                "india.html", "korea.html", "taiwan.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
-               "disruptions.html",
+               "disruptions.html", "android.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
@@ -55,6 +55,7 @@ SUFFIX = {
     "tiktok.html": "tiktok",
     "discord.html": "discord",
     "disruptions.html": "disruptions",
+    "android.html": "android",
     "mcp.html": "mcp",
     "methodology.html": "methodology",
     "schema.html": "schema",
@@ -115,7 +116,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -10279,6 +10280,305 @@ for _loc in _GT_NAV:
         if _o in _gt_text and _o not in _gt_own:
             PAGES[_loc]["disruptions.html"].append((_o, _n))
             _gt_own.add(_o)
+
+# ── android.html localization (self-contained; authored + pool inherit) ──
+# Derived from korea.html, so its chrome + shared chart/table strings (Trends,
+# "No data available.", Loading…, table scroll, provenance labels, "query
+# builder"/"Schema"/"Methodology" hint links) pool-inherit from korea.html; only
+# the Android-specific strings are authored here.
+_AN_NAV = {
+    "es": "Seguridad de Android",
+    "fr": "Sécurité Android",
+    "de": "Android-Sicherheit",
+    "it": "Sicurezza Android",
+    "ja": "Android セキュリティ",
+    "zh": "Android 安全",
+    "ko": "Android 보안",
+}
+_AN_CARD_DESC_EN = "Google's Android ecosystem security report — Potentially Harmful Application (PHA) rates on devices and in Google Play, by Android version, country and malware category, 2017 – 2024."
+_AN_CARD_DESC = {
+    "es": "El informe de seguridad del ecosistema Android de Google: tasas de aplicaciones potencialmente dañinas (PHA) en dispositivos y en Google Play, por versión de Android, país y categoría de malware, 2017 – 2024.",
+    "fr": "Le rapport de sécurité de l'écosystème Android de Google : taux d'applications potentiellement dangereuses (PHA) sur les appareils et dans Google Play, par version d'Android, pays et catégorie de malware, 2017 – 2024.",
+    "de": "Googles Sicherheitsbericht zum Android-Ökosystem: Raten potenziell schädlicher Apps (PHA) auf Geräten und in Google Play, nach Android-Version, Land und Malware-Kategorie, 2017 – 2024.",
+    "it": "Il report sulla sicurezza dell'ecosistema Android di Google: tassi di applicazioni potenzialmente dannose (PHA) sui dispositivi e in Google Play, per versione di Android, Paese e categoria di malware, 2017 – 2024.",
+    "ja": "Google の Android エコシステム セキュリティ レポート：デバイスおよび Google Play における有害な可能性のあるアプリ（PHA）の割合。Android バージョン・国・マルウェアのカテゴリ別、2017 – 2024 年。",
+    "zh": "Google 的 Android 生态系统安全报告：设备上和 Google Play 中潜在有害应用 (PHA) 的比率，按 Android 版本、国家/地区和恶意软件类别划分，2017 – 2024 年。",
+    "ko": "Google의 Android 생태계 보안 보고서: 기기 및 Google Play에서의 잠재적 유해 애플리케이션(PHA) 비율. Android 버전·국가·멀웨어 카테고리별, 2017 – 2024년.",
+}
+_AN_PAGE = {
+    "Android Ecosystem Security — Transparency Report API": {
+        "es": "Seguridad del ecosistema Android — Transparency Report API",
+        "fr": "Sécurité de l'écosystème Android — Transparency Report API",
+        "de": "Sicherheit des Android-Ökosystems — Transparency Report API",
+        "it": "Sicurezza dell'ecosistema Android — Transparency Report API",
+        "ja": "Android エコシステムのセキュリティ — Transparency Report API",
+        "zh": "Android 生态系统安全 — Transparency Report API",
+        "ko": "Android 생태계 보안 — Transparency Report API",
+    },
+    "Google · Android security · 2017 – 2024": {
+        "es": "Google · Seguridad de Android · 2017 – 2024",
+        "fr": "Google · Sécurité Android · 2017 – 2024",
+        "de": "Google · Android-Sicherheit · 2017 – 2024",
+        "it": "Google · Sicurezza Android · 2017 – 2024",
+        "ja": "Google · Android セキュリティ · 2017 – 2024",
+        "zh": "Google · Android 安全 · 2017 – 2024",
+        "ko": "Google · Android 보안 · 2017 – 2024",
+    },
+    "Android Ecosystem Security": {
+        "es": "Seguridad del ecosistema Android",
+        "fr": "Sécurité de l'écosystème Android",
+        "de": "Sicherheit des Android-Ökosystems",
+        "it": "Sicurezza dell'ecosistema Android",
+        "ja": "Android エコシステムのセキュリティ",
+        "zh": "Android 生态系统安全",
+        "ko": "Android 생태계 보안",
+    },
+    "Google's Android ecosystem security Transparency Report: the rate of <strong>Potentially Harmful Applications (PHA)</strong> — malware — on Android devices and in Google Play. A tidy-long dataset covering five cuts: PHA rates on devices (by market type and by Android version), and PHA install rates on Google Play (overall, by country, and by malware category). Values are <strong>rates, not counts</strong> — a PHA rate is a fraction of installs or devices — so this page reports averages and shares, never sums.": {
+        "es": "El informe de transparencia de seguridad del ecosistema Android de Google: la tasa de <strong>aplicaciones potencialmente dañinas (PHA)</strong> —malware— en dispositivos Android y en Google Play. Un conjunto de datos tidy-long con cinco cortes: tasas de PHA en dispositivos (por tipo de mercado y por versión de Android) y tasas de instalación de PHA en Google Play (global, por país y por categoría de malware). Los valores son <strong>tasas, no recuentos</strong> —una tasa de PHA es una fracción de instalaciones o dispositivos—, por lo que esta página muestra promedios y proporciones, nunca sumas.",
+        "fr": "Le rapport de transparence sur la sécurité de l'écosystème Android de Google : le taux d'<strong>applications potentiellement dangereuses (PHA)</strong> — des malwares — sur les appareils Android et dans Google Play. Un jeu de données tidy-long couvrant cinq découpages : taux de PHA sur les appareils (par type de marché et par version d'Android) et taux d'installation de PHA dans Google Play (global, par pays et par catégorie de malware). Les valeurs sont des <strong>taux, pas des comptes</strong> — un taux de PHA est une fraction des installations ou des appareils —, cette page présente donc des moyennes et des parts, jamais des sommes.",
+        "de": "Googles Transparenzbericht zur Sicherheit des Android-Ökosystems: die Rate <strong>potenziell schädlicher Apps (PHA)</strong> — Malware — auf Android-Geräten und in Google Play. Ein Tidy-long-Datensatz mit fünf Schnitten: PHA-Raten auf Geräten (nach Markttyp und nach Android-Version) und PHA-Installationsraten in Google Play (gesamt, nach Land und nach Malware-Kategorie). Die Werte sind <strong>Raten, keine Zählungen</strong> — eine PHA-Rate ist ein Bruchteil der Installationen oder Geräte —, daher zeigt diese Seite Durchschnitte und Anteile, niemals Summen.",
+        "it": "Il report di trasparenza sulla sicurezza dell'ecosistema Android di Google: il tasso di <strong>applicazioni potenzialmente dannose (PHA)</strong> — malware — sui dispositivi Android e in Google Play. Un set di dati tidy-long con cinque tagli: tassi di PHA sui dispositivi (per tipo di mercato e per versione di Android) e tassi di installazione di PHA su Google Play (complessivo, per Paese e per categoria di malware). I valori sono <strong>tassi, non conteggi</strong> — un tasso di PHA è una frazione delle installazioni o dei dispositivi —, quindi questa pagina mostra medie e quote, mai somme.",
+        "ja": "Google の Android エコシステム セキュリティに関する透明性レポート：Android デバイスおよび Google Play における<strong>有害な可能性のあるアプリ（PHA）</strong>（マルウェア）の割合。5 つの切り口を含む tidy-long のデータセットです。デバイス上の PHA 率（市場タイプ別・Android バージョン別）と、Google Play での PHA インストール率（全体・国別・マルウェアのカテゴリ別）。値は<strong>割合であり件数ではありません</strong>。PHA 率はインストールまたはデバイスに対する比率なので、このページは平均と構成比を示し、合計は示しません。",
+        "zh": "Google 关于 Android 生态系统安全的透明度报告：Android 设备上和 Google Play 中<strong>潜在有害应用 (PHA)</strong>（恶意软件）的比率。这是一个包含五个切面的 tidy-long 数据集：设备上的 PHA 比率（按市场类型和 Android 版本）以及 Google Play 中的 PHA 安装比率（总体、按国家/地区和按恶意软件类别）。这些值是<strong>比率而非计数</strong>——PHA 比率是安装量或设备数的一个比例——因此本页展示平均值和占比，而非求和。",
+        "ko": "Google의 Android 생태계 보안 투명성 보고서: Android 기기와 Google Play에서의 <strong>잠재적 유해 애플리케이션(PHA)</strong>(멀웨어) 비율. 다섯 가지 단면을 다루는 tidy-long 데이터셋입니다. 기기의 PHA 비율(시장 유형별·Android 버전별)과 Google Play의 PHA 설치 비율(전체·국가별·멀웨어 카테고리별). 값은 <strong>비율이며 건수가 아닙니다</strong> — PHA 비율은 설치나 기기에 대한 분수이므로, 이 페이지는 평균과 비중을 보여주며 합계는 보여주지 않습니다.",
+    },
+    "Interactive views of the reported PHA rates. Each chart has a text alternative for screen readers. Rates are shown as a percentage of devices or installs.": {
+        "es": "Vistas interactivas de las tasas de PHA notificadas. Cada gráfico tiene una alternativa de texto para lectores de pantalla. Las tasas se muestran como un porcentaje de dispositivos o instalaciones.",
+        "fr": "Vues interactives des taux de PHA déclarés. Chaque graphique a une alternative textuelle pour les lecteurs d'écran. Les taux sont présentés en pourcentage des appareils ou des installations.",
+        "de": "Interaktive Ansichten der gemeldeten PHA-Raten. Jedes Diagramm hat eine Textalternative für Screenreader. Die Raten werden als Prozentsatz der Geräte oder Installationen angezeigt.",
+        "it": "Viste interattive dei tassi di PHA riportati. Ogni grafico ha un'alternativa testuale per gli screen reader. I tassi sono mostrati come percentuale di dispositivi o installazioni.",
+        "ja": "報告された PHA 率のインタラクティブなビュー。各グラフにはスクリーンリーダー用のテキスト代替があります。率はデバイスまたはインストールに対する百分率で表示されます。",
+        "zh": "报告的 PHA 比率的交互式视图。每个图表都为屏幕阅读器提供文本替代。比率以设备或安装量的百分比显示。",
+        "ko": "보고된 PHA 비율의 대화형 보기. 각 차트에는 스크린 리더용 텍스트 대안이 있습니다. 비율은 기기 또는 설치의 백분율로 표시됩니다.",
+    },
+    "PHA rate by Android version over time": {
+        "es": "Tasa de PHA por versión de Android a lo largo del tiempo",
+        "fr": "Taux de PHA par version d'Android au fil du temps",
+        "de": "PHA-Rate nach Android-Version im Zeitverlauf",
+        "it": "Tasso di PHA per versione di Android nel tempo",
+        "ja": "Android バージョン別の PHA 率の推移",
+        "zh": "各 Android 版本的 PHA 比率随时间变化",
+        "ko": "시간에 따른 Android 버전별 PHA 비율",
+    },
+    "Percentage of devices, by Android version, with at least one potentially harmful application installed, per quarter.": {
+        "es": "Porcentaje de dispositivos, por versión de Android, con al menos una aplicación potencialmente dañina instalada, por trimestre.",
+        "fr": "Pourcentage d'appareils, par version d'Android, ayant au moins une application potentiellement dangereuse installée, par trimestre.",
+        "de": "Prozentsatz der Geräte je Android-Version mit mindestens einer installierten potenziell schädlichen App, pro Quartal.",
+        "it": "Percentuale di dispositivi, per versione di Android, con almeno un'applicazione potenzialmente dannosa installata, per trimestre.",
+        "ja": "少なくとも 1 つの有害な可能性のあるアプリがインストールされているデバイスの割合（Android バージョン別、四半期ごと）。",
+        "zh": "按 Android 版本划分、至少安装了一个潜在有害应用的设备百分比（按季度）。",
+        "ko": "잠재적 유해 애플리케이션이 하나 이상 설치된 기기의 비율(Android 버전별, 분기별).",
+    },
+    "PHA rate on devices by market type": {
+        "es": "Tasa de PHA en dispositivos por tipo de mercado",
+        "fr": "Taux de PHA sur les appareils par type de marché",
+        "de": "PHA-Rate auf Geräten nach Markttyp",
+        "it": "Tasso di PHA sui dispositivi per tipo di mercato",
+        "ja": "市場タイプ別のデバイスの PHA 率",
+        "zh": "各市场类型的设备 PHA 比率",
+        "ko": "시장 유형별 기기 PHA 비율",
+    },
+    "Average percentage of devices with a PHA installed — consumer vs. enterprise devices with Google Play Protect.": {
+        "es": "Porcentaje medio de dispositivos con una PHA instalada: dispositivos de consumo frente a dispositivos empresariales con Google Play Protect.",
+        "fr": "Pourcentage moyen d'appareils avec une PHA installée — appareils grand public vs. appareils d'entreprise avec Google Play Protect.",
+        "de": "Durchschnittlicher Prozentsatz der Geräte mit installierter PHA — Verbraucher- vs. Unternehmensgeräte mit Google Play Protect.",
+        "it": "Percentuale media di dispositivi con una PHA installata — dispositivi consumer vs. dispositivi aziendali con Google Play Protect.",
+        "ja": "PHA がインストールされているデバイスの平均割合 — Google Play Protect を利用する一般向けデバイスと企業向けデバイスの比較。",
+        "zh": "安装了 PHA 的设备的平均百分比——使用 Google Play Protect 的消费者设备与企业设备对比。",
+        "ko": "PHA가 설치된 기기의 평균 비율 — Google Play Protect를 사용하는 소비자 기기와 기업 기기 비교.",
+    },
+    "PHA install rate by country": {
+        "es": "Tasa de instalación de PHA por país",
+        "fr": "Taux d'installation de PHA par pays",
+        "de": "PHA-Installationsrate nach Land",
+        "it": "Tasso di installazione di PHA per Paese",
+        "ja": "国別の PHA インストール率",
+        "zh": "各国家/地区的 PHA 安装比率",
+        "ko": "국가별 PHA 설치 비율",
+    },
+    "Average percentage of Google Play installs that were PHAs, across the top-volume Android markets.": {
+        "es": "Porcentaje medio de instalaciones de Google Play que fueron PHA, en los mercados Android de mayor volumen.",
+        "fr": "Pourcentage moyen des installations Google Play qui étaient des PHA, dans les marchés Android au plus fort volume.",
+        "de": "Durchschnittlicher Prozentsatz der Google-Play-Installationen, die PHAs waren, in den auflagenstärksten Android-Märkten.",
+        "it": "Percentuale media delle installazioni da Google Play che erano PHA, nei mercati Android a maggior volume.",
+        "ja": "Google Play のインストールのうち PHA だった平均割合（インストール数が最も多い Android 市場）。",
+        "zh": "在安装量最高的 Android 市场中，Google Play 安装量里属于 PHA 的平均百分比。",
+        "ko": "설치량이 가장 많은 Android 시장에서 Google Play 설치 중 PHA였던 평균 비율.",
+    },
+    "PHA installs by malware category": {
+        "es": "Instalaciones de PHA por categoría de malware",
+        "fr": "Installations de PHA par catégorie de malware",
+        "de": "PHA-Installationen nach Malware-Kategorie",
+        "it": "Installazioni di PHA per categoria di malware",
+        "ja": "マルウェアのカテゴリ別の PHA インストール",
+        "zh": "按恶意软件类别划分的 PHA 安装",
+        "ko": "멀웨어 카테고리별 PHA 설치",
+    },
+    "Each malware category's average share of PHA installs from Google Play (shares sum to 100% within a quarter).": {
+        "es": "La proporción media de cada categoría de malware sobre las instalaciones de PHA desde Google Play (las proporciones suman el 100 % dentro de un trimestre).",
+        "fr": "La part moyenne de chaque catégorie de malware dans les installations de PHA depuis Google Play (les parts totalisent 100 % au sein d'un trimestre).",
+        "de": "Der durchschnittliche Anteil jeder Malware-Kategorie an den PHA-Installationen aus Google Play (die Anteile summieren sich innerhalb eines Quartals auf 100 %).",
+        "it": "La quota media di ciascuna categoria di malware sulle installazioni di PHA da Google Play (le quote sommano al 100 % all'interno di un trimestre).",
+        "ja": "Google Play からの PHA インストールに占める各マルウェア カテゴリの平均構成比（構成比は四半期内で 100% になります）。",
+        "zh": "每个恶意软件类别在 Google Play 的 PHA 安装中的平均占比（同一季度内各占比合计为 100%）。",
+        "ko": "Google Play의 PHA 설치에서 각 멀웨어 카테고리가 차지하는 평균 비중(비중은 분기 내에서 합계 100%).",
+    },
+    "Malware categories by install rate": {
+        "es": "Categorías de malware por tasa de instalación",
+        "fr": "Catégories de malware par taux d'installation",
+        "de": "Malware-Kategorien nach Installationsrate",
+        "it": "Categorie di malware per tasso di installazione",
+        "ja": "インストール率で見るマルウェアのカテゴリ",
+        "zh": "按安装比率划分的恶意软件类别",
+        "ko": "설치 비율 기준 멀웨어 카테고리",
+    },
+    "Average PHA install rate from Google Play by malware category, all quarters combined.": {
+        "es": "Tasa media de instalación de PHA desde Google Play por categoría de malware, todos los trimestres combinados.",
+        "fr": "Taux moyen d'installation de PHA depuis Google Play par catégorie de malware, tous trimestres confondus.",
+        "de": "Durchschnittliche PHA-Installationsrate aus Google Play nach Malware-Kategorie, alle Quartale zusammen.",
+        "it": "Tasso medio di installazione di PHA da Google Play per categoria di malware, tutti i trimestri combinati.",
+        "ja": "マルウェアのカテゴリ別、Google Play からの平均 PHA インストール率（全四半期の合計）。",
+        "zh": "按恶意软件类别划分、来自 Google Play 的平均 PHA 安装比率（所有季度合计）。",
+        "ko": "멀웨어 카테고리별 Google Play의 평균 PHA 설치 비율(전체 분기 합산).",
+    },
+    "What the report covers": {
+        "es": "Qué cubre el informe",
+        "fr": "Ce que couvre le rapport",
+        "de": "Was der Bericht abdeckt",
+        "it": "Cosa copre il report",
+        "ja": "レポートの対象",
+        "zh": "报告涵盖的内容",
+        "ko": "보고서가 다루는 범위",
+    },
+    "The number of reported values in each cut of the dataset. Counts of rows, not summed quantities.": {
+        "es": "El número de valores notificados en cada corte del conjunto de datos. Recuentos de filas, no cantidades sumadas.",
+        "fr": "Le nombre de valeurs déclarées dans chaque découpage du jeu de données. Des comptages de lignes, pas des quantités additionnées.",
+        "de": "Die Anzahl gemeldeter Werte in jedem Schnitt des Datensatzes. Zeilenzahlen, keine summierten Mengen.",
+        "it": "Il numero di valori riportati in ciascun taglio del set di dati. Conteggi di righe, non quantità sommate.",
+        "ja": "データセットの各切り口で報告された値の数。合計量ではなく行数です。",
+        "zh": "数据集每个切面中报告值的数量。是行数统计，而非求和数量。",
+        "ko": "데이터셋의 각 단면에서 보고된 값의 개수. 합산 수량이 아니라 행 수입니다.",
+    },
+    "Refine or extend these in the <a href=\"/reports\">query builder</a> (pin a <code>section</code> and <code>metric</code>, and prefer AVG over SUM — these are rates), browse the full field list on the <a href=\"/schema\">Schema</a> page, or read the <a href=\"/methodology\">Methodology</a>.": {
+        "es": "Refina o amplía estas consultas en el <a href=\"/reports\">generador de consultas</a> (fija un <code>section</code> y un <code>metric</code>, y prefiere AVG en lugar de SUM: son tasas), explora la lista completa de campos en la página <a href=\"/schema\">Esquema</a> o lee la <a href=\"/methodology\">Metodología</a>.",
+        "fr": "Affinez ou étendez ces requêtes dans le <a href=\"/reports\">générateur de requêtes</a> (fixez un <code>section</code> et un <code>metric</code>, et préférez AVG à SUM : ce sont des taux), parcourez la liste complète des champs sur la page <a href=\"/schema\">Schéma</a>, ou lisez la <a href=\"/methodology\">Méthodologie</a>.",
+        "de": "Verfeinern oder erweitern Sie diese im <a href=\"/reports\">Abfrage-Builder</a> (fixieren Sie eine <code>section</code> und eine <code>metric</code> und bevorzugen Sie AVG statt SUM — dies sind Raten), durchsuchen Sie die vollständige Feldliste auf der <a href=\"/schema\">Schema</a>-Seite oder lesen Sie die <a href=\"/methodology\">Methodik</a>.",
+        "it": "Affina o estendi queste query nel <a href=\"/reports\">generatore di query</a> (fissa una <code>section</code> e una <code>metric</code> e preferisci AVG a SUM: sono tassi), sfoglia l'elenco completo dei campi nella pagina <a href=\"/schema\">Schema</a> o leggi la <a href=\"/methodology\">Metodologia</a>.",
+        "ja": "これらは<a href=\"/reports\">クエリビルダー</a>で絞り込み・拡張できます（<code>section</code> と <code>metric</code> を固定し、SUM ではなく AVG を使ってください。これらは率です）。全フィールドの一覧は<a href=\"/schema\">スキーマ</a>ページで確認でき、<a href=\"/methodology\">方法論</a>も参照できます。",
+        "zh": "可在<a href=\"/reports\">查询构建器</a>中优化或扩展这些查询（固定 <code>section</code> 和 <code>metric</code>，并优先使用 AVG 而非 SUM——这些是比率），在<a href=\"/schema\">架构</a>页面浏览完整字段列表，或阅读<a href=\"/methodology\">方法论</a>。",
+        "ko": "<a href=\"/reports\">쿼리 빌더</a>에서 이 쿼리를 다듬거나 확장할 수 있습니다(<code>section</code>과 <code>metric</code>을 고정하고 SUM 대신 AVG를 사용하세요 — 이 값들은 비율입니다). 전체 필드 목록은 <a href=\"/schema\">스키마</a> 페이지에서 볼 수 있고, <a href=\"/methodology\">방법론</a>도 참조하세요.",
+    },
+    "Source: <a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">Google Android ecosystem security Transparency Report</a>. Data via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Methodology</a> · <a href=\"/api-key\">API key</a> · <a href=\"/privacy\">Privacy</a>": {
+        "es": "Fuente: <a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">informe de transparencia de seguridad del ecosistema Android de Google</a>. Datos vía <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Metodología</a> · <a href=\"/api-key\">Clave de API</a> · <a href=\"/privacy\">Privacidad</a>",
+        "fr": "Source : <a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">rapport de transparence sur la sécurité de l'écosystème Android de Google</a>. Données via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Méthodologie</a> · <a href=\"/api-key\">Clé d'API</a> · <a href=\"/privacy\">Confidentialité</a>",
+        "de": "Quelle: <a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">Googles Transparenzbericht zur Sicherheit des Android-Ökosystems</a>. Daten über <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Methodik</a> · <a href=\"/api-key\">API-Schlüssel</a> · <a href=\"/privacy\">Datenschutz</a>",
+        "it": "Fonte: <a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">report di trasparenza sulla sicurezza dell'ecosistema Android di Google</a>. Dati tramite <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Metodologia</a> · <a href=\"/api-key\">Chiave API</a> · <a href=\"/privacy\">Privacy</a>",
+        "ja": "出典：<a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">Google の Android エコシステム セキュリティに関する透明性レポート</a>。データは <a href=\"/api\">Transparency Report API</a> 経由 · <a href=\"/methodology\">方法論</a> · <a href=\"/api-key\">API キー</a> · <a href=\"/privacy\">プライバシー</a>",
+        "zh": "来源：<a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">Google 的 Android 生态系统安全透明度报告</a>。数据经由 <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">方法论</a> · <a href=\"/api-key\">API 密钥</a> · <a href=\"/privacy\">隐私</a>",
+        "ko": "출처: <a href=\"https://transparencyreport.google.com/android-security/overview\" target=\"_blank\" rel=\"noopener noreferrer\">Google의 Android 생태계 보안 투명성 보고서</a>. 데이터는 <a href=\"/api\">Transparency Report API</a> 경유 · <a href=\"/methodology\">방법론</a> · <a href=\"/api-key\">API 키</a> · <a href=\"/privacy\">개인정보</a>",
+    },
+    "“Google Android ecosystem security (PHA rates), via the Transparency Report API (": {
+        "es": "“Seguridad del ecosistema Android de Google (tasas de PHA), vía la Transparency Report API (",
+        "fr": "“Sécurité de l'écosystème Android de Google (taux de PHA), via la Transparency Report API (",
+        "de": "“Sicherheit des Android-Ökosystems von Google (PHA-Raten), über die Transparency Report API (",
+        "it": "“Sicurezza dell'ecosistema Android di Google (tassi di PHA), tramite la Transparency Report API (",
+        "ja": "“Google の Android エコシステム セキュリティ（PHA 率）、Transparency Report API 経由 (",
+        "zh": "“Google Android 生态系统安全（PHA 比率），经由 Transparency Report API (",
+        "ko": "“Google Android 생태계 보안(PHA 비율), Transparency Report API 경유 (",
+    },
+    "Malware category": {
+        "es": "Categoría de malware", "fr": "Catégorie de malware", "de": "Malware-Kategorie",
+        "it": "Categoria di malware", "ja": "マルウェアのカテゴリ", "zh": "恶意软件类别", "ko": "멀웨어 카테고리",
+    },
+    "Avg PHA install rate": {
+        "es": "Tasa media de instalación de PHA", "fr": "Taux moyen d'installation de PHA",
+        "de": "Durchschn. PHA-Installationsrate", "it": "Tasso medio di installazione PHA",
+        "ja": "平均 PHA インストール率", "zh": "平均 PHA 安装比率", "ko": "평균 PHA 설치 비율",
+    },
+    "Share of PHA installs": {
+        "es": "Proporción de instalaciones de PHA", "fr": "Part des installations de PHA",
+        "de": "Anteil der PHA-Installationen", "it": "Quota di installazioni PHA",
+        "ja": "PHA インストールの構成比", "zh": "PHA 安装占比", "ko": "PHA 설치 비중",
+    },
+    "PHA install rate": {
+        "es": "Tasa de instalación de PHA", "fr": "Taux d'installation de PHA",
+        "de": "PHA-Installationsrate", "it": "Tasso di installazione PHA",
+        "ja": "PHA インストール率", "zh": "PHA 安装比率", "ko": "PHA 설치 비율",
+    },
+    "Market type": {
+        "es": "Tipo de mercado", "fr": "Type de marché", "de": "Markttyp",
+        "it": "Tipo di mercato", "ja": "市場タイプ", "zh": "市场类型", "ko": "시장 유형",
+    },
+    "PHA rate": {
+        "es": "Tasa de PHA", "fr": "Taux de PHA", "de": "PHA-Rate",
+        "it": "Tasso di PHA", "ja": "PHA 率", "zh": "PHA 比率", "ko": "PHA 비율",
+    },
+    "Reported values": {
+        "es": "Valores notificados", "fr": "Valeurs déclarées", "de": "Gemeldete Werte",
+        "it": "Valori riportati", "ja": "報告値", "zh": "报告值", "ko": "보고된 값",
+    },
+    "Quarter": {
+        "es": "Trimestre", "fr": "Trimestre", "de": "Quartal",
+        "it": "Trimestre", "ja": "四半期", "zh": "季度", "ko": "분기",
+    },
+    "Country": {
+        "es": "País", "fr": "Pays", "de": "Land",
+        "it": "Paese", "ja": "国", "zh": "国家/地区", "ko": "국가",
+    },
+    "Section": {
+        "es": "Sección", "fr": "Section", "de": "Sektion",
+        "it": "Sezione", "ja": "セクション", "zh": "章节", "ko": "섹션",
+    },
+    "Average PHA install rate from Google Play by malware category.": {
+        "es": "Tasa media de instalación de PHA desde Google Play por categoría de malware.",
+        "fr": "Taux moyen d'installation de PHA depuis Google Play par catégorie de malware.",
+        "de": "Durchschnittliche PHA-Installationsrate aus Google Play nach Malware-Kategorie.",
+        "it": "Tasso medio di installazione di PHA da Google Play per categoria di malware.",
+        "ja": "マルウェアのカテゴリ別、Google Play からの平均 PHA インストール率。",
+        "zh": "按恶意软件类别划分、来自 Google Play 的平均 PHA 安装比率。",
+        "ko": "멀웨어 카테고리별 Google Play의 평균 PHA 설치 비율.",
+    },
+    "Reported values in each cut of the Android security dataset.": {
+        "es": "Valores notificados en cada corte del conjunto de datos de seguridad de Android.",
+        "fr": "Valeurs déclarées dans chaque découpage du jeu de données de sécurité Android.",
+        "de": "Gemeldete Werte in jedem Schnitt des Android-Sicherheitsdatensatzes.",
+        "it": "Valori riportati in ciascun taglio del set di dati sulla sicurezza di Android.",
+        "ja": "Android セキュリティ データセットの各切り口で報告された値。",
+        "zh": "Android 安全数据集每个切面中报告的值。",
+        "ko": "Android 보안 데이터셋의 각 단면에서 보고된 값.",
+    },
+    "Failed to load malware-category rates: ": {
+        "es": "No se pudieron cargar las tasas por categoría de malware: ",
+        "fr": "Échec du chargement des taux par catégorie de malware : ",
+        "de": "Malware-Kategorie-Raten konnten nicht geladen werden: ",
+        "it": "Impossibile caricare i tassi per categoria di malware: ",
+        "ja": "マルウェア カテゴリ別の率の読み込みに失敗しました: ",
+        "zh": "加载恶意软件类别比率失败：",
+        "ko": "멀웨어 카테고리별 비율을 불러오지 못했습니다: ",
+    },
+    "Failed to load section coverage: ": {
+        "es": "No se pudo cargar la cobertura por sección: ",
+        "fr": "Échec du chargement de la couverture par section : ",
+        "de": "Sektionsabdeckung konnte nicht geladen werden: ",
+        "it": "Impossibile caricare la copertura per sezione: ",
+        "ja": "セクションのカバレッジの読み込みに失敗しました: ",
+        "zh": "加载章节覆盖范围失败：",
+        "ko": "섹션 커버리지를 불러오지 못했습니다: ",
+    },
+}
+for _loc in _AN_NAV:
+    COMMON[_loc].append(("      Android Security\n    </a>", f"      {_AN_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Android Security</h3>", f"<h3>{_AN_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_AN_CARD_DESC_EN, _AN_CARD_DESC[_loc]))
+    PAGES[_loc]["android.html"] = [(_en, _tr[_loc]) for _en, _tr in _AN_PAGE.items()]
+    _an_text = open(os.path.join(STATIC, "android.html"), encoding="utf-8").read()
+    _an_own = {_o for _o, _ in PAGES[_loc]["android.html"]}
+    # Derived from korea.html: inherit its shared chrome + chart/table strings
+    # (Trends, "No data available.", Loading…, table scroll, provenance labels).
+    for _o, _n in PAGES[_loc]["korea.html"]:
+        if _o in _an_text and _o not in _an_own:
+            PAGES[_loc]["android.html"].append((_o, _n))
+            _an_own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

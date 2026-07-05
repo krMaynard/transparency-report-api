@@ -31,10 +31,12 @@ requests), the **TikTok Government & Legal Requests reports**
 (government content-removal requests + user-information requests per country +
 IP/copyright removal requests, half-yearly since 2019), the **Discord
 Transparency Reports** (Trust & Safety enforcement by policy category +
-government/legal requests by country, quarterly since 2022), and Google's
+government/legal requests by country, quarterly since 2022), Google's
 **Traffic & Disruptions catalogue** (government-ordered internet shutdowns,
 blocks and outages affecting Google products, with news-source citations —
-a historical dataset Google froze at 2009–2021).
+a historical dataset Google froze at 2009–2021), and Google's **Android
+ecosystem security** report (Potentially Harmful Application / malware rates on
+devices and in Google Play, by version × country × category, 2017–2024).
 
 Built to demonstrate two things:
 
@@ -54,7 +56,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), and the non-VLOP harmonised reports |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), and the non-VLOP harmonised reports |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -71,6 +73,7 @@ Built to demonstrate two things:
 | `data/tiktok-transparency.json` | Vendored snapshot of the TikTok Government & Legal Requests reports (sibling `dsa-transparency-data/tiktok-transparency/build_tiktok.py`) — a tidy-long `columns`+`rows` list; seeded into the `tiktok_metrics` table by `seed.build_tiktok_db` |
 | `data/discord-transparency.json` | Vendored snapshot of the Discord Transparency Reports (sibling `dsa-transparency-data/discord-transparency/build_discord.py`) — a tidy-long `columns`+`rows` list; seeded into the `discord_metrics` table by `seed.build_discord_db` |
 | `data/google-traffic.json` | Vendored snapshot of Google's Traffic & Disruptions catalogue (sibling `dsa-transparency-data/google-traffic/build_traffic.py`) — a flat-catalogue `columns`+`rows` list (one row per disruption event); seeded into the read-only `google_traffic` table by `seed.build_google_traffic_db` |
+| `data/android-security.json` | Vendored snapshot of Google's Android ecosystem security report (sibling `dsa-transparency-data/android-security/build_android.py`) — a tidy-long `columns`+`rows` list of PHA (malware) rates; seeded into the `android_metrics` table by `seed.build_android_db` |
 | `data/template-crosswalk.json` | Vendored `{original-language label → canonical English}` map for the template's `sections`/`indicators`/`scopes`, applied by `seed.normalize_dimensions` to stamp each dim row's language-neutral `key`. Regenerate with `scripts/build_template_crosswalk.py` |
 | `scripts/build_template_crosswalk.py` | Learns `data/template-crosswalk.json` by aligning same-structure non-VLOP report sheets to an English reference (drops ambiguous labels) — reads the sibling repo's extracted CSVs |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
@@ -89,6 +92,7 @@ Built to demonstrate two things:
 | `static/tiktok.html` | Public TikTok Government & Legal Requests dataset page (served at `/tiktok`) — Trends charts + overview tables over `POST /api/explore` (`tiktok_metrics`) |
 | `static/discord.html` | Public Discord Transparency Reports dataset page (served at `/discord`) — Trends charts + overview tables over `POST /api/explore` (`discord_metrics`) |
 | `static/disruptions.html` | Public Google Traffic & Disruptions catalogue page (served at `/disruptions`) — the "Government internet shutdowns" filterable table over `GET /api/traffic-disruptions` (a flat catalogue like `/catalog`, not `/api/explore`) |
+| `static/android.html` | Public Android ecosystem security dataset page (served at `/android`) — Trends charts + overview tables over `POST /api/explore` (`android_metrics`); PHA rates shown as percentages |
 | `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
 | `data/ny-tos-normalized.csv` | Vendored snapshot of the **normalized NY ToS enforcement statistics** (sibling `dsa-transparency-data/ny-tos-reports/ny_tos_normalized.csv` — per-category figures mapped onto the Stop Hiding Hate Act's five categories; see that repo's `NORMALIZATION.md`) — seeded into the queryable `ny_tos_stats` table by `seed.build_ny_tos_stats` |
 | `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 8 tools, and host config; static, no page JS |
@@ -96,7 +100,7 @@ Built to demonstrate two things:
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
-| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the twenty-two pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the twenty-three pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -131,7 +135,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -257,7 +261,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Twelve non-DSA datasets ride alongside, each exposed as an ordinary query table
+Thirteen non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -367,6 +371,20 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   different years); `_leg_warnings` warns when a SUM pins no `section`/`metric`.
   A known 2023-Q3 column-shift in the extractor's source is corrected +
   Total-validated upstream.
+- **Google Android ecosystem security** — a single **tidy-long**
+  `android_metrics` table (one row per measured value: `section`/`period`/
+  `category`/`metric`/`unit` + a `value`; dims stored inline). Google's Android
+  security Transparency Report — Potentially Harmful Application (PHA / malware)
+  rates on devices and in Google Play (2017-Q1→2024-Q4). Five cuts (`section`):
+  `devices_with_pha` (by market type, 12-mo rolling), `devices_by_version` (by
+  Android version, quarterly), `installs` (by source, rolling),
+  `installs_by_country` (by country ISO-2, rolling) and `installs_by_category`
+  (by malware category, quarterly). `period` is a `YYYY-MM-DD` date (rolling end
+  date / quarter end date). `metric` is `pha_rate` (every cut) or
+  `category_share` (installs_by_category only); `unit` is `rate` (a **fraction
+  of 1** — never SUM) or `percent` (the category share, sums to ~100/quarter).
+  These are **rates, not counts** — `_leg_warnings` warns on any SUM and when a
+  SUM/AVG pins no `section`/`metric`; prefer AVG/MIN/MAX.
 
 **Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
 `build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an
@@ -634,6 +652,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/tiktok` | — | Public TikTok Government & Legal Requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/discord` | — | Public Discord Transparency Reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/disruptions` | — | Public Google Traffic & Disruptions catalogue page (web UI over `GET /api/traffic-disruptions`) |
+| GET | `/android` | — | Public Android ecosystem security dataset page (web UI over `POST /api/explore`) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/methodology` | — | Public methodology page (web UI; how the dataset is sourced/processed/cited) |
 | GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |

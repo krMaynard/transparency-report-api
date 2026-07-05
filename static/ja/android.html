@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Android エコシステムのセキュリティ — Transparency Report API</title>
+<meta name="description" content="Google's Android ecosystem security Transparency Report — Potentially Harmful Application (PHA) malware rates on Android devices and in Google Play, by version, country and category, 2017–2024." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="/static/vendor/chart.umd.js" defer></script>
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', t);
+    } catch (e) { document.documentElement.setAttribute('data-theme', 'light'); }
+  })();
+</script>
+<style>
+  :root {
+    --bg: #f2f2f2; --panel: #fff; --panel2: #f5f5f5; --border: #e8e8e8;
+    --fg: #333; --muted: #666; --accent: #1e7268; --accent-dark: #155a52; --accent2: #1e7268;
+    --on-accent: #fff; --shadow: rgba(0,0,0,.07);
+    --mono: ui-monospace, SFMono-Regular, "DejaVu Sans Mono", Menlo, monospace;
+    --topbar-h: 52px; --header-h: var(--topbar-h); --sidebar-w: 220px;
+  }
+  [data-theme="dark"] {
+    --bg: #15181c; --panel: #1d2025; --panel2: #2a2f35; --border: #2c3138;
+    --fg: #e8e8e8; --muted: #b0b0b0; --accent: #4ec1b1; --accent-dark: #6ed3c4; --accent2: #6ed3c4;
+    --on-accent: #08110f; --shadow: rgba(0,0,0,.45);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+  }
+  /* ── Site banner ─────────────────────────────────────────────── */
+  .page-header { position: sticky; top: 0; z-index: 200; }
+  .site-nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.9rem 1.5rem; background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .site-nav .nav-name { font-weight: 700; font-size: 1rem; color: var(--fg); text-decoration: none; }
+  .site-nav .nav-links { display: flex; gap: 1.4rem; align-items: center; }
+  .site-nav .nav-links a { color: var(--muted); text-decoration: none; font-size: .9rem; }
+  .site-nav .nav-links a:hover { color: var(--accent); }
+  /* Cross-site language switcher (globe) — CSS-only <details> disclosure */
+  .site-nav .nav-right { display: flex; align-items: center; gap: 1.4rem; }
+  .lang-switcher { position: relative; }
+  .lang-switcher > summary {
+    display: inline-flex; align-items: center; gap: 0.38rem; list-style: none; cursor: pointer;
+    padding: 0.34rem 0.55rem; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel); color: var(--fg); font-weight: 600; font-size: 0.85rem; line-height: 1; white-space: nowrap;
+  }
+  .lang-switcher > summary::-webkit-details-marker { display: none; }
+  .lang-switcher > summary:hover,
+  .lang-switcher[open] > summary { border-color: var(--accent); color: var(--accent); }
+  .lang-switcher .lang-globe { width: 17px; height: 17px; }
+  .lang-switcher .lang-caret { width: 11px; height: 11px; opacity: .75; transition: transform .2s ease; }
+  .lang-switcher[open] .lang-caret { transform: rotate(180deg); }
+  .lang-menu {
+    position: absolute; top: calc(100% + 8px); right: 0; min-width: 170px; margin: 0; padding: .3rem;
+    list-style: none; background: var(--panel); border: 1px solid var(--border); border-radius: 12px;
+    box-shadow: 0 12px 30px var(--shadow); z-index: 201;
+  }
+  .lang-menu li { margin: 0; }
+  .lang-opt {
+    display: flex; align-items: center; justify-content: space-between; gap: 1.5rem;
+    padding: .5rem .65rem; border-radius: 8px; text-decoration: none; color: var(--fg); font-size: .9rem; white-space: nowrap;
+  }
+  .lang-opt:hover { background: var(--panel2); }
+  .lang-opt.is-current { font-weight: 700; }
+  .lang-check { width: 16px; height: 16px; color: var(--accent); }
+  @media (max-width: 640px) {
+    .site-nav { flex-wrap: wrap; row-gap: .5rem; }
+    .site-nav .nav-links { flex-wrap: wrap; gap: 0.9rem 1.1rem; }
+    .lang-switcher > summary > span { display: none; }
+    .lang-switcher > summary { padding: .3rem .42rem; }
+  }
+  .topbar {
+display: flex; align-items: center; justify-content: space-between;
+    height: var(--topbar-h); padding: 0 1rem;
+    background: var(--panel); border-bottom: 1px solid var(--border);
+  }
+  .topbar-left { display: flex; align-items: center; gap: 0.6rem; }
+  .topbar-brand { font-weight: 700; font-size: 0.95rem; color: var(--fg); text-decoration: none; white-space: nowrap; }
+  .topbar-brand:hover { color: var(--accent); }
+  .topbar-right { display: flex; align-items: center; gap: 0.5rem; }
+  .hamburger {
+    display: none; align-items: center; justify-content: center;
+    background: none; border: 0; color: var(--fg); cursor: pointer; padding: 6px;
+    border-radius: 6px; width: auto; margin: 0;
+  }
+  .hamburger:hover { color: var(--accent); background: var(--panel2); }
+  .hamburger svg { width: 20px; height: 20px; display: block; }
+  .theme-toggle {
+    background: none; border: 0; color: var(--muted); cursor: pointer; padding: 4px;
+    display: inline-flex; width: auto; margin: 0; border-radius: 6px;
+  }
+  .theme-toggle:hover { color: var(--accent); }
+  .theme-toggle svg { width: 20px; height: 20px; }
+  .theme-icon-light { display: none; }
+  [data-theme="dark"] .theme-toggle .theme-icon-light { display: block; }
+  [data-theme="dark"] .theme-toggle .theme-icon-dark { display: none; }
+  .app-body { display: flex; min-height: calc(100vh - var(--header-h)); }
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    position: sticky; top: var(--header-h); height: calc(100vh - var(--header-h));
+    overflow-y: auto; background: var(--panel); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; transition: transform 0.22s ease;
+  }
+  .sidebar nav { flex: 1; padding: 0.75rem 0.5rem; }
+  .nav-section {
+    font-size: 10.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--muted); padding: 0.55rem 0.75rem 0.25rem;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.45rem 0.75rem; border-radius: 7px;
+    color: var(--fg); text-decoration: none; font-size: 13.5px; margin: 1px 0; position: relative;
+  }
+  .nav-item svg { flex-shrink: 0; color: var(--muted); }
+  .nav-item:hover { background: var(--panel2); color: var(--accent); }
+  .nav-item:hover svg { color: var(--accent); }
+  .nav-item.is-active { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-dark); font-weight: 600; }
+  [data-theme="dark"] .nav-item.is-active { color: var(--accent); }
+  .nav-item.is-active svg { color: var(--accent); }
+  .nav-item.is-active::before {
+    content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+    width: 3px; border-radius: 2px; background: var(--accent);
+  }
+  .nav-item.is-soon { color: var(--muted); cursor: default; }
+  .nav-item.is-soon:hover { background: none; color: var(--muted); }
+  .nav-item.is-soon svg { opacity: 0.5; }
+  .soon-badge {
+    margin-left: auto; font-size: 10px; font-weight: 700; letter-spacing: .05em;
+    background: var(--panel2); color: var(--muted); border: 1px solid var(--border);
+    border-radius: 999px; padding: 1px 7px;
+  }
+  .nav-item.is-ext { color: var(--muted); font-size: 12.5px; }
+  .nav-item.is-ext:hover { color: var(--accent); }
+  .nav-hr { border: none; border-top: 1px solid var(--border); margin: 0.5rem 0.75rem; }
+  .sidebar-footer { padding: 0.75rem 1rem; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .sidebar-footer a { color: var(--muted); text-decoration: none; }
+  .sidebar-footer a:hover { color: var(--accent); }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; z-index: 205; background: rgba(0,0,0,.4); }
+  .sidebar-overlay.is-open { display: block; }
+  .main-area { flex: 1; min-width: 0; }
+  .wrap { max-width: 960px; padding: 28px 2rem; }
+  header { margin-bottom: 16px; }
+  header .badge {
+    display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid var(--border); border-radius: 999px;
+    padding: 3px 12px; background: var(--panel); margin-bottom: 14px;
+  }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; color: var(--muted); max-width: 680px; }
+
+  /* ── Charts ──────────────────────────────────────────────────── */
+  .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px 14px;
+  }
+  .chart-card.wide { grid-column: 1 / -1; }
+  .chart-card h3 { margin: 0 0 4px; font-size: 15px; }
+  .chart-card .chart-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
+  canvas { width: 100% !important; }
+  .chart-loading { color: var(--muted); font-size: 13px; text-align: center; padding: 40px 0; }
+  /* When Chart.js is unavailable the sr-only mirror table is revealed instead. */
+  .chart-card .chart-fallback { overflow-x: auto; }
+  .chart-card .chart-fallback table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .chart-card .chart-fallback th, .chart-card .chart-fallback td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .chart-card .chart-fallback caption { text-align: left; color: var(--muted); font-size: 12px; padding-bottom: 6px; }
+  @media (max-width: 900px) {
+    .chart-grid { grid-template-columns: 1fr; }
+    .chart-card.wide { grid-column: 1; }
+  }
+
+  /* ── Data section ────────────────────────────────────────────── */
+  .data-section { margin-bottom: 26px; }
+  .data-section h2 { font-size: 18px; margin: 0 0 6px; }
+  .data-section .sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; max-width: 680px; }
+  .results {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px 18px;
+  }
+  .results-loading { color: var(--muted); font-size: 13px; padding: 18px 4px; }
+
+  /* ── Data table ──────────────────────────────────────────────── */
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; white-space: nowrap; }
+  th.num, td.num { text-align: right; }
+  td.num { font-family: var(--mono); color: var(--accent2); }
+  tr:last-child td { border-bottom: none; }
+
+  /* ── Utils ───────────────────────────────────────────────────── */
+  .error { color: #c0392b; font-size: 13px; padding: 8px 0; }
+  [data-theme="dark"] .error { color: #ff7b72; }
+  .hidden { display: none !important; }
+  a:focus-visible, button:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 8px;
+  }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+  .skip-link {
+    position: absolute; left: 8px; top: -48px; z-index: 999;
+    background: var(--accent); color: var(--on-accent); padding: 8px 14px;
+    border-radius: 8px; font-weight: 700; transition: top .15s;
+  }
+  .skip-link:focus { top: 8px; }
+  footer { color: var(--muted); font-size: 13px; margin-top: 8px; padding-bottom: 2rem; }
+  footer a { color: var(--accent); text-decoration: none; }
+  .provenance { font-size: 12px; margin-top: 6px; }
+  .provenance .prov-label { font-weight: 600; }
+  .hint { color: var(--muted); font-size: 13px; margin: 18px 0 0; }
+  .hint a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 720px) {
+    .hamburger { display: flex; }
+    .sidebar { position: fixed; left: 0; top: var(--header-h); bottom: 0; z-index: 210; transform: translateX(calc(-1 * var(--sidebar-w))); }
+    .sidebar.is-open { transform: translateX(0); }
+    .wrap { padding: 20px 1rem; }
+  }
+  /* On phones the data tables stack into labelled cards: the header row is hidden
+     but kept in the accessibility tree (sr-only) so screen-reader column context
+     survives, and each cell carries its column name via data-label. */
+  @media (max-width: 620px) {
+    .table-scroll { overflow-x: visible; }
+    .recordtable { font-size: 14px; }
+    .recordtable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+    .recordtable, .recordtable tbody, .recordtable tr, .recordtable td { display: block; width: 100%; }
+    .recordtable tr {
+      border: 1px solid var(--border); border-radius: 10px;
+      background: var(--panel2); padding: 4px 14px; margin: 0 0 12px;
+    }
+    .recordtable td {
+      border: none; border-bottom: 1px solid var(--border); padding: 9px 0;
+      text-align: left; word-break: break-word;
+    }
+    .recordtable td.num { text-align: left; }
+    .recordtable tr td:last-child { border-bottom: none; }
+    .recordtable td::before {
+      content: attr(data-label); display: block; margin-bottom: 2px;
+      font-size: 11.5px; font-weight: 700; letter-spacing: .04em;
+      text-transform: uppercase; color: var(--muted);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main">本文へスキップ</a>
+
+<!-- ── Site banner ──────────────────────────────────────────────────────── -->
+<div class="page-header">
+<nav class="site-nav" aria-label="サイト">
+  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="https://kieranmaynard.com/work.html">実績</a>
+      <a href="https://kieranmaynard.com/transparency.html">プロダクト</a>
+      <a href="https://kieranmaynard.com/consulting.html">コンサルティング</a>
+      <a href="https://kieranmaynard.com/blog.html">ブログ</a>
+      <a href="https://kieranmaynard.com/contact.html">お問い合わせ</a>
+    </div>
+    <details class="lang-switcher">
+      <summary class="lang-current" aria-label="言語" title="言語">
+        <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
+        <span>日本語</span>
+        <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
+      </summary>
+      <ul class="lang-menu">
+        <li><a class="lang-opt" href="/android"><span>English</span></a></li>
+        <li><a class="lang-opt" href="/es/android"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr/android"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de/android"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it/android"><span>Italiano</span></a></li>
+        <li><a class="lang-opt is-current" href="/ja/android" aria-current="page"><span>日本語</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/zh/android"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko/android"><span>한국어</span></a></li>
+      </ul>
+    </details>
+  </div>
+</nav>
+
+<header class="topbar">
+  <div class="topbar-left">
+    <button type="button" class="hamburger" id="hamburger" aria-label="ナビゲーションの切り替え" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
+      </svg>
+    </button>
+    <a href="/ja/" class="topbar-brand">Transparency Report API</a>
+  </div>
+  <div class="topbar-right">
+    <button type="button" class="theme-toggle" aria-label="ダークモードの切り替え" aria-pressed="false" data-theme-toggle>
+      <svg class="theme-icon-dark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+      <svg class="theme-icon-light" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
+    </button>
+  </div>
+</header>
+</div>
+
+<div class="app-body">
+
+<aside class="sidebar" id="sidebar" aria-label="アプリケーションのナビゲーション">
+  <nav>
+    <a href="/ja/" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
+      </svg>
+      ホーム
+    </a>
+
+    <div class="nav-section">規制報告</div>
+
+    <a href="/ja/reports" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <rect x="1" y="9" width="3" height="6" rx="1"/>
+        <rect x="6" y="5" width="3" height="10" rx="1"/>
+        <rect x="11" y="1" width="3" height="14" rx="1"/>
+      </svg>
+      DSA レポート
+    </a>
+
+    <a href="/ja/catalog" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
+        <circle cx="8" cy="6" r="1.55"/>
+      </svg>
+      レポートの掲載先
+    </a>
+
+    <a href="/ja/ny-tos" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M3.5 1.75h6l3 3v9.5a.5.5 0 0 1-.5.5h-8.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5z"/>
+        <path d="M9.25 1.9v3.1h3.1M5.25 8.5h5.5M5.25 11h5.5" stroke-linecap="round"/>
+      </svg>
+      NY 利用規約報告
+    </a>
+
+    <a href="/ja/india" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3.25" y="2.75" width="9.5" height="11.5" rx="1"/>
+        <path d="M6 1.5h4v2.5H6zM5.5 7.25h5M5.5 9.75h5M5.5 12.25h3" stroke-linecap="round"/>
+      </svg>
+      インドIT規則
+    </a>
+
+    <a href="/ja/korea" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M2.25 3.25h11.5v7.5H8.25l-3 2.75v-2.75h-2a.999.999 0 0 1-1-1z" stroke-linejoin="round"/>
+        <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
+      </svg>
+      韓国透明性レポート
+    </a>
+
+    <a href="/ja/taiwan" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 2.1 14.6 13.4H1.4L8 2.1z" stroke-linejoin="round"/>
+        <path d="M8 6.6v3M8 11.7h.01" stroke-linecap="round"/>
+      </svg>
+      台湾詐欺対策
+    </a>
+
+    <div class="nav-section">プラットフォーム transparency</div>
+
+    <a href="/ja/removals" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+        <circle cx="8" cy="8" r="6.25"/>
+        <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
+      </svg>
+      Google の削除要請
+    </a>
+
+    <a href="/ja/user-data" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1.75a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2zM2.4 13.6c0-2.6 2.5-4.1 5.6-4.1s5.6 1.5 5.6 4.1v.65H2.4z"/>
+      </svg>
+      Google ユーザーデータ
+    </a>
+
+    <a href="/ja/apple" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="4.25" y="1.75" width="7.5" height="12.5" rx="1.5"/>
+        <path d="M6.75 12.5h2.5" stroke-linecap="round"/>
+      </svg>
+      Apple 透明性レポート
+    </a>
+
+    <a href="/ja/snap" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 1.9c-1.85 0-3 1.35-3 3.25 0 1.15.2 1.75-.35 2.35-.4.45-1.15.45-1.15.95 0 .5.95.65 1.3.9.3.55-.45 1.1-.15 1.5.3.35 1.05-.1 1.65.2.5.25.85 1.1 1.85 1.1s1.35-.85 1.85-1.1c.6-.3 1.35.15 1.65-.2.3-.4-.45-.95-.15-1.5.35-.25 1.3-.4 1.3-.9 0-.5-.75-.5-1.15-.95-.55-.6-.35-1.2-.35-2.35 0-1.9-1.15-3.25-3-3.25z"/>
+      </svg>
+      Snap 透明性レポート
+    </a>
+
+    <a href="/ja/github" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
+      </svg>
+      GitHub 透明性レポート
+    </a>
+
+    <a href="/ja/microsoft" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <rect x="2" y="2" width="5.4" height="5.4"/>
+        <rect x="8.6" y="2" width="5.4" height="5.4"/>
+        <rect x="2" y="8.6" width="5.4" height="5.4"/>
+        <rect x="8.6" y="8.6" width="5.4" height="5.4"/>
+      </svg>
+      Microsoft への要請
+    </a>
+
+    <a href="/ja/linkedin" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="2" y="5" width="12" height="8.75" rx="1.25"/>
+        <path d="M5.75 5V3.5A1.25 1.25 0 0 1 7 2.25h2a1.25 1.25 0 0 1 1.25 1.25V5M2 8.25h12" stroke-linecap="round"/>
+      </svg>
+      LinkedIn への要請
+    </a>
+
+    <a href="/ja/tiktok" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
+      </svg>
+      TikTok への要請
+    </a>
+
+    <a href="/ja/discord" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M13.35 3.5A12.3 12.3 0 0 0 10.3 2.5l-.16.31a11.4 11.4 0 0 1 2.7.87A9.6 9.6 0 0 0 8 2.6a9.6 9.6 0 0 0-4.84 1.08 11.4 11.4 0 0 1 2.7-.87L5.7 2.5a12.3 12.3 0 0 0-3.05 1A13 13 0 0 0 .8 11.6a11 11 0 0 0 3.35 1.7l.5-.83a7.5 7.5 0 0 1-1.18-.57l.29-.22a6.8 6.8 0 0 0 5.85 0l.29.22a7.5 7.5 0 0 1-1.18.57l.5.83A11 11 0 0 0 15.2 11.6a13 13 0 0 0-1.85-8.1zM5.65 9.9c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.5 1.23-1.1 1.23zm4.7 0c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.49 1.23-1.1 1.23z"/>
+      </svg>
+      Discord レポート
+    </a>
+
+    <a href="/ja/disruptions" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 13.4h.01" stroke-linecap="round"/>
+        <path d="M5.4 10.8a3.7 3.7 0 0 1 5.2 0M3 8.4a7 7 0 0 1 10 0" stroke-linecap="round"/>
+        <path d="M2.4 2.4l11.2 11.2" stroke-linecap="round"/>
+      </svg>
+      トラフィック障害
+    </a>
+
+    <a href="/ja/android" class="nav-item is-active" aria-current="page">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 1.75 3 3.4v3.9c0 3 2.1 5.6 5 6.45 2.9-.85 5-3.45 5-6.45V3.4L8 1.75z" stroke-linejoin="round"/>
+        <path d="M5.8 8.1 7.3 9.6l3-3.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Android セキュリティ
+    </a>
+
+    <hr class="nav-hr">
+    <div class="nav-section">ツール</div>
+
+    <a href="/ja/schema" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
+        <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
+      </svg>
+      スキーマ
+    </a>
+
+    <a href="/ja/methodology" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
+        <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
+      </svg>
+      方法論
+    </a>
+
+    <a href="/ja/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API キー
+    </a>
+
+    <a href="/docs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
+      </svg>
+      API リファレンス
+    </a>
+
+    <a href="/ja/mcp" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
+        <rect x="2" y="9" width="12" height="4.5" rx="1"/>
+        <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
+      </svg>
+      MCP サーバー
+    </a>
+
+    <a href="/ja/privacy" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
+      </svg>
+      プライバシー
+    </a>
+
+    <hr class="nav-hr">
+
+    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
+      </svg>
+      kieranmaynard.com
+    </a>
+
+    <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
+      </svg>
+      GitHub
+    </a>
+  </nav>
+  <div class="sidebar-footer">作成：<a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/ja/privacy">プライバシー</a></div>
+</aside>
+
+<div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+<div class="main-area">
+<div class="wrap">
+
+<main id="main" tabindex="-1">
+  <header>
+    <span class="badge">Google · Android セキュリティ · 2017 – 2024</span>
+    <h1>Android エコシステムのセキュリティ</h1>
+    <p>Google の Android エコシステム セキュリティに関する透明性レポート：Android デバイスおよび Google Play における<strong>有害な可能性のあるアプリ（PHA）</strong>（マルウェア）の割合。5 つの切り口を含む tidy-long のデータセットです。デバイス上の PHA 率（市場タイプ別・Android バージョン別）と、Google Play での PHA インストール率（全体・国別・マルウェアのカテゴリ別）。値は<strong>割合であり件数ではありません</strong>。PHA 率はインストールまたはデバイスに対する比率なので、このページは平均と構成比を示し、合計は示しません。</p>
+  </header>
+
+  <div class="error hidden" id="load-error" role="alert"></div>
+
+  <section class="data-section" aria-label="Charts">
+    <h2>トレンド</h2>
+    <p class="sub">報告された PHA 率のインタラクティブなビュー。各グラフにはスクリーンリーダー用のテキスト代替があります。率はデバイスまたはインストールに対する百分率で表示されます。</p>
+    <div class="chart-grid">
+
+      <div class="chart-card wide">
+        <h3>Android バージョン別の PHA 率の推移</h3>
+        <p class="chart-sub">少なくとも 1 つの有害な可能性のあるアプリがインストールされているデバイスの割合（Android バージョン別、四半期ごと）。</p>
+        <div class="chart-loading" id="ver-loading">読み込み中…</div>
+        <canvas id="chart-ver" height="140" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-ver-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>市場タイプ別のデバイスの PHA 率</h3>
+        <p class="chart-sub">PHA がインストールされているデバイスの平均割合 — Google Play Protect を利用する一般向けデバイスと企業向けデバイスの比較。</p>
+        <div class="chart-loading" id="mkt-loading">読み込み中…</div>
+        <canvas id="chart-mkt" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-mkt-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>国別の PHA インストール率</h3>
+        <p class="chart-sub">Google Play のインストールのうち PHA だった平均割合（インストール数が最も多い Android 市場）。</p>
+        <div class="chart-loading" id="cty-loading">読み込み中…</div>
+        <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-cty-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>マルウェアのカテゴリ別の PHA インストール</h3>
+        <p class="chart-sub">Google Play からの PHA インストールに占める各マルウェア カテゴリの平均構成比（構成比は四半期内で 100% になります）。</p>
+        <div class="chart-loading" id="cat-loading">読み込み中…</div>
+        <canvas id="chart-cat" height="140" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-cat-table" class="sr-only"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ── インストール率で見るマルウェアのカテゴリ ─────────────────────── -->
+  <section class="data-section">
+    <h2>インストール率で見るマルウェアのカテゴリ</h2>
+    <p class="sub">マルウェアのカテゴリ別、Google Play からの平均 PHA インストール率（全四半期の合計）。</p>
+    <div class="results" id="catRates" aria-busy="true">
+      <div class="results-loading">読み込み中…</div>
+    </div>
+  </section>
+
+  <!-- ── レポートの対象 ─────────────────────────────────── -->
+  <section class="data-section">
+    <h2>レポートの対象</h2>
+    <p class="sub">データセットの各切り口で報告された値の数。合計量ではなく行数です。</p>
+    <div class="results" id="sectionCoverage" aria-busy="true">
+      <div class="results-loading">読み込み中…</div>
+    </div>
+  </section>
+
+  <p class="hint">これらは<a href="/ja/reports">クエリビルダー</a>で絞り込み・拡張できます（<code>section</code> と <code>metric</code> を固定し、SUM ではなく AVG を使ってください。これらは率です）。全フィールドの一覧は<a href="/ja/schema">スキーマ</a>ページで確認でき、<a href="/ja/methodology">方法論</a>も参照できます。</p>
+</main>
+
+<footer>
+  <p>出典：<a href="https://transparencyreport.google.com/android-security/overview" target="_blank" rel="noopener noreferrer">Google の Android エコシステム セキュリティに関する透明性レポート</a>。データは <a href="/api">Transparency Report API</a> 経由 · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
+</footer>
+
+</div>
+</div><!-- /.main-area -->
+</div><!-- /.app-body -->
+
+<script>
+(function () {
+  "use strict";
+
+  // ── Dark mode + hamburger ─────────────────────────────────────────────────
+  var themeBtn = document.querySelector('[data-theme-toggle]');
+  if (themeBtn) {
+    var syncThemeBtn = function () {
+      themeBtn.setAttribute('aria-pressed', String(document.documentElement.getAttribute('data-theme') === 'dark'));
+    };
+    syncThemeBtn();
+    themeBtn.addEventListener('click', function () {
+      var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try { localStorage.setItem('theme', next); } catch (e) {}
+      syncThemeBtn();
+    });
+  }
+    // Keep --header-h in sync with the actual rendered height of the site
+  // banner + topbar (which varies as the nav links wrap on narrow widths),
+  // so the fixed/sticky sidebar starts right below it instead of overlapping.
+  var pageHeader = document.querySelector('.page-header');
+  if (pageHeader) {
+    var syncHeaderHeight = function () {
+      document.documentElement.style.setProperty('--header-h', pageHeader.offsetHeight + 'px');
+    };
+    syncHeaderHeight();
+    if (window.ResizeObserver) {
+      new ResizeObserver(syncHeaderHeight).observe(pageHeader);
+    } else {
+      window.addEventListener('resize', syncHeaderHeight);
+    }
+  }
+  var hamburger = document.getElementById('hamburger');
+  var sidebar   = document.getElementById('sidebar');
+  var overlay   = document.getElementById('sidebar-overlay');
+  function openSidebar()  { sidebar.classList.add('is-open'); overlay.classList.add('is-open'); hamburger.setAttribute('aria-expanded','true'); overlay.removeAttribute('aria-hidden'); }
+  function closeSidebar() { sidebar.classList.remove('is-open'); overlay.classList.remove('is-open'); hamburger.setAttribute('aria-expanded','false'); overlay.setAttribute('aria-hidden','true'); }
+  hamburger.addEventListener('click', function () { sidebar.classList.contains('is-open') ? closeSidebar() : openSidebar(); });
+  overlay.addEventListener('click', closeSidebar);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && sidebar.classList.contains('is-open')) closeSidebar(); });
+
+  // ── Helpers ───────────────────────────────────────────────────────────────
+  function fmt(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('en-US');
+  }
+  // PHA figures are rates: the raw pha_rate is a fraction of 1 (scaled to a
+  // percent for display); category_share is already a percentage. Both render
+  // through pct(), so axes/tooltips/tables all read as "0.108%" / "21.4%".
+  function pct(n) {
+    if (n == null) return '—';
+    return Number(n).toLocaleString('en-US', { maximumFractionDigits: 3 }) + '%';
+  }
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+  // pha_rate is a fraction of 1; scale a [label, value] or [x, series, value]
+  // row's numeric cell to a percentage. category_share is already a percent.
+  function scale(rows, idx) {
+    return rows.map(function (r) {
+      var c = r.slice();
+      c[idx] = c[idx] == null ? null : c[idx] * 100;
+      return c;
+    });
+  }
+
+  // ── API call ────────────────────────────────────────────────────────────────
+  async function explore(body) {
+    var r = await fetch('/api/explore', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    var d = await r.json();
+    if (!r.ok) throw new Error(d.detail || "HTTP " + r.status);
+    return d;
+  }
+
+  // Render a two-column (label, number) result into an accessible table.
+  function renderTable(elId, rows, caption, labelHead, numHead, numFmt) {
+    var el = document.getElementById(elId);
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">No data available.</div>';
+      return;
+    }
+    var f = numFmt || fmt;
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc(caption) + '</caption>'
+      + '<thead><tr>'
+      + '<th scope="col">' + esc(labelHead) + '</th>'
+      + '<th scope="col" class="num">' + esc(numHead) + '</th>'
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>'
+            + '<td data-label="' + esc(labelHead) + '">' + esc(r[0]) + '</td>'
+            + '<td class="num" data-label="' + esc(numHead) + '">' + f(r[1]) + '</td>'
+            + '</tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
+
+  function showError(elId, message) {
+    var el = document.getElementById(elId);
+    el.removeAttribute('aria-busy');
+    el.innerHTML = '<div class="error" role="alert">' + esc(message) + '</div>';
+  }
+
+  // ── Provenance ──────────────────────────────────────────────────────────────
+  function fillProvenance(generated, version) {
+    if (!generated) return;
+    document.getElementById('prov-snap').textContent = generated;
+    document.getElementById('prov-cite').textContent =
+      "“Google の Android エコシステム セキュリティ（PHA 率）、Transparency Report API 経由 (" + generated + ' のスナップショット'
+      + (version ? '、データセットバージョン ' + version : '') + ').”';
+    document.getElementById('provenance').hidden = false;
+  }
+
+  // ── Chart helpers ─────────────────────────────────────────────────────────
+  function chartReady() { return typeof Chart !== 'undefined'; }
+
+  var PALETTE = [
+    '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
+    '#6a994e','#bc4749','#a7c957','#386641','#c9d6df','#52796f','#84a98c','#cad2c5'
+  ];
+
+  function showChart(canvasId, loadingId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    document.getElementById(canvasId).classList.remove('hidden');
+  }
+
+  // Chart.js unavailable: hide the loading slot and reveal the (already
+  // populated) sr-only mirror table so sighted users still get the numbers.
+  function fallbackTable(loadingId, tableId) {
+    document.getElementById(loadingId).classList.add('hidden');
+    var t = document.getElementById(tableId);
+    if (t) { t.classList.remove('sr-only'); t.classList.add('chart-fallback'); }
+  }
+
+  // No-data state: keep the canvas hidden and reuse the loading slot for the
+  // message, so empty is distinguishable from loading and from broken.
+  function emptyChart(loadingId) {
+    document.getElementById(loadingId).textContent = "No data available.";
+  }
+
+  // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
+  // get the numbers even though the canvas is aria-hidden (and even if
+  // Chart.js fails to load). Caption = the card's own (localized) <h3>.
+  function srTable(tableId, headers, rows) {
+    var el = document.getElementById(tableId);
+    if (!el) return;
+    var card = el.closest('.chart-card');
+    var h3 = card ? card.querySelector('h3') : null;
+    var caption = h3 ? h3.textContent.trim() : '';
+    el.innerHTML = '<table><caption>' + esc(caption) + '</caption><thead><tr>'
+      + headers.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rows.map(function (r) {
+          return '<tr>' + r.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  function hbarChart(id, loadId, tableId, labels, values, valFmt) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    var f = valFmt || fmt;
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[0], borderRadius: 4 }] },
+      options: {
+        indexAxis: 'y', responsive: true,
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return f(ctx.raw); } } } },
+        scales: { x: { ticks: { callback: function(v) { return f(v); } } } },
+      },
+    });
+  }
+
+  function linesChart(id, loadId, tableId, labels, dsets, valFmt) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    var f = valFmt || fmt;
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'line',
+      data: { labels: labels, datasets: dsets.map(function (ds, i) {
+        return { label: ds.label, data: ds.data, borderColor: PALETTE[i % PALETTE.length],
+                 backgroundColor: PALETTE[i % PALETTE.length] + '22', borderWidth: 2,
+                 pointRadius: 1.5, tension: 0.3, fill: dsets.length === 1 };
+      }) },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + f(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return f(v); } } } },
+      },
+    });
+  }
+
+  // Pivot [x, series, n] rows into { labels, keys, dsets } for a line chart.
+  function pivot(rows, seriesLabels) {
+    var labels = [], bySeries = {};
+    rows.forEach(function (r) {
+      if (labels.indexOf(r[0]) < 0) labels.push(r[0]);
+      (bySeries[r[1]] = bySeries[r[1]] || {})[r[0]] = r[2];
+    });
+    var keys = Object.keys(bySeries).sort();
+    return { labels: labels, keys: keys, bySeries: bySeries, dsets: keys.map(function (k) {
+      return { label: (seriesLabels && seriesLabels[k]) || k,
+               data: labels.map(function (x) { return bySeries[k][x] == null ? null : bySeries[k][x]; }) };
+    }) };
+  }
+
+  // Accessible mirror table for a pivoted line chart (one column per series).
+  function seriesTable(tableId, head, p, cellFmt) {
+    var f = cellFmt || fmt;
+    srTable(tableId, [head].concat(p.dsets.map(function (d) { return d.label; })),
+      p.labels.map(function (x) {
+        return [x].concat(p.keys.map(function (k) { return f(p.bySeries[k][x]); }));
+      }));
+  }
+
+  // Chart queries. Filter values are snake_case section/metric codes, so the
+  // localization generator's prose find/replace can never rewrite them. Every
+  // aggregate is AVG/MAX (PHA figures are rates, never summed), pins a single
+  // section and metric, and stays under the explore row cap.
+  function VER_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["devices_by_version"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["period","category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":450}; }
+  function MKT_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["devices_with_pha"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  function CTY_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_country"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25}; }
+  function CAT_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]},{"operation":"EQ","field_name":"metric","field_values":["category_share"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25}; }
+
+  function renderCharts(ver, mkt, cty, cat) {
+    if (!ver.rows.length) { emptyChart('ver-loading'); } else {
+      var p1 = pivot(scale(ver.rows, 2), null);   // pha_rate fraction -> percent
+      seriesTable('chart-ver-table', "四半期", p1, pct);
+      linesChart('chart-ver', 'ver-loading', 'chart-ver-table', p1.labels, p1.dsets, pct);
+    }
+    if (!mkt.rows.length) { emptyChart('mkt-loading'); } else {
+      var m = scale(mkt.rows, 1);
+      srTable('chart-mkt-table', ["市場タイプ", "PHA 率"], m.map(function (r) { return [r[0], pct(r[1])]; }));
+      hbarChart('chart-mkt', 'mkt-loading', 'chart-mkt-table', m.map(function (r) { return r[0]; }), m.map(function (r) { return r[1]; }), pct);
+    }
+    if (!cty.rows.length) { emptyChart('cty-loading'); } else {
+      var c = scale(cty.rows, 1);
+      srTable('chart-cty-table', ["国", "PHA インストール率"], c.map(function (r) { return [r[0], pct(r[1])]; }));
+      hbarChart('chart-cty', 'cty-loading', 'chart-cty-table', c.map(function (r) { return r[0]; }), c.map(function (r) { return r[1]; }), pct);
+    }
+    if (!cat.rows.length) { emptyChart('cat-loading'); } else {
+      var k = cat.rows;   // category_share is already a percentage
+      srTable('chart-cat-table', ["マルウェアのカテゴリ", "PHA インストールの構成比"], k.map(function (r) { return [r[0], pct(r[1])]; }));
+      hbarChart('chart-cat', 'cat-loading', 'chart-cat-table', k.map(function (r) { return r[0]; }), k.map(function (r) { return r[1]; }), pct);
+    }
+  }
+
+  // ── Load ──────────────────────────────────────────────────────────────────
+  async function load() {
+    // Malware categories ranked by average PHA インストール率 (a fraction -> %).
+    try {
+      var d = await explore({"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
+      var rows = scale(d.rows || [], 1);
+      renderTable('catRates', rows, "マルウェアのカテゴリ別、Google Play からの平均 PHA インストール率。", "マルウェアのカテゴリ", "平均 PHA インストール率", pct);
+      fillProvenance(d.generated, d.version);
+    } catch (err) {
+      showError('catRates', "マルウェア カテゴリ別の率の読み込みに失敗しました: " + err.message);
+    }
+
+    // Coverage: COUNT of reported values per section.
+    try {
+      var d2 = await explore({"table":"android_metrics","group_by":["section"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
+      renderTable('sectionCoverage', d2.rows || [], "Android セキュリティ データセットの各切り口で報告された値。", "セクション", "報告値");
+      if (d2.generated) fillProvenance(d2.generated, d2.version);
+    } catch (err) {
+      showError('sectionCoverage', "セクションのカバレッジの読み込みに失敗しました: " + err.message);
+    }
+  }
+
+  load();
+
+  // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
+  // single failure can't block the rest of the page.
+  var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
+  Promise.all([soft(VER_Q()), soft(MKT_Q()), soft(CTY_Q()), soft(CAT_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3]);
+  });
+})();
+</script>
+</body>
+</html>

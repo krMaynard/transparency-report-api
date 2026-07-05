@@ -1260,6 +1260,20 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "android_metrics": TableSpec(
+        "Google Android ecosystem security — Potentially Harmful Application (PHA) rates on devices and in Google Play (Google's Android security Transparency Report). A tidy-long table across five cuts (`section`): devices_with_pha (by market type, 12-month rolling), devices_by_version (by Android version, quarterly), installs (by source, 12-month rolling), installs_by_country (by country ISO-2, 12-month rolling) and installs_by_category (by PHA category, quarterly). One row per measured value, identified by section × category × metric × period. `period` is a YYYY-MM-DD date (the 12-month rolling end date for the rolling cuts; the quarter end date for the quarterly cuts). `category` is the row dimension kept verbatim (a market type, an Android version, an install source, a country ISO-2 code, or a PHA category like Backdoor/Riskware). `metric` is 'pha_rate' (every cut) or 'category_share' (installs_by_category only). `unit` is 'rate' (a fraction of 1 — Google's PHA rate; NEVER SUM) or 'percent' (category_share, which sums to ~100 across categories per quarter). These are rates, not counts: pin a `section` AND a `metric` and prefer AVG/MIN/MAX over SUM.",
+        "FROM android_metrics f",
+        {
+            "section":  "f.section",
+            "period":   "f.period",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -2398,6 +2412,12 @@ def disruptions_page() -> FileResponse:
     return _serve_page("disruptions.html", "Traffic disruptions page")
 
 
+@app.get("/android", response_class=HTMLResponse)
+def android_page() -> FileResponse:
+    """Serve the Android ecosystem security (PHA rates) dataset page (reads POST /api/explore)."""
+    return _serve_page("android.html", "Android security page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2457,6 +2477,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "tiktok": ("tiktok.html", "TikTok requests page", {}),
     "discord": ("discord.html", "Discord transparency page", {}),
     "disruptions": ("disruptions.html", "Traffic disruptions page", {}),
+    "android": ("android.html", "Android security page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
@@ -3564,6 +3585,31 @@ def _leg_warnings(
                 "metrics in one 'value' column; this aggregate pins no 'metric', so "
                 "it may sum a rate with a count. Filter or group by 'metric'."
             )
+    # android_metrics is entirely rates (PHA rate as a fraction of 1; the
+    # by-category share as a percent). Summing rates is meaningless, and the five
+    # cuts aren't comparable, so warn on any SUM and on unpinned section/metric.
+    if table == "android_metrics" and any(
+        a.field_name == "value" for a in aggregates
+    ):
+        if any(a.function == "SUM" and a.field_name == "value" for a in aggregates):
+            out.append(
+                "'android_metrics' values are rates (a fraction of 1) and a "
+                "per-category percent share, not counts — SUMming them is "
+                "meaningless. Use AVG/MIN/MAX (or filter to a single series)."
+            )
+        if any(a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates):
+            if "section" not in pinned:
+                out.append(
+                    "'android_metrics' spans five cuts (devices vs installs, by "
+                    "version/country/category) whose rates aren't comparable; this "
+                    "aggregate pins no 'section'. Filter or group by 'section'."
+                )
+            if "metric" not in pinned:
+                out.append(
+                    "'android_metrics' mixes the PHA rate and the by-category "
+                    "percent share as separate metrics in one 'value' column; this "
+                    "aggregate pins no 'metric'. Filter or group by 'metric'."
+                )
     # ny_tos_stats normalizes only the *category* dimension: metric/submetric
     # stay in each company's own terms (flagged vs actioned vs warned…), counts
     # and percent rates share one `value` column, and Strava's per-format
@@ -4030,7 +4076,7 @@ FIELD_HELP: dict[str, str] = {
     "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
     "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
     # ── India IT Rules (tidy-long india_metrics) ──
-    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics / tiktok_metrics: 'count' or 'percent' (tiktok_metrics reports every rate/percentage as a fraction of 1). microsoft_metrics: 'count'. discord_metrics: 'count' or 'percent' (an appeal/report rate as the reported percentage number, e.g. 10.45). Never SUM across different units; pin a unit before aggregating.",
+    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics / tiktok_metrics: 'count' or 'percent' (tiktok_metrics reports every rate/percentage as a fraction of 1). microsoft_metrics: 'count'. discord_metrics: 'count' or 'percent' (an appeal/report rate as the reported percentage number, e.g. 10.45). android_metrics: 'rate' (Google's PHA rate, a fraction of 1 — never SUM) or 'percent' (a PHA category's share of installs, sums to ~100/quarter). Never SUM across different units; pin a unit before aggregating.",
     # ── Korea transparency (tidy-long korea_metrics) ──
     "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
     # ── NY ToS normalized stats (tidy-long ny_tos_stats) ──

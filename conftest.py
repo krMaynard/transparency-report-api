@@ -309,6 +309,28 @@ _TRAFFIC_FIXTURE = {
 }
 seed.build_google_traffic_db(_TRAFFIC_FIXTURE, _DB)
 
+# A small slice of the Android ecosystem security (PHA rates) dataset
+# (android-security.json shape). Covers all five sections and both metrics/units,
+# so the suite exercises the rate-vs-percent distinction and the SUM guardrail.
+# [section, period, category, metric, unit, value]
+_ANDROID_FIXTURE = {
+    "columns": ["section", "period", "category", "metric", "unit", "value"],
+    "rows": [
+        ["devices_with_pha", "2024-12-31", "All Devices", "pha_rate", "rate", 0.00099],
+        ["devices_with_pha", "2024-12-31", "Enterprise devices", "pha_rate", "rate", 5.6e-05],
+        ["devices_by_version", "2024-12-31", "15", "pha_rate", "rate", 0.00026],
+        ["devices_by_version", "2024-12-31", "KitKat", "pha_rate", "rate", 0.0111],
+        ["installs", "2024-12-31", "Google Play", "pha_rate", "rate", 0.00082],
+        ["installs_by_country", "2024-12-31", "US", "pha_rate", "rate", 0.00032],
+        ["installs_by_country", "2024-12-31", "IN", "pha_rate", "rate", 0.00202],
+        # by-category yields two measures per source row: the rate and its share.
+        ["installs_by_category", "2024-12-31", "Riskware", "pha_rate", "rate", 9.9e-05],
+        ["installs_by_category", "2024-12-31", "Riskware", "category_share", "percent", 21.43],
+        ["installs_by_category", "2024-12-31", "Backdoor", "category_share", "percent", 2.9],
+    ],
+}
+seed.build_android_db(_ANDROID_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /
