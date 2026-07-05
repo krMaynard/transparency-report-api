@@ -1368,7 +1368,8 @@ def build_ca_ab587_reports(rows: list[dict[str, str]], db_path: str) -> int:
                 "INSERT INTO ca_ab587_reports "
                 "(company, platform, period, period_original, access, source_url, "
                 "filename, archived, sha256, bytes) VALUES (?,?,?,?,?,?,?,?,?,?)",
-                [tuple((r.get(c) or None) for c in _CA_AB587_COLUMNS) for r in rows],
+                [tuple((r.get(c) if r.get(c) not in (None, "") else None)
+                       for c in _CA_AB587_COLUMNS) for r in rows],
             )
         return len(rows)
     finally:
@@ -1390,6 +1391,10 @@ def _build_narratives(data: dict[str, Any], db_path: str, source: str) -> int:
     rows = data.get("rows")
     if rows is None:
         raise ValueError(f"{source} narratives dataset is missing 'rows'")
+    for i, r in enumerate(rows):
+        if len(r) != len(expected_cols):
+            raise ValueError(f"{source} narratives row {i} has length {len(r)}, "
+                             f"expected {len(expected_cols)}")
     conn = sqlite3.connect(db_path)
     try:
         with conn:
