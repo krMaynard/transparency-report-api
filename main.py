@@ -1122,7 +1122,7 @@ TABLES: dict[str, TableSpec] = {
         },
     ),
     "india_metrics": TableSpec(
-        "India IT Rules 2021 monthly compliance reports — significant social media intermediaries' monthly filings: content actioned proactively (by policy area + proactive-detection rate), user grievances received/actioned (by category), accounts actioned, Grievance Appellate Committee (GAC) orders, and law-enforcement/takedown actions. A tidy-long table: one row per measured value, identified by platform × period × section × category × metric, with a `unit` (count/approx_count/percent). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat, Roblox.",
+        "India IT Rules 2021 monthly compliance reports — significant social media intermediaries' monthly filings: content actioned proactively (by policy area + proactive-detection rate), user grievances received/actioned (by category), accounts actioned, Grievance Appellate Committee (GAC) orders, and law-enforcement/takedown actions. A tidy-long table: one row per measured value, identified by platform × period × section × category × metric, with a `unit` (count/approx_count/percent). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat, Roblox, Google, Pinterest.",
         "FROM india_metrics f",
         {
             "platform": "f.platform",

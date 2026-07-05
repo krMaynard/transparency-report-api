@@ -361,7 +361,7 @@ CREATE INDEX idx_snap_section ON snap_metrics(section);
 -- `value` is REAL because Meta's proactive figures are abbreviated approximations
 -- and proactive rates are percentages (see `unit`). Dims stored inline.
 CREATE TABLE india_metrics (
-    platform TEXT NOT NULL,   -- Facebook/Instagram/Twitter/Moj/ShareChat/Roblox/Meta
+    platform TEXT NOT NULL,   -- Facebook/Instagram/Twitter/Moj/ShareChat/Roblox/Google/Pinterest/Meta
     period   TEXT NOT NULL,   -- covered month, 'YYYY-MM'
     section  TEXT NOT NULL,   -- content_actioned_proactive, grievances_received, …
     category TEXT NOT NULL,   -- policy area / complaint category / ban duration / ''

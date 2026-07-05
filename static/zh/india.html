@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>印度IT规则合规报告 — Transparency Report API</title>
-<meta name="description" content="India IT Rules 2021 monthly compliance reports — content actioned proactively, user grievances, accounts actioned and law-enforcement requests, as filed by Facebook, Instagram, Twitter/X, Moj, ShareChat and Roblox." />
+<meta name="description" content="India IT Rules 2021 monthly compliance reports — content actioned proactively, user grievances, accounts actioned and law-enforcement requests, as filed by Facebook, Instagram, Twitter/X, Moj, ShareChat, Roblox, Google and Pinterest." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -541,7 +541,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">印度 · 月度报告 · 2021 – 2026</span>
     <h1>印度IT规则合规报告</h1>
-    <p>印度2021年IT规则要求大型社交媒体中介每月发布的合规报告，由 Facebook、Instagram、Twitter/X、Moj、ShareChat 和 Roblox 提交：主动处理的内容（按政策领域）、收到并处理的用户申诉、被处置的账号，以及执法请求。tidy-long 格式数据集：每行是一个测量值，由平台 × 月份 × 板块 × 类别 × 指标标识。数据<strong>不能跨板块比较</strong>，单位混合了精确计数、Meta 的<strong>约数</strong>和百分比——本页面为每个视图固定单一板块和指标。</p>
+    <p>印度2021年IT规则要求大型社交媒体中介每月发布的合规报告，由 Facebook、Instagram、Twitter/X、Moj、ShareChat、Roblox、Google 和 Pinterest 提交：主动处理的内容（按政策领域）、收到并处理的用户申诉、被处置的账号，以及执法请求。tidy-long 格式数据集：每行是一个测量值，由平台 × 月份 × 板块 × 类别 × 指标标识。数据<strong>不能跨板块比较</strong>，单位混合了精确计数、Meta 的<strong>约数</strong>和百分比——本页面为每个视图固定单一板块和指标。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -591,6 +591,14 @@ display: flex; align-items: center; justify-content: space-between;
         <div id="chart-rbx-table" class="sr-only"></div>
       </div>
 
+      <div class="chart-card wide">
+        <h3>Google 投诉与删除措施</h3>
+        <p class="chart-sub">Google 在其印度 SSMI 平台（YouTube、Play、搜索、Blogger 等）收到的用户投诉与相应采取的删除措施的每月对比——其最长的序列，自2021年4月起。</p>
+        <div class="chart-loading" id="goo-loading">加载中…</div>
+        <canvas id="chart-goo" height="120" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-goo-table" class="sr-only"></div>
+      </div>
+
     </div>
   </section>
 
@@ -616,7 +624,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>来源：依据2021年IT规则发布的月度合规报告（<a href="https://transparency.meta.com/reports/india-monthly-reports/" target="_blank" rel="noopener noreferrer">Meta</a>、<a href="https://transparency.x.com/" target="_blank" rel="noopener noreferrer">X</a>、Moj、ShareChat 和 <a href="https://about.roblox.com/" target="_blank" rel="noopener noreferrer">Roblox</a>，存档于 <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>）。数据经由 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">方法论</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
+  <p>Sources: monthly IT Rules 2021 compliance reports published by <a href="https://transparency.meta.com/reports/india-monthly-reports/" target="_blank" rel="noopener noreferrer">Meta</a>, <a href="https://transparency.x.com/" target="_blank" rel="noopener noreferrer">X</a>, Moj, ShareChat, <a href="https://about.roblox.com/" target="_blank" rel="noopener noreferrer">Roblox</a>, <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">Google</a> and <a href="https://policy.pinterest.com/en/india-transparency-report" target="_blank" rel="noopener noreferrer">Pinterest</a>, archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">Methodology</a> · <a href="/zh/api-key">API key</a> · <a href="/zh/privacy">隐私</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">快照：</span> <span id="prov-snap"></span> · <span class="prov-label">引用格式：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -847,13 +855,15 @@ display: flex; align-items: center; justify-content: space-between;
   // localization generator's prose find/replace can never rewrite them.
   var GRV_METRICS = { "grievances_received": "收到的申诉", "urls_actioned": "处理的 URL" };
   var RBX_METRICS = { "grievances_received": "收到的申诉", "enforcement_actions": "处置措施" };
+  var GOO_SECTIONS = { "complaints_received": "收到的投诉", "removal_actions": "删除措施" };
   function PRO_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["content_actioned_proactive"]},{"operation":"EQ","field_name":"metric","field_values":["content_actioned"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":12}; }
   function GRV_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["grievances_received"]},{"operation":"EQ","field_name":"metric","field_values":["reports"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
   function TWG_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["grievances"]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
   function SUS_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["accounts_actioned"]},{"operation":"EQ","field_name":"metric","field_values":["accounts_suspended"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
   function RBX_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Roblox"]},{"operation":"EQ","field_name":"section","field_values":["grievances"]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
+  function GOO_Q() { return {"table":"india_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Google"]},{"operation":"IN","field_name":"section","field_values":["complaints_received","removal_actions"]}]},"group_by":["period","section"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":200}; }
 
-  function renderCharts(pro, grv, twg, sus, rbx) {
+  function renderCharts(pro, grv, twg, sus, rbx, goo) {
     if (!pro.rows.length) { emptyChart('pro-loading'); } else {
       srTable('chart-pro-table', ["政策领域", "处理的内容"],
         pro.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
@@ -883,6 +893,11 @@ display: flex; align-items: center; justify-content: space-between;
       seriesTable('chart-rbx-table', "月份", pr);
       linesChart('chart-rbx', 'rbx-loading', 'chart-rbx-table', pr.labels, pr.dsets);
     }
+    if (!goo.rows.length) { emptyChart('goo-loading'); } else {
+      var pgo = pivot(goo.rows, GOO_SECTIONS);
+      seriesTable('chart-goo-table', "月份", pgo);
+      linesChart('chart-goo', 'goo-loading', 'chart-goo-table', pgo.labels, pgo.dsets);
+    }
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
@@ -911,8 +926,8 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(PRO_Q()), soft(GRV_Q()), soft(TWG_Q()), soft(SUS_Q()), soft(RBX_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4]);
+  Promise.all([soft(PRO_Q()), soft(GRV_Q()), soft(TWG_Q()), soft(SUS_Q()), soft(RBX_Q()), soft(GOO_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4], cs[5]);
   });
 })();
 </script>
