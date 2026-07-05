@@ -10844,6 +10844,16 @@ for _loc, (_g_rem, _g_ud, _g_dis, _kor) in _NAV_STD.items():
         ("      Google — Disruptions\n    </a>", f"      Google — {_g_dis}\n    </a>"),
         ("      Korea\n    </a>", f"      {_kor}\n    </a>"),
     ])
+    # The home feature-card titles were standardized to match the sidebar, so the
+    # descriptive ones (Google — X, Korea) get the same translation as the nav.
+    # (Google — Android and the bare platform names are proper nouns; DSA / NY ToS
+    # / CA AB 587 are codes — all shown untranslated.)
+    PAGES[_loc]["home.html"].extend([
+        ("<h3>Google — Removals</h3>", f"<h3>Google — {_g_rem}</h3>"),
+        ("<h3>Google — User Data</h3>", f"<h3>Google — {_g_ud}</h3>"),
+        ("<h3>Google — Disruptions</h3>", f"<h3>Google — {_g_dis}</h3>"),
+        ("<h3>Korea</h3>", f"<h3>{_kor}</h3>"),
+    ])
 # ── California AB 587 Terms-of-Service reports catalogue page ─────────────────
 # Mirrors the NY ToS page (its California analogue): only the AB-587-specific
 # visible strings live here; shared catalogue chrome (column headers, "What the
