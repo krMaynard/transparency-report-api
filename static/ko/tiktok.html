@@ -368,7 +368,7 @@ display: flex; align-items: center; justify-content: space-between;
       대만 사기 방지
     </a>
 
-    <div class="nav-section">플랫폼 투명성</div>
+    <div class="nav-section">플랫폼 transparency</div>
 
     <a href="/ko/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -522,7 +522,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>전 세계 정부 콘텐츠 삭제 요청</h3>
         <p class="chart-sub">반기별 정부 콘텐츠 삭제 요청(모든 국가 합계).</p>
-        <div class="chart-loading" id="req-loading">Loading…</div>
+        <div class="chart-loading" id="req-loading">불러오는 중…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
       </div>
@@ -530,7 +530,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>삭제 요청 상위 10개국</h3>
         <p class="chart-sub">정부 콘텐츠 삭제 요청 기준 국가 순위(전체 반기 합계).</p>
-        <div class="chart-loading" id="cty-loading">Loading…</div>
+        <div class="chart-loading" id="cty-loading">불러오는 중…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
       </div>
@@ -538,7 +538,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>유형별 이용자 정보 요청</h3>
         <p class="chart-sub">반기별 정부 이용자 정보 요청(요청 유형별, 전 세계).</p>
-        <div class="chart-loading" id="rem-loading">Loading…</div>
+        <div class="chart-loading" id="rem-loading">불러오는 중…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
       </div>
@@ -546,7 +546,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>유형별 지식재산권 삭제 요청</h3>
         <p class="chart-sub">반기별 지식재산권 삭제 요청(저작권 대 상표, 전 세계).</p>
-        <div class="chart-loading" id="usa-loading">Loading…</div>
+        <div class="chart-loading" id="usa-loading">불러오는 중…</div>
         <canvas id="chart-usa" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-usa-table" class="sr-only"></div>
       </div>
@@ -554,21 +554,21 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── 보고서가 다루는 범위 ─────────────────────────────────── -->
   <section class="data-section">
     <h2>보고서가 다루는 범위</h2>
     <p class="sub">각 dataset의 보고된 값 개수. 합산 수량이 아니라 행 수입니다.</p>
     <div class="results" id="datasetCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">불러오는 중…</div>
     </div>
   </section>
 
-  <!-- ── Accounts subject ───────────────────────────────────────── -->
+  <!-- ── 대상 계정 수 ───────────────────────────────────────── -->
   <section class="data-section">
     <h2>이용자 정보 요청 추이</h2>
     <p class="sub">반기별 정부 이용자 정보 요청 총계(모든 국가 합계).</p>
-    <div class="results" id="infoByPeriod" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+    <div class="results" id="infoBy기간" aria-busy="true">
+      <div class="results-loading">불러오는 중…</div>
     </div>
   </section>
 
@@ -681,8 +681,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“TikTok Government & 법적 요청 수, Transparency Report API 경유 (" + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      "“TikTok Government & 법적 요청 수, Transparency Report API 경유 (" + generated + ' 스냅샷'
+      + (version ? ', 데이터셋 버전 ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -845,19 +845,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per dataset.
     try {
       var d = await explore({"table":"tiktok_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
-      renderTable('datasetCoverage', d.rows || [], "TikTok 보고서의 각 dataset에 보고된 값.", "데이터셋", "Reported values");
+      renderTable('datasetCoverage', d.rows || [], "TikTok 보고서의 각 dataset에 보고된 값.", "데이터셋", "보고 값 수");
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('datasetCoverage', "데이터셋 커버리지를 불러오지 못했습니다: " + err.message);
     }
 
-    // Accounts subject to member-data requests, per half-year.
+    // 회원 데이터 요청 대상 계정, per half-year.
     try {
       var d2 = await explore({"table":"tiktok_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["information_requests"]},{"operation":"IN","field_name":"metric","field_values":["total_legal_requests","total_emergency_requests","total_preservation_requests"]},{"operation":"EQ","field_name":"country","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":25});
-      renderTable('infoByPeriod', d2.rows || [], "반기별 정부 이용자 정보 요청 총계.", "반기", "요청 수");
+      renderTable('infoBy기간', d2.rows || [], "반기별 정부 이용자 정보 요청 총계.", "반기", "요청 수");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('infoByPeriod', "이용자 정보 요청을 불러오지 못했습니다: " + err.message);
+      showError('infoBy기간', "이용자 정보 요청을 불러오지 못했습니다: " + err.message);
     }
   }
 

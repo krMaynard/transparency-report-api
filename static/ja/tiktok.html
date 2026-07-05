@@ -368,7 +368,7 @@ display: flex; align-items: center; justify-content: space-between;
       台湾詐欺対策
     </a>
 
-    <div class="nav-section">プラットフォームの透明性</div>
+    <div class="nav-section">プラットフォーム transparency</div>
 
     <a href="/ja/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -522,7 +522,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>政府によるコンテンツ削除要請（全世界）</h3>
         <p class="chart-sub">半期ごとの政府によるコンテンツ削除要請（全ての国の合計）。</p>
-        <div class="chart-loading" id="req-loading">Loading…</div>
+        <div class="chart-loading" id="req-loading">読み込み中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
       </div>
@@ -530,7 +530,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>削除要請の多い上位 10 か国</h3>
         <p class="chart-sub">政府によるコンテンツ削除要請でランク付けした国（全半期の合計）。</p>
-        <div class="chart-loading" id="cty-loading">Loading…</div>
+        <div class="chart-loading" id="cty-loading">読み込み中…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
       </div>
@@ -538,7 +538,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>種類別のユーザー情報要請</h3>
         <p class="chart-sub">半期ごとの政府によるユーザー情報要請（要請の種類別、全世界）。</p>
-        <div class="chart-loading" id="rem-loading">Loading…</div>
+        <div class="chart-loading" id="rem-loading">読み込み中…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
       </div>
@@ -546,7 +546,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>種類別の知的財産削除要請</h3>
         <p class="chart-sub">半期ごとの知的財産削除要請（著作権と商標、全世界）。</p>
-        <div class="chart-loading" id="usa-loading">Loading…</div>
+        <div class="chart-loading" id="usa-loading">読み込み中…</div>
         <canvas id="chart-usa" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-usa-table" class="sr-only"></div>
       </div>
@@ -554,21 +554,21 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── レポートが対象とする範囲 ─────────────────────────────────── -->
   <section class="data-section">
     <h2>レポートの対象</h2>
     <p class="sub">各 dataset の報告値の数。合計量ではなく行数です。</p>
     <div class="results" id="datasetCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">読み込み中…</div>
     </div>
   </section>
 
-  <!-- ── Accounts subject ───────────────────────────────────────── -->
+  <!-- ── 対象アカウント数 ───────────────────────────────────────── -->
   <section class="data-section">
     <h2>ユーザー情報要請の推移</h2>
     <p class="sub">半期ごとの政府によるユーザー情報要請の合計（全ての国の合計）。</p>
-    <div class="results" id="infoByPeriod" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+    <div class="results" id="infoBy期間" aria-busy="true">
+      <div class="results-loading">読み込み中…</div>
     </div>
   </section>
 
@@ -681,8 +681,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“TikTok Government & 法的 要請数、Transparency Report API 経由 (" + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      "“TikTok Government & 法的 要請数、Transparency Report API 経由 (" + generated + ' のスナップショット'
+      + (version ? '、データセットバージョン ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -845,19 +845,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per dataset.
     try {
       var d = await explore({"table":"tiktok_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
-      renderTable('datasetCoverage', d.rows || [], "TikTok レポートの各 dataset で報告された値。", "データセット", "Reported values");
+      renderTable('datasetCoverage', d.rows || [], "TikTok レポートの各 dataset で報告された値。", "データセット", "報告値の件数");
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('datasetCoverage', "データセットのカバレッジの読み込みに失敗しました: " + err.message);
     }
 
-    // Accounts subject to member-data requests, per half-year.
+    // メンバーデータ要請の対象アカウント, per half-year.
     try {
       var d2 = await explore({"table":"tiktok_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["information_requests"]},{"operation":"IN","field_name":"metric","field_values":["total_legal_requests","total_emergency_requests","total_preservation_requests"]},{"operation":"EQ","field_name":"country","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":25});
-      renderTable('infoByPeriod', d2.rows || [], "半期ごとの政府によるユーザー情報要請の合計。", "半期", "要請数");
+      renderTable('infoBy期間', d2.rows || [], "半期ごとの政府によるユーザー情報要請の合計。", "半期", "要請数");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('infoByPeriod', "ユーザー情報要請の読み込みに失敗しました: " + err.message);
+      showError('infoBy期間', "ユーザー情報要請の読み込みに失敗しました: " + err.message);
     }
   }
 

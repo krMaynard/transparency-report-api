@@ -368,7 +368,7 @@ display: flex; align-items: center; justify-content: space-between;
       台湾反诈骗
     </a>
 
-    <div class="nav-section">平台透明度</div>
+    <div class="nav-section">平台 transparency</div>
 
     <a href="/zh/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -522,7 +522,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>全球政府内容移除请求</h3>
         <p class="chart-sub">各半年的政府内容移除请求（所有国家/地区合计）。</p>
-        <div class="chart-loading" id="req-loading">Loading…</div>
+        <div class="chart-loading" id="req-loading">加载中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
       </div>
@@ -530,7 +530,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>移除请求最多的 10 个国家/地区</h3>
         <p class="chart-sub">按政府内容移除请求排名的国家/地区（所有半年合计）。</p>
-        <div class="chart-loading" id="cty-loading">Loading…</div>
+        <div class="chart-loading" id="cty-loading">加载中…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
       </div>
@@ -538,7 +538,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>按类型划分的用户信息请求</h3>
         <p class="chart-sub">各半年的政府用户信息请求（按请求类型，全球）。</p>
-        <div class="chart-loading" id="rem-loading">Loading…</div>
+        <div class="chart-loading" id="rem-loading">加载中…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
       </div>
@@ -546,7 +546,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>按类型划分的知识产权移除请求</h3>
         <p class="chart-sub">各半年的知识产权移除请求（版权与商标，全球）。</p>
-        <div class="chart-loading" id="usa-loading">Loading…</div>
+        <div class="chart-loading" id="usa-loading">加载中…</div>
         <canvas id="chart-usa" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-usa-table" class="sr-only"></div>
       </div>
@@ -554,21 +554,21 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── 报告涵盖的内容 ─────────────────────────────────── -->
   <section class="data-section">
     <h2>报告涵盖的内容</h2>
     <p class="sub">每个 dataset 中报告值的数量。是行数统计，而非求和数量。</p>
     <div class="results" id="datasetCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">加载中…</div>
     </div>
   </section>
 
-  <!-- ── Accounts subject ───────────────────────────────────────── -->
+  <!-- ── 涉及的账号 ───────────────────────────────────────── -->
   <section class="data-section">
     <h2>用户信息请求随时间变化</h2>
     <p class="sub">各半年的政府用户信息请求总数（所有国家/地区合计）。</p>
-    <div class="results" id="infoByPeriod" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+    <div class="results" id="infoBy时期" aria-busy="true">
+      <div class="results-loading">加载中…</div>
     </div>
   </section>
 
@@ -681,8 +681,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“TikTok Government & 法律 请求数，经由 Transparency Report API (" + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      "“TikTok Government & 法律 请求数，经由 Transparency Report API (" + generated + ' 快照'
+      + (version ? '，数据集版本 ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -845,19 +845,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per dataset.
     try {
       var d = await explore({"table":"tiktok_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
-      renderTable('datasetCoverage', d.rows || [], "TikTok 报告中每个 dataset 的报告值。", "数据集", "Reported values");
+      renderTable('datasetCoverage', d.rows || [], "TikTok 报告中每个 dataset 的报告值。", "数据集", "报告值数量");
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('datasetCoverage', "加载数据集覆盖范围失败：" + err.message);
     }
 
-    // Accounts subject to member-data requests, per half-year.
+    // 会员数据请求涉及的账号, per half-year.
     try {
       var d2 = await explore({"table":"tiktok_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["information_requests"]},{"operation":"IN","field_name":"metric","field_values":["total_legal_requests","total_emergency_requests","total_preservation_requests"]},{"operation":"EQ","field_name":"country","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":25});
-      renderTable('infoByPeriod', d2.rows || [], "各半年的政府用户信息请求总数。", "半年", "请求数");
+      renderTable('infoBy时期', d2.rows || [], "各半年的政府用户信息请求总数。", "半年", "请求数");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('infoByPeriod', "加载用户信息请求失败：" + err.message);
+      showError('infoBy时期', "加载用户信息请求失败：" + err.message);
     }
   }
 

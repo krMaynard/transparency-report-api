@@ -368,7 +368,7 @@ display: flex; align-items: center; justify-content: space-between;
       Taiwan Anti-Betrug
     </a>
 
-    <div class="nav-section">Plattform-Transparenz</div>
+    <div class="nav-section">Plattform transparency</div>
 
     <a href="/de/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -522,7 +522,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>Behördliche Ersuchen um Inhaltsentfernung weltweit</h3>
         <p class="chart-sub">Behördliche Ersuchen um Inhaltsentfernung je Halbjahr, alle Länder zusammen.</p>
-        <div class="chart-loading" id="req-loading">Loading…</div>
+        <div class="chart-loading" id="req-loading">Wird geladen…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
       </div>
@@ -530,7 +530,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>Top 10 Länder nach Entfernungsersuchen</h3>
         <p class="chart-sub">Länder nach behördlichen Ersuchen um Inhaltsentfernung, alle Halbjahre zusammen.</p>
-        <div class="chart-loading" id="cty-loading">Loading…</div>
+        <div class="chart-loading" id="cty-loading">Wird geladen…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
       </div>
@@ -538,7 +538,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>Ersuchen um Nutzerinformationen nach Art</h3>
         <p class="chart-sub">Behördliche Ersuchen um Nutzerinformationen je Halbjahr, nach Ersuchensart (weltweit).</p>
-        <div class="chart-loading" id="rem-loading">Loading…</div>
+        <div class="chart-loading" id="rem-loading">Wird geladen…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
       </div>
@@ -546,7 +546,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>Entfernungsersuchen wegen Schutzrechten nach Art</h3>
         <p class="chart-sub">Entfernungsersuchen wegen geistigen Eigentums je Halbjahr, Urheberrecht vs. Marke (weltweit).</p>
-        <div class="chart-loading" id="usa-loading">Loading…</div>
+        <div class="chart-loading" id="usa-loading">Wird geladen…</div>
         <canvas id="chart-usa" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-usa-table" class="sr-only"></div>
       </div>
@@ -554,21 +554,21 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── Was der Bericht abdeckt ─────────────────────────────────── -->
   <section class="data-section">
     <h2>Was die Berichte abdecken</h2>
     <p class="sub">Die Anzahl gemeldeter Werte je Dataset. Zeilenzahlen, keine summierten Mengen.</p>
     <div class="results" id="datasetCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">Wird geladen…</div>
     </div>
   </section>
 
-  <!-- ── Accounts subject ───────────────────────────────────────── -->
+  <!-- ── Betroffene Konten ───────────────────────────────────────── -->
   <section class="data-section">
     <h2>Ersuchen um Nutzerinformationen im Zeitverlauf</h2>
     <p class="sub">Gesamtzahl behördlicher Ersuchen um Nutzerinformationen je Halbjahr, alle Länder zusammen.</p>
-    <div class="results" id="infoByPeriod" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+    <div class="results" id="infoByZeitraum" aria-busy="true">
+      <div class="results-loading">Wird geladen…</div>
     </div>
   </section>
 
@@ -681,8 +681,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“TikTok Government & Rechtlich Anfragen, über die Transparency Report API (Snapshot " + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      "“TikTok Government & Rechtlich Anfragen, über die Transparency Report API (Snapshot " + generated + ''
+      + (version ? ', Datensatzversion ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -845,19 +845,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per dataset.
     try {
       var d = await explore({"table":"tiktok_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
-      renderTable('datasetCoverage', d.rows || [], "Gemeldete Werte in jedem Dataset der TikTok-Berichte.", "Dataset", "Reported values");
+      renderTable('datasetCoverage', d.rows || [], "Gemeldete Werte in jedem Dataset der TikTok-Berichte.", "Dataset", "Gemeldete Werte");
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('datasetCoverage', "Dataset-Abdeckung konnte nicht geladen werden: " + err.message);
     }
 
-    // Accounts subject to member-data requests, per half-year.
+    // Von Mitgliederdaten-Anfragen betroffene Konten, per half-year.
     try {
       var d2 = await explore({"table":"tiktok_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["information_requests"]},{"operation":"IN","field_name":"metric","field_values":["total_legal_requests","total_emergency_requests","total_preservation_requests"]},{"operation":"EQ","field_name":"country","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":25});
-      renderTable('infoByPeriod', d2.rows || [], "Gesamtzahl behördlicher Ersuchen um Nutzerinformationen, je Halbjahr.", "Halbjahr", "Anfragen");
+      renderTable('infoByZeitraum', d2.rows || [], "Gesamtzahl behördlicher Ersuchen um Nutzerinformationen, je Halbjahr.", "Halbjahr", "Anfragen");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('infoByPeriod', "Ersuchen um Nutzerinformationen konnten nicht geladen werden: " + err.message);
+      showError('infoByZeitraum', "Ersuchen um Nutzerinformationen konnten nicht geladen werden: " + err.message);
     }
   }
 

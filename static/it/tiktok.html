@@ -368,7 +368,7 @@ display: flex; align-items: center; justify-content: space-between;
       Antifrode Taiwan
     </a>
 
-    <div class="nav-section">Trasparenza delle piattaforme</div>
+    <div class="nav-section">Piattaforma transparency</div>
 
     <a href="/it/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
@@ -522,7 +522,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>Richieste governative di rimozione di contenuti nel mondo</h3>
         <p class="chart-sub">Richieste governative di rimozione di contenuti per semestre, tutti i Paesi combinati.</p>
-        <div class="chart-loading" id="req-loading">Loading…</div>
+        <div class="chart-loading" id="req-loading">Caricamento…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
       </div>
@@ -530,7 +530,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>10 Paesi principali per richieste di rimozione</h3>
         <p class="chart-sub">Paesi ordinati per richieste governative di rimozione di contenuti, tutti i semestri combinati.</p>
-        <div class="chart-loading" id="cty-loading">Loading…</div>
+        <div class="chart-loading" id="cty-loading">Caricamento…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
       </div>
@@ -538,7 +538,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card">
         <h3>Richieste di informazioni sugli utenti per tipo</h3>
         <p class="chart-sub">Richieste governative di informazioni sugli utenti per semestre, per tipo di richiesta (globale).</p>
-        <div class="chart-loading" id="rem-loading">Loading…</div>
+        <div class="chart-loading" id="rem-loading">Caricamento…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
       </div>
@@ -546,7 +546,7 @@ display: flex; align-items: center; justify-content: space-between;
       <div class="chart-card wide">
         <h3>Richieste di rimozione per PI per tipo</h3>
         <p class="chart-sub">Richieste di rimozione per proprietà intellettuale per semestre, copyright rispetto a marchio (globale).</p>
-        <div class="chart-loading" id="usa-loading">Loading…</div>
+        <div class="chart-loading" id="usa-loading">Caricamento…</div>
         <canvas id="chart-usa" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-usa-table" class="sr-only"></div>
       </div>
@@ -554,21 +554,21 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <!-- ── What the report covers ─────────────────────────────────── -->
+  <!-- ── Cosa copre il report ─────────────────────────────────── -->
   <section class="data-section">
     <h2>Cosa coprono i report</h2>
     <p class="sub">Il numero di valori riportati in ciascun dataset. Conteggi di righe, non quantità sommate.</p>
     <div class="results" id="datasetCoverage" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+      <div class="results-loading">Caricamento…</div>
     </div>
   </section>
 
-  <!-- ── Accounts subject ───────────────────────────────────────── -->
+  <!-- ── Account interessati ───────────────────────────────────────── -->
   <section class="data-section">
     <h2>Richieste di informazioni sugli utenti nel tempo</h2>
-    <p class="sub">Totale delle richieste governative di informazioni sugli utenti per semestre, tutti i Paesi combinati.</p>
-    <div class="results" id="infoByPeriod" aria-busy="true">
-      <div class="results-loading">Loading…</div>
+    <p class="sub">Totalee delle richieste governative di informazioni sugli utenti per semestre, tutti i Paesi combinati.</p>
+    <div class="results" id="infoByPeriodo" aria-busy="true">
+      <div class="results-loading">Caricamento…</div>
     </div>
   </section>
 
@@ -681,8 +681,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“TikTok Government & Legali Richieste, tramite la Transparency Report API (snapshot " + generated + ' snapshot'
-      + (version ? ', dataset version ' + version : '') + ').”';
+      "“TikTok Government & Legali Richieste, tramite la Transparency Report API (snapshot " + generated + ''
+      + (version ? ', versione del set di dati ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -845,19 +845,19 @@ display: flex; align-items: center; justify-content: space-between;
     // Coverage: COUNT of reported values per dataset.
     try {
       var d = await explore({"table":"tiktok_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
-      renderTable('datasetCoverage', d.rows || [], "Valori riportati in ciascun dataset dei report di TikTok.", "Dataset", "Reported values");
+      renderTable('datasetCoverage', d.rows || [], "Valori riportati in ciascun dataset dei report di TikTok.", "Dataset", "Valori dichiarati");
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('datasetCoverage', "Impossibile caricare la copertura per dataset: " + err.message);
     }
 
-    // Accounts subject to member-data requests, per half-year.
+    // Account interessati dalle richieste di dati dei membri, per half-year.
     try {
       var d2 = await explore({"table":"tiktok_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["information_requests"]},{"operation":"IN","field_name":"metric","field_values":["total_legal_requests","total_emergency_requests","total_preservation_requests"]},{"operation":"EQ","field_name":"country","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":25});
-      renderTable('infoByPeriod', d2.rows || [], "Totale delle richieste governative di informazioni sugli utenti, per semestre.", "Semestre", "Richieste");
+      renderTable('infoByPeriodo', d2.rows || [], "Totalee delle richieste governative di informazioni sugli utenti, per semestre.", "Semestre", "Richieste");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('infoByPeriod', "Impossibile caricare le richieste di informazioni sugli utenti: " + err.message);
+      showError('infoByPeriodo', "Impossibile caricare le richieste di informazioni sugli utenti: " + err.message);
     }
   }
 

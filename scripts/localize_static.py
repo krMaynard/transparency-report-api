@@ -9706,9 +9706,26 @@ for _loc in _TT_NAV:
     PAGES[_loc]["home.html"].append(("<h3>TikTok Requests</h3>", f"<h3>{_TT_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_TT_CARD_DESC_EN, _TT_CARD_DESC[_loc]))
     PAGES[_loc]["tiktok.html"] = [(_en, _tr[_loc]) for _en, _tr in _TT_PAGE.items()]
+    # Inherit the shared chrome strings this page reuses verbatim from the
+    # sibling dataset pages (Loading…, Reported values, No data available.,
+    # the snapshot/citation mechanics …) — any pool find-string present in the
+    # page and not already authored above. Authored pairs take precedence.
+    _tt_text = open(os.path.join(STATIC, "tiktok.html"), encoding="utf-8").read()
+    _tt_own = {_o for _o, _ in PAGES[_loc]["tiktok.html"]}
+    _tt_pool: dict[str, str] = {}
+    for _src in ("snap.html", "korea.html", "linkedin.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            _tt_pool.setdefault(_o, _n)
+    for _o, _n in _tt_pool.items():
+        if _o in _tt_text and _o not in _tt_own:
+            PAGES[_loc]["tiktok.html"].append((_o, _n))
     _tt_snap = dict(PAGES[_loc]["snap.html"])
     if _HINT_SECTION in _tt_snap:
-        PAGES[_loc]["tiktok.html"].append((_HINT_SECTION.replace("<code>section</code>", "<code>dataset</code>"), _tt_snap[_HINT_SECTION].replace("<code>section</code>", "<code>dataset</code>")))
+        _tt_own = {_o for _o, _ in PAGES[_loc]["tiktok.html"]}
+        _hint = (_HINT_SECTION.replace("<code>section</code>", "<code>dataset</code>"),
+                 _tt_snap[_HINT_SECTION].replace("<code>section</code>", "<code>dataset</code>"))
+        if _hint[0] not in _tt_own:
+            PAGES[_loc]["tiktok.html"].append(_hint)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
