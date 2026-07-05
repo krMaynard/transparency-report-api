@@ -1462,6 +1462,76 @@ class TestReportLocations:
         assert len(lines) == 4  # header + 3 rows
 
 
+# ── Public Google Traffic & Disruptions catalogue (GET /api/traffic-disruptions) ──
+
+class TestTrafficDisruptions:
+    def test_public_and_populated(self):
+        r = client.get("/api/traffic-disruptions")  # no X-API-Key
+        assert r.status_code == 200
+        d = r.json()
+        assert d["count"] == d["total"] == 4
+        assert d["country_count"] == 4 and d["product_count"] == 2
+        assert set(d["facets"]) == {"country", "product", "year"}
+        # Years are the non-null start-date years, sorted.
+        assert d["facets"]["year"] == ["2009", "2021"]
+        assert d["facets"]["product"] == ["Web Search", "YouTube"]
+        # Ordered by start_date with nulls last, so Syria (no start date) is last.
+        assert [row["country"] for row in d["rows"]] == \
+            ["Bangladesh", "Sudan", "Burkina Faso", "Syria"]
+        # The Syria row's missing start date surfaces as JSON null, not a crash.
+        syria = next(row for row in d["rows"] if row["country"] == "Syria")
+        assert syria["start_date"] is None and syria["year"] is None
+        assert syria["end_date"] == "2011-02-08"
+
+    def test_catalogue_carries_provenance(self):
+        r = client.get("/api/traffic-disruptions")
+        d = r.json()
+        assert d.get("version") and "generated" in d
+        assert r.headers.get("X-Catalogue-Version") == d["version"]
+        cv = client.get("/api/traffic-disruptions", params={"format": "csv"})
+        assert cv.headers.get("X-Catalogue-Version") == d["version"]
+        assert f'traffic-disruptions-{d["version"]}.csv' in cv.headers.get("content-disposition", "")
+
+    def test_filter_by_product_and_year(self):
+        r = client.get("/api/traffic-disruptions", params={"product": "YouTube"})
+        d = r.json()
+        assert d["count"] == 2 and d["total"] == 4
+        assert all(row["product"] == "YouTube" for row in d["rows"])
+        r2 = client.get("/api/traffic-disruptions", params={"year": "2021"})
+        assert r2.json()["count"] == 2
+
+    def test_filter_by_country(self):
+        r = client.get("/api/traffic-disruptions", params={"country": "Sudan"})
+        d = r.json()
+        assert d["count"] == 1 and d["rows"][0]["product"] == "Web Search"
+
+    def test_free_text_search(self):
+        # Matches country / product / title / source, case-insensitively.
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "sudan"}).json()["count"] == 1
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "bloomberg"}).json()["count"] == 1
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "youtube"}).json()["count"] == 2
+        assert client.get("/api/traffic-disruptions",
+                          params={"q": "nomatch-xyz"}).json()["count"] == 0
+
+    def test_combined_filters(self):
+        r = client.get("/api/traffic-disruptions",
+                       params={"product": "Web Search", "year": "2009"})
+        assert r.json()["count"] == 0  # the 2009 event is a YouTube one
+
+    def test_csv_export(self):
+        r = client.get("/api/traffic-disruptions", params={"format": "csv"})
+        assert r.status_code == 200
+        assert "text/csv" in r.headers["content-type"]
+        assert "attachment" in r.headers.get("content-disposition", "")
+        lines = r.text.splitlines()
+        assert lines[0] == ("country,iso2,product,start_date,end_date,year,"
+                            "source,source_url,title,excerpt,disruption_url")
+        assert len(lines) == 5  # header + 4 rows
+
+
 # ── Public NY ToS-reports catalogue (GET /api/ny-tos-reports) ────────────────
 
 class TestNYTosReports:
@@ -1521,6 +1591,67 @@ class TestNYTosReports:
         r = client.get("/ny-tos")
         assert r.status_code == 200
         assert "/api/ny-tos-reports" in r.text and 'id="rl-period"' in r.text
+
+
+# ── Public NY ToS narrative full-text search (GET /api/narratives) ───────────
+
+class TestNarratives:
+    def test_public_index(self):
+        # No query: returns the facet lists + how much prose is searchable.
+        d = client.get("/api/narratives").json()  # no X-API-Key
+        assert d["searched"] is False
+        assert d["page_total"] == 3
+        assert set(d["companies"]) == {"Snap Inc", "TikTok Inc"}
+        assert d["results"] == []
+        assert d["mark_open"] and d["mark_close"]  # highlight sentinels present
+
+    def test_full_text_search_ranks_and_links(self):
+        d = client.get("/api/narratives", params={"q": "hate speech"}).json()
+        assert d["searched"] is True and d["total"] == 1
+        hit = d["results"][0]
+        assert hit["company"] == "Snap Inc" and hit["page"] == 5
+        # The match is wrapped in the highlight sentinels for the client to swap.
+        assert d["mark_open"] in hit["snippet"] and d["mark_close"] in hit["snippet"]
+        # Deep link into the archived PDF at the matching page.
+        assert hit["archived_url"].endswith("2025-q3-snap-inc.pdf#page=5")
+
+    def test_stemming(self):
+        # The porter tokenizer stems, so "appeal" matches "appeals".
+        assert client.get("/api/narratives", params={"q": "appeal"}).json()["total"] == 1
+
+    def test_company_filter(self):
+        d = client.get("/api/narratives",
+                       params={"q": "harassment", "company": "TikTok Inc"}).json()
+        assert d["total"] == 1 and d["results"][0]["company"] == "TikTok Inc"
+        # No public archive for the TikTok filing → no deep link.
+        assert d["results"][0]["archived_url"] is None
+        # Same query pinned to the other company returns nothing.
+        assert client.get("/api/narratives",
+                          params={"q": "harassment", "company": "Snap Inc"}).json()["total"] == 0
+
+    def test_no_match(self):
+        d = client.get("/api/narratives", params={"q": "cryptocurrency"}).json()
+        assert d["searched"] is True and d["total"] == 0 and d["results"] == []
+
+    def test_malformed_query_is_safe(self):
+        # FTS5 operators / unbalanced quotes must not 500 — only word tokens survive.
+        for bad in ['"OR hate* (AND', 'NEAR("x"', 'a AND b OR', '""', '* * *']:
+            r = client.get("/api/narratives", params={"q": bad})
+            assert r.status_code == 200, bad
+
+    def test_page_served(self):
+        r = client.get("/narratives")
+        assert r.status_code == 200
+        assert "/api/narratives" in r.text and 'id="nout"' in r.text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("ny-tos-narratives.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["company", "platform", "period", "page", "heading", "text"]
+        assert all(len(r) == 6 for r in data["rows"])
+        assert all(isinstance(r[3], int) for r in data["rows"])  # page is an int
 
 
 # ── Public interactive query (POST /api/explore) ─────────────────────────────
@@ -2086,7 +2217,7 @@ class TestLocalization:
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
                 "user-data", "microsoft", "linkedin", "tiktok", "discord",
-                "mcp", "methodology", "schema", "api-key", "privacy")
+                "disruptions", "android", "narratives", "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
         # Home is served with a trailing slash (/es/); sub-pages without.
@@ -2497,6 +2628,31 @@ class TestDatasetPages:
         assert '"table":"discord_metrics"' in r.text
         assert "/static/vendor/chart.umd.js" in r.text
 
+    def test_disruptions_page_served(self):
+        r = client.get("/disruptions")
+        assert r.status_code == 200
+        assert "Google Traffic" in r.text
+        # Reads the dedicated flat-catalogue endpoint, like /catalog.
+        assert "/api/traffic-disruptions" in r.text
+        assert 'id="gt-out"' in r.text
+
+    def test_localized_disruptions_page(self):
+        r = client.get("/es/disruptions")
+        assert r.status_code == 200
+        assert "Interrupciones de tráfico" in r.text  # nav label / chrome localized
+
+    def test_android_page_served(self):
+        r = client.get("/android")
+        assert r.status_code == 200
+        assert "Android Ecosystem Security" in r.text
+        assert '"table":"android_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
+    def test_localized_android_page(self):
+        r = client.get("/de/android")
+        assert r.status_code == 200
+        assert "Android-Sicherheit" in r.text  # nav label / chrome localized
+
     def test_request_report_pages_in_sidebar_nav(self):
         for path in ("/", "/reports", "/schema", "/apple"):
             t = client.get(path).text
@@ -2505,6 +2661,8 @@ class TestDatasetPages:
             assert 'href="/linkedin"' in t, path
             assert 'href="/tiktok"' in t, path
             assert 'href="/discord"' in t, path
+            assert 'href="/disruptions"' in t, path
+            assert 'href="/android"' in t, path
 
     def test_localized_request_report_pages(self):
         cases = {"/es/user-data": "Solicitudes de datos de usuarios de Google",
@@ -3137,6 +3295,71 @@ class TestDiscordTable:
         assert not any(r[2].strip() == "" for r in data["rows"])
         assert ["2023-Q3", "accounts_disabled", "Child Safety", "accounts_disabled",
                 "count", 128153] in data["rows"]
+
+
+class TestAndroidTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "android_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=android_metrics", headers=MOMO).json()
+        assert {"section", "period", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_metric_value(self):
+        # devices_with_pha / All Devices / 2024-12-31 pha_rate = 0.00099 (fixture).
+        job = _submit_and_wait({
+            "table": "android_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["devices_with_pha"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["All Devices"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["pha_rate"]},
+            ]},
+            "aggregates": [{"function": "MAX", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert abs(body["rows"][0][0] - 0.00099) < 1e-9
+
+    def test_two_metrics_from_categories(self):
+        # installs_by_category carries both pha_rate and category_share.
+        q = {"table": "android_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["installs_by_category"]}]},
+             "group_by": ["metric"],
+             "aggregates": [{"function": "COUNT", "field_name": "value", "alias": "n"}]}
+        rows = client.post("/api/explore", json=q).json()["rows"]
+        metrics = {r[0] for r in rows}
+        assert metrics == {"pha_rate", "category_share"}
+
+    def test_explore_warns_on_sum(self):
+        # These are rates — a SUM is meaningless and must warn.
+        q = {"table": "android_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        text = " ".join(client.post("/api/explore", json=q).json().get("warnings", []))
+        assert "SUM" in text and "section" in text and "metric" in text
+
+    def test_explore_avg_pinned_no_warning(self):
+        q = {"table": "android_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["devices_with_pha"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["pha_rate"]}]},
+             "group_by": ["category"],
+             "aggregates": [{"function": "AVG", "field_name": "value", "alias": "v"}]}
+        assert not client.post("/api/explore", json=q).json().get("warnings")
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("android-security.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["section", "period", "category", "metric", "unit", "value"]
+        assert all(len(r) == 6 for r in data["rows"])
+        # units are only 'rate' or 'percent'; every category_share is a percent.
+        assert {r[4] for r in data["rows"]} == {"rate", "percent"}
+        assert all(r[4] == "percent" for r in data["rows"] if r[3] == "category_share")
+        assert all(r[4] == "rate" for r in data["rows"] if r[3] == "pha_rate")
 
 
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────

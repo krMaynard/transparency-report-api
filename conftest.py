@@ -285,6 +285,52 @@ _DISCORD_FIXTURE = {
 }
 seed.build_discord_db(_DISCORD_FIXTURE, _DB)
 
+# A small slice of the Google Traffic & Disruptions catalogue (google-traffic.json
+# shape). A flat catalogue: one row per disruption event. The Syria row omits its
+# start_date/year (Google published only an end date) so the suite exercises the
+# null-grouping + "nulls last" ordering the endpoint relies on.
+_TRAFFIC_FIXTURE = {
+    "columns": ["country", "iso2", "product", "start_date", "end_date", "year",
+                "source", "source_url", "title", "excerpt", "disruption_url"],
+    "rows": [
+        ["Sudan", "SD", "Web Search", "2021-10-25", "2021-11-18", "2021",
+         "Quartz", "https://qz.com/x", "Sudan shuts down the internet",
+         "coup aftermath", "https://transparencyreport.google.com/traffic/overview?a=1"],
+        ["Burkina Faso", "BF", "Web Search", "2021-11-21", "2021-11-28", "2021",
+         "Bloomberg", "https://bloomberg.com/x", "Burkina Faso extends outage",
+         "before protests", "https://transparencyreport.google.com/traffic/overview?a=2"],
+        ["Bangladesh", "BD", "YouTube", "2009-03-06", "2009-03-11", "2009",
+         "BBC", "http://news.bbc.co.uk/x", "Bangladesh blocks YouTube",
+         "leaked recording", "https://transparencyreport.google.com/traffic/overview?a=3"],
+        ["Syria", "SY", "YouTube", None, "2011-02-08", None,
+         "Associated Press", "http://ap.org/x", "Syria appears to lift ban",
+         "first time in three years", "https://transparencyreport.google.com/traffic/overview?a=4"],
+    ],
+}
+seed.build_google_traffic_db(_TRAFFIC_FIXTURE, _DB)
+
+# A small slice of the Android ecosystem security (PHA rates) dataset
+# (android-security.json shape). Covers all five sections and both metrics/units,
+# so the suite exercises the rate-vs-percent distinction and the SUM guardrail.
+# [section, period, category, metric, unit, value]
+_ANDROID_FIXTURE = {
+    "columns": ["section", "period", "category", "metric", "unit", "value"],
+    "rows": [
+        ["devices_with_pha", "2024-12-31", "All Devices", "pha_rate", "rate", 0.00099],
+        ["devices_with_pha", "2024-12-31", "Enterprise devices", "pha_rate", "rate", 5.6e-05],
+        ["devices_by_version", "2024-12-31", "15", "pha_rate", "rate", 0.00026],
+        ["devices_by_version", "2024-12-31", "KitKat", "pha_rate", "rate", 0.0111],
+        ["installs", "2024-12-31", "Google Play", "pha_rate", "rate", 0.00082],
+        ["installs_by_country", "2024-12-31", "US", "pha_rate", "rate", 0.00032],
+        ["installs_by_country", "2024-12-31", "IN", "pha_rate", "rate", 0.00202],
+        # by-category yields two measures per source row: the rate and its share.
+        ["installs_by_category", "2024-12-31", "Riskware", "pha_rate", "rate", 9.9e-05],
+        ["installs_by_category", "2024-12-31", "Riskware", "category_share", "percent", 21.43],
+        ["installs_by_category", "2024-12-31", "Backdoor", "category_share", "percent", 2.9],
+    ],
+}
+seed.build_android_db(_ANDROID_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /
@@ -316,6 +362,23 @@ _NY_TOS_FIXTURE = [
      "filename": "", "archived": "", "sha256": "", "bytes": ""},
 ]
 seed.build_ny_tos_reports(_NY_TOS_FIXTURE, _DB)
+
+# A tiny slice of the NY ToS report narratives (ny-tos-narratives.json shape),
+# seeded into the FTS5 table. The Snap page matches the archived Snap filing so
+# the archived-PDF deep link (#page=) is exercised; the TikTok page has no
+# public archive. [company, platform, period, page, heading, text]
+_NARRATIVES_FIXTURE = {
+    "columns": ["company", "platform", "period", "page", "heading", "text"],
+    "rows": [
+        ["Snap Inc", "", "2025 Q3", 5, "Hateful Content",
+         "Snap prohibits hate speech and removes content that demeans a protected group."],
+        ["Snap Inc", "", "2025 Q3", 7, "",
+         "We disclose the number of appeals received and how many were granted."],
+        ["TikTok Inc", "", "2025 Q4", 3, "",
+         "This report describes our approach to misinformation and coordinated harassment."],
+    ],
+}
+seed.build_ny_tos_narratives(_NARRATIVES_FIXTURE, _DB)
 
 # A small slice of the normalized NY ToS stats (ny-tos-normalized.csv shape):
 # a count + a percent for Snap (unit mixing), a Strava category_total + its
