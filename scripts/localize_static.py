@@ -33,7 +33,7 @@ STATIC = os.path.join(ROOT, "static")
 PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-tos.html",
                "apple.html", "github.html", "snap.html",
                "india.html", "korea.html", "taiwan.html",
-               "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html",
+               "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
@@ -52,6 +52,7 @@ SUFFIX = {
     "microsoft.html": "microsoft",
     "linkedin.html": "linkedin",
     "tiktok.html": "tiktok",
+    "discord.html": "discord",
     "mcp.html": "mcp",
     "methodology.html": "methodology",
     "schema.html": "schema",
@@ -112,7 +113,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -9726,6 +9727,335 @@ for _loc in _TT_NAV:
                  _tt_snap[_HINT_SECTION].replace("<code>section</code>", "<code>dataset</code>"))
         if _hint[0] not in _tt_own:
             PAGES[_loc]["tiktok.html"].append(_hint)
+
+
+# ── discord.html localization (self-contained; authored + pool inherit) ──
+_DC_NAV = {
+    "es": "Informes de Discord",
+    "fr": "Rapports Discord",
+    "de": "Discord-Berichte",
+    "it": "Report di Discord",
+    "ja": "Discord レポート",
+    "zh": "Discord 报告",
+    "ko": "Discord 보고서",
+}
+_DC_CARD_DESC_EN = "Discord's Transparency Reports — Trust &amp; Safety enforcement by policy category (accounts, servers and members actioned) and government / legal requests by country, quarterly since 2022."
+_DC_CARD_DESC = {
+    "es": "Los informes de transparencia de Discord: medidas de Confianza y Seguridad por categoría de política (cuentas, servidores y miembros sancionados) y solicitudes gubernamentales/legales por país, trimestrales desde 2022.",
+    "fr": "Les rapports de transparence de Discord : mesures de confiance et sécurité par catégorie de politique (comptes, serveurs et membres sanctionnés) et demandes gouvernementales/légales par pays, trimestriels depuis 2022.",
+    "de": "Discords Transparenzberichte: Trust-&-Safety-Maßnahmen nach Richtlinienkategorie (Konten, Server und Mitglieder) sowie behördliche/rechtliche Anfragen nach Land, vierteljährlich seit 2022.",
+    "it": "I report di trasparenza di Discord: interventi di Trust & Safety per categoria di policy (account, server e membri sanzionati) e richieste governative/legali per Paese, trimestrali dal 2022.",
+    "ja": "Discord の透明性レポート：ポリシーカテゴリ別の信頼と安全の措置（対応したアカウント・サーバー・メンバー）と、国別の政府・法的要請。2022 年以降、四半期ごと。",
+    "zh": "Discord 的透明度报告：按政策类别划分的信任与安全处置（受处置的账号、服务器和成员）以及按国家/地区划分的政府/法律请求，自 2022 年起每季度发布。",
+    "ko": "Discord의 투명성 보고서: 정책 카테고리별 신뢰·안전 조치(조치된 계정·서버·멤버)와 국가별 정부·법적 요청. 2022년 이후 분기별.",
+}
+_DC_PAGE = {
+    "Discord Transparency Reports — Transparency Report API": {
+        "es": "Informes de transparencia de Discord — Transparency Report API",
+        "fr": "Rapports de transparence de Discord — Transparency Report API",
+        "de": "Discord-Transparenzberichte — Transparency Report API",
+        "it": "Report di trasparenza di Discord — Transparency Report API",
+        "ja": "Discord 透明性レポート — Transparency Report API",
+        "zh": "Discord 透明度报告 — Transparency Report API",
+        "ko": "Discord 투명성 보고서 — Transparency Report API",
+    },
+    "Discord Transparency Reports": {
+        "es": "Informes de transparencia de Discord",
+        "fr": "Rapports de transparence de Discord",
+        "de": "Discord-Transparenzberichte",
+        "it": "Report di trasparenza di Discord",
+        "ja": "Discord 透明性レポート",
+        "zh": "Discord 透明度报告",
+        "ko": "Discord 투명성 보고서",
+    },
+    "Discord · Quarterly / Half-yearly · 2022 – 2024": {
+        "es": "Discord · Trimestral / Semestral · 2022 – 2024",
+        "fr": "Discord · Trimestriel / Semestriel · 2022 – 2024",
+        "de": "Discord · Vierteljährlich / Halbjährlich · 2022 – 2024",
+        "it": "Discord · Trimestrale / Semestrale · 2022 – 2024",
+        "ja": "Discord · 四半期／半期 · 2022 – 2024",
+        "zh": "Discord · 每季度／每半年 · 2022 – 2024",
+        "ko": "Discord · 분기별／반기별 · 2022 – 2024",
+    },
+    "Discord's Transparency Reports, per reporting period (quarterly through 2023, half-yearly from 2024): Trust &amp; Safety enforcement — accounts, servers and members actioned by policy category, accounts disabled, servers removed, appeals — and government / legal requests (US legal process, international requests, preservation &amp; emergency requests) by country. A tidy-long dataset: each row is one measured value identified by section × period × category × metric. Section labels change across reporting eras, and appeal/report rates are percentages; every view on this page pins a single section and metric.": {
+        "es": "Los informes de transparencia de Discord, por período (trimestrales hasta 2023, semestrales desde 2024): medidas de Confianza y Seguridad —cuentas, servidores y miembros sancionados por categoría de política, cuentas deshabilitadas, servidores eliminados, apelaciones— y solicitudes gubernamentales/legales (procesos legales de EE. UU., solicitudes internacionales, de conservación y de emergencia) por país. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por sección × período × categoría × métrica. Las etiquetas de sección cambian entre períodos y las tasas de apelaciones/informes son porcentajes; cada vista de esta página fija una única sección y métrica.",
+        "fr": "Les rapports de transparence de Discord, par période (trimestriels jusqu'en 2023, semestriels depuis 2024) : mesures de confiance et sécurité — comptes, serveurs et membres sanctionnés par catégorie de politique, comptes désactivés, serveurs supprimés, appels — et demandes gouvernementales/légales (procédures légales américaines, demandes internationales, de conservation et d'urgence) par pays. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par section × période × catégorie × métrique. Les libellés de section changent selon les périodes et les taux d'appels/signalements sont des pourcentages ; chaque vue de cette page fixe une seule section et métrique.",
+        "de": "Discords Transparenzberichte, je Berichtszeitraum (vierteljährlich bis 2023, halbjährlich ab 2024): Trust-&-Safety-Maßnahmen — Konten, Server und Mitglieder nach Richtlinienkategorie, deaktivierte Konten, entfernte Server, Einsprüche — sowie behördliche/rechtliche Anfragen (US-Rechtsverfahren, internationale, Sicherungs- und Notfallanfragen) nach Land. Ein Tidy-long-Datensatz: jede Zeile ist ein Messwert, identifiziert durch Sektion × Zeitraum × Kategorie × Metrik. Die Sektionsbezeichnungen ändern sich über die Zeiträume, und Einspruchs-/Meldequoten sind Prozentwerte; jede Ansicht dieser Seite fixiert eine einzelne Sektion und Metrik.",
+        "it": "I report di trasparenza di Discord, per periodo (trimestrali fino al 2023, semestrali dal 2024): interventi di Trust & Safety — account, server e membri sanzionati per categoria di policy, account disattivati, server rimossi, ricorsi — e richieste governative/legali (procedure legali USA, richieste internazionali, di conservazione e di emergenza) per Paese. Un set di dati tidy-long: ogni riga è un valore misurato identificato da sezione × periodo × categoria × metrica. Le etichette di sezione cambiano tra i periodi e i tassi di ricorsi/segnalazioni sono percentuali; ogni vista di questa pagina fissa una singola sezione e metrica.",
+        "ja": "Discord の透明性レポート（期間ごと。2023 年まで四半期、2024 年から半期）：信頼と安全の措置 — ポリシーカテゴリ別に対応したアカウント・サーバー・メンバー、無効化アカウント、削除サーバー、異議申立 — および国別の政府・法的要請（米国の法的手続き、国際要請、保全・緊急要請）。tidy-long のデータセットで、各行はセクション × 期間 × カテゴリ × メトリクスで識別される 1 つの測定値です。セクション名は期間によって変わり、異議・通報の率は割合です。このページの各ビューは単一のセクションとメトリクスを固定しています。",
+        "zh": "Discord 的透明度报告，按报告期（2023 年前每季度，2024 年起每半年）：信任与安全处置——按政策类别处置的账号、服务器和成员，停用的账号，移除的服务器，申诉——以及按国家/地区划分的政府/法律请求（美国法律程序、国际请求、保全与紧急请求）。这是一个 tidy-long 数据集：每行是由 章节 × 报告期 × 类别 × 指标 标识的一个测量值。章节标签在不同报告期会变化，申诉/举报率是百分比；本页每个视图都固定单一章节和指标。",
+        "ko": "Discord의 투명성 보고서로, 보고 기간별(2023년까지 분기, 2024년부터 반기)입니다: 신뢰·안전 조치 — 정책 카테고리별로 조치된 계정·서버·멤버, 비활성화된 계정, 삭제된 서버, 이의 제기 — 및 국가별 정부·법적 요청(미국 법적 절차, 국제 요청, 보존·긴급 요청). tidy-long 데이터셋으로, 각 행은 섹션 × 기간 × 카테고리 × 지표로 식별되는 하나의 측정값입니다. 섹션 라벨은 기간에 따라 바뀌고 이의/신고 비율은 백분율입니다. 이 페이지의 모든 뷰는 단일 섹션과 지표를 고정합니다.",
+    },
+    "Trends": {
+        "es": "Tendencias",
+        "fr": "Tendances",
+        "de": "Trends",
+        "it": "Tendenze",
+        "ja": "傾向",
+        "zh": "趋势",
+        "ko": "추이",
+    },
+    "Interactive views of the reported figures. Each chart has a text alternative for screen readers.": {
+        "es": "Vistas interactivas de las cifras notificadas. Cada gráfico tiene una alternativa de texto para lectores de pantalla.",
+        "fr": "Vues interactives des chiffres déclarés. Chaque graphique a une alternative textuelle pour les lecteurs d'écran.",
+        "de": "Interaktive Ansichten der gemeldeten Zahlen. Jedes Diagramm hat eine Textalternative für Screenreader.",
+        "it": "Viste interattive delle cifre riportate. Ogni grafico ha un'alternativa testuale per gli screen reader.",
+        "ja": "報告された数値のインタラクティブなビュー。各グラフにはスクリーンリーダー用のテキスト代替があります。",
+        "zh": "报告数字的交互式视图。每个图表都为屏幕阅读器提供文本替代。",
+        "ko": "보고된 수치의 대화형 보기. 각 차트에는 스크린 리더용 텍스트 대안이 있습니다.",
+    },
+    "Accounts disabled over time": {
+        "es": "Cuentas deshabilitadas a lo largo del tiempo",
+        "fr": "Comptes désactivés au fil du temps",
+        "de": "Deaktivierte Konten im Zeitverlauf",
+        "it": "Account disattivati nel tempo",
+        "ja": "無効化アカウントの推移",
+        "zh": "停用账号随时间变化",
+        "ko": "비활성화 계정 추이",
+    },
+    "Accounts disabled for policy violations, per reporting period.": {
+        "es": "Cuentas deshabilitadas por infracciones de las políticas, por período.",
+        "fr": "Comptes désactivés pour violation des politiques, par période.",
+        "de": "Wegen Richtlinienverstößen deaktivierte Konten, je Berichtszeitraum.",
+        "it": "Account disattivati per violazioni delle policy, per periodo.",
+        "ja": "ポリシー違反により無効化されたアカウント（期間ごと）。",
+        "zh": "因违反政策而停用的账号（按报告期）。",
+        "ko": "정책 위반으로 비활성화된 계정(보고 기간별).",
+    },
+    "Accounts disabled by policy category": {
+        "es": "Cuentas deshabilitadas por categoría de política",
+        "fr": "Comptes désactivés par catégorie de politique",
+        "de": "Deaktivierte Konten nach Richtlinienkategorie",
+        "it": "Account disattivati per categoria di policy",
+        "ja": "ポリシーカテゴリ別の無効化アカウント",
+        "zh": "按政策类别划分的停用账号",
+        "ko": "정책 카테고리별 비활성화 계정",
+    },
+    "Policy categories ranked by accounts disabled, all periods combined.": {
+        "es": "Categorías de política clasificadas por cuentas deshabilitadas, todos los períodos combinados.",
+        "fr": "Catégories de politique classées par comptes désactivés, toutes périodes confondues.",
+        "de": "Richtlinienkategorien nach deaktivierten Konten, alle Zeiträume zusammen.",
+        "it": "Categorie di policy ordinate per account disattivati, tutti i periodi combinati.",
+        "ja": "無効化アカウント数でランク付けしたポリシーカテゴリ（全期間の合計）。",
+        "zh": "按停用账号数排名的政策类别（所有报告期合计）。",
+        "ko": "비활성화 계정 수 기준 정책 카테고리 순위(전체 기간 합계).",
+    },
+    "International government requests: top countries": {
+        "es": "Solicitudes gubernamentales internacionales: países principales",
+        "fr": "Demandes gouvernementales internationales : principaux pays",
+        "de": "Internationale behördliche Anfragen: Top-Länder",
+        "it": "Richieste governative internazionali: Paesi principali",
+        "ja": "国際的な政府要請：上位の国",
+        "zh": "国际政府请求：主要国家/地区",
+        "ko": "국제 정부 요청: 상위 국가",
+    },
+    "Countries ranked by international government information requests, all periods combined.": {
+        "es": "Países clasificados por solicitudes gubernamentales internacionales de información, todos los períodos combinados.",
+        "fr": "Pays classés par demandes gouvernementales internationales d'informations, toutes périodes confondues.",
+        "de": "Länder nach internationalen behördlichen Informationsanfragen, alle Zeiträume zusammen.",
+        "it": "Paesi ordinati per richieste governative internazionali di informazioni, tutti i periodi combinati.",
+        "ja": "国際的な政府情報要請でランク付けした国（全期間の合計）。",
+        "zh": "按国际政府信息请求排名的国家/地区（所有报告期合计）。",
+        "ko": "국제 정부 정보 요청 기준 국가 순위(전체 기간 합계).",
+    },
+    "US government information requests by type": {
+        "es": "Solicitudes gubernamentales de información de EE. UU. por tipo",
+        "fr": "Demandes gouvernementales d'informations des États-Unis par type",
+        "de": "US-behördliche Informationsanfragen nach Art",
+        "it": "Richieste governative di informazioni degli USA per tipo",
+        "ja": "米国政府による情報要請（種類別）",
+        "zh": "美国政府信息请求（按类型）",
+        "ko": "미국 정부 정보 요청(유형별)",
+    },
+    "US legal-process requests and how many produced information, by request type (2024-H1).": {
+        "es": "Solicitudes de proceso legal de EE. UU. y cuántas produjeron información, por tipo de solicitud (2024-H1).",
+        "fr": "Demandes de procédure légale américaines et combien ont produit des informations, par type de demande (2024-H1).",
+        "de": "US-Rechtsverfahrensanfragen und wie viele Informationen lieferten, nach Anfrageart (2024-H1).",
+        "it": "Richieste di procedura legale USA e quante hanno prodotto informazioni, per tipo di richiesta (2024-H1).",
+        "ja": "米国の法的手続き要請と、そのうち情報が提供された件数（要請の種類別、2024-H1）。",
+        "zh": "美国法律程序请求及其中产生信息的数量（按请求类型，2024-H1）。",
+        "ko": "미국 법적 절차 요청과 그중 정보를 제공한 건수(요청 유형별, 2024-H1).",
+    },
+    "What the reports cover": {
+        "es": "Qué cubren los informes",
+        "fr": "Ce que couvrent les rapports",
+        "de": "Was die Berichte abdecken",
+        "it": "Cosa coprono i report",
+        "ja": "レポートの対象",
+        "zh": "报告涵盖的内容",
+        "ko": "보고서가 다루는 범위",
+    },
+    "The number of reported values in each report section. Counts of rows, not summed quantities.": {
+        "es": "El número de valores declarados en cada sección del informe. Recuentos de filas, no cantidades sumadas.",
+        "fr": "Le nombre de valeurs déclarées dans chaque section du rapport. Des comptages de lignes, pas des quantités additionnées.",
+        "de": "Die Anzahl gemeldeter Werte je Berichtssektion. Zeilenzahlen, keine summierten Mengen.",
+        "it": "Il numero di valori riportati in ciascuna sezione del report. Conteggi di righe, non quantità sommate.",
+        "ja": "レポートの各セクションの報告値の数。合計量ではなく行数です。",
+        "zh": "报告每个章节中报告值的数量。是行数统计，而非求和数量。",
+        "ko": "보고서 각 섹션의 보고된 값 개수. 합산 수량이 아니라 행 수입니다.",
+    },
+    "US government information requests": {
+        "es": "Solicitudes gubernamentales de información de EE. UU.",
+        "fr": "Demandes gouvernementales d'informations des États-Unis",
+        "de": "US-behördliche Informationsanfragen",
+        "it": "Richieste governative di informazioni degli USA",
+        "ja": "米国政府による情報要請",
+        "zh": "美国政府信息请求",
+        "ko": "미국 정부 정보 요청",
+    },
+    "US legal-process requests by type (2024-H1) — court orders, subpoenas, search warrants and more.": {
+        "es": "Solicitudes de proceso legal de EE. UU. por tipo (2024-H1): órdenes judiciales, citaciones, órdenes de registro y más.",
+        "fr": "Demandes de procédure légale américaines par type (2024-H1) : ordonnances, assignations, mandats de perquisition et plus.",
+        "de": "US-Rechtsverfahrensanfragen nach Art (2024-H1) — gerichtliche Anordnungen, Vorladungen, Durchsuchungsbefehle und mehr.",
+        "it": "Richieste di procedura legale USA per tipo (2024-H1): ordini del tribunale, citazioni, mandati di perquisizione e altro.",
+        "ja": "米国の法的手続き要請（種類別、2024-H1）— 裁判所命令、召喚状、捜索令状など。",
+        "zh": "美国法律程序请求（按类型，2024-H1）——法院命令、传票、搜查令等。",
+        "ko": "미국 법적 절차 요청(유형별, 2024-H1) — 법원 명령, 소환장, 수색 영장 등.",
+    },
+    "Source: <a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">Discord Transparency Reports</a>. Data via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Methodology</a> · <a href=\"/api-key\">API key</a> · <a href=\"/privacy\">Privacy</a>": {
+        "es": "Fuente: <a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">informes de transparencia de Discord</a>. Datos vía <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Metodología</a> · <a href=\"/api-key\">Clave de API</a> · <a href=\"/privacy\">Privacidad</a>",
+        "fr": "Source : <a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">rapports de transparence de Discord</a>. Données via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Méthodologie</a> · <a href=\"/api-key\">Clé d'API</a> · <a href=\"/privacy\">Confidentialité</a>",
+        "de": "Quelle: <a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">Discord-Transparenzberichte</a>. Daten über <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Methodik</a> · <a href=\"/api-key\">API-Schlüssel</a> · <a href=\"/privacy\">Datenschutz</a>",
+        "it": "Fonte: <a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">report di trasparenza di Discord</a>. Dati tramite <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Metodologia</a> · <a href=\"/api-key\">Chiave API</a> · <a href=\"/privacy\">Privacy</a>",
+        "ja": "出典：<a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">Discord 透明性レポート</a>。データは <a href=\"/api\">Transparency Report API</a> 経由 · <a href=\"/methodology\">方法論</a> · <a href=\"/api-key\">API キー</a> · <a href=\"/privacy\">プライバシー</a>",
+        "zh": "来源：<a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">Discord 透明度报告</a>。数据经由 <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">方法论</a> · <a href=\"/api-key\">API 密钥</a> · <a href=\"/privacy\">隐私</a>",
+        "ko": "출처: <a href=\"https://discord.com/safety-transparency-reports\" target=\"_blank\" rel=\"noopener noreferrer\">Discord 투명성 보고서</a>. 데이터는 <a href=\"/api\">Transparency Report API</a> 경유 · <a href=\"/methodology\">방법론</a> · <a href=\"/api-key\">API 키</a> · <a href=\"/privacy\">개인정보</a>",
+    },
+    "“Discord Transparency Reports, via the Transparency Report API (": {
+        "es": "“Discord Transparency Reports, vía la Transparency Report API (instantánea de ",
+        "fr": "“Discord Transparency Reports, via la Transparency Report API (instantané de ",
+        "de": "“Discord Transparency Reports, über die Transparency Report API (Snapshot ",
+        "it": "“Discord Transparency Reports, tramite la Transparency Report API (snapshot ",
+        "ja": "“Discord Transparency Reports、Transparency Report API 経由 (",
+        "zh": "“Discord Transparency Reports，经由 Transparency Report API (",
+        "ko": "“Discord Transparency Reports, Transparency Report API 경유 (",
+    },
+    "Requests": {
+        "es": "Solicitudes",
+        "fr": "Demandes",
+        "de": "Anfragen",
+        "it": "Richieste",
+        "ja": "要請数",
+        "zh": "请求数",
+        "ko": "요청 수",
+    },
+    "Information produced": {
+        "es": "Información aportada",
+        "fr": "Informations fournies",
+        "de": "Bereitgestellte Informationen",
+        "it": "Informazioni fornite",
+        "ja": "提供された情報",
+        "zh": "已提供的信息",
+        "ko": "제공된 정보",
+    },
+    "Section": {
+        "es": "Sección",
+        "fr": "Section",
+        "de": "Sektion",
+        "it": "Sezione",
+        "ja": "セクション",
+        "zh": "章节",
+        "ko": "섹션",
+    },
+    "Reported values": {
+        "es": "Valores declarados",
+        "fr": "Valeurs déclarées",
+        "de": "Gemeldete Werte",
+        "it": "Valori riportati",
+        "ja": "報告値",
+        "zh": "报告值",
+        "ko": "보고된 값",
+    },
+    "Request type": {
+        "es": "Tipo de solicitud",
+        "fr": "Type de demande",
+        "de": "Anfrageart",
+        "it": "Tipo di richiesta",
+        "ja": "要請の種類",
+        "zh": "请求类型",
+        "ko": "요청 유형",
+    },
+    "Country": {
+        "es": "País",
+        "fr": "Pays",
+        "de": "Land",
+        "it": "Paese",
+        "ja": "国",
+        "zh": "国家/地区",
+        "ko": "국가",
+    },
+    "Policy category": {
+        "es": "Categoría de política",
+        "fr": "Catégorie de politique",
+        "de": "Richtlinienkategorie",
+        "it": "Categoria di policy",
+        "ja": "ポリシーカテゴリ",
+        "zh": "政策类别",
+        "ko": "정책 카테고리",
+    },
+    "Accounts disabled": {
+        "es": "Cuentas deshabilitadas",
+        "fr": "Comptes désactivés",
+        "de": "Deaktivierte Konten",
+        "it": "Account disattivati",
+        "ja": "無効化アカウント",
+        "zh": "停用账号",
+        "ko": "비활성화 계정",
+    },
+    "Reported values in each section of the Discord reports.": {
+        "es": "Valores declarados en cada sección de los informes de Discord.",
+        "fr": "Valeurs déclarées dans chaque section des rapports de Discord.",
+        "de": "Gemeldete Werte in jeder Sektion der Discord-Berichte.",
+        "it": "Valori riportati in ciascuna sezione dei report di Discord.",
+        "ja": "Discord レポートの各セクションで報告された値。",
+        "zh": "Discord 报告中每个章节的报告值。",
+        "ko": "Discord 보고서의 각 섹션에 보고된 값.",
+    },
+    "US government information requests by type (2024-H1).": {
+        "es": "Solicitudes gubernamentales de información de EE. UU. por tipo (2024-H1).",
+        "fr": "Demandes gouvernementales d'informations des États-Unis par type (2024-H1).",
+        "de": "US-behördliche Informationsanfragen nach Art (2024-H1).",
+        "it": "Richieste governative di informazioni degli USA per tipo (2024-H1).",
+        "ja": "米国政府による情報要請（種類別、2024-H1）。",
+        "zh": "美国政府信息请求（按类型，2024-H1）。",
+        "ko": "미국 정부 정보 요청(유형별, 2024-H1).",
+    },
+    "Failed to load US requests: ": {
+        "es": "No se pudieron cargar las solicitudes de EE. UU.: ",
+        "fr": "Échec du chargement des demandes américaines : ",
+        "de": "US-Anfragen konnten nicht geladen werden: ",
+        "it": "Impossibile caricare le richieste USA: ",
+        "ja": "米国の要請の読み込みに失敗しました: ",
+        "zh": "加载美国请求失败：",
+        "ko": "미국 요청을 불러오지 못했습니다: ",
+    },
+    "Failed to load dataset coverage: ": {
+        "es": "No se pudo cargar la cobertura por dataset: ",
+        "fr": "Échec du chargement de la couverture par dataset : ",
+        "de": "Dataset-Abdeckung konnte nicht geladen werden: ",
+        "it": "Impossibile caricare la copertura per dataset: ",
+        "ja": "データセットのカバレッジの読み込みに失敗しました: ",
+        "zh": "加载数据集覆盖范围失败：",
+        "ko": "데이터셋 커버리지를 불러오지 못했습니다: ",
+    },
+}
+for _loc in _DC_NAV:
+    COMMON[_loc].append(("      Discord Reports\n    </a>", f"      {_DC_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Discord Reports</h3>", f"<h3>{_DC_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_DC_CARD_DESC_EN, _DC_CARD_DESC[_loc]))
+    PAGES[_loc]["discord.html"] = [(_en, _tr[_loc]) for _en, _tr in _DC_PAGE.items()]
+    _dc_text = open(os.path.join(STATIC, "discord.html"), encoding="utf-8").read()
+    _dc_own = {_o for _o, _ in PAGES[_loc]["discord.html"]}
+    _dc_pool = {}
+    for _src in ("snap.html", "korea.html", "linkedin.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            _dc_pool.setdefault(_o, _n)
+    for _o, _n in _dc_pool.items():
+        if _o in _dc_text and _o not in _dc_own:
+            PAGES[_loc]["discord.html"].append((_o, _n))
+    _dc_snap = dict(PAGES[_loc]["snap.html"])
+    if _HINT_SECTION in _dc_snap and _HINT_SECTION not in {_o for _o, _ in PAGES[_loc]["discord.html"]}:
+        PAGES[_loc]["discord.html"].append((_HINT_SECTION, _dc_snap[_HINT_SECTION]))
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

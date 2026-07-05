@@ -2085,7 +2085,7 @@ class TestLocalization:
     LOCALES = ("es", "fr", "de", "it", "ja", "zh", "ko")
     SUFFIXES = ("", "reports", "removals", "catalog", "ny-tos", "apple",
                 "github", "snap", "india", "korea", "taiwan",
-                "user-data", "microsoft", "linkedin", "tiktok",
+                "user-data", "microsoft", "linkedin", "tiktok", "discord",
                 "mcp", "methodology", "schema", "api-key", "privacy")
 
     def _path(self, loc, suffix):
@@ -2490,6 +2490,13 @@ class TestDatasetPages:
         assert '"table":"tiktok_metrics"' in r.text
         assert "/static/vendor/chart.umd.js" in r.text
 
+    def test_discord_page_served(self):
+        r = client.get("/discord")
+        assert r.status_code == 200
+        assert "Discord Transparency Reports" in r.text
+        assert '"table":"discord_metrics"' in r.text
+        assert "/static/vendor/chart.umd.js" in r.text
+
     def test_request_report_pages_in_sidebar_nav(self):
         for path in ("/", "/reports", "/schema", "/apple"):
             t = client.get(path).text
@@ -2497,12 +2504,14 @@ class TestDatasetPages:
             assert 'href="/microsoft"' in t, path
             assert 'href="/linkedin"' in t, path
             assert 'href="/tiktok"' in t, path
+            assert 'href="/discord"' in t, path
 
     def test_localized_request_report_pages(self):
         cases = {"/es/user-data": "Solicitudes de datos de usuarios de Google",
                  "/fr/microsoft": "Demandes des forces de l'ordre à Microsoft",
                  "/ko/linkedin": "LinkedIn 정부 요청",
-                 "/zh/tiktok": "对 TikTok 的政府与法律请求"}
+                 "/zh/tiktok": "对 TikTok 的政府与法律请求",
+                 "/ja/discord": "Discord 透明性レポート"}
         for path, marker in cases.items():
             r = client.get(path)
             assert r.status_code == 200, path
@@ -3069,6 +3078,65 @@ class TestTikTokTable:
                 assert r[5] == int(r[5])
         # ip_removals is global-only; the other two carry a global 'All' row.
         assert {r[2] for r in data["rows"] if r[0] == "ip_removals"} == {"All"}
+
+
+class TestDiscordTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "discord_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=discord_metrics", headers=MOMO).json()
+        assert {"period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_metric_value(self):
+        # 2024-H1 US subpoenas = 2,065 requests (fixture, matches the report CSV).
+        job = _submit_and_wait({
+            "table": "discord_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["us_gov_info_requests"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2024-H1"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["Subpoenas"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 2065
+
+    def test_explore_warns_on_unpinned_aggregation(self):
+        q = {"table": "discord_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        text = " ".join(client.post("/api/explore", json=q).json().get("warnings", []))
+        assert "section" in text and "metric" in text
+
+    def test_explore_pinned_no_warning(self):
+        q = {"table": "discord_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["us_gov_info_requests"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["requests"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        assert not client.post("/api/explore", json=q).json().get("warnings")
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("discord-transparency.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["period", "section", "category", "metric", "unit", "value"]
+        assert all(len(r) == 6 for r in data["rows"])
+        # every percent value carries the reported number; counts are whole numbers.
+        for r in data["rows"]:
+            if r[4] == "count":
+                assert r[5] == int(r[5])
+        # the 2023-Q3 Accounts Disabled column-shift is corrected: Child Safety is
+        # present (128,153) and there are no empty-category rows anywhere.
+        assert not any(r[2].strip() == "" for r in data["rows"])
+        assert ["2023-Q3", "accounts_disabled", "Child Safety", "accounts_disabled",
+                "count", 128153] in data["rows"]
 
 
 # ── Non-VLOP harmonised-template reports loaded into the star schema ──────────

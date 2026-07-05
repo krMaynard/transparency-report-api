@@ -264,6 +264,27 @@ _TIKTOK_FIXTURE = {
 }
 seed.build_tiktok_db(_TIKTOK_FIXTURE, _DB)
 
+# A small slice of the Discord Transparency Reports dataset
+# (discord-transparency.json shape). [period, section, category, metric, unit, value]
+_DISCORD_FIXTURE = {
+    "columns": ["period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        # enforcement — accounts disabled by policy category
+        ["2024-H1", "accounts_disabled", "Child Safety", "accounts_disabled", "count", 178165],
+        ["2024-H1", "accounts_disabled", "Hateful Conduct", "accounts_disabled", "count", 5457],
+        # appeals — carries a percentage rate
+        ["2024-H1", "appeals", "Child Safety", "appeals", "count", 36202],
+        ["2024-H1", "appeals", "Child Safety", "pct_of_appeals_granted", "percent", 2.14],
+        # government/legal requests by country / request type
+        ["2024-H1", "us_gov_info_requests", "Subpoenas", "requests", "count", 2065],
+        ["2024-H1", "us_gov_info_requests", "Subpoenas", "information_produced", "count", 1609],
+        ["2024-H1", "international_government_information_requests", "Germany", "requests", "count", 90],
+        # era-varying section label (older quarterly report)
+        ["2023-Q3", "us_gov_info_requests", "Subpoenas", "requests", "count", 100],
+    ],
+}
+seed.build_discord_db(_DISCORD_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /
