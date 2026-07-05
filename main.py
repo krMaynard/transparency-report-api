@@ -1246,6 +1246,20 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "discord_metrics": TableSpec(
+        "Discord Transparency Reports — Trust & Safety enforcement and government/legal requests, per reporting period (quarterly 'YYYY-Qn' 2022-2023, half-yearly 'YYYY-Hn' 2024+). A tidy-long table walked from each report CSV's labelled sub-tables: one row per measured value, identified by section × category × metric × period. Sections include enforcement (accounts/servers/members actioned by policy category, accounts_disabled, servers_removed, appeals, reports, ncmec) and requests (us_gov_info_requests, international_government_information_requests, preservation_requests, emergency_requests — by country). `category` is the row dimension kept verbatim (a policy category, a country, a request type, or a month). `unit` is 'count' or 'percent' (an appeal/report rate carried as the reported percentage number — never SUM a percent). Pin a `section` AND a `metric` before aggregating: sections mix enforcement counts, request counts and rates, and the section labels change across eras (e.g. the US-legal-process section is 'legal'/'united_states_government_information_requests'/'us_gov_info_requests' in different years).",
+        "FROM discord_metrics f",
+        {
+            "period":   "f.period",
+            "section":  "f.section",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -2372,6 +2386,12 @@ def tiktok_page() -> FileResponse:
     return _serve_page("tiktok.html", "TikTok requests page")
 
 
+@app.get("/discord", response_class=HTMLResponse)
+def discord_page() -> FileResponse:
+    """Serve the Discord Transparency Reports dataset page (reads POST /api/explore)."""
+    return _serve_page("discord.html", "Discord transparency page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2429,6 +2449,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "microsoft": ("microsoft.html", "Microsoft requests page", {}),
     "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
     "tiktok": ("tiktok.html", "TikTok requests page", {}),
+    "discord": ("discord.html", "Discord transparency page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
@@ -3395,6 +3416,24 @@ def _leg_warnings(
                 "may double-count. Filter country='All' for the global figure or "
                 "exclude it for the per-country breakdown."
             )
+    # discord_metrics stacks many sub-tables (enforcement counts, request counts
+    # and appeal/report rates) in one `value` column, and its section labels
+    # change across reporting eras.
+    if table == "discord_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'discord_metrics' spans report sections whose measures aren't "
+                "comparable (and whose labels change across eras); this aggregate "
+                "pins no 'section'. Filter or group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'discord_metrics' mixes counts and (percentage) rates as separate "
+                "metrics in one 'value' column; this aggregate pins no 'metric', so "
+                "it may sum a rate with a count. Filter or group by 'metric'."
+            )
     # ny_tos_stats normalizes only the *category* dimension: metric/submetric
     # stay in each company's own terms (flagged vs actioned vs warned…), counts
     # and percent rates share one `value` column, and Strava's per-format
@@ -3861,7 +3900,7 @@ FIELD_HELP: dict[str, str] = {
     "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
     "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
     # ── India IT Rules (tidy-long india_metrics) ──
-    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics / tiktok_metrics: 'count' or 'percent' (tiktok_metrics reports every rate/percentage as a fraction of 1). microsoft_metrics: 'count'. Never SUM across different units; pin a unit before aggregating.",
+    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics / tiktok_metrics: 'count' or 'percent' (tiktok_metrics reports every rate/percentage as a fraction of 1). microsoft_metrics: 'count'. discord_metrics: 'count' or 'percent' (an appeal/report rate as the reported percentage number, e.g. 10.45). Never SUM across different units; pin a unit before aggregating.",
     # ── Korea transparency (tidy-long korea_metrics) ──
     "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
     # ── NY ToS normalized stats (tidy-long ny_tos_stats) ──

@@ -96,6 +96,11 @@ _DEFAULT_LINKEDIN_SOURCE = os.getenv(
 _DEFAULT_TIKTOK_SOURCE = os.getenv(
     "SEED_TIKTOK_SOURCE_JSON", os.path.join(HERE, "data", "tiktok-transparency.json")
 )
+# Discord Transparency Reports — vendored in-repo (from the sibling data repo's
+# discord-transparency/build_discord.py).
+_DEFAULT_DISCORD_SOURCE = os.getenv(
+    "SEED_DISCORD_SOURCE_JSON", os.path.join(HERE, "data", "discord-transparency.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -459,6 +464,23 @@ CREATE TABLE tiktok_metrics (
     value    REAL
 );
 CREATE INDEX idx_tiktok_dataset ON tiktok_metrics(dataset);
+
+-- Discord Transparency Reports (discord-transparency/build_discord.py).
+-- Tidy-long: one row per measured value walked from the per-period report CSV's
+-- labelled sub-tables. Trust & Safety enforcement + government/legal requests,
+-- by section × category × metric × period ('YYYY-Qn' 2022-2023, 'YYYY-Hn'
+-- 2024+). `value` is REAL: exact counts (unit='count') and appeal/report rates
+-- as the reported percentage number (unit='percent', non-additive). Section
+-- labels evolve across eras (Discord's own renaming). Dims inline.
+CREATE TABLE discord_metrics (
+    period    TEXT NOT NULL,  -- 'YYYY-Qn' (2022-2023) / 'YYYY-Hn' (2024+)
+    section   TEXT NOT NULL,  -- accounts_disabled / appeals / us_gov_info_requests / ...
+    category  TEXT NOT NULL,  -- policy category, country, request type, or month
+    metric    TEXT NOT NULL,  -- individual_accounts / requests / pct_of_appeals_granted / ...
+    unit      TEXT NOT NULL,  -- count / percent
+    value     REAL
+);
+CREATE INDEX idx_discord_section ON discord_metrics(section);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -1085,6 +1107,35 @@ def build_tiktok_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_discord_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the discord_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is
+    the tidy-long discord-transparency.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("discord dataset is None")
+    expected_cols = ["period", "section", "category", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"discord dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("discord dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO discord_metrics (period, section, category, metric, "
+                "unit, value) VALUES (?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -1197,6 +1248,8 @@ def main() -> None:
                         help="Path to linkedin-transparency.json")
     parser.add_argument("--tiktok-source", default=_DEFAULT_TIKTOK_SOURCE,
                         help="Path to tiktok-transparency.json")
+    parser.add_argument("--discord-source", default=_DEFAULT_DISCORD_SOURCE,
+                        help="Path to discord-transparency.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1345,6 +1398,16 @@ def main() -> None:
               f"{len({r[0] for r in tt_data['rows']})} datasets")
     else:
         print(f"  (skipping TikTok transparency — not found: {args.tiktok_source})")
+
+    if os.path.isfile(args.discord_source):
+        with open(args.discord_source, "r", encoding="utf-8") as f:
+            dc_data = json.load(f)
+        dc_rows = build_discord_db(dc_data, args.db)
+        print(f"  discord transparency: {dc_rows} metric rows across "
+              f"{len({r[0] for r in dc_data['rows']})} periods, "
+              f"{len({r[1] for r in dc_data['rows']})} sections")
+    else:
+        print(f"  (skipping Discord transparency — not found: {args.discord_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).
