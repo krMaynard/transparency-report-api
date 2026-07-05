@@ -56,7 +56,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -81,6 +81,7 @@ Built to demonstrate two things:
 | `static/index.html` | Public VLOP dashboard (served at `/reports`) — Chart.js overview + interactive query builder + "Compare tables" composite panel + NL "Ask" box (`GET /api/overview`, `POST /api/explore`, `POST /api/ask`) |
 | `static/catalog.html` | Public report-locations catalogue page (served at `/catalog`) — the "Where platforms publish their reports" filterable table over `GET /api/report-locations` |
 | `static/ny-tos.html` | Public NY Terms-of-Service reports page (served at `/ny-tos`) — filterable filings catalogue over `GET /api/ny-tos-reports` + an "Enforcement statistics" panel over `POST /api/explore` (`ny_tos_stats`) |
+| `static/ca-ab587.html` | Public California AB 587 Terms-of-Service reports page (served at `/ca-ab587`) — the "California AB 587 Terms-of-Service reports" filterable filings catalogue over `GET /api/ca-ab587-reports` (a flat catalogue like `/ny-tos`, no stats panel) |
 | `static/apple.html` | Public Apple Transparency Report dataset page (served at `/apple`) — overview tables over `POST /api/explore` (`apple_requests`) |
 | `static/github.html` | Public GitHub Transparency Report dataset page (served at `/github`) — overview tables over `POST /api/explore` (`github_metrics`) |
 | `static/snap.html` | Public Snap Transparency Report dataset page (served at `/snap`) — overview tables over `POST /api/explore` (`snap_metrics`) |
@@ -94,8 +95,10 @@ Built to demonstrate two things:
 | `static/discord.html` | Public Discord Transparency Reports dataset page (served at `/discord`) — Trends charts + overview tables over `POST /api/explore` (`discord_metrics`) |
 | `static/disruptions.html` | Public Google Traffic & Disruptions catalogue page (served at `/disruptions`) — the "Government internet shutdowns" filterable table over `GET /api/traffic-disruptions` (a flat catalogue like `/catalog`, not `/api/explore`) |
 | `static/android.html` | Public Android ecosystem security dataset page (served at `/android`) — Trends charts + overview tables over `POST /api/explore` (`android_metrics`); PHA rates shown as percentages |
-| `static/narratives.html` | Public narrative full-text search page (served at `/narratives`) — a search box + highlighted result snippets over `GET /api/narratives` (SQLite FTS5) spanning the NY ToS filings (deep-linking into the archived PDFs) and the DSA reports' Table-11 prose |
+| `static/narratives.html` | Public narrative full-text search page (served at `/narratives`) — a search box + highlighted result snippets over `GET /api/narratives` (SQLite FTS5) spanning the NY ToS filings (deep-linking into the archived PDFs), the California AB 587 filings, and the DSA reports' Table-11 prose |
 | `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
+| `data/ca-ab587-reports.csv` | Vendored snapshot of California's AB 587 Terms-of-Service reports catalogue (sibling `dsa-transparency-data/ca-ab587/ca_ab587_reports.csv`) — seeded into the read-only `ca_ab587_reports` table by `seed.build_ca_ab587_reports` |
+| `data/ca-ab587-narratives.json` | Vendored snapshot of the **narrative text** of the CA AB 587 filings (sibling `dsa-transparency-data/ca-ab587/extract_narrative.py`) — one `columns`+`rows` entry per page of prose; seeded into the FTS5 `report_narratives` table (`source='ca-ab587'`) by `seed.build_ca_ab587_narratives` |
 | `data/ny-tos-normalized.csv` | Vendored snapshot of the **normalized NY ToS enforcement statistics** (sibling `dsa-transparency-data/ny-tos-reports/ny_tos_normalized.csv` — per-category figures mapped onto the Stop Hiding Hate Act's five categories; see that repo's `NORMALIZATION.md`) — seeded into the queryable `ny_tos_stats` table by `seed.build_ny_tos_stats` |
 | `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 8 tools, and host config; static, no page JS |
 | `static/methodology.html` | Public methodology page (served at `/methodology`) — how the dataset is sourced, processed (double-count handling, cross-language keys), queried, and cited, plus known limitations; static, no page JS |
@@ -137,7 +140,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/narratives`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/ca-ab587`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/narratives`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -455,6 +458,22 @@ PDFs, not the 1–11 template). Seeded from `data/ny-tos-reports.csv` via
 `auth-required` (login-gated at the AG, catalogued with `source_url` only). It
 powers the public `GET /api/ny-tos-reports` endpoint and the `/ny-tos` page.
 
+A standalone **`ca_ab587_reports`** table (also flat) is the **California analogue
+of `ny_tos_reports`** — **California's AB 587 Terms-of-Service reports**, the
+semiannual filings social-media companies submit to the California Attorney
+General (Bus. & Prof. Code §§ 22675-22681) on how their terms define and enforce
+categories of content (the same five as NY's: hate speech, extremism,
+disinformation, harassment, foreign political interference). Seeded from
+`data/ca-ab587-reports.csv` via `build_ca_ab587_reports()` (`company`,
+`platform`, `period`, `period_original`, `access`, `source_url`, `filename`,
+`archived`, `sha256`, `bytes`). `access` is always `public`; unlike the 11 NY ToS
+PDFs, the ~100 AB 587 PDFs (~300 MB) aren't mirrored in-repo, so `archived`/
+`sha256`/`bytes` are blank and the catalogue points at `source_url` on
+oag.ca.gov. `period` normalises the AG's own label (`Q3/Q4 2025` → `2025 H2`; the
+earliest partial filings stay `2023 Q3`/`2023 Q4`), kept verbatim in
+`period_original`. It powers the public `GET /api/ca-ab587-reports` endpoint and
+the `/ca-ab587` page (memoise-and-filter-in-memory, like `/ny-tos`).
+
 A third standalone **`google_traffic`** table (also flat) holds Google's
 **Traffic & Disruptions catalogue** — one row per observed disruption of a
 Google product in a country (government-ordered internet shutdowns, blocks and
@@ -485,12 +504,18 @@ the sibling repo's `ny-tos-reports/NORMALIZATION.md`.
 The **`report_narratives`** table carries the **narrative full text** of the
 report corpora — the *prose*, not the numbers — indexed for full-text search
 (SQLite **FTS5**, `heading`/`text` tokenized `porter unicode61`; `source`/
-`company`/`platform`/`period`/`page` UNINDEXED). Two `source`s ride in one table:
+`company`/`platform`/`period`/`page` UNINDEXED). Three `source`s ride in one table:
 - **`ny-tos`** — one row per **page** of a NY ToS filing (how each platform
   defines/enforces hate speech / extremism / disinformation / harassment /
   foreign-interference), loaded by `seed.build_ny_tos_narratives` from
   `data/ny-tos-narratives.json` (extracted by the sibling repo's
   `ny-tos-reports/extract_narrative.py` from the publicly-archived PDFs).
+- **`ca-ab587`** — one row per **page** of a California AB 587 filing (the same
+  five content categories, filed with the California AG), loaded by
+  `seed.build_ca_ab587_narratives` from `data/ca-ab587-narratives.json`
+  (extracted by the sibling repo's `ca-ab587/extract_narrative.py` from the
+  on-demand-fetched PDFs). Shares the page-based loader `_build_narratives` with
+  `ny-tos`. No archived-PDF deep link (the PDFs aren't mirrored in-repo).
 - **`dsa`** — one row per **DSA Table-11 qualitative description** (how each
   service describes its content-moderation approach, per indicator), derived at
   seed time by `seed.build_dsa_narratives` straight from the already-loaded
@@ -668,6 +693,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/api/overview` | — | Public headline aggregates powering the dashboard |
 | GET | `/api/report-locations` | — | Public: non-VLOP DSA report-locations catalogue (filters: `category`/`confidence`/`harmonised_template`/`q`; `format=json\|csv`) — memoised, read-only |
 | GET | `/api/ny-tos-reports` | — | Public: New York Social Media ToS-reports catalogue (filters: `period`/`access`/`q`; `format=json\|csv`) — memoised, read-only |
+| GET | `/api/ca-ab587-reports` | — | Public: California AB 587 ToS-reports catalogue (filters: `platform`/`period`/`q`; `format=json\|csv`) — memoised, read-only |
 | GET | `/api/traffic-disruptions` | — | Public: Google Traffic & Disruptions catalogue (filters: `country`/`product`/`year`/`q`; `format=json\|csv`) — memoised, read-only |
 | GET | `/api/narratives` | — | Public: full-text search over the report narratives — NY ToS filings + DSA Table-11 prose (`q` + `source`/`company`/`period` filters) — SQLite FTS5, ranked, highlighted, IP-rate-limited |
 | GET | `/api/explore/options` | — | Public: tables + dimensions/measures for the query builder |
@@ -676,6 +702,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/api` | — | API service info |
 | GET | `/catalog` | — | Public report-locations catalogue page (web UI over `GET /api/report-locations`) |
 | GET | `/ny-tos` | — | Public NY Terms-of-Service reports catalogue page (web UI over `GET /api/ny-tos-reports`) |
+| GET | `/ca-ab587` | — | Public California AB 587 Terms-of-Service reports catalogue page (web UI over `GET /api/ca-ab587-reports`) |
 | GET | `/india` | — | Public India IT Rules compliance-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/korea` | — | Public Korea (Naver + Kakao) transparency dataset page (web UI over `POST /api/explore`) |
 | GET | `/taiwan` | — | Public Taiwan Anti-Fraud Act dataset page (web UI over `POST /api/explore`) |
@@ -686,7 +713,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/discord` | — | Public Discord Transparency Reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/disruptions` | — | Public Google Traffic & Disruptions catalogue page (web UI over `GET /api/traffic-disruptions`) |
 | GET | `/android` | — | Public Android ecosystem security dataset page (web UI over `POST /api/explore`) |
-| GET | `/narratives` | — | Public narrative full-text search page (web UI over `GET /api/narratives`; NY ToS + DSA prose) |
+| GET | `/narratives` | — | Public narrative full-text search page (web UI over `GET /api/narratives`; NY ToS + CA AB 587 + DSA prose) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/methodology` | — | Public methodology page (web UI; how the dataset is sourced/processed/cited) |
 | GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |

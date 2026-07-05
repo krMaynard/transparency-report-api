@@ -31,6 +31,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC = os.path.join(ROOT, "static")
 
 PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-tos.html",
+               "ca-ab587.html",
                "apple.html", "github.html", "snap.html",
                "india.html", "korea.html", "taiwan.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
@@ -43,6 +44,7 @@ SUFFIX = {
     "removals.html": "removals",
     "catalog.html": "catalog",
     "ny-tos.html": "ny-tos",
+    "ca-ab587.html": "ca-ab587",
     "apple.html": "apple",
     "github.html": "github",
     "snap.html": "snap",
@@ -116,7 +118,7 @@ def build_switcher(active: str, suffix: str) -> str:
 
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
-INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/apple', '/github', '/snap',
+INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/ca-ab587', '/apple', '/github', '/snap',
                   '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
@@ -10681,23 +10683,23 @@ _NAR_PAGE = {
         "zh": "检索透明度报告正文",
         "ko": "투명성 보고서 본문 검색",
     },
-    "Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's Terms-of-Service filings and the EU DSA reports' qualitative sections.": {
-        "es": "Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y las secciones cualitativas de los informes de la DSA de la UE.",
-        "fr": "Recherche plein texte dans la prose des rapports de transparence des plateformes : le langage qu'elles emploient pour décrire comment elles définissent et appliquent leurs politiques de modération de contenu. Couvre les dépôts de conditions d'utilisation de New York et les sections qualitatives des rapports DSA de l'UE.",
-        "de": "Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die New Yorker Nutzungsbedingungen-Berichte und die qualitativen Abschnitte der EU-DSA-Berichte.",
-        "it": "Ricerca full-text nella prosa dei report di trasparenza delle piattaforme: il linguaggio con cui descrivono come definiscono e applicano le loro policy di moderazione dei contenuti. Comprende i report sulle condizioni di servizio di New York e le sezioni qualitative dei report DSA dell'UE.",
-        "ja": "プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークの利用規約報告書と、EU DSA 報告書の定性的セクションを対象とします。",
-        "zh": "对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约《服务条款》报告和欧盟 DSA 报告的定性部分。",
-        "ko": "플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕 서비스 약관 보고서와 EU DSA 보고서의 정성적 섹션을 아우릅니다.",
+    "Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings and the EU DSA reports' qualitative sections.": {
+        "es": "Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y California y las secciones cualitativas de los informes de la DSA de la UE.",
+        "fr": "Recherche plein texte dans la prose des rapports de transparence des plateformes : le langage qu'elles emploient pour décrire comment elles définissent et appliquent leurs politiques de modération de contenu. Couvre les dépôts de conditions d'utilisation de New York et de Californie et les sections qualitatives des rapports DSA de l'UE.",
+        "de": "Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien und die qualitativen Abschnitte der EU-DSA-Berichte.",
+        "it": "Ricerca full-text nella prosa dei report di trasparenza delle piattaforme: il linguaggio con cui descrivono come definiscono e applicano le loro policy di moderazione dei contenuti. Comprende i report sulle condizioni di servizio di New York e della California e le sezioni qualitative dei report DSA dell'UE.",
+        "ja": "プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークとカリフォルニアの利用規約報告書と、EU DSA 報告書の定性的セクションを対象とします。",
+        "zh": "对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约和加利福尼亚州的《服务条款》报告以及欧盟 DSA 报告的定性部分。",
+        "ko": "플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕과 캘리포니아의 서비스 약관 보고서와 EU DSA 보고서의 정성적 섹션을 아우릅니다.",
     },
-    "Full-text search across the <strong>prose</strong> of two corpora: New York's Social Media Terms-of-Service filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference) and the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach). Each result is one page or description, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).": {
-        "es": "Búsqueda de texto completo en la <strong>prosa</strong> de dos corpus: los informes de condiciones de servicio de redes sociales de Nueva York (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera) y las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos). Cada resultado es una página o descripción, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).",
-        "fr": "Recherche plein texte dans la <strong>prose</strong> de deux corpus : les dépôts de conditions d'utilisation des réseaux sociaux de New York (comment les plateformes décrivent la définition et l'application de leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère) et les descriptions qualitatives du tableau 11 des rapports DSA de l'UE (comment chaque service décrit son approche de modération de contenu). Chaque résultat est une page ou une description, classée par pertinence ; les résultats de New York renvoient au PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).",
-        "de": "Volltextsuche im <strong>Fließtext</strong> zweier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben) und die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt). Jedes Ergebnis ist eine Seite oder Beschreibung, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).",
-        "it": "Ricerca full-text nella <strong>prosa</strong> di due corpora: i report sulle condizioni di servizio dei social media di New York (come le piattaforme descrivono la definizione e l'applicazione delle regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera) e le descrizioni qualitative della Tabella 11 dei report DSA dell'UE (come ciascun servizio descrive il proprio approccio alla moderazione dei contenuti). Ogni risultato è una pagina o descrizione, ordinata per pertinenza; i risultati di New York rimandano al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).",
-        "ja": "2 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）と、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）です。各結果は 1 ページまたは 1 件の記述で、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。",
-        "zh": "对两个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）以及欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式）。每条结果是一页或一条描述，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。",
-        "ko": "두 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명)와 EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지). 각 결과는 한 페이지 또는 하나의 기술이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.",
+    "Full-text search across the <strong>prose</strong> of three corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference) and the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach). Each result is one page or description, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).": {
+        "es": "Búsqueda de texto completo en la <strong>prosa</strong> de tres corpus: los informes de condiciones de servicio de redes sociales de Nueva York y los informes AB 587 de California (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera) y las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos). Cada resultado es una página o descripción, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).",
+        "fr": "Recherche plein texte dans la <strong>prose</strong> de trois corpus : les dépôts de conditions d'utilisation des réseaux sociaux de New York et les dépôts AB 587 de Californie (comment les plateformes décrivent la définition et l'application de leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère) et les descriptions qualitatives du tableau 11 des rapports DSA de l'UE (comment chaque service décrit son approche de modération de contenu). Chaque résultat est une page ou une description, classée par pertinence ; les résultats de New York renvoient au PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).",
+        "de": "Volltextsuche im <strong>Fließtext</strong> dreier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben) und die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt). Jedes Ergebnis ist eine Seite oder Beschreibung, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).",
+        "it": "Ricerca full-text nella <strong>prosa</strong> di tre corpora: i report sulle condizioni di servizio dei social media di New York e le presentazioni AB 587 della California (come le piattaforme descrivono la definizione e l'applicazione delle regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera) e le descrizioni qualitative della Tabella 11 dei report DSA dell'UE (come ciascun servizio descrive il proprio approccio alla moderazione dei contenuti). Ogni risultato è una pagina o descrizione, ordinata per pertinenza; i risultati di New York rimandano al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).",
+        "ja": "3 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書とカリフォルニア州 AB 587 の提出書類（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）と、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）です。各結果は 1 ページまたは 1 件の記述で、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。",
+        "zh": "对三个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告和加利福尼亚州 AB 587 提交文件（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）以及欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式）。每条结果是一页或一条描述，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。",
+        "ko": "세 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서와 캘리포니아 AB 587 제출물(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명)와 EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지). 각 결과는 한 페이지 또는 하나의 기술이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.",
     },
     "<label>Source <select": {
         "es": "<label>Fuente <select", "fr": "<label>Source <select",
@@ -10842,6 +10844,135 @@ for _loc, (_g_rem, _g_ud, _g_dis, _kor) in _NAV_STD.items():
         ("      Google — Disruptions\n    </a>", f"      Google — {_g_dis}\n    </a>"),
         ("      Korea\n    </a>", f"      {_kor}\n    </a>"),
     ])
+# ── California AB 587 Terms-of-Service reports catalogue page ─────────────────
+# Mirrors the NY ToS page (its California analogue): only the AB-587-specific
+# visible strings live here; shared catalogue chrome (column headers, "What the
+# columns mean", Download CSV, Search, provenance labels) is inherited from the
+# already-built ny-tos.html per-locale pool below.
+_AB587_NAV = {
+    "es": "Informes AB 587 de CA", "fr": "Rapports AB 587 de CA",
+    "de": "CA-AB-587-Berichte", "it": "Report AB 587 della CA",
+    "ja": "CA AB 587 報告書", "zh": "加州 AB 587 报告", "ko": "CA AB 587 보고서",
+}
+_AB587_CARD_DESC_EN = "California's AB 587 Terms-of-Service reports — the semiannual filings social-media companies submit to the California Attorney General on how their terms define and enforce categories of content. A catalogue linking each filing."
+_AB587_CARD_DESC = {
+    "es": "Los informes de condiciones de servicio AB 587 de California — las presentaciones semestrales que las empresas de redes sociales entregan a la Fiscalía General de California sobre cómo sus términos definen y aplican categorías de contenido. Un catálogo que enlaza cada presentación.",
+    "fr": "Les rapports sur les conditions d'utilisation AB 587 de Californie — les dépôts semestriels que les entreprises de réseaux sociaux remettent au procureur général de Californie sur la façon dont leurs conditions définissent et appliquent des catégories de contenu. Un catalogue reliant chaque dépôt.",
+    "de": "Kaliforniens AB-587-Nutzungsbedingungen-Berichte — die halbjährlichen Einreichungen, die Social-Media-Unternehmen beim Generalstaatsanwalt Kaliforniens einreichen, dazu, wie ihre Bedingungen Inhaltskategorien definieren und durchsetzen. Ein Katalog, der jede Einreichung verlinkt.",
+    "it": "I report sui termini di servizio AB 587 della California — le presentazioni semestrali che le aziende di social media inviano al procuratore generale della California su come i loro termini definiscono e applicano categorie di contenuti. Un catalogo che collega ogni presentazione.",
+    "ja": "カリフォルニア州 AB 587 利用規約報告書 — ソーシャルメディア企業が、自社の規約でコンテンツのカテゴリをどのように定義し執行するかについて、カリフォルニア州司法長官へ半期ごとに提出する書類です。各提出をリンクしたカタログ。",
+    "zh": "加利福尼亚州 AB 587 服务条款报告——社交媒体公司每半年向加利福尼亚州总检察长提交的文件，说明其条款如何界定和执行各类内容。一份链接每份提交的目录。",
+    "ko": "캘리포니아 AB 587 이용약관 보고서 — 소셜미디어 기업이 자사 약관이 콘텐츠 범주를 어떻게 정의하고 집행하는지에 관해 캘리포니아 주 법무장관에게 반기별로 제출하는 문서입니다. 각 제출물을 연결한 목록.",
+}
+_AB587_PAGE = {
+    "<title>California AB 587 Terms-of-Service reports · Transparency Report</title>": {
+        "es": "<title>Informes de condiciones de servicio AB 587 de California · Transparency Report</title>",
+        "fr": "<title>Rapports sur les conditions d'utilisation AB 587 de Californie · Transparency Report</title>",
+        "de": "<title>AB-587-Nutzungsbedingungen-Berichte Kaliforniens · Transparency Report</title>",
+        "it": "<title>Report sui termini di servizio AB 587 della California · Transparency Report</title>",
+        "ja": "<title>カリフォルニア州 AB 587 利用規約報告書 · Transparency Report</title>",
+        "zh": "<title>加利福尼亚州 AB 587 服务条款报告 · Transparency Report</title>",
+        "ko": "<title>캘리포니아 AB 587 이용약관 보고서 · Transparency Report</title>",
+    },
+    "<h1>California AB 587 Terms-of-Service reports</h1>": {
+        "es": "<h1>Informes de condiciones de servicio AB 587 de California</h1>",
+        "fr": "<h1>Rapports sur les conditions d'utilisation AB 587 de Californie</h1>",
+        "de": "<h1>AB-587-Nutzungsbedingungen-Berichte Kaliforniens</h1>",
+        "it": "<h1>Report sui termini di servizio AB 587 della California</h1>",
+        "ja": "<h1>カリフォルニア州 AB 587 利用規約報告書</h1>",
+        "zh": "<h1>加利福尼亚州 AB 587 服务条款报告</h1>",
+        "ko": "<h1>캘리포니아 AB 587 이용약관 보고서</h1>",
+    },
+    "<p>The terms-of-service reports social-media companies file with the California Attorney General under AB 587.</p>": {
+        "es": "<p>Los informes de condiciones de servicio que las empresas de redes sociales presentan ante la Fiscalía General de California en virtud de la ley AB 587.</p>",
+        "fr": "<p>Les rapports sur les conditions d'utilisation que les entreprises de réseaux sociaux déposent auprès du procureur général de Californie en vertu de la loi AB 587.</p>",
+        "de": "<p>Die Nutzungsbedingungen-Berichte, die Social-Media-Unternehmen gemäß AB 587 beim Generalstaatsanwalt Kaliforniens einreichen.</p>",
+        "it": "<p>I report sui termini di servizio che le aziende di social media presentano al procuratore generale della California ai sensi della legge AB 587.</p>",
+        "ja": "<p>ソーシャルメディア企業が AB 587 に基づきカリフォルニア州司法長官に提出する利用規約報告書。</p>",
+        "zh": "<p>社交媒体公司根据 AB 587 向加利福尼亚州总检察长提交的服务条款报告。</p>",
+        "ko": "<p>소셜미디어 기업이 AB 587에 따라 캘리포니아 주 법무장관에게 제출하는 이용약관 보고서.</p>",
+    },
+    "<p class=\"sub\">California's <strong>AB 587</strong> (Bus. &amp; Prof. Code §§ 22675-22681) requires social-media companies with over $100M in annual revenue to file <strong>semiannual</strong> terms-of-service reports with the state Attorney General, describing how their terms define and enforce categories of content — hate speech, extremism, disinformation, harassment and foreign political interference — and how automated moderation works. This catalogues every published filing. Served by the public, read-only <code>GET /api/ca-ab587-reports</code>. The filings' prose is searchable on the <a href=\"/narratives?source=ca-ab587\">Narrative search</a> page.</p>": {
+        "es": "<p class=\"sub\">La ley <strong>AB 587</strong> de California (Bus. &amp; Prof. Code §§ 22675-22681) exige que las empresas de redes sociales con más de 100 millones de dólares de ingresos anuales presenten informes de condiciones de servicio <strong>semestrales</strong> ante la Fiscalía General del estado, describiendo cómo sus términos definen y aplican categorías de contenido — discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera — y cómo funciona la moderación automatizada. Aquí se cataloga cada presentación publicada. Servido por el endpoint público de solo lectura <code>GET /api/ca-ab587-reports</code>. El texto de las presentaciones se puede buscar en la página de <a href=\"/es/narratives?source=ca-ab587\">Búsqueda de textos</a>.</p>",
+        "fr": "<p class=\"sub\">L'<strong>AB 587</strong> de Californie (Bus. &amp; Prof. Code §§ 22675-22681) impose aux entreprises de réseaux sociaux réalisant plus de 100 M$ de chiffre d'affaires annuel de déposer <strong>deux fois par an</strong> des rapports sur leurs conditions d'utilisation auprès du procureur général de l'État, décrivant comment leurs conditions définissent et appliquent des catégories de contenu — discours de haine, extrémisme, désinformation, harcèlement et ingérence politique étrangère — et comment fonctionne la modération automatisée. Ce catalogue recense chaque dépôt publié. Fourni par l'endpoint public en lecture seule <code>GET /api/ca-ab587-reports</code>. Le texte des dépôts est consultable sur la page <a href=\"/fr/narratives?source=ca-ab587\">Recherche de textes</a>.</p>",
+        "de": "<p class=\"sub\">Kaliforniens <strong>AB 587</strong> (Bus. &amp; Prof. Code §§ 22675-22681) verpflichtet Social-Media-Unternehmen mit über 100 Mio. $ Jahresumsatz, <strong>halbjährlich</strong> Berichte zu ihren Nutzungsbedingungen beim Generalstaatsanwalt des Staates einzureichen, in denen sie darlegen, wie ihre Bedingungen Inhaltskategorien — Hassrede, Extremismus, Desinformation, Belästigung und ausländische politische Einflussnahme — definieren und durchsetzen und wie die automatisierte Moderation funktioniert. Hier wird jede veröffentlichte Einreichung katalogisiert. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/ca-ab587-reports</code>. Der Text der Einreichungen ist auf der Seite <a href=\"/de/narratives?source=ca-ab587\">Volltextsuche</a> durchsuchbar.</p>",
+        "it": "<p class=\"sub\">L'<strong>AB 587</strong> della California (Bus. &amp; Prof. Code §§ 22675-22681) impone alle aziende di social media con oltre 100 milioni di dollari di ricavi annui di presentare <strong>due volte l'anno</strong> report sui termini di servizio al procuratore generale dello Stato, descrivendo come i loro termini definiscono e applicano categorie di contenuti — incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera — e come funziona la moderazione automatizzata. Qui viene catalogata ogni presentazione pubblicata. Servito dall'endpoint pubblico di sola lettura <code>GET /api/ca-ab587-reports</code>. Il testo delle presentazioni è consultabile nella pagina <a href=\"/it/narratives?source=ca-ab587\">Ricerca nei testi</a>.</p>",
+        "ja": "<p class=\"sub\">カリフォルニア州の <strong>AB 587</strong>（Bus. &amp; Prof. Code §§ 22675-22681）は、年間売上1億ドル超のソーシャルメディア企業に対し、利用規約がコンテンツのカテゴリ（ヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉）をどのように定義し執行するか、また自動モデレーションがどのように機能するかを記した利用規約報告書を <strong>半期ごと</strong> に州司法長官へ提出することを義務づけています。本ページは公開された提出分をすべてカタログ化しています。公開・読み取り専用の <code>GET /api/ca-ab587-reports</code> が提供します。提出書類の本文は<a href=\"/ja/narratives?source=ca-ab587\">本文検索</a>ページで検索できます。</p>",
+        "zh": "<p class=\"sub\">加利福尼亚州的 <strong>AB 587</strong>（Bus. &amp; Prof. Code §§ 22675-22681）要求年收入超过1亿美元的社交媒体公司<strong>每半年</strong>向州总检察长提交服务条款报告，说明其条款如何界定和执行各类内容——仇恨言论、极端主义、虚假信息、骚扰和外国政治干预——以及自动审核如何运作。本页收录每一份已发布的提交文件。由公开、只读的 <code>GET /api/ca-ab587-reports</code> 提供支持。提交文件的正文可在<a href=\"/zh/narratives?source=ca-ab587\">全文检索</a>页面搜索。</p>",
+        "ko": "<p class=\"sub\">캘리포니아의 <strong>AB 587</strong>(Bus. &amp; Prof. Code §§ 22675-22681)은 연간 매출 1억 달러를 초과하는 소셜미디어 기업에 대해, 자사 약관이 콘텐츠 범주(혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입)를 어떻게 정의하고 집행하는지, 그리고 자동 조정이 어떻게 작동하는지 설명하는 이용약관 보고서를 <strong>반기별</strong>로 주 법무장관에게 제출하도록 요구합니다. 이 페이지는 공개된 모든 제출물을 목록화합니다. 공개·읽기 전용 <code>GET /api/ca-ab587-reports</code>가 제공합니다. 제출물의 본문은 <a href=\"/ko/narratives?source=ca-ab587\">본문 검색</a> 페이지에서 검색할 수 있습니다.</p>",
+    },
+    "<p><strong>Company</strong> — the filer, verbatim from the AG repository. <strong>Platform</strong> — a normalised brand for grouping filings from the same company across periods. <strong>Period</strong> — the reporting half-year, normalised (<em>2025 H2</em>); the earliest partial filings stay <em>2023 Q3</em>/<em>2023 Q4</em>. <strong>Filed as</strong> — the AG's own period label, kept verbatim.</p>": {
+        "es": "<p><strong>Empresa</strong> — el declarante, tal como aparece en el repositorio de la Fiscalía. <strong>Plataforma</strong> — una marca normalizada para agrupar las presentaciones de una misma empresa a lo largo de los períodos. <strong>Período</strong> — el semestre del informe, normalizado (<em>2025 H2</em>); las primeras presentaciones parciales se mantienen como <em>2023 Q3</em>/<em>2023 Q4</em>. <strong>Presentado como</strong> — la etiqueta de período propia de la Fiscalía, conservada literalmente.</p>",
+        "fr": "<p><strong>Entreprise</strong> — le déposant, tel qu'il figure dans le dépôt du procureur. <strong>Plateforme</strong> — une marque normalisée pour regrouper les dépôts d'une même entreprise au fil des périodes. <strong>Période</strong> — le semestre couvert, normalisé (<em>2025 H2</em>) ; les premiers dépôts partiels restent <em>2023 Q3</em>/<em>2023 Q4</em>. <strong>Déposé comme</strong> — l'intitulé de période propre au procureur, conservé tel quel.</p>",
+        "de": "<p><strong>Unternehmen</strong> — der Einreicher, wörtlich aus dem Verzeichnis des Generalstaatsanwalts. <strong>Plattform</strong> — eine normalisierte Marke, um Einreichungen desselben Unternehmens über Zeiträume hinweg zu gruppieren. <strong>Zeitraum</strong> — das berichtete Halbjahr, normalisiert (<em>2025 H2</em>); die frühesten Teil-Einreichungen bleiben <em>2023 Q3</em>/<em>2023 Q4</em>. <strong>Eingereicht als</strong> — die Zeitraumsbezeichnung des Generalstaatsanwalts, wörtlich beibehalten.</p>",
+        "it": "<p><strong>Azienda</strong> — il dichiarante, testualmente dal repository del procuratore. <strong>Piattaforma</strong> — un marchio normalizzato per raggruppare le presentazioni di una stessa azienda nei vari periodi. <strong>Periodo</strong> — il semestre del report, normalizzato (<em>2025 H2</em>); le prime presentazioni parziali restano <em>2023 Q3</em>/<em>2023 Q4</em>. <strong>Presentato come</strong> — l'etichetta di periodo propria del procuratore, mantenuta testualmente.</p>",
+        "ja": "<p><strong>会社</strong> — 提出者。司法長官のリポジトリの表記そのまま。<strong>プラットフォーム</strong> — 同一会社の複数期の提出をまとめるために正規化したブランド名。<strong>期間</strong> — 報告対象の半期。正規化済み（<em>2025 H2</em>）。最初期の部分的な提出は <em>2023 Q3</em>/<em>2023 Q4</em> のまま。<strong>提出時の表記</strong> — 司法長官による期間ラベルをそのまま保持。</p>",
+        "zh": "<p><strong>公司</strong> — 提交者，照录自总检察长的资料库。<strong>平台</strong> — 用于将同一公司跨报告期的提交归类的规范化品牌名。<strong>报告期</strong> — 报告涵盖的半年，已规范化（<em>2025 H2</em>）；最早的部分提交保留为 <em>2023 Q3</em>/<em>2023 Q4</em>。<strong>提交时标注</strong> — 总检察长自己的报告期标签，照录保留。</p>",
+        "ko": "<p><strong>회사</strong> — 제출자. 법무장관 저장소의 표기 그대로. <strong>플랫폼</strong> — 동일 회사의 여러 기간 제출물을 묶기 위한 정규화된 브랜드명. <strong>기간</strong> — 보고 대상 반기. 정규화됨(<em>2025 H2</em>). 가장 이른 부분 제출물은 <em>2023 Q3</em>/<em>2023 Q4</em>로 유지. <strong>제출 표기</strong> — 법무장관 자체 기간 라벨을 그대로 보존.</p>",
+    },
+    "<p><strong>Report</strong> — the filing PDF on the California AG site (<code>oag.ca.gov</code>), the authoritative location.</p>": {
+        "es": "<p><strong>Informe</strong> — el PDF de la presentación en el sitio de la Fiscalía de California (<code>oag.ca.gov</code>), la ubicación autorizada.</p>",
+        "fr": "<p><strong>Rapport</strong> — le PDF du dépôt sur le site du procureur général de Californie (<code>oag.ca.gov</code>), l'emplacement de référence.</p>",
+        "de": "<p><strong>Bericht</strong> — die Einreichungs-PDF auf der Website des kalifornischen Generalstaatsanwalts (<code>oag.ca.gov</code>), der maßgebliche Speicherort.</p>",
+        "it": "<p><strong>Report</strong> — il PDF della presentazione sul sito del procuratore generale della California (<code>oag.ca.gov</code>), la posizione autorevole.</p>",
+        "ja": "<p><strong>レポート</strong> — カリフォルニア州司法長官サイト（<code>oag.ca.gov</code>）にある提出 PDF。正式な保管場所です。</p>",
+        "zh": "<p><strong>报告</strong> — 加利福尼亚州总检察长网站（<code>oag.ca.gov</code>）上的提交 PDF，即权威位置。</p>",
+        "ko": "<p><strong>보고서</strong> — 캘리포니아 주 법무장관 사이트(<code>oag.ca.gov</code>)의 제출 PDF. 공식 위치입니다.</p>",
+    },
+    "<label>Platform <select": {
+        "es": "<label>Plataforma <select", "fr": "<label>Plateforme <select",
+        "de": "<label>Plattform <select", "it": "<label>Piattaforma <select",
+        "ja": "<label>プラットフォーム <select", "zh": "<label>平台 <select", "ko": "<label>플랫폼 <select",
+    },
+    "<th scope=\"col\">Filed as</th>": {
+        "es": "<th scope=\"col\">Presentado como</th>", "fr": "<th scope=\"col\">Déposé comme</th>",
+        "de": "<th scope=\"col\">Eingereicht als</th>", "it": "<th scope=\"col\">Presentato come</th>",
+        "ja": "<th scope=\"col\">提出時の表記</th>", "zh": "<th scope=\"col\">提交时标注</th>", "ko": "<th scope=\"col\">제출 표기</th>",
+    },
+    "`Showing ${fmt(d.count)} of ${fmt(d.total)} filings across ${fmt(d.company_count)} platforms.`": {
+        "es": "`Mostrando ${fmt(d.count)} de ${fmt(d.total)} presentaciones de ${fmt(d.company_count)} plataformas.`",
+        "fr": "`Affichage de ${fmt(d.count)} sur ${fmt(d.total)} dépôts pour ${fmt(d.company_count)} plateformes.`",
+        "de": "`${fmt(d.count)} von ${fmt(d.total)} Einreichungen über ${fmt(d.company_count)} Plattformen.`",
+        "it": "`Visualizzazione di ${fmt(d.count)} di ${fmt(d.total)} presentazioni su ${fmt(d.company_count)} piattaforme.`",
+        "ja": "`${fmt(d.company_count)} 個のプラットフォームの ${fmt(d.total)} 件中 ${fmt(d.count)} 件を表示しています。`",
+        "zh": "`显示 ${fmt(d.company_count)} 个平台的 ${fmt(d.total)} 份提交中的 ${fmt(d.count)} 份。`",
+        "ko": "`${fmt(d.company_count)}개 플랫폼의 제출물 ${fmt(d.total)}건 중 ${fmt(d.count)}건을 표시합니다.`",
+    },
+    "“California AB 587 Terms-of-Service reports, via the Transparency Report API (catalogue version ${d.version}).”": {
+        "es": "“Informes de condiciones de servicio AB 587 de California, vía la Transparency Report API (versión del catálogo ${d.version}).”",
+        "fr": "“Rapports sur les conditions d'utilisation AB 587 de Californie, via la Transparency Report API (version du catalogue ${d.version}).”",
+        "de": "“AB-587-Nutzungsbedingungen-Berichte Kaliforniens, über die Transparency Report API (Katalogversion ${d.version}).”",
+        "it": "“Report sui termini di servizio AB 587 della California, tramite la Transparency Report API (versione del catalogo ${d.version}).”",
+        "ja": "“カリフォルニア州 AB 587 利用規約報告書、Transparency Report API 経由（カタログバージョン ${d.version}）。”",
+        "zh": "“加利福尼亚州 AB 587 服务条款报告，经由 Transparency Report API（目录版本 ${d.version}）。”",
+        "ko": "“캘리포니아 AB 587 이용약관 보고서, Transparency Report API 경유(카탈로그 버전 ${d.version}).”",
+    },
+    ">CA AB 587 filings</option>": {
+        "es": ">Informes AB 587 de CA</option>", "fr": ">Dépôts AB 587 de CA</option>",
+        "de": ">CA-AB-587-Berichte</option>", "it": ">Report AB 587 della CA</option>",
+        "ja": ">CA AB 587 報告書</option>", "zh": ">加州 AB 587 报告</option>", "ko": ">CA AB 587 보고서</option>",
+    },
+}
+for _loc in _AB587_NAV:
+    COMMON[_loc].append(("      CA AB 587 reports\n    </a>", f"      {_AB587_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>CA AB 587 reports</h3>", f"<h3>{_AB587_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_AB587_CARD_DESC_EN, _AB587_CARD_DESC[_loc]))
+    # The narratives page gains a CA AB 587 source option (added after its own block ran).
+    PAGES[_loc]["narratives.html"].append((">CA AB 587 filings</option>", _AB587_PAGE[">CA AB 587 filings</option>"][_loc]))
+    PAGES[_loc]["ca-ab587.html"] = [
+        (_en, _tr[_loc]) for _en, _tr in _AB587_PAGE.items()
+        if _en != ">CA AB 587 filings</option>"
+    ]
+    _ab_text = open(os.path.join(STATIC, "ca-ab587.html"), encoding="utf-8").read()
+    _ab_own = {_o for _o, _ in PAGES[_loc]["ca-ab587.html"]}
+    # Derived from ny-tos.html (its analogue): inherit shared catalogue chrome
+    # (column headers, "What the columns mean", Download CSV, Search, provenance,
+    # error strings) for anything still present in the AB-587 page.
+    for _o, _n in PAGES[_loc]["ny-tos.html"]:
+        if _o in _ab_text and _o not in _ab_own:
+            PAGES[_loc]["ca-ab587.html"].append((_o, _n))
+            _ab_own.add(_o)
+
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

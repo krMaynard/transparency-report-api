@@ -384,6 +384,35 @@ _NARRATIVES_FIXTURE = {
     ],
 }
 seed.build_ny_tos_narratives(_NARRATIVES_FIXTURE, _DB)
+
+# A tiny slice of the California AB 587 ToS catalogue (ca-ab587-reports.csv shape).
+# Two platforms across two periods; archived/sha256/bytes blank (the AB 587 PDFs
+# aren't mirrored in-repo — the catalogue points at oag.ca.gov).
+_CA_AB587_FIXTURE = [
+    {"company": "Snap Inc.", "platform": "Snap", "period": "2025 H2",
+     "period_original": "Q3/Q4 2025", "access": "public",
+     "source_url": "https://oag.ca.gov/sites/default/files/Snap%20AB587%20Q3-Q4%202025.pdf",
+     "filename": "snap-2025-h2-aa11bb.pdf", "archived": "", "sha256": "", "bytes": ""},
+    {"company": "Reddit, Inc.", "platform": "Reddit", "period": "2024 H1",
+     "period_original": "Q1/Q2 2024", "access": "public",
+     "source_url": "https://oag.ca.gov/sites/default/files/Reddit%20AB587%20Q1-Q2%202024.pdf",
+     "filename": "reddit-2024-h1-cc22dd.pdf", "archived": "", "sha256": "", "bytes": ""},
+]
+seed.build_ca_ab587_reports(_CA_AB587_FIXTURE, _DB)
+
+# A tiny slice of the AB 587 narratives (source='ca-ab587'), same page-per-row
+# shape as the NY ToS narratives. [company, platform, period, page, heading, text]
+_CA_AB587_NARRATIVES_FIXTURE = {
+    "columns": ["company", "platform", "period", "page", "heading", "text"],
+    "rows": [
+        ["Snap Inc.", "Snap", "2025 H2", 4, "Extremism",
+         "Snap's California AB 587 report explains how it defines extremism and enforces its policy against violent radicalization campaigns."],
+        ["Reddit, Inc.", "Reddit", "2024 H1", 2, "",
+         "Reddit's California report describes its disinformation policy and how it handles coordinated inauthentic behavior."],
+    ],
+}
+seed.build_ca_ab587_narratives(_CA_AB587_NARRATIVES_FIXTURE, _DB)
+
 # Index the DSA Table-11 qualitative prose (source='dsa') from the seeded t11
 # rows — the same code path seed.main() runs after the harmonised append.
 seed.build_dsa_narratives(_DB)

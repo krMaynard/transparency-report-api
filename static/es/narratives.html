@@ -353,6 +353,14 @@ display: flex; align-items: center;
       NY ToS
     </a>
 
+    <a href="/es/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      CA AB 587
+    </a>
+
     <a href="/es/india" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3.25" y="2.75" width="9.5" height="11.5" rx="1"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Búsqueda de texto completo</span>
     <h1>Busca en el texto de los informes de transparencia</h1>
-    <p>Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y las secciones cualitativas de los informes de la DSA de la UE.</p>
+    <p>Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y California y las secciones cualitativas de los informes de la DSA de la UE.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Búsqueda de texto completo en la <strong>prosa</strong> de dos corpus: los informes de condiciones de servicio de redes sociales de Nueva York (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera) y las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos). Cada resultado es una página o descripción, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Búsqueda de texto completo en la <strong>prosa</strong> de tres corpus: los informes de condiciones de servicio de redes sociales de Nueva York y los informes AB 587 de California (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera) y las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos). Cada resultado es una página o descripción, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Buscar <input id="nq" type="search" placeholder="p. ej. discurso de odio, apelaciones, algoritmo" autocomplete="off" /></label>
-      <label>Fuente <select id="nsrc"><option value="">Todas</option><option value="ny-tos">Informes ToS de NY</option><option value="dsa">Informes DSA</option></select></label>
+      <label>Fuente <select id="nsrc"><option value="">Todas</option><option value="ny-tos">Informes ToS de NY</option><option value="ca-ab587">Informes AB 587 de CA</option><option value="dsa">Informes DSA</option></select></label>
       <label>Empresa <select id="nco"><option value="">Todas</option></select></label>
       <label>Período <select id="nper"><option value="">Todas</option></select></label>
       <button id="nbtn" type="button">Buscar</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 
