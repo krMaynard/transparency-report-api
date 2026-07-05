@@ -361,6 +361,14 @@ display: flex; align-items: center;
       NY-ToS-Berichte
     </a>
 
+    <a href="/de/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      CA-AB-587-Berichte
+    </a>
+
     <a href="/de/narratives" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Volltextsuche</span>
     <h1>Den Text der Transparenzberichte durchsuchen</h1>
-    <p>Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die New Yorker Nutzungsbedingungen-Berichte und die qualitativen Abschnitte der EU-DSA-Berichte.</p>
+    <p>Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien und die qualitativen Abschnitte der EU-DSA-Berichte.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Volltextsuche im <strong>Fließtext</strong> zweier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben) und die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt). Jedes Ergebnis ist eine Seite oder Beschreibung, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Volltextsuche im <strong>Fließtext</strong> dreier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben) und die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt). Jedes Ergebnis ist eine Seite oder Beschreibung, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Suche <input id="nq" type="search" placeholder="z. B. Hassrede, Einsprüche, Algorithmus" autocomplete="off" /></label>
-      <label>Quelle <select id="nsrc"><option value="">Alle</option><option value="ny-tos">NY-ToS-Berichte</option><option value="dsa">DSA-Berichte</option></select></label>
+      <label>Quelle <select id="nsrc"><option value="">Alle</option><option value="ny-tos">NY-ToS-Berichte</option><option value="ca-ab587">CA-AB-587-Berichte</option><option value="dsa">DSA-Berichte</option></select></label>
       <label>Unternehmen <select id="nco"><option value="">Alle</option></select></label>
       <label>Zeitraum <select id="nper"><option value="">Alle</option></select></label>
       <button id="nbtn" type="button">Suchen</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 

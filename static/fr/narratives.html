@@ -361,6 +361,14 @@ display: flex; align-items: center;
       Rapports CGU de NY
     </a>
 
+    <a href="/fr/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      Rapports AB 587 de CA
+    </a>
+
     <a href="/fr/narratives" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Recherche plein texte</span>
     <h1>Rechercher dans le texte des rapports de transparence</h1>
-    <p>Recherche plein texte dans la prose des rapports de transparence des plateformes : le langage qu'elles emploient pour décrire comment elles définissent et appliquent leurs politiques de modération de contenu. Couvre les dépôts de conditions d'utilisation de New York et les sections qualitatives des rapports DSA de l'UE.</p>
+    <p>Recherche plein texte dans la prose des rapports de transparence des plateformes : le langage qu'elles emploient pour décrire comment elles définissent et appliquent leurs politiques de modération de contenu. Couvre les dépôts de conditions d'utilisation de New York et de Californie et les sections qualitatives des rapports DSA de l'UE.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Recherche plein texte dans la <strong>prose</strong> de deux corpus : les dépôts de conditions d'utilisation des réseaux sociaux de New York (comment les plateformes décrivent la définition et l'application de leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère) et les descriptions qualitatives du tableau 11 des rapports DSA de l'UE (comment chaque service décrit son approche de modération de contenu). Chaque résultat est une page ou une description, classée par pertinence ; les résultats de New York renvoient au PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Recherche plein texte dans la <strong>prose</strong> de trois corpus : les dépôts de conditions d'utilisation des réseaux sociaux de New York et les dépôts AB 587 de Californie (comment les plateformes décrivent la définition et l'application de leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère) et les descriptions qualitatives du tableau 11 des rapports DSA de l'UE (comment chaque service décrit son approche de modération de contenu). Chaque résultat est une page ou une description, classée par pertinence ; les résultats de New York renvoient au PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Rechercher <input id="nq" type="search" placeholder="ex. discours de haine, appels, algorithme" autocomplete="off" /></label>
-      <label>Source <select id="nsrc"><option value="">Toutes</option><option value="ny-tos">Dépôts ToS de NY</option><option value="dsa">Rapports DSA</option></select></label>
+      <label>Source <select id="nsrc"><option value="">Toutes</option><option value="ny-tos">Dépôts ToS de NY</option><option value="ca-ab587">Dépôts AB 587 de CA</option><option value="dsa">Rapports DSA</option></select></label>
       <label>Entreprise <select id="nco"><option value="">Toutes</option></select></label>
       <label>Période <select id="nper"><option value="">Toutes</option></select></label>
       <button id="nbtn" type="button">Rechercher</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 

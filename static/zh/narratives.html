@@ -361,6 +361,14 @@ display: flex; align-items: center;
       纽约服务条款报告
     </a>
 
+    <a href="/zh/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      加州 AB 587 报告
+    </a>
+
     <a href="/zh/narratives" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">全文检索</span>
     <h1>检索透明度报告正文</h1>
-    <p>对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约《服务条款》报告和欧盟 DSA 报告的定性部分。</p>
+    <p>对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约和加利福尼亚州的《服务条款》报告以及欧盟 DSA 报告的定性部分。</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">对两个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）以及欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式）。每条结果是一页或一条描述，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。</p>
+    <p class="sub">对三个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告和加利福尼亚州 AB 587 提交文件（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）以及欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式）。每条结果是一页或一条描述，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。</p>
     <div class="controls">
       <label>搜索 <input id="nq" type="search" placeholder="例如：仇恨言论、申诉、算法" autocomplete="off" /></label>
-      <label>来源 <select id="nsrc"><option value="">全部</option><option value="ny-tos">纽约 ToS 报告</option><option value="dsa">DSA 报告</option></select></label>
+      <label>来源 <select id="nsrc"><option value="">全部</option><option value="ny-tos">纽约 ToS 报告</option><option value="ca-ab587">加州 AB 587 报告</option><option value="dsa">DSA 报告</option></select></label>
       <label>公司 <select id="nco"><option value="">全部</option></select></label>
       <label>报告期 <select id="nper"><option value="">全部</option></select></label>
       <button id="nbtn" type="button">搜索</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 

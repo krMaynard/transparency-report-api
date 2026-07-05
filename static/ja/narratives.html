@@ -361,6 +361,14 @@ display: flex; align-items: center;
       NY 利用規約報告
     </a>
 
+    <a href="/ja/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      CA AB 587 報告書
+    </a>
+
     <a href="/ja/narratives" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">全文検索</span>
     <h1>透明性レポートの本文を検索</h1>
-    <p>プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークの利用規約報告書と、EU DSA 報告書の定性的セクションを対象とします。</p>
+    <p>プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークとカリフォルニアの利用規約報告書と、EU DSA 報告書の定性的セクションを対象とします。</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">2 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）と、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）です。各結果は 1 ページまたは 1 件の記述で、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。</p>
+    <p class="sub">3 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書とカリフォルニア州 AB 587 の提出書類（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）と、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）です。各結果は 1 ページまたは 1 件の記述で、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。</p>
     <div class="controls">
       <label>検索 <input id="nq" type="search" placeholder="例：ヘイトスピーチ、異議申立、アルゴリズム" autocomplete="off" /></label>
-      <label>ソース <select id="nsrc"><option value="">すべて</option><option value="ny-tos">NY ToS 報告書</option><option value="dsa">DSA 報告書</option></select></label>
+      <label>ソース <select id="nsrc"><option value="">すべて</option><option value="ny-tos">NY ToS 報告書</option><option value="ca-ab587">CA AB 587 報告書</option><option value="dsa">DSA 報告書</option></select></label>
       <label>企業 <select id="nco"><option value="">すべて</option></select></label>
       <label>期間 <select id="nper"><option value="">すべて</option></select></label>
       <button id="nbtn" type="button">検索</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 

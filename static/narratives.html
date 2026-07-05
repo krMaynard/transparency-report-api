@@ -361,6 +361,14 @@ display: flex; align-items: center;
       NY ToS reports
     </a>
 
+    <a href="/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      CA AB 587 reports
+    </a>
+
     <a href="/narratives" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Full-text search</span>
     <h1>Search the report narratives</h1>
-    <p>Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's Terms-of-Service filings and the EU DSA reports' qualitative sections.</p>
+    <p>Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings and the EU DSA reports' qualitative sections.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Full-text search across the <strong>prose</strong> of two corpora: New York's Social Media Terms-of-Service filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference) and the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach). Each result is one page or description, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Full-text search across the <strong>prose</strong> of three corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference) and the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach). Each result is one page or description, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Search <input id="nq" type="search" placeholder="e.g. hate speech, appeals, algorithm" autocomplete="off" /></label>
-      <label>Source <select id="nsrc"><option value="">All</option><option value="ny-tos">NY ToS filings</option><option value="dsa">DSA reports</option></select></label>
+      <label>Source <select id="nsrc"><option value="">All</option><option value="ny-tos">NY ToS filings</option><option value="ca-ab587">CA AB 587 filings</option><option value="dsa">DSA reports</option></select></label>
       <label>Company <select id="nco"><option value="">All</option></select></label>
       <label>Period <select id="nper"><option value="">All</option></select></label>
       <button id="nbtn" type="button">Search</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 
