@@ -361,6 +361,14 @@ display: flex; align-items: center;
       Report ToS di NY
     </a>
 
+    <a href="/it/ca-ab587" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
+        <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
+      </svg>
+      Report AB 587 della CA
+    </a>
+
     <a href="/it/narratives" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
@@ -556,15 +564,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Ricerca full-text</span>
     <h1>Cerca nel testo dei report di trasparenza</h1>
-    <p>Ricerca full-text nella prosa dei report di trasparenza delle piattaforme: il linguaggio con cui descrivono come definiscono e applicano le loro policy di moderazione dei contenuti. Comprende i report sulle condizioni di servizio di New York e le sezioni qualitative dei report DSA dell'UE.</p>
+    <p>Ricerca full-text nella prosa dei report di trasparenza delle piattaforme: il linguaggio con cui descrivono come definiscono e applicano le loro policy di moderazione dei contenuti. Comprende i report sulle condizioni di servizio di New York e della California e le sezioni qualitative dei report DSA dell'UE.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Ricerca full-text nella <strong>prosa</strong> di due corpora: i report sulle condizioni di servizio dei social media di New York (come le piattaforme descrivono la definizione e l'applicazione delle regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera) e le descrizioni qualitative della Tabella 11 dei report DSA dell'UE (come ciascun servizio descrive il proprio approccio alla moderazione dei contenuti). Ogni risultato è una pagina o descrizione, ordinata per pertinenza; i risultati di New York rimandano al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Ricerca full-text nella <strong>prosa</strong> di tre corpora: i report sulle condizioni di servizio dei social media di New York e le presentazioni AB 587 della California (come le piattaforme descrivono la definizione e l'applicazione delle regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera) e le descrizioni qualitative della Tabella 11 dei report DSA dell'UE (come ciascun servizio descrive il proprio approccio alla moderazione dei contenuti). Ogni risultato è una pagina o descrizione, ordinata per pertinenza; i risultati di New York rimandano al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Cerca <input id="nq" type="search" placeholder="es. incitamento all'odio, ricorsi, algoritmo" autocomplete="off" /></label>
-      <label>Fonte <select id="nsrc"><option value="">Tutte</option><option value="ny-tos">Report ToS di NY</option><option value="dsa">Report DSA</option></select></label>
+      <label>Fonte <select id="nsrc"><option value="">Tutte</option><option value="ny-tos">Report ToS di NY</option><option value="ca-ab587">Report AB 587 della CA</option><option value="dsa">Report DSA</option></select></label>
       <label>Azienda <select id="nco"><option value="">Tutte</option></select></label>
       <label>Periodo <select id="nper"><option value="">Tutte</option></select></label>
       <button id="nbtn" type="button">Cerca</button>
@@ -613,7 +621,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
 
 let nAbort = null;
 

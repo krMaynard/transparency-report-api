@@ -116,6 +116,14 @@ _DEFAULT_ANDROID_SOURCE = os.getenv(
 _DEFAULT_NARRATIVES_SOURCE = os.getenv(
     "SEED_NARRATIVES_SOURCE_JSON", os.path.join(HERE, "data", "ny-tos-narratives.json")
 )
+# California AB 587 ToS reports — catalogue CSV + narrative full text, vendored
+# in-repo (from the sibling data repo's ca-ab587/).
+_DEFAULT_CA_AB587_SOURCE = os.getenv(
+    "SEED_CA_AB587_CSV", os.path.join(HERE, "data", "ca-ab587-reports.csv")
+)
+_DEFAULT_CA_AB587_NARRATIVES_SOURCE = os.getenv(
+    "SEED_CA_AB587_NARRATIVES_JSON", os.path.join(HERE, "data", "ca-ab587-narratives.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -573,6 +581,26 @@ CREATE TABLE ny_tos_reports (
 CREATE INDEX idx_ny_period ON ny_tos_reports(period);
 CREATE INDEX idx_ny_access ON ny_tos_reports(access);
 
+-- California's AB 587 Terms-of-Service reports: one row per filing the California
+-- Attorney General publishes. The California analogue of ny_tos_reports (same
+-- content categories, a US-state AG repository), also a flat catalogue. `archived`
+-- is a GitHub URL to the mirrored PDF; `period_original` keeps the AG's own label.
+CREATE TABLE ca_ab587_reports (
+    id              INTEGER PRIMARY KEY,
+    company         TEXT NOT NULL,
+    platform        TEXT,
+    period          TEXT NOT NULL,
+    period_original TEXT,
+    access          TEXT NOT NULL,
+    source_url      TEXT NOT NULL,
+    filename        TEXT,
+    archived        TEXT,
+    sha256          TEXT,
+    bytes           INTEGER
+);
+CREATE INDEX idx_ab587_period   ON ca_ab587_reports(period);
+CREATE INDEX idx_ab587_platform ON ca_ab587_reports(platform);
+
 -- Normalized NY ToS enforcement statistics: the per-category figures extracted
 -- from the archived filings, mapped onto the Stop Hiding Hate Act's five
 -- categories (sibling ny-tos-reports/NORMALIZATION.md documents the mapping and
@@ -623,6 +651,8 @@ _RL_COLUMNS = ("platform", "company", "category", "confidence",
                "harmonised_template", "format_period", "url_label", "url", "archived")
 _NY_TOS_COLUMNS = ("company", "platform", "period", "upload_date", "access",
                    "source_url", "filename", "archived", "sha256", "bytes")
+_CA_AB587_COLUMNS = ("company", "platform", "period", "period_original", "access",
+                     "source_url", "filename", "archived", "sha256", "bytes")
 
 # fact table name → (number of columns, source JSON key)
 _FACT_TABLES = {
@@ -1325,34 +1355,67 @@ _NY_STATS_COLUMNS = ("company", "period", "shha_category", "original_label",
                      "value", "unit", "page")
 
 
-def build_ny_tos_narratives(data: dict[str, Any], db_path: str) -> int:
-    """Populate the report_narratives FTS5 table with the NY ToS filing prose
-    (source='ny-tos') in an existing DB at db_path.
+def build_ca_ab587_reports(rows: list[dict[str, str]], db_path: str) -> int:
+    """Populate the ca_ab587_reports table in an existing DB at db_path.
 
-    The DB must already contain the virtual table (created by SCHEMA). The dataset
-    is the tidy-long ny-tos-narratives.json (`columns` header + `rows` in column
-    order: company, platform, period, page, heading, text). Returns the row count.
+    The DB must already contain the table (created by SCHEMA). `rows` are dicts
+    keyed by `_CA_AB587_COLUMNS`. Returns the number of rows inserted.
+    """
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ca_ab587_reports "
+                "(company, platform, period, period_original, access, source_url, "
+                "filename, archived, sha256, bytes) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                [tuple((r.get(c) if r.get(c) not in (None, "") else None)
+                       for c in _CA_AB587_COLUMNS) for r in rows],
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
+def _build_narratives(data: dict[str, Any], db_path: str, source: str) -> int:
+    """Populate the report_narratives FTS5 table with one page-per-row prose
+    dataset (`columns` header + `rows` in column order: company, platform, period,
+    page, heading, text), tagged with `source`. Shared by every page-based
+    narrative corpus (NY ToS filings, California AB 587 filings). Returns the count.
     """
     if data is None:
-        raise ValueError("narratives dataset is None")
+        raise ValueError(f"{source} narratives dataset is None")
     expected_cols = ["company", "platform", "period", "page", "heading", "text"]
     if data.get("columns") != expected_cols:
-        raise ValueError(f"narratives dataset columns {data.get('columns')} "
+        raise ValueError(f"{source} narratives dataset columns {data.get('columns')} "
                          f"don't match the expected order {expected_cols}")
     rows = data.get("rows")
     if rows is None:
-        raise ValueError("narratives dataset is missing 'rows'")
+        raise ValueError(f"{source} narratives dataset is missing 'rows'")
+    for i, r in enumerate(rows):
+        if len(r) != len(expected_cols):
+            raise ValueError(f"{source} narratives row {i} has length {len(r)}, "
+                             f"expected {len(expected_cols)}")
     conn = sqlite3.connect(db_path)
     try:
         with conn:
             conn.executemany(
                 "INSERT INTO report_narratives (source, company, platform, period, "
-                "page, heading, text) VALUES ('ny-tos',?,?,?,?,?,?)",
-                rows,
+                "page, heading, text) VALUES (?,?,?,?,?,?,?)",
+                [(source, *r) for r in rows],
             )
         return len(rows)
     finally:
         conn.close()
+
+
+def build_ny_tos_narratives(data: dict[str, Any], db_path: str) -> int:
+    """Populate report_narratives with the NY ToS filing prose (source='ny-tos')."""
+    return _build_narratives(data, db_path, "ny-tos")
+
+
+def build_ca_ab587_narratives(data: dict[str, Any], db_path: str) -> int:
+    """Populate report_narratives with the CA AB 587 filing prose (source='ca-ab587')."""
+    return _build_narratives(data, db_path, "ca-ab587")
 
 
 # A qualitative cell shorter than this (after trimming) is a placeholder — a bare
@@ -1435,6 +1498,10 @@ def main() -> None:
                         help="Path to ny-tos-reports.csv (NY ToS catalogue)")
     parser.add_argument("--ny-stats", default=_DEFAULT_NY_STATS_SOURCE,
                         help="Path to ny-tos-normalized.csv (normalized NY ToS stats)")
+    parser.add_argument("--ca-ab587", default=_DEFAULT_CA_AB587_SOURCE,
+                        help="Path to ca-ab587-reports.csv (California AB 587 catalogue)")
+    parser.add_argument("--ca-ab587-narratives", default=_DEFAULT_CA_AB587_NARRATIVES_SOURCE,
+                        help="Path to ca-ab587-narratives.json")
     parser.add_argument("--apple-source", default=_DEFAULT_APPLE_SOURCE,
                         help="Path to apple-transparency.json")
     parser.add_argument("--github-source", default=_DEFAULT_GITHUB_SOURCE,
@@ -1503,6 +1570,13 @@ def main() -> None:
         print(f"  ny_tos_reports: {n} rows from {os.path.basename(args.ny_tos)}")
     else:
         print(f"  (skipping NY ToS reports — not found: {args.ny_tos})")
+
+    if os.path.isfile(args.ca_ab587):
+        ab_rows = _load_report_locations_csv(args.ca_ab587)
+        n = build_ca_ab587_reports(ab_rows, args.db)
+        print(f"  ca_ab587_reports: {n} rows from {os.path.basename(args.ca_ab587)}")
+    else:
+        print(f"  (skipping CA AB 587 reports — not found: {args.ca_ab587})")
 
     if os.path.isfile(args.ny_stats):
         ny_stat_rows = _load_report_locations_csv(args.ny_stats)
@@ -1650,6 +1724,15 @@ def main() -> None:
               f"{len({r[0] for r in nar_data['rows']})} companies")
     else:
         print(f"  (skipping NY ToS narratives — not found: {args.narratives_source})")
+
+    if os.path.isfile(args.ca_ab587_narratives):
+        with open(args.ca_ab587_narratives, "r", encoding="utf-8") as f:
+            ab_nar_data = json.load(f)
+        ab_nar_rows = build_ca_ab587_narratives(ab_nar_data, args.db)
+        print(f"  ca ab587 narratives: {ab_nar_rows} pages across "
+              f"{len({r[1] or r[0] for r in ab_nar_data['rows']})} platforms")
+    else:
+        print(f"  (skipping CA AB 587 narratives — not found: {args.ca_ab587_narratives})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

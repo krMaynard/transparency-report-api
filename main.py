@@ -2340,6 +2340,12 @@ def ny_tos_page() -> FileResponse:
     return _serve_page("ny-tos.html", "NY ToS reports page")
 
 
+@app.get("/ca-ab587", response_class=HTMLResponse)
+def ca_ab587_page() -> FileResponse:
+    """Serve the CA AB 587 ToS-reports catalogue page (reads GET /api/ca-ab587-reports)."""
+    return _serve_page("ca-ab587.html", "CA AB 587 reports page")
+
+
 @app.get("/apple", response_class=HTMLResponse)
 def apple_page() -> FileResponse:
     """Serve the Apple Transparency Report dataset page (reads POST /api/explore)."""
@@ -2471,6 +2477,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "removals": ("removals.html", "Removals page", {}),
     "catalog": ("catalog.html", "Catalogue page", {}),
     "ny-tos": ("ny-tos.html", "NY ToS reports page", {}),
+    "ca-ab587": ("ca-ab587.html", "CA AB 587 reports page", {}),
     "apple": ("apple.html", "Apple transparency page", {}),
     "github": ("github.html", "GitHub transparency page", {}),
     "snap": ("snap.html", "Snap transparency page", {}),
@@ -3073,6 +3080,122 @@ def ny_tos_reports(
     }, headers=prov_headers)
 
 
+# California's AB 587 Terms-of-Service reports, seeded from data/ca-ab587-reports.csv
+# into the read-only `ca_ab587_reports` table. Same memoise-and-filter-in-memory
+# pattern as /ny-tos-reports — the California analogue, a static catalogue.
+_AB587_OUT_COLUMNS = (
+    "company", "platform", "period", "period_original", "access",
+    "source_url", "filename", "archived", "sha256", "bytes",
+)
+_ab587_cache: dict[str, Any] | None = None
+_ab587_cache_lock = threading.Lock()
+
+
+def _compute_ca_ab587_reports() -> dict[str, Any]:
+    conn = _connect_ro()
+    try:
+        rows = [
+            dict(zip(_AB587_OUT_COLUMNS, r))
+            for r in conn.execute(
+                "SELECT company, platform, period, period_original, access, "
+                "source_url, filename, archived, sha256, bytes "
+                "FROM ca_ab587_reports "
+                "ORDER BY period DESC, platform COLLATE NOCASE, company COLLATE NOCASE, id"
+            ).fetchall()
+        ]
+    finally:
+        conn.close()
+
+    version = hashlib.sha256(
+        json.dumps(rows, sort_keys=True, ensure_ascii=False).encode("utf-8")
+    ).hexdigest()[:12]
+
+    return {
+        "rows": rows,
+        "total": len(rows),
+        "company_count": len({r["platform"] or r["company"] for r in rows}),
+        "archived_count": sum(1 for r in rows if r.get("archived")),
+        "version": version,
+        "facets": {
+            "platform": sorted({r["platform"] for r in rows if r.get("platform")}, key=str.lower),
+            "period": sorted({r["period"] for r in rows if r.get("period")}, reverse=True),
+        },
+    }
+
+
+def _ca_ab587_data() -> dict[str, Any]:
+    global _ab587_cache
+    if _ab587_cache is None:
+        with _ab587_cache_lock:
+            if _ab587_cache is None:
+                _ab587_cache = _compute_ca_ab587_reports()
+    return _ab587_cache
+
+
+@api_router.get("/ca-ab587-reports", response_model=None)
+def ca_ab587_reports(
+    platform: str | None = None,
+    period: str | None = None,
+    q: str | None = Query(None, max_length=200),
+    format: Literal["json", "csv"] = "json",
+) -> JSONResponse | PlainTextResponse:
+    """Public catalogue of California's AB 587 Terms-of-Service reports — the
+    semiannual content-moderation filings social-media companies submit to the
+    California Attorney General (Bus. & Prof. Code §§ 22675-22681) — no auth. The
+    California analogue of `/ny-tos-reports`. Filter by `platform`, `period`, and
+    a free-text `q` (matches company/platform/URL). Returns JSON (`{count, total,
+    facets, rows}`) or `format=csv`. Memoised: the read-only table is static, so
+    rows are loaded once and filtered in memory (no user input reaches SQL)."""
+    data = _ca_ab587_data()
+    rows = data["rows"]
+
+    needle = q.strip().lower() if q and q.strip() else None
+    out = [
+        r for r in rows
+        if (platform is None or r["platform"] == platform)
+        and (period is None or r["period"] == period)
+        and (
+            needle is None
+            or needle in (r["company"] or "").lower()
+            or needle in (r["platform"] or "").lower()
+            or needle in (r["source_url"] or "").lower()
+        )
+    ]
+
+    version = data["version"]
+    generated = _dataset_meta().get("generated")
+    prov_headers = {"X-Catalogue-Version": version}
+    if generated:
+        prov_headers["X-Dataset-Generated"] = generated
+
+    if format == "csv":
+        buf = io.StringIO()
+        writer = csv.writer(buf)
+        writer.writerow(_AB587_OUT_COLUMNS)
+        writer.writerows(
+            [[_csv_safe(r[c] if r[c] is not None else "") for c in _AB587_OUT_COLUMNS] for r in out]
+        )
+        return PlainTextResponse(
+            buf.getvalue(),
+            media_type="text/csv",
+            headers={
+                **prov_headers,
+                "Content-Disposition": f'attachment; filename="ca-ab587-reports-{version}.csv"',
+            },
+        )
+
+    return JSONResponse({
+        "count": len(out),
+        "total": data["total"],
+        "company_count": data["company_count"],
+        "archived_count": data["archived_count"],
+        "version": version,
+        "generated": generated,
+        "facets": data["facets"],
+        "rows": out,
+    }, headers=prov_headers)
+
+
 # Full-text search over the report narratives (seeded into the FTS5
 # `report_narratives` table by seed.build_ny_tos_narratives + build_dsa_narratives).
 # Two `source`s: 'ny-tos' (one row per page of a NY ToS filing, deep-linkable into
@@ -3083,7 +3206,7 @@ def ny_tos_reports(
 _FTS_TERM = re.compile(r"[0-9A-Za-z]+")
 _MARK_OPEN = chr(0xE000)
 _MARK_CLOSE = chr(0xE001)
-_NARRATIVE_SOURCES = ("ny-tos", "dsa")
+_NARRATIVE_SOURCES = ("ny-tos", "dsa", "ca-ab587")
 
 
 def _fts_match(q: str) -> str:

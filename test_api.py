@@ -1593,17 +1593,86 @@ class TestNYTosReports:
         assert "/api/ny-tos-reports" in r.text and 'id="rl-period"' in r.text
 
 
+# ── Public CA AB 587-reports catalogue (GET /api/ca-ab587-reports) ───────────
+
+class TestCAAB587Reports:
+    def test_public_and_populated(self):
+        r = client.get("/api/ca-ab587-reports")  # no X-API-Key
+        assert r.status_code == 200
+        d = r.json()
+        # The conftest fixture seeds two public filings (Snap 2025 H2, Reddit 2024 H1).
+        assert d["count"] == d["total"] == 2
+        assert d["company_count"] == 2  # distinct platform
+        assert d["archived_count"] == 0  # AB 587 PDFs aren't mirrored in-repo
+        assert set(d["facets"]) == {"platform", "period"}
+        assert d["facets"]["platform"] == ["Reddit", "Snap"]
+        # Sorted by period DESC: 2025 H2 (Snap) before 2024 H1 (Reddit).
+        assert [row["company"] for row in d["rows"]] == ["Snap Inc.", "Reddit, Inc."]
+        snap = d["rows"][0]
+        assert snap["platform"] == "Snap" and snap["period_original"] == "Q3/Q4 2025"
+        assert snap["access"] == "public" and snap["archived"] is None
+
+    def test_catalogue_carries_provenance(self):
+        r = client.get("/api/ca-ab587-reports")
+        d = r.json()
+        assert d.get("version") and "generated" in d
+        assert r.headers.get("X-Catalogue-Version") == d["version"]
+        cv = client.get("/api/ca-ab587-reports", params={"format": "csv"})
+        assert cv.headers.get("X-Catalogue-Version") == d["version"]
+        assert f'ca-ab587-reports-{d["version"]}.csv' in cv.headers.get("content-disposition", "")
+
+    def test_filter_by_platform_and_period(self):
+        r = client.get("/api/ca-ab587-reports", params={"platform": "Reddit"})
+        d = r.json()
+        assert d["count"] == 1 and d["rows"][0]["company"] == "Reddit, Inc."
+        r = client.get("/api/ca-ab587-reports", params={"period": "2025 H2"})
+        assert r.json()["count"] == 1 and r.json()["rows"][0]["platform"] == "Snap"
+
+    def test_free_text_search(self):
+        # Matches company / platform / source url, case-insensitively.
+        assert client.get("/api/ca-ab587-reports", params={"q": "reddit"}).json()["count"] == 1
+        assert client.get("/api/ca-ab587-reports", params={"q": "oag.ca.gov"}).json()["count"] == 2
+        assert client.get("/api/ca-ab587-reports", params={"q": "nomatch-xyz"}).json()["count"] == 0
+
+    def test_csv_export(self):
+        r = client.get("/api/ca-ab587-reports", params={"format": "csv"})
+        assert r.status_code == 200
+        assert "text/csv" in r.headers["content-type"]
+        lines = r.text.splitlines()
+        assert lines[0] == "company,platform,period,period_original,access,source_url,filename,archived,sha256,bytes"
+        assert len(lines) == 3  # header + 2 rows
+
+    def test_page_served(self):
+        r = client.get("/ca-ab587")
+        assert r.status_code == 200
+        assert "/api/ca-ab587-reports" in r.text and 'id="rl-platform"' in r.text
+
+    def test_vendored_catalogue_shape(self):
+        import csv
+        import pathlib
+        with pathlib.Path(__file__).with_name("data").joinpath(
+                "ca-ab587-reports.csv").open(encoding="utf-8-sig", newline="") as f:
+            rows = list(csv.DictReader(f))
+        assert rows and set(rows[0]) == {
+            "company", "platform", "period", "period_original", "access",
+            "source_url", "filename", "archived", "sha256", "bytes"}
+        # The AB 587 PDFs aren't mirrored in-repo — every row points at oag.ca.gov.
+        assert all(r["access"] == "public" for r in rows)
+        assert all(not r["archived"] for r in rows)
+        assert all("oag.ca.gov" in r["source_url"] for r in rows)
+
+
 # ── Public NY ToS narrative full-text search (GET /api/narratives) ───────────
 
 class TestNarratives:
-    def test_public_index_spans_both_sources(self):
+    def test_public_index_spans_all_sources(self):
         # No query: returns the facet lists + how much prose is searchable across
-        # both corpora (3 NY ToS pages + 1 DSA description from the fixtures).
+        # all corpora (3 NY ToS pages + 1 DSA description + 2 CA AB 587 pages).
         d = client.get("/api/narratives").json()  # no X-API-Key
         assert d["searched"] is False
-        assert d["page_total"] == 4
-        assert d["sources"] == ["ny-tos", "dsa"]
-        assert {"Snap Inc", "TikTok Inc", "YouTube"} <= set(d["companies"])
+        assert d["page_total"] == 6
+        assert d["sources"] == ["ny-tos", "dsa", "ca-ab587"]
+        assert {"Snap Inc", "TikTok Inc", "YouTube", "Reddit, Inc."} <= set(d["companies"])
         assert d["results"] == []
         assert d["mark_open"] and d["mark_close"]  # highlight sentinels present
 
@@ -1612,6 +1681,20 @@ class TestNarratives:
         assert set(ny["companies"]) == {"Snap Inc", "TikTok Inc"} and ny["page_total"] == 3
         dsa = client.get("/api/narratives", params={"source": "dsa"}).json()
         assert dsa["companies"] == ["YouTube"] and dsa["page_total"] == 1
+        ab = client.get("/api/narratives", params={"source": "ca-ab587"}).json()
+        assert set(ab["companies"]) == {"Snap Inc.", "Reddit, Inc."} and ab["page_total"] == 2
+
+    def test_ca_ab587_source_indexed(self):
+        # The CA AB 587 prose (source='ca-ab587') is searchable and scoped by source.
+        d = client.get("/api/narratives",
+                       params={"q": "extremism", "source": "ca-ab587"}).json()
+        assert d["total"] == 1
+        hit = d["results"][0]
+        assert hit["source"] == "ca-ab587" and hit["company"] == "Snap Inc."
+        assert hit["page"] == 4
+        # "extremism" is unique to the CA corpus — not in the NY ToS pages.
+        assert client.get("/api/narratives",
+                          params={"q": "extremism", "source": "ny-tos"}).json()["total"] == 0
 
     def test_full_text_search_ranks_and_links(self):
         d = client.get("/api/narratives", params={"q": "hate speech"}).json()
@@ -1682,6 +1765,15 @@ class TestNarratives:
                           .joinpath("ny-tos-narratives.json").read_text(encoding="utf-8"))
         assert data["columns"] == ["company", "platform", "period", "page", "heading", "text"]
         assert all(len(r) == 6 for r in data["rows"])
+        assert all(isinstance(r[3], int) for r in data["rows"])  # page is an int
+
+    def test_vendored_ca_ab587_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("ca-ab587-narratives.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["company", "platform", "period", "page", "heading", "text"]
+        assert data["rows"] and all(len(r) == 6 for r in data["rows"])
         assert all(isinstance(r[3], int) for r in data["rows"])  # page is an int
 
 
