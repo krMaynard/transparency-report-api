@@ -91,6 +91,11 @@ _DEFAULT_MICROSOFT_SOURCE = os.getenv(
 _DEFAULT_LINKEDIN_SOURCE = os.getenv(
     "SEED_LINKEDIN_SOURCE_JSON", os.path.join(HERE, "data", "linkedin-transparency.json")
 )
+# TikTok Government & Legal Requests reports — vendored in-repo (from the
+# sibling data repo's tiktok-transparency/build_tiktok.py).
+_DEFAULT_TIKTOK_SOURCE = os.getenv(
+    "SEED_TIKTOK_SOURCE_JSON", os.path.join(HERE, "data", "tiktok-transparency.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -436,6 +441,24 @@ CREATE TABLE linkedin_metrics (
     value_high REAL
 );
 CREATE INDEX idx_linkedin_dataset ON linkedin_metrics(dataset);
+
+-- TikTok Government & Legal Requests reports (tiktok-transparency/build_tiktok.py).
+-- Tidy-long: one row per measured value from the cumulative CLIGR CSVs. Three
+-- datasets (government_removals / information_requests / ip_removals) by
+-- country × half-year, 2019-H1 onward. `value` is REAL: exact integer counts
+-- (unit='count') and rate/percentage rows carried as fractions of 1
+-- (unit='percent', non-additive). The global 'All' country row sits alongside
+-- the per-country rows (pin country before aggregating). Dims inline.
+CREATE TABLE tiktok_metrics (
+    dataset  TEXT NOT NULL,   -- government_removals / information_requests /
+                              -- ip_removals
+    period   TEXT NOT NULL,   -- half-year, 'YYYY-H1' / 'YYYY-H2'
+    country  TEXT NOT NULL,   -- market name, or 'All' (global aggregate)
+    metric   TEXT NOT NULL,   -- total_requests_received / legal_requests / ...
+    unit     TEXT NOT NULL,   -- count / percent
+    value    REAL
+);
+CREATE INDEX idx_tiktok_dataset ON tiktok_metrics(dataset);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -1033,6 +1056,35 @@ def build_linkedin_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_tiktok_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the tiktok_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is
+    the tidy-long tiktok-transparency.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("tiktok dataset is None")
+    expected_cols = ["dataset", "period", "country", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"tiktok dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("tiktok dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO tiktok_metrics (dataset, period, country, metric, "
+                "unit, value) VALUES (?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_report_locations(rows: list[dict[str, str]], db_path: str) -> int:
     """Populate the report_locations table in an existing DB at db_path.
 
@@ -1143,6 +1195,8 @@ def main() -> None:
                         help="Path to microsoft-lerr.json")
     parser.add_argument("--linkedin-source", default=_DEFAULT_LINKEDIN_SOURCE,
                         help="Path to linkedin-transparency.json")
+    parser.add_argument("--tiktok-source", default=_DEFAULT_TIKTOK_SOURCE,
+                        help="Path to tiktok-transparency.json")
     args = parser.parse_args()
 
     with open(args.source, "r", encoding="utf-8") as f:
@@ -1281,6 +1335,16 @@ def main() -> None:
               f"{len({r[0] for r in li_data['rows']})} datasets")
     else:
         print(f"  (skipping LinkedIn transparency — not found: {args.linkedin_source})")
+
+    if os.path.isfile(args.tiktok_source):
+        with open(args.tiktok_source, "r", encoding="utf-8") as f:
+            tt_data = json.load(f)
+        tt_rows = build_tiktok_db(tt_data, args.db)
+        print(f"  tiktok transparency: {tt_rows} metric rows across "
+              f"{len({r[1] for r in tt_data['rows']})} periods, "
+              f"{len({r[0] for r in tt_data['rows']})} datasets")
+    else:
+        print(f"  (skipping TikTok transparency — not found: {args.tiktok_source})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

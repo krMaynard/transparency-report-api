@@ -25,9 +25,11 @@ Meta's not yet retrievable), **Google government requests for user
 information** (the biannual bulk export: global/diplomatic/enterprise requests
 + banded US national-security ranges, 2009 H2 onward), the **Microsoft Law
 Enforcement Requests Report** (per-country demands + disclosure outcomes,
-half-yearly since 2013), and the **LinkedIn Government Requests Report**
+half-yearly since 2013), the **LinkedIn Government Requests Report**
 (member-data requests, the US legal-process breakdown, and content-removal
-requests).
+requests), and the **TikTok Government & Legal Requests reports**
+(government content-removal requests + user-information requests per country +
+IP/copyright removal requests, half-yearly since 2019).
 
 Built to demonstrate two things:
 
@@ -47,7 +49,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), and the non-VLOP harmonised reports |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), and the non-VLOP harmonised reports |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -61,6 +63,7 @@ Built to demonstrate two things:
 | `data/google-user-data.json` | Vendored snapshot of Google's government requests for user information (sibling `dsa-transparency-data/google-user-data/build_userdata.py`) — a tidy-long `columns`+`rows` list; seeded into the `google_userdata_metrics` table by `seed.build_google_userdata_db` |
 | `data/microsoft-lerr.json` | Vendored snapshot of the Microsoft Law Enforcement Requests Report (sibling `dsa-transparency-data/microsoft-lerr/build_microsoft.py`) — a tidy-long `columns`+`rows` list; seeded into the `microsoft_metrics` table by `seed.build_microsoft_db` |
 | `data/linkedin-transparency.json` | Vendored snapshot of the LinkedIn Government Requests Report (sibling `dsa-transparency-data/linkedin-transparency/build_linkedin.py`) — a tidy-long `columns`+`rows` list; seeded into the `linkedin_metrics` table by `seed.build_linkedin_db` |
+| `data/tiktok-transparency.json` | Vendored snapshot of the TikTok Government & Legal Requests reports (sibling `dsa-transparency-data/tiktok-transparency/build_tiktok.py`) — a tidy-long `columns`+`rows` list; seeded into the `tiktok_metrics` table by `seed.build_tiktok_db` |
 | `data/template-crosswalk.json` | Vendored `{original-language label → canonical English}` map for the template's `sections`/`indicators`/`scopes`, applied by `seed.normalize_dimensions` to stamp each dim row's language-neutral `key`. Regenerate with `scripts/build_template_crosswalk.py` |
 | `scripts/build_template_crosswalk.py` | Learns `data/template-crosswalk.json` by aligning same-structure non-VLOP report sheets to an English reference (drops ambiguous labels) — reads the sibling repo's extracted CSVs |
 | `demo.py` | Narrated walkthrough script (run after starting the server) |
@@ -76,6 +79,7 @@ Built to demonstrate two things:
 | `static/user-data.html` | Public Google user-data requests dataset page (served at `/user-data`) — Trends charts + overview tables over `POST /api/explore` (`google_userdata_metrics`) |
 | `static/microsoft.html` | Public Microsoft LERR dataset page (served at `/microsoft`) — Trends charts + overview tables over `POST /api/explore` (`microsoft_metrics`) |
 | `static/linkedin.html` | Public LinkedIn Government Requests dataset page (served at `/linkedin`) — Trends charts + overview tables over `POST /api/explore` (`linkedin_metrics`) |
+| `static/tiktok.html` | Public TikTok Government & Legal Requests dataset page (served at `/tiktok`) — Trends charts + overview tables over `POST /api/explore` (`tiktok_metrics`) |
 | `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
 | `data/ny-tos-normalized.csv` | Vendored snapshot of the **normalized NY ToS enforcement statistics** (sibling `dsa-transparency-data/ny-tos-reports/ny_tos_normalized.csv` — per-category figures mapped onto the Stop Hiding Hate Act's five categories; see that repo's `NORMALIZATION.md`) — seeded into the queryable `ny_tos_stats` table by `seed.build_ny_tos_stats` |
 | `static/mcp.html` | Public MCP-server info page (served at `/mcp`) — documents `mcp_server.py`, its 8 tools, and host config; static, no page JS |
@@ -83,7 +87,7 @@ Built to demonstrate two things:
 | `static/vendor/chart.umd.js` | Vendored Chart.js 4.4.4 (self-hosted, not a CDN) — served by the `/static/vendor/{filename}` route so the dashboard CSP stays `script-src 'self'` |
 | `static/api-key.html` | API-key sign-in page (served at `/api-key`; formerly the "researcher portal") — Google sign-in + demo fallback. `/portal` 308-redirects here |
 | `static/schema.html` | Public dataset-schema browser (served at `/schema`) — report tables + dimensions/measures, no sign-in (reads `/api/tables` + `/api/schema/{table}`) |
-| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the nineteen pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
+| `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the twenty pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
@@ -118,7 +122,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -244,7 +248,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Ten non-DSA datasets ride alongside, each exposed as an ordinary query table
+Eleven non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -322,6 +326,21 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   (2015-H1→; `pct_*` metrics are percentages of requests, and the
   national-security rows are banded ranges), and government content-removal
   requests (2018-H1→). Scraped from the server-rendered report page.
+- **TikTok Government & Legal Requests reports** — a single **tidy-long**
+  `tiktok_metrics` table (one row per measured value: `dataset`/`period`/
+  `country`/`metric`/`unit` + a `value`; dims stored inline). A stream distinct
+  from TikTok's DSA content-moderation figures. Three datasets by country ×
+  half-year (2019-H1→), from the cumulative CLIGR CSVs: `government_removals`
+  (content-removal requests — requests/content/accounts received & actioned,
+  removal rate), `information_requests` (legal/emergency/preservation requests,
+  accounts specified, disclosure percentages) and `ip_removals` (global-only —
+  copyright & trademark request/removal counts + success/appeal rates). `unit`
+  is `count` or `percent` (every rate/percentage is a **fraction of 1** — never
+  SUM). **The global `All` country row sits alongside the per-country rows**,
+  and the `All` aggregate uses different metric names than the per-country rows
+  (`total_government_requests`/`total_legal_requests`/… at `All` vs
+  `total_requests_received`/`legal_requests`/… per country) — pin `country` (or
+  the right metric grain) plus a `dataset` and `metric` before aggregating.
 
 **Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
 `build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an
@@ -573,6 +592,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |
+| GET | `/tiktok` | — | Public TikTok Government & Legal Requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/methodology` | — | Public methodology page (web UI; how the dataset is sourced/processed/cited) |
 | GET | `/schema` | — | Public dataset-schema browser (web UI; no sign-in) |

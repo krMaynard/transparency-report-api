@@ -1232,6 +1232,20 @@ TABLES: dict[str, TableSpec] = {
             "value_high": "f.value_high",
         },
     ),
+    "tiktok_metrics": TableSpec(
+        "TikTok Government & Legal Requests reports — a stream distinct from the DSA content-moderation figures. Three datasets by country × half-year (2019-H1 onward): government content-removal requests ('government_removals' — requests/content/accounts received & actioned, removal rate), government requests for user information ('information_requests' — legal/emergency/preservation requests, accounts specified, disclosure percentages), and IP/copyright removal requests ('ip_removals' — global-only, copyright & trademark counts + success/appeal rates). A tidy-long table: one row per measured value, identified by dataset × period × country × metric. `unit` is 'count' (exact integer) or 'percent' (a rate/percentage reported as a fraction of 1 — never SUM a percent). The global 'All' country row sits ALONGSIDE the per-country rows, so an unpinned SUM double-counts — pin `country` (or filter out 'All'). Pin a `dataset` and a `metric` before aggregating: requests ≠ content ≠ accounts, and the counts split several ways.",
+        "FROM tiktok_metrics f",
+        {
+            "dataset": "f.dataset",
+            "period":  "f.period",
+            "country": "f.country",
+            "metric":  "f.metric",
+            "unit":    "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -2352,6 +2366,12 @@ def linkedin_page() -> FileResponse:
     return _serve_page("linkedin.html", "LinkedIn requests page")
 
 
+@app.get("/tiktok", response_class=HTMLResponse)
+def tiktok_page() -> FileResponse:
+    """Serve the TikTok Government & Legal Requests dataset page (reads POST /api/explore)."""
+    return _serve_page("tiktok.html", "TikTok requests page")
+
+
 @app.get("/mcp", response_class=HTMLResponse)
 def mcp_page() -> FileResponse:
     """Serve the MCP-server info page (static; documents mcp_server.py)."""
@@ -2408,6 +2428,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "user-data": ("user-data.html", "Google user data page", {}),
     "microsoft": ("microsoft.html", "Microsoft requests page", {}),
     "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
+    "tiktok": ("tiktok.html", "TikTok requests page", {}),
     "mcp": ("mcp.html", "MCP page", {}),
     "methodology": ("methodology.html", "Methodology page", {}),
     "schema": ("schema.html", "Schema page", {}),
@@ -3340,6 +3361,40 @@ def _leg_warnings(
                 "splits as separate metrics; this aggregate pins no 'metric', so "
                 "it may add different quantities. Filter or group by 'metric'."
             )
+    # tiktok_metrics mixes counts and (fractional) percentages in one value
+    # column across three datasets, and its global 'All' country row sits
+    # alongside the per-country rows.
+    if table == "tiktok_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "unit" not in pinned:
+            out.append(
+                "'tiktok_metrics' keeps counts and (fractional) percentages in "
+                "one 'value' column; this aggregate pins no 'unit', so it may sum "
+                "a rate with a count. Filter or group by 'unit'."
+            )
+        if "dataset" not in pinned:
+            out.append(
+                "'tiktok_metrics' spans government-removal, information-request "
+                "and IP-removal datasets whose metrics aren't comparable; this "
+                "aggregate pins no 'dataset'. Filter or group by 'dataset'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'tiktok_metrics' reports requests, content and accounts (split "
+                "several ways) as separate metrics; this aggregate pins no "
+                "'metric', so it may add different quantities. Filter or group "
+                "by 'metric'."
+            )
+        # The global 'All' country row co-exists with the per-country rows;
+        # summing over both double-counts (unless 'All' itself is the target).
+        if "country" not in pinned:
+            out.append(
+                "'tiktok_metrics' carries a global 'All' country row alongside "
+                "the per-country rows; this aggregate pins no 'country', so it "
+                "may double-count. Filter country='All' for the global figure or "
+                "exclude it for the per-country breakdown."
+            )
     # ny_tos_stats normalizes only the *category* dimension: metric/submetric
     # stay in each company's own terms (flagged vs actioned vs warned…), counts
     # and percent rates share one `value` column, and Strava's per-format
@@ -3794,7 +3849,7 @@ FIELD_HELP: dict[str, str] = {
     "accounts_low": "Lower bound of the reported accounts/users range (apple_national_security).",
     "accounts_high": "Upper bound of the reported accounts/users range (apple_national_security).",
     # ── GitHub transparency (tidy-long github_metrics) ──
-    "dataset": "Which series within the table the row belongs to. github_metrics: e.g. government_takedowns_received / user_info_requests / national_security / dmca_takedowns / eu_dsa_mau. google_userdata_metrics: global / global_diplomatic / enterprise / enterprise_diplomatic / us_fisa_content / us_fisa_non_content / us_nsl. linkedin_metrics: member_data_requests / us_breakdown / content_removal_requests. Pin a dataset before aggregating; metrics aren't comparable across datasets.",
+    "dataset": "Which series within the table the row belongs to. github_metrics: e.g. government_takedowns_received / user_info_requests / national_security / dmca_takedowns / eu_dsa_mau. google_userdata_metrics: global / global_diplomatic / enterprise / enterprise_diplomatic / us_fisa_content / us_fisa_non_content / us_nsl. linkedin_metrics: member_data_requests / us_breakdown / content_removal_requests. tiktok_metrics: government_removals / information_requests / ip_removals (ip_removals is global-only). Pin a dataset before aggregating; metrics aren't comparable across datasets.",
     "category": "In-row breakdown within a github_metrics dataset — request type, abuse type, takedown type, etc. (empty when the dataset has no sub-breakdown).",
     "metric": "Which reported count the row is, when a github_metrics dataset has several (e.g. received / disclosed; repos_affected / pages_affected / accounts_affected); otherwise 'count'.",
     "count_low": "Reported value (github_metrics). Equals count_high for exact counts; for national_security and eu_dsa_mau the value is a banded range, so this is the lower bound.",
@@ -3806,7 +3861,7 @@ FIELD_HELP: dict[str, str] = {
     "sub_category_1": "First sub-breakdown within a snap_metrics section (e.g. a country, or a violation category).",
     "sub_category_2": "Second sub-breakdown within a snap_metrics section (e.g. the violation category when sub_category_1 is a country).",
     # ── India IT Rules (tidy-long india_metrics) ──
-    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics: 'count' or 'percent'. microsoft_metrics: 'count'. Never SUM across different units; pin a unit before aggregating.",
+    "unit": "What the value measures. india_metrics: 'count' (exact integer), 'approx_count' (Meta's abbreviated proactive figures like 2.3M — rounded best-estimates, not exact), or 'percent' (proactive-detection rates). korea_metrics: 'count', 'percent' (Naver's compliance rates) or 'average' (Naver's accounts-per-processed-request). google_userdata_metrics / linkedin_metrics / tiktok_metrics: 'count' or 'percent' (tiktok_metrics reports every rate/percentage as a fraction of 1). microsoft_metrics: 'count'. Never SUM across different units; pin a unit before aggregating.",
     # ── Korea transparency (tidy-long korea_metrics) ──
     "service": "Kakao reports per service corp ('Daum' / 'Kakao'); Naver reports company-wide (empty string).",
     # ── NY ToS normalized stats (tidy-long ny_tos_stats) ──
