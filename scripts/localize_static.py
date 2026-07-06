@@ -10985,6 +10985,17 @@ for _loc in _AB587_NAV:
             _ab_own.add(_o)
 
 
+_MANDATES_NAV = {
+    'es': 'Obligaciones de reporte',
+    'fr': 'Obligations de rapport',
+    'de': 'Meldepflichten',
+    'it': 'Obblighi di rendicontazione',
+    'ja': '報告義務',
+    'zh': '报告义务',
+    'ko': '보고 의무',
+}
+for _loc, _lbl in _MANDATES_NAV.items():
+    COMMON[_loc].append(("      Reporting mandates\n    </a>", f"      {_lbl}\n    </a>"))
 
 
 # ── Türkiye Law No. 5651 platform transparency reports page ──────────────────

@@ -2462,6 +2462,14 @@ def methodology_page() -> FileResponse:
     return _serve_page("methodology.html", "Methodology page")
 
 
+@app.get("/mandates", response_class=HTMLResponse)
+def mandates_page() -> FileResponse:
+    """Serve the reporting-mandates reference page (static; a global reference table
+    of the laws that require platforms to publish transparency reports). English-only
+    — a dense legal reference; the localized sidebars link here."""
+    return _serve_page("mandates.html", "Reporting mandates page")
+
+
 @app.get("/portal", include_in_schema=False)
 def portal_redirect() -> RedirectResponse:
     """Permanent redirect from the old researcher-portal URL to /api-key."""
