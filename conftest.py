@@ -281,6 +281,23 @@ _JAPAN_FIXTURE = {
 }
 seed.build_japan_db(_JAPAN_FIXTURE, _DB)
 
+# A small slice of the TikTok CGER dataset (tiktok-cger.json shape): a couple of
+# quarters, the 'All' grain plus a policy breakdown, mixing a count metric (Total
+# videos removed) and rate metrics (Proactive removal rate — a fraction of 1).
+# [period, metric, policy_type, issue, task_type, task, unit, value]
+_TIKTOK_CGER_FIXTURE = {
+    "columns": ["period", "metric", "policy_type", "issue", "task_type", "task", "unit", "value"],
+    "rows": [
+        ["2025 Q4", "Total videos removed", "All", "All", "All", "All", "count", 175302085],
+        ["2026 Q1", "Total videos removed", "All", "All", "All", "All", "count", 184012576],
+        ["2026 Q1", "Proactive removal rate", "All", "All", "All", "All", "rate", 0.994],
+        ["2026 Q1", "Removal rate within 24 hours", "All", "All", "All", "All", "rate", 0.934],
+        ["2026 Q1", "Total videos removed", "Policy", "Safety and Civility", "All", "All", "count", 25656334],
+        ["2026 Q1", "Total videos removed", "Policy", "Mental and Behavioral Health", "All", "All", "count", 38689999],
+    ],
+}
+seed.build_tiktok_cger_db(_TIKTOK_CGER_FIXTURE, _DB)
+
 # A small slice of the Google user-data dataset (google-user-data.json shape).
 # [dataset, period, country, iso2, product, legal_process, assisting_country,
 #  metric, unit, value_low, value_high]
