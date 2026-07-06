@@ -33,7 +33,7 @@ STATIC = os.path.join(ROOT, "static")
 PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-tos.html",
                "ca-ab587.html",
                "apple.html", "github.html", "snap.html",
-               "india.html", "korea.html", "taiwan.html",
+               "india.html", "korea.html", "taiwan.html", "turkey.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
                "disruptions.html", "android.html", "narratives.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
@@ -51,6 +51,7 @@ SUFFIX = {
     "india.html": "india",
     "korea.html": "korea",
     "taiwan.html": "taiwan",
+    "turkey.html": "turkey",
     "user-data.html": "user-data",
     "microsoft.html": "microsoft",
     "linkedin.html": "linkedin",
@@ -119,7 +120,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/ca-ab587', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/turkey', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -10983,6 +10984,234 @@ for _loc in _AB587_NAV:
             PAGES[_loc]["ca-ab587.html"].append((_o, _n))
             _ab_own.add(_o)
 
+
+
+
+# ── Türkiye Law No. 5651 platform transparency reports page ──────────────────
+# Sidebar-nav label + home feature-card, then the page-unique strings; shared
+# chart chrome (Trends, "Interactive views…", Loading…, provenance, the query-
+# builder hint, "What the reports cover") is inherited from the snap / microsoft
+# / india pages below (a pair is taken only when its find-string is in the page).
+_TR_NAV = {
+    "es": "Ley 5651 (Türkiye)", "fr": "Loi 5651 (Türkiye)", "de": "Türkei — Gesetz 5651",
+    "it": "Legge 5651 (Türkiye)", "ja": "トルコ 5651号法", "zh": "土耳其 5651号法", "ko": "튀르키예 5651호법",
+}
+_TR_CARD_DESC_EN = "The six-monthly content-removal reports platforms publish under Türkiye's Law No. 5651 — individual and authority requests by requesting body, from Meta's Facebook &amp; Instagram reports."
+_TR_CARD_DESC = {
+    "es": "Los informes semestrales de retirada de contenidos que las plataformas publican bajo la Ley N.º 5651 de Türkiye: solicitudes individuales y de autoridades por organismo solicitante, a partir de los informes de Facebook e Instagram de Meta.",
+    "fr": "Les rapports semestriels de retrait de contenu que les plateformes publient au titre de la loi n° 5651 de Türkiye : demandes individuelles et des autorités par organisme demandeur, d'après les rapports Facebook et Instagram de Meta.",
+    "de": "Die halbjährlichen Berichte zur Inhaltsentfernung, die Plattformen nach dem türkischen Gesetz Nr. 5651 veröffentlichen — Anfragen von Einzelpersonen und Behörden nach anfragender Stelle, aus Metas Facebook- und Instagram-Berichten.",
+    "it": "I report semestrali sulla rimozione di contenuti che le piattaforme pubblicano ai sensi della Legge n. 5651 della Türkiye: richieste individuali e delle autorità per ente richiedente, dai report di Facebook e Instagram di Meta.",
+    "ja": "プラットフォームがトルコの法律第5651号に基づき公表する半期ごとのコンテンツ削除レポート。個人および当局からの要請を要請元別に、Meta の Facebook・Instagram レポートから。",
+    "zh": "各平台依据土耳其第5651号法半年发布的内容移除报告——按请求机构列出的个人和当局请求，来自 Meta 的 Facebook 与 Instagram 报告。",
+    "ko": "플랫폼이 튀르키예 제5651호법에 따라 반기별로 공개하는 콘텐츠 삭제 보고서 — 요청 주체별 개인·당국 요청. Meta의 Facebook·Instagram 보고서 기반.",
+}
+_TR_PAGE = {
+    "Türkiye Law No. 5651 transparency reports — Transparency Report API": {
+        "es": "Informes de transparencia de la Ley N.º 5651 de Türkiye — Transparency Report API",
+        "fr": "Rapports de transparence de la loi n° 5651 de Türkiye — Transparency Report API",
+        "de": "Transparenzberichte zum türkischen Gesetz Nr. 5651 — Transparency Report API",
+        "it": "Report di trasparenza della Legge n. 5651 della Türkiye — Transparency Report API",
+        "ja": "トルコ 法律第5651号 透明性レポート — Transparency Report API",
+        "zh": "土耳其第5651号法透明度报告 — Transparency Report API",
+        "ko": "튀르키예 제5651호법 투명성 보고서 — Transparency Report API",
+    },
+    "Meta · Half-yearly · 2023 – 2025": {
+        "es": "Meta · Semestral · 2023 – 2025", "fr": "Meta · Semestriel · 2023 – 2025",
+        "de": "Meta · Halbjährlich · 2023 – 2025", "it": "Meta · Semestrale · 2023 – 2025",
+        "ja": "Meta · 半期ごと · 2023 – 2025", "zh": "Meta · 每半年 · 2023 – 2025", "ko": "Meta · 반기별 · 2023 – 2025",
+    },
+    "Türkiye — Law No. 5651 transparency reports": {
+        "es": "Türkiye — Informes de transparencia de la Ley N.º 5651",
+        "fr": "Türkiye — Rapports de transparence de la loi n° 5651",
+        "de": "Türkei — Transparenzberichte zum Gesetz Nr. 5651",
+        "it": "Türkiye — Report di trasparenza della Legge n. 5651",
+        "ja": "トルコ — 法律第5651号 透明性レポート",
+        "zh": "土耳其 — 第5651号法透明度报告",
+        "ko": "튀르키예 — 제5651호법 투명성 보고서",
+    },
+    "The six-monthly transparency reports platforms publish under Türkiye's <strong>Law No. 5651</strong> (Additional Article 4), on the content-removal and access-blocking decisions notified to them. Two request streams: <strong>individual applications</strong> (Art. 9/9-A — people reporting personality/privacy violations) and <strong>judicial &amp; administrative authorities</strong> (Art. 8/8-A — the ICTA, the Consumer-Policy channel, and court orders). Currently Meta's Facebook &amp; Instagram reports, five half-years 2023 – 2025. A tidy-long dataset: each row is one measured value identified by platform × half-year × section × metric. Authority counts can bundle Facebook + Instagram together, so per-authority views are shown per platform, not summed.": {
+        "es": "Los informes de transparencia semestrales que las plataformas publican bajo la <strong>Ley N.º 5651</strong> de Türkiye (Artículo Adicional 4), sobre las decisiones de retirada de contenido y bloqueo de acceso que se les notifican. Dos flujos de solicitudes: <strong>solicitudes individuales</strong> (Art. 9/9-A — personas que denuncian violaciones de sus derechos de personalidad/privacidad) y <strong>autoridades judiciales y administrativas</strong> (Art. 8/8-A — la ICTA, el canal de Política de Consumo y órdenes judiciales). Actualmente los informes de Facebook e Instagram de Meta, cinco semestres 2023 – 2025. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por plataforma × semestre × sección × métrica. Los recuentos de autoridades pueden agrupar Facebook + Instagram, por lo que las vistas por autoridad se muestran por plataforma, no sumadas.",
+        "fr": "Les rapports de transparence semestriels que les plateformes publient au titre de la <strong>loi n° 5651</strong> de Türkiye (article additionnel 4), sur les décisions de retrait de contenu et de blocage d'accès qui leur sont notifiées. Deux flux de demandes : <strong>demandes individuelles</strong> (art. 9/9-A — personnes signalant des atteintes à leurs droits de la personnalité/vie privée) et <strong>autorités judiciaires et administratives</strong> (art. 8/8-A — l'ICTA, le canal de politique de consommation et les décisions de justice). Actuellement les rapports Facebook et Instagram de Meta, cinq semestres 2023 – 2025. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par plateforme × semestre × section × métrique. Les décomptes d'autorités peuvent regrouper Facebook + Instagram, donc les vues par autorité sont affichées par plateforme, pas additionnées.",
+        "de": "Die halbjährlichen Transparenzberichte, die Plattformen nach dem türkischen <strong>Gesetz Nr. 5651</strong> (Zusatzartikel 4) veröffentlichen, zu den ihnen mitgeteilten Entscheidungen über Inhaltsentfernung und Zugangssperren. Zwei Anfrageströme: <strong>Anfragen von Einzelpersonen</strong> (Art. 9/9-A — Personen, die Verletzungen ihrer Persönlichkeits-/Datenschutzrechte melden) und <strong>Justiz- und Verwaltungsbehörden</strong> (Art. 8/8-A — die ICTA, der Verbraucherschutz-Kanal und Gerichtsbeschlüsse). Derzeit Metas Facebook- und Instagram-Berichte, fünf Halbjahre 2023 – 2025. Ein Tidy-long-Datensatz: jede Zeile ist ein Messwert, identifiziert durch Plattform × Halbjahr × Abschnitt × Metrik. Behördenzahlen können Facebook + Instagram bündeln, daher werden Ansichten je Behörde pro Plattform gezeigt, nicht summiert.",
+        "it": "I report di trasparenza semestrali che le piattaforme pubblicano ai sensi della <strong>Legge n. 5651</strong> della Türkiye (Articolo aggiuntivo 4), sulle decisioni di rimozione di contenuti e blocco dell'accesso a loro notificate. Due flussi di richieste: <strong>richieste individuali</strong> (Art. 9/9-A — persone che segnalano violazioni dei propri diritti della personalità/privacy) e <strong>autorità giudiziarie e amministrative</strong> (Art. 8/8-A — l'ICTA, il canale di Politica dei consumatori e gli ordini del tribunale). Attualmente i report di Facebook e Instagram di Meta, cinque semestri 2023 – 2025. Un set di dati tidy-long: ogni riga è un valore misurato identificato da piattaforma × semestre × sezione × metrica. I conteggi delle autorità possono aggregare Facebook + Instagram, quindi le viste per autorità sono mostrate per piattaforma, non sommate.",
+        "ja": "プラットフォームがトルコの<strong>法律第5651号</strong>（追加条項4）に基づき公表する半期ごとの透明性レポート。通知されたコンテンツ削除・アクセス遮断の決定に関するものです。要請は2系統：<strong>個人からの申請</strong>（第9条/9-A条 — 人格権・プライバシー侵害を申し立てる個人）と<strong>司法・行政当局</strong>（第8条/8-A条 — ICTA、消費者政策チャネル、裁判所命令）。現在は Meta の Facebook・Instagram レポート、2023 – 2025 の5半期分。tidy-long データセットで、各行はプラットフォーム × 半期 × セクション × メトリクスで識別される1つの測定値です。当局の件数は Facebook と Instagram をまとめて計上することがあるため、当局別のビューは合算せずプラットフォーム別に表示します。",
+        "zh": "各平台依据土耳其<strong>第5651号法</strong>（附加条款4）半年发布的透明度报告，内容涉及向其送达的内容移除和访问屏蔽决定。请求分两类：<strong>个人申请</strong>（第9条/9-A条——就人格权/隐私权受侵害进行举报的个人）和<strong>司法与行政当局</strong>（第8条/8-A条——ICTA、消费者政策渠道及法院命令）。目前为 Meta 的 Facebook 与 Instagram 报告，2023 – 2025 共五个半年。这是一个 tidy-long 数据集：每行是由平台 × 半年 × 板块 × 指标标识的一个测量值。当局数据可能将 Facebook 与 Instagram 合并计数，因此按当局的视图按平台分别显示，不做求和。",
+        "ko": "플랫폼이 튀르키예 <strong>제5651호법</strong>(추가 조항 4)에 따라 반기별로 공개하는 투명성 보고서로, 통지받은 콘텐츠 삭제·접속 차단 결정에 관한 것입니다. 요청은 두 갈래: <strong>개인 신청</strong>(제9조/9-A조 — 인격권·프라이버시 침해를 신고하는 개인)과 <strong>사법·행정 당국</strong>(제8조/8-A조 — ICTA, 소비자정책 채널, 법원 명령). 현재는 Meta의 Facebook·Instagram 보고서로 2023 – 2025의 다섯 반기. tidy-long 데이터셋으로, 각 행은 플랫폼 × 반기 × 섹션 × 지표로 식별되는 하나의 측정값입니다. 당국 집계는 Facebook과 Instagram을 합쳐 계산할 수 있어, 당국별 뷰는 합산하지 않고 플랫폼별로 표시합니다.",
+    },
+    "Authority removal requests per half-year": {
+        "es": "Solicitudes de retirada de autoridades por semestre", "fr": "Demandes de retrait des autorités par semestre",
+        "de": "Behördliche Entfernungsanfragen je Halbjahr", "it": "Richieste di rimozione delle autorità per semestre",
+        "ja": "当局による削除要請（半期ごと）", "zh": "各半年的当局移除请求", "ko": "반기별 당국 삭제 요청",
+    },
+    "Total removal requests from judicial &amp; administrative authorities (Art. 8/8-A) each half-year, one line per platform.": {
+        "es": "Total de solicitudes de retirada de autoridades judiciales y administrativas (Art. 8/8-A) por semestre, una línea por plataforma.",
+        "fr": "Total des demandes de retrait des autorités judiciaires et administratives (art. 8/8-A) par semestre, une ligne par plateforme.",
+        "de": "Gesamtzahl der Entfernungsanfragen von Justiz- und Verwaltungsbehörden (Art. 8/8-A) je Halbjahr, eine Linie pro Plattform.",
+        "it": "Totale delle richieste di rimozione delle autorità giudiziarie e amministrative (Art. 8/8-A) per semestre, una linea per piattaforma.",
+        "ja": "司法・行政当局（第8条/8-A条）からの削除要請の合計を半期ごとに、プラットフォームごとに1本の線で表示。",
+        "zh": "司法与行政当局（第8条/8-A条）每半年的移除请求总数，每个平台一条线。",
+        "ko": "사법·행정 당국(제8조/8-A조)의 삭제 요청 총계를 반기별로, 플랫폼마다 한 선으로 표시.",
+    },
+    "Requests by requesting authority (latest half-year)": {
+        "es": "Solicitudes por organismo solicitante (último semestre)", "fr": "Demandes par organisme demandeur (dernier semestre)",
+        "de": "Anfragen nach anfragender Stelle (letztes Halbjahr)", "it": "Richieste per ente richiedente (ultimo semestre)",
+        "ja": "要請元別の要請（直近の半期）", "zh": "按请求机构列出的请求（最近半年）", "ko": "요청 주체별 요청(최근 반기)",
+    },
+    "The most recent half-year's authority requests split by source — ICTA, the Consumer-Policy channel, and court orders — per platform.": {
+        "es": "Las solicitudes de autoridades del semestre más reciente, desglosadas por fuente — la ICTA, el canal de Política de Consumo y órdenes judiciales — por plataforma.",
+        "fr": "Les demandes des autorités du semestre le plus récent, ventilées par source — l'ICTA, le canal de politique de consommation et les décisions de justice — par plateforme.",
+        "de": "Die Behördenanfragen des jüngsten Halbjahrs, aufgeschlüsselt nach Quelle — die ICTA, der Verbraucherschutz-Kanal und Gerichtsbeschlüsse — pro Plattform.",
+        "it": "Le richieste delle autorità del semestre più recente, suddivise per fonte — l'ICTA, il canale di Politica dei consumatori e gli ordini del tribunale — per piattaforma.",
+        "ja": "直近の半期における当局の要請を要請元別（ICTA、消費者政策チャネル、裁判所命令）に、プラットフォームごとに表示。",
+        "zh": "最近半年的当局请求按来源拆分——ICTA、消费者政策渠道及法院命令——按平台显示。",
+        "ko": "가장 최근 반기의 당국 요청을 출처별(ICTA, 소비자정책 채널, 법원 명령)로, 플랫폼마다 표시.",
+    },
+    "Individual applications per half-year": {
+        "es": "Solicitudes individuales por semestre", "fr": "Demandes individuelles par semestre",
+        "de": "Anfragen von Einzelpersonen je Halbjahr", "it": "Richieste individuali per semestre",
+        "ja": "個人からの申請（半期ごと）", "zh": "各半年的个人申请", "ko": "반기별 개인 신청",
+    },
+    "Applications received via the platforms' dedicated Law 5651 reporting form (Art. 9/9-A), one line per platform.": {
+        "es": "Solicitudes recibidas a través del formulario específico de la Ley 5651 de las plataformas (Art. 9/9-A), una línea por plataforma.",
+        "fr": "Demandes reçues via le formulaire de signalement dédié à la loi 5651 des plateformes (art. 9/9-A), une ligne par plateforme.",
+        "de": "Über das plattformeigene Meldeformular nach Gesetz 5651 (Art. 9/9-A) eingegangene Anfragen, eine Linie pro Plattform.",
+        "it": "Richieste ricevute tramite il modulo di segnalazione dedicato alla Legge 5651 delle piattaforme (Art. 9/9-A), una linea per piattaforma.",
+        "ja": "各プラットフォームの法律5651号専用の報告フォーム（第9条/9-A条）を通じて受け取った申請を、プラットフォームごとに1本の線で表示。",
+        "zh": "通过各平台专用的5651号法举报表单（第9条/9-A条）收到的申请，每个平台一条线。",
+        "ko": "각 플랫폼의 5651호법 전용 신고 양식(제9조/9-A조)을 통해 접수된 신청을 플랫폼마다 한 선으로 표시.",
+    },
+    "Requests by requesting authority (Instagram, all half-years)": {
+        "es": "Solicitudes por organismo solicitante (Instagram, todos los semestres)",
+        "fr": "Demandes par organisme demandeur (Instagram, tous les semestres)",
+        "de": "Anfragen nach anfragender Stelle (Instagram, alle Halbjahre)",
+        "it": "Richieste per ente richiedente (Instagram, tutti i semestri)",
+        "ja": "要請元別の要請（Instagram、全半期）", "zh": "按请求机构列出的请求（Instagram，所有半年）", "ko": "요청 주체별 요청(Instagram, 전체 반기)",
+    },
+    "Instagram authority requests summed over all half-years, by source. Shown for a single platform because authority counts can bundle Facebook &amp; Instagram together.": {
+        "es": "Solicitudes de autoridades a Instagram sumadas en todos los semestres, por fuente. Se muestra una sola plataforma porque los recuentos de autoridades pueden agrupar Facebook e Instagram.",
+        "fr": "Demandes des autorités à Instagram cumulées sur tous les semestres, par source. Affiché pour une seule plateforme car les décomptes d'autorités peuvent regrouper Facebook et Instagram.",
+        "de": "Behördenanfragen an Instagram, summiert über alle Halbjahre, nach Quelle. Für eine einzige Plattform gezeigt, da Behördenzahlen Facebook und Instagram bündeln können.",
+        "it": "Richieste delle autorità a Instagram sommate su tutti i semestri, per fonte. Mostrato per una singola piattaforma perché i conteggi delle autorità possono aggregare Facebook e Instagram.",
+        "ja": "Instagram に対する当局の要請を全半期で合計し、要請元別に表示。当局の件数は Facebook と Instagram をまとめて計上することがあるため、単一プラットフォームで表示しています。",
+        "zh": "Instagram 收到的当局请求在所有半年内的合计，按来源列出。仅显示单一平台，因为当局数据可能将 Facebook 与 Instagram 合并计数。",
+        "ko": "Instagram에 대한 당국 요청을 전체 반기에 걸쳐 합산하여 출처별로 표시. 당국 집계가 Facebook과 Instagram을 합쳐 계산할 수 있어 단일 플랫폼으로 표시합니다.",
+    },
+    "The number of reported values in each request stream. Counts of rows, not summed quantities.": {
+        "es": "El número de valores declarados en cada flujo de solicitudes. Recuentos de filas, no cantidades sumadas.",
+        "fr": "Le nombre de valeurs déclarées dans chaque flux de demandes. Décomptes de lignes, pas des quantités additionnées.",
+        "de": "Die Anzahl der gemeldeten Werte in jedem Anfragestrom. Zeilenzahlen, keine summierten Mengen.",
+        "it": "Il numero di valori dichiarati in ciascun flusso di richieste. Conteggi di righe, non quantità sommate.",
+        "ja": "各要請系統で報告された値の数。合計した量ではなく行数です。",
+        "zh": "每个请求类别中报告值的数量。是行数，而非求和的数量。",
+        "ko": "각 요청 계열에서 보고된 값의 개수. 합산한 수량이 아니라 행 수입니다.",
+    },
+    'Source: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta Türkiye Law 5651 transparency reports</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a>': {
+        "es": 'Fuente: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Informes de transparencia de la Ley 5651 de Türkiye de Meta</a>. Datos vía <a href="/api">Transparency Report API</a> · <a href="/methodology">Metodología</a> · <a href="/api-key">Clave de API</a> · <a href="/privacy">Privacidad</a>',
+        "fr": 'Source : <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Rapports de transparence loi 5651 de Türkiye de Meta</a>. Données via <a href="/api">Transparency Report API</a> · <a href="/methodology">Méthodologie</a> · <a href="/api-key">Clé d\'API</a> · <a href="/privacy">Confidentialité</a>',
+        "de": 'Quelle: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Metas Türkei-Transparenzberichte nach Gesetz 5651</a>. Daten über <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodik</a> · <a href="/api-key">API-Schlüssel</a> · <a href="/privacy">Datenschutz</a>',
+        "it": 'Fonte: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Report di trasparenza Legge 5651 della Türkiye di Meta</a>. Dati via <a href="/api">Transparency Report API</a> · <a href="/methodology">Metodologia</a> · <a href="/api-key">Chiave API</a> · <a href="/privacy">Privacy</a>',
+        "ja": 'ソース: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta のトルコ 法律5651号 透明性レポート</a>。データ提供: <a href="/api">Transparency Report API</a> · <a href="/methodology">方法論</a> · <a href="/api-key">API キー</a> · <a href="/privacy">プライバシー</a>',
+        "zh": '来源：<a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta 的土耳其5651号法透明度报告</a>。数据来自 <a href="/api">Transparency Report API</a> · <a href="/methodology">方法论</a> · <a href="/api-key">API 密钥</a> · <a href="/privacy">隐私</a>',
+        "ko": '출처: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta의 튀르키예 5651호법 투명성 보고서</a>. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/methodology">방법론</a> · <a href="/api-key">API 키</a> · <a href="/privacy">개인정보</a>',
+    },
+    "“Türkiye Law No. 5651 platform transparency reports, via the Transparency Report API (": {
+        "es": "“Informes de transparencia de plataformas de la Ley N.º 5651 de Türkiye, vía la Transparency Report API (instantánea de ",
+        "fr": "“Rapports de transparence des plateformes au titre de la loi n° 5651 de Türkiye, via la Transparency Report API (",
+        "de": "“Plattform-Transparenzberichte nach dem türkischen Gesetz Nr. 5651, über die Transparency Report API (",
+        "it": "“Report di trasparenza delle piattaforme ai sensi della Legge n. 5651 della Türkiye, tramite la Transparency Report API (",
+        "ja": "“トルコ 法律第5651号 プラットフォーム透明性レポート、Transparency Report API 経由 (",
+        "zh": "“土耳其第5651号法平台透明度报告，经由 Transparency Report API (",
+        "ko": "“튀르키예 제5651호법 플랫폼 투명성 보고서, Transparency Report API 경유 (",
+    },
+    "ICTA (Art. 8/8-A)": {
+        "es": "ICTA (Art. 8/8-A)", "fr": "ICTA (art. 8/8-A)", "de": "ICTA (Art. 8/8-A)", "it": "ICTA (Art. 8/8-A)",
+        "ja": "ICTA（第8条/8-A条）", "zh": "ICTA（第8条/8-A条）", "ko": "ICTA(제8조/8-A조)",
+    },
+    "Consumer Policy channel": {
+        "es": "Canal de Política de Consumo", "fr": "Canal de politique de consommation",
+        "de": "Verbraucherschutz-Kanal", "it": "Canale di Politica dei consumatori",
+        "ja": "消費者政策チャネル", "zh": "消费者政策渠道", "ko": "소비자정책 채널",
+    },
+    "Court orders": {
+        "es": "Órdenes judiciales", "fr": "Décisions de justice", "de": "Gerichtsbeschlüsse",
+        "it": "Ordini del tribunale", "ja": "裁判所命令", "zh": "法院命令", "ko": "법원 명령",
+    },
+    "Individual applications (Art. 9/9-A)": {
+        "es": "Solicitudes individuales (Art. 9/9-A)", "fr": "Demandes individuelles (art. 9/9-A)",
+        "de": "Anfragen von Einzelpersonen (Art. 9/9-A)", "it": "Richieste individuali (Art. 9/9-A)",
+        "ja": "個人からの申請（第9条/9-A条）", "zh": "个人申请（第9条/9-A条）", "ko": "개인 신청(제9조/9-A조)",
+    },
+    "Authority requests (Art. 8/8-A)": {
+        "es": "Solicitudes de autoridades (Art. 8/8-A)", "fr": "Demandes des autorités (art. 8/8-A)",
+        "de": "Behördenanfragen (Art. 8/8-A)", "it": "Richieste delle autorità (Art. 8/8-A)",
+        "ja": "当局の要請（第8条/8-A条）", "zh": "当局请求（第8条/8-A条）", "ko": "당국 요청(제8조/8-A조)",
+    },
+    "Instagram authority requests, totalled per requesting authority.": {
+        "es": "Solicitudes de autoridades a Instagram, totalizadas por organismo solicitante.",
+        "fr": "Demandes des autorités à Instagram, totalisées par organisme demandeur.",
+        "de": "Behördenanfragen an Instagram, summiert je anfragender Stelle.",
+        "it": "Richieste delle autorità a Instagram, totalizzate per ente richiedente.",
+        "ja": "Instagram に対する当局の要請を要請元別に合計。",
+        "zh": "Instagram 收到的当局请求，按请求机构汇总。",
+        "ko": "Instagram에 대한 당국 요청을 요청 주체별로 합산.",
+    },
+    "Requesting authority": {
+        "es": "Organismo solicitante", "fr": "Organisme demandeur", "de": "Anfragende Stelle",
+        "it": "Ente richiedente", "ja": "要請元", "zh": "请求机构", "ko": "요청 주체",
+    },
+    "Total requests": {
+        "es": "Solicitudes totales", "fr": "Total des demandes", "de": "Anfragen gesamt",
+        "it": "Richieste totali", "ja": "要請の合計", "zh": "请求总数", "ko": "총 요청",
+    },
+    "Reported values in each request stream of the Law 5651 reports.": {
+        "es": "Valores declarados en cada flujo de solicitudes de los informes de la Ley 5651.",
+        "fr": "Valeurs déclarées dans chaque flux de demandes des rapports de la loi 5651.",
+        "de": "Gemeldete Werte in jedem Anfragestrom der Gesetz-5651-Berichte.",
+        "it": "Valori dichiarati in ciascun flusso di richieste dei report della Legge 5651.",
+        "ja": "法律5651号レポートの各要請系統で報告された値。",
+        "zh": "5651号法报告中每个请求类别的报告值。",
+        "ko": "5651호법 보고서의 각 요청 계열에서 보고된 값.",
+    },
+    "Request stream": {
+        "es": "Flujo de solicitudes", "fr": "Flux de demandes", "de": "Anfragestrom",
+        "it": "Flusso di richieste", "ja": "要請系統", "zh": "请求类别", "ko": "요청 계열",
+    },
+    "Half-year": {
+        "es": "Semestre", "fr": "Semestre", "de": "Halbjahr", "it": "Semestre",
+        "ja": "半期", "zh": "半年", "ko": "반기",
+    },
+    "Failed to load authority totals: ": {
+        "es": "No se pudieron cargar los totales de autoridades: ", "fr": "Impossible de charger les totaux des autorités : ",
+        "de": "Behördensummen konnten nicht geladen werden: ", "it": "Impossibile caricare i totali delle autorità: ",
+        "ja": "当局の合計を読み込めませんでした: ", "zh": "无法加载当局合计：", "ko": "당국 합계를 불러오지 못했습니다: ",
+    },
+    "Failed to load stream coverage: ": {
+        "es": "No se pudo cargar la cobertura de los flujos: ", "fr": "Impossible de charger la couverture des flux : ",
+        "de": "Die Stromabdeckung konnte nicht geladen werden: ", "it": "Impossibile caricare la copertura dei flussi: ",
+        "ja": "系統のカバレッジを読み込めませんでした: ", "zh": "无法加载类别覆盖情况：", "ko": "계열 커버리지를 불러오지 못했습니다: ",
+    },
+    '"Authority (" + latest + ")"': {
+        "es": '"Organismo (" + latest + ")"', "fr": '"Autorité (" + latest + ")"',
+        "de": '"Behörde (" + latest + ")"', "it": '"Autorità (" + latest + ")"',
+        "ja": '"当局 (" + latest + ")"', "zh": '"当局 (" + latest + ")"', "ko": '"당국 (" + latest + ")"',
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    COMMON[_loc].append(("      Türkiye Law 5651\n    </a>", f"      {_TR_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Türkiye Law 5651</h3>", f"<h3>{_TR_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_TR_CARD_DESC_EN, _TR_CARD_DESC[_loc]))
+    PAGES[_loc]["turkey.html"] = [(_en, _tr[_loc]) for _en, _tr in _TR_PAGE.items()]
+    _tr_text = open(os.path.join(STATIC, "turkey.html"), encoding="utf-8").read()
+    _tr_own = {_o for _o, _ in PAGES[_loc]["turkey.html"]}
+    # Inherit shared chart/dataset chrome from sibling pages (Trends, "Interactive
+    # views…", Loading…, provenance, the query-builder hint, "What the reports
+    # cover") — a pair is taken only when its find-string occurs in this page.
+    for _src in ("snap.html", "microsoft.html", "india.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _tr_text and _o not in _tr_own:
+                PAGES[_loc]["turkey.html"].append((_o, _n))
+                _tr_own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

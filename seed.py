@@ -76,6 +76,11 @@ _DEFAULT_KOREA_SOURCE = os.getenv(
 _DEFAULT_TAIWAN_SOURCE = os.getenv(
     "SEED_TAIWAN_SOURCE_JSON", os.path.join(HERE, "data", "taiwan-anti-fraud.json")
 )
+# Türkiye Law No. 5651 platform transparency reports — vendored in-repo (from the
+# sibling data repo's turkey-law5651/build_turkey.py).
+_DEFAULT_TURKEY_SOURCE = os.getenv(
+    "SEED_TURKEY_SOURCE_JSON", os.path.join(HERE, "data", "turkey-law5651.json")
+)
 # Google government requests for user information — vendored in-repo (from the
 # sibling data repo's google-user-data/build_userdata.py).
 _DEFAULT_GOOGLE_UD_SOURCE = os.getenv(
@@ -410,6 +415,21 @@ CREATE TABLE taiwan_metrics (
     value     REAL
 );
 CREATE INDEX idx_taiwan_section ON taiwan_metrics(section);
+
+-- Türkiye Law No. 5651 platform transparency reports (turkey-law5651/
+-- build_turkey.py). Tidy-long: one row per measured value from the platforms'
+-- six-monthly Law 5651 reports (Meta Facebook/Instagram; more platforms later).
+-- Two request streams (section): individual applications (Art. 9/9-A) and
+-- judicial & administrative authorities (Art. 8/8-A). Dims inline.
+CREATE TABLE turkey_metrics (
+    platform TEXT NOT NULL,     -- reporting service: Facebook / Instagram
+    period   TEXT NOT NULL,     -- reporting half-year, 'YYYY HN'
+    section  TEXT NOT NULL,     -- individual_requests / authority_requests
+    metric   TEXT NOT NULL,     -- applications_received, requests_icta, ...
+    unit     TEXT NOT NULL,     -- count
+    value    INTEGER
+);
+CREATE INDEX idx_turkey_section ON turkey_metrics(section);
 
 -- Google government requests for user information (google-user-data/
 -- build_userdata.py). Tidy-long: one row per measured value from the biannual
@@ -1093,6 +1113,35 @@ def build_taiwan_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the turkey_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long turkey-law5651.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("turkey dataset is None")
+    expected_cols = ["platform", "period", "section", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"turkey dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("turkey dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO turkey_metrics (platform, period, section, "
+                "metric, unit, value) VALUES (?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_google_userdata_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the google_userdata_metrics table in an existing DB at db_path.
 
@@ -1514,6 +1563,8 @@ def main() -> None:
                         help="Path to korea-transparency.json")
     parser.add_argument("--taiwan-source", default=_DEFAULT_TAIWAN_SOURCE,
                         help="Path to taiwan-anti-fraud.json")
+    parser.add_argument("--turkey-source", default=_DEFAULT_TURKEY_SOURCE,
+                        help="Path to turkey-law5651.json")
     parser.add_argument("--google-ud-source", default=_DEFAULT_GOOGLE_UD_SOURCE,
                         help="Path to google-user-data.json")
     parser.add_argument("--microsoft-source", default=_DEFAULT_MICROSOFT_SOURCE,
@@ -1645,6 +1696,16 @@ def main() -> None:
               f"{len({r[3] for r in taiwan_data['rows']})} categories")
     else:
         print(f"  (skipping Taiwan anti-fraud — not found: {args.taiwan_source})")
+
+    if os.path.isfile(args.turkey_source):
+        with open(args.turkey_source, "r", encoding="utf-8") as f:
+            turkey_data = json.load(f)
+        turkey_rows = build_turkey_db(turkey_data, args.db)
+        print(f"  turkey law 5651: {turkey_rows} metric rows across "
+              f"{len({r[0] for r in turkey_data['rows']})} platforms, "
+              f"{len({r[1] for r in turkey_data['rows']})} periods")
+    else:
+        print(f"  (skipping Türkiye Law 5651 — not found: {args.turkey_source})")
 
     if os.path.isfile(args.google_ud_source):
         with open(args.google_ud_source, "r", encoding="utf-8") as f:

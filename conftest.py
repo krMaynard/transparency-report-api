@@ -192,6 +192,25 @@ _TAIWAN_FIXTURE = {
 }
 seed.build_taiwan_db(_TAIWAN_FIXTURE, _DB)
 
+# A small slice of the Türkiye Law 5651 dataset (turkey-law5651.json shape):
+# Facebook + Instagram, two half-years, both request streams (individual Art.
+# 9/9-A and authority Art. 8/8-A with the per-authority breakdown).
+# [platform, period, section, metric, unit, value]
+_TURKEY_FIXTURE = {
+    "columns": ["platform", "period", "section", "metric", "unit", "value"],
+    "rows": [
+        ["Facebook", "2024 H2", "individual_requests", "applications_received", "count", 294],
+        ["Facebook", "2024 H2", "authority_requests", "requests_total", "count", 2724],
+        ["Facebook", "2024 H2", "authority_requests", "requests_icta", "count", 2350],
+        ["Facebook", "2024 H2", "authority_requests", "requests_consumer_policy", "count", 118],
+        ["Facebook", "2024 H2", "authority_requests", "requests_court_orders", "count", 256],
+        ["Instagram", "2024 H2", "individual_requests", "applications_received", "count", 303],
+        ["Instagram", "2024 H2", "authority_requests", "requests_total", "count", 2842],
+        ["Instagram", "2025 H1", "authority_requests", "requests_total", "count", 9471],
+    ],
+}
+seed.build_turkey_db(_TURKEY_FIXTURE, _DB)
+
 # A small slice of the Google user-data dataset (google-user-data.json shape).
 # [dataset, period, country, iso2, product, legal_process, assisting_country,
 #  metric, unit, value_low, value_high]

@@ -3138,6 +3138,90 @@ class TestTaiwanTable:
                 "urls_removed", "count", 3564] in plat
 
 
+class TestTurkeyTable:
+    def test_turkey_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "turkey_metrics" in names
+
+    def test_turkey_fields_endpoint(self):
+        body = client.get("/api/fields?table=turkey_metrics", headers=MOMO).json()
+        assert {"platform", "period", "section", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_turkey_authority_breakdown(self):
+        # Facebook 2024 H2 authority breakdown (fixture, matches the filed PDF):
+        # ICTA 2350 + Consumer Policy 118 + court orders 256.
+        job = _submit_and_wait({
+            "table": "turkey_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["authority_requests"]},
+                {"operation": "IN", "field_name": "metric",
+                 "field_values": ["requests_icta", "requests_consumer_policy", "requests_court_orders"]},
+            ]},
+            "group_by": ["metric"],
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+            "sort": [{"field_name": "v", "order": "desc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["requests_icta", 2350], ["requests_court_orders", 256],
+                                ["requests_consumer_policy", 118]]
+
+    def test_turkey_requests_total_by_period(self):
+        job = _submit_and_wait({
+            "table": "turkey_metrics", "group_by": ["period"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["Instagram"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests_total"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2024 H2", 2842], ["2025 H1", 9471]]
+
+    def test_turkey_unpinned_sum_warns(self):
+        # A SUM pinning neither section nor metric would mix the two request
+        # streams and add unrelated quantities (requests vs entities).
+        r = client.post("/api/explore", json={
+            "table": "turkey_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "section" in warnings and "metric" in warnings
+
+    def test_turkey_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "turkey_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["authority_requests"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["requests_total"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
+
+    def test_turkey_page_served(self):
+        r = client.get("/turkey")
+        assert r.status_code == 200
+        assert '"table":"turkey_metrics"' in r.text and "Law No. 5651" in r.text
+
+    def test_vendored_turkey_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("turkey-law5651.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["platform", "period", "section", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 6 for r in data["rows"])
+        assert all(r[4] == "count" for r in data["rows"])
+        assert {r[0] for r in data["rows"]} == {"Facebook", "Instagram"}
+        assert {r[2] for r in data["rows"]} <= {"individual_requests", "authority_requests"}
+
+
 class TestGoogleUserDataTable:
     def test_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
