@@ -34,9 +34,13 @@ Transparency Reports** (Trust & Safety enforcement by policy category +
 government/legal requests by country, quarterly since 2022), Google's
 **Traffic & Disruptions catalogue** (government-ordered internet shutdowns,
 blocks and outages affecting Google products, with news-source citations —
-a historical dataset Google froze at 2009–2021), and Google's **Android
+a historical dataset Google froze at 2009–2021), Google's **Android
 ecosystem security** report (Potentially Harmful Application / malware rates on
-devices and in Google Play, by version × country × category, 2017–2024).
+devices and in Google Play, by version × country × category, 2017–2024), and
+**Türkiye's Law No. 5651 platform transparency reports** (the six-monthly
+content-removal / access-blocking figures platforms publish for Türkiye —
+individual Art. 9/9-A applications and Art. 8/8-A authority requests by
+requesting body; Meta's Facebook & Instagram, 2023–2025).
 
 Built to demonstrate two things:
 
@@ -56,7 +60,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -67,6 +71,7 @@ Built to demonstrate two things:
 | `data/india-it-rules.json` | Vendored snapshot of India's IT Rules 2021 monthly compliance reports (sibling `dsa-transparency-data/india-it-rules/build_india.py`) — a tidy-long `columns`+`rows` list across publishers; seeded into the `india_metrics` table by `seed.build_india_db` |
 | `data/korea-transparency.json` | Vendored snapshot of the Korea (Naver + Kakao) transparency reports (sibling `dsa-transparency-data/korea-transparency/build_korea.py`) — a tidy-long `columns`+`rows` list; seeded into the `korea_metrics` table by `seed.build_korea_db` |
 | `data/taiwan-anti-fraud.json` | Vendored snapshot of Taiwan's Anti-Fraud Act data (sibling `dsa-transparency-data/taiwan-anti-fraud/build_taiwan.py`) — a tidy-long `columns`+`rows` list; seeded into the `taiwan_metrics` table by `seed.build_taiwan_db` |
+| `data/turkey-law5651.json` | Vendored snapshot of Türkiye's Law No. 5651 platform transparency reports (sibling `dsa-transparency-data/turkey-law5651/build_turkey.py`) — a tidy-long `columns`+`rows` list; seeded into the `turkey_metrics` table by `seed.build_turkey_db` |
 | `data/google-user-data.json` | Vendored snapshot of Google's government requests for user information (sibling `dsa-transparency-data/google-user-data/build_userdata.py`) — a tidy-long `columns`+`rows` list; seeded into the `google_userdata_metrics` table by `seed.build_google_userdata_db` |
 | `data/microsoft-lerr.json` | Vendored snapshot of the Microsoft Law Enforcement Requests Report (sibling `dsa-transparency-data/microsoft-lerr/build_microsoft.py`) — a tidy-long `columns`+`rows` list; seeded into the `microsoft_metrics` table by `seed.build_microsoft_db` |
 | `data/linkedin-transparency.json` | Vendored snapshot of the LinkedIn Government Requests Report (sibling `dsa-transparency-data/linkedin-transparency/build_linkedin.py`) — a tidy-long `columns`+`rows` list; seeded into the `linkedin_metrics` table by `seed.build_linkedin_db` |
@@ -88,6 +93,7 @@ Built to demonstrate two things:
 | `static/india.html` | Public India IT Rules compliance-reports dataset page (served at `/india`) — Trends charts + overview tables over `POST /api/explore` (`india_metrics`) |
 | `static/korea.html` | Public Korea (Naver + Kakao) transparency dataset page (served at `/korea`) — Trends charts + overview tables over `POST /api/explore` (`korea_metrics`) |
 | `static/taiwan.html` | Public Taiwan Anti-Fraud Act dataset page (served at `/taiwan`) — Trends charts + overview tables + the "Platform statutory reports" panel over `POST /api/explore` (`taiwan_metrics`) |
+| `static/turkey.html` | Public Türkiye Law No. 5651 transparency-reports dataset page (served at `/turkey`) — Trends charts + overview tables over `POST /api/explore` (`turkey_metrics`) |
 | `static/user-data.html` | Public Google user-data requests dataset page (served at `/user-data`) — Trends charts + overview tables over `POST /api/explore` (`google_userdata_metrics`) |
 | `static/microsoft.html` | Public Microsoft LERR dataset page (served at `/microsoft`) — Trends charts + overview tables over `POST /api/explore` (`microsoft_metrics`) |
 | `static/linkedin.html` | Public LinkedIn Government Requests dataset page (served at `/linkedin`) — Trends charts + overview tables over `POST /api/explore` (`linkedin_metrics`) |
@@ -140,7 +146,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/ca-ab587`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/narratives`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/ca-ab587`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/turkey`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/narratives`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -266,7 +272,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Thirteen non-DSA datasets ride alongside, each exposed as an ordinary query table
+Fourteen non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -322,6 +328,22 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   accounts, and some metrics are parts/subsets of others
   (`urls_removed_legal`/`_policy` sum to `urls_removed`; the CIB figure is
   inside `art33_accounts_suspended`); `_leg_warnings` warns on both.
+- **Türkiye Law No. 5651 platform reports** — a single **tidy-long**
+  `turkey_metrics` table (one row per measured value: `platform`/`period`/
+  `section`/`metric`/`unit` + a `value`; dims stored inline). The six-monthly
+  transparency reports platforms publish under Türkiye's Law 5651 (Additional
+  Art. 4) on the content-removal / access-blocking decisions notified to them —
+  currently **Meta** (`platform` `Facebook`/`Instagram`), five half-years
+  H1 2023 → H1 2025 (parsed from the static PDFs on `transparency.meta.com/sr/`;
+  TikTok/X/YouTube publish their own reports and slot in later). Two request
+  streams (`section`): `individual_requests` (Art. 9/9-A — personality/privacy
+  applications via a form) and `authority_requests` (Art. 8/8-A — the ICTA, the
+  Consumer-Policy channel, and court orders). Pin a `section` **and a `metric`**
+  before aggregating — requests ≠ reported entities ≠ removed entities, and
+  `requests_icta`/`_consumer_policy`/`_court_orders` are parts of
+  `requests_total` (which they may not fully sum to, as Meta doesn't categorise
+  every request; authority counts can also bundle Facebook + Instagram);
+  `_leg_warnings` warns on both.
 - **Google government requests for user information** — a single **tidy-long**
   `google_userdata_metrics` table (one row per measured value: `dataset`/
   `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
@@ -706,6 +728,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/india` | — | Public India IT Rules compliance-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/korea` | — | Public Korea (Naver + Kakao) transparency dataset page (web UI over `POST /api/explore`) |
 | GET | `/taiwan` | — | Public Taiwan Anti-Fraud Act dataset page (web UI over `POST /api/explore`) |
+| GET | `/turkey` | — | Public Türkiye Law No. 5651 transparency-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |

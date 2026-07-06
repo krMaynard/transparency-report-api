@@ -1184,6 +1184,20 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "turkey_metrics": TableSpec(
+        "Türkiye Law No. 5651 platform transparency reports — the six-monthly reports social-network providers with >1M daily accesses from Türkiye publish (Additional Article 4) on the content-removal / access-blocking decisions notified to them. Currently Meta (platform 'Facebook' / 'Instagram'), five half-years H1 2023 → H1 2025. Two request streams (section): 'individual_requests' (Art. 9/9-A — natural/legal persons reporting personality/privacy violations via a form) and 'authority_requests' (Art. 8/8-A — the ICTA, the Consumer-Policy channel, and court orders). A tidy-long table: one row per measured value, identified by platform × period × section × metric. Pin a section AND a metric before aggregating — requests ≠ reported entities ≠ removed entities, and requests_icta/_consumer_policy/_court_orders are components of requests_total (which they may not fully sum to, as Meta doesn't categorise every request; authority counts can also bundle Facebook + Instagram).",
+        "FROM turkey_metrics f",
+        {
+            "platform": "f.platform",
+            "period":   "f.period",
+            "section":  "f.section",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "google_userdata_metrics": TableSpec(
         "Google government requests for user information — the biannual bulk export of Google's Transparency Report user-data section (2009-H2 onward): requests, accounts and percentage-disclosed per country × legal process (dataset 'global'), the diplomatic/MLAT slice, Enterprise Cloud (GCP / Google Workspace) requests, and the US national-security figures (FISA content / FISA non-content / NSLs), which are banded ranges (value_low != value_high, non-additive). A tidy-long table: one row per measured value. Caution: 2012-H2..2014-H1 report an 'All' legal_process aggregate alongside the per-process split — pin legal_process before summing, and never SUM percent rows.",
         "FROM google_userdata_metrics f",
@@ -2382,6 +2396,12 @@ def taiwan_page() -> FileResponse:
     return _serve_page("taiwan.html", "Taiwan anti-fraud page")
 
 
+@app.get("/turkey", response_class=HTMLResponse)
+def turkey_page() -> FileResponse:
+    """Serve the Türkiye Law 5651 dataset page (reads POST /api/explore)."""
+    return _serve_page("turkey.html", "Turkey Law 5651 page")
+
+
 @app.get("/user-data", response_class=HTMLResponse)
 def user_data_page() -> FileResponse:
     """Serve the Google user-data requests dataset page (reads POST /api/explore)."""
@@ -2484,6 +2504,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "india": ("india.html", "India IT Rules page", {}),
     "korea": ("korea.html", "Korea transparency page", {}),
     "taiwan": ("taiwan.html", "Taiwan anti-fraud page", {}),
+    "turkey": ("turkey.html", "Turkey Law 5651 page", {}),
     "user-data": ("user-data.html", "Google user data page", {}),
     "microsoft": ("microsoft.html", "Microsoft requests page", {}),
     "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
@@ -3755,6 +3776,25 @@ def _leg_warnings(
                 "others (urls_removed_legal/policy sum to urls_removed; the CIB "
                 "subset is inside art33_accounts_suspended); this aggregate pins "
                 "no 'metric'. Filter or group by 'metric'."
+            )
+    # turkey_metrics keeps two request streams (individual vs authority) and,
+    # within the authority stream, per-authority counts that are parts of the
+    # total (and may bundle Facebook + Instagram).
+    if table == "turkey_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'turkey_metrics' spans the individual-applications stream "
+                "(Art. 9/9-A) and the authority-requests stream (Art. 8/8-A); "
+                "this aggregate pins no 'section'. Filter or group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'turkey_metrics' reports requests, reported entities and removed "
+                "entities as separate metrics, and requests_icta/_consumer_policy/"
+                "_court_orders are parts of requests_total; this aggregate pins no "
+                "'metric'. Filter or group by 'metric'."
             )
     # linkedin_metrics mixes counts, percentages and banded national-security
     # ranges in one value column, across three report datasets.
