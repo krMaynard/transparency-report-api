@@ -555,9 +555,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Meta · 반기별 · 2023 – 2025</span>
+    <span class="badge">Meta + X · 반기별 · 2021 – 2025</span>
     <h1>튀르키예 — 제5651호법 투명성 보고서</h1>
-    <p>플랫폼이 튀르키예 <strong>제5651호법</strong>(추가 조항 4)에 따라 반기별로 공개하는 투명성 보고서로, 통지받은 콘텐츠 삭제·접속 차단 결정에 관한 것입니다. 요청은 두 갈래: <strong>개인 신청</strong>(제9조/9-A조 — 인격권·프라이버시 침해를 신고하는 개인)과 <strong>사법·행정 당국</strong>(제8조/8-A조 — ICTA, 소비자정책 채널, 법원 명령). 현재는 Meta의 Facebook·Instagram 보고서로 2023 – 2025의 다섯 반기. tidy-long 데이터셋으로, 각 행은 플랫폼 × 반기 × 섹션 × 지표로 식별되는 하나의 측정값입니다. 당국 집계는 Facebook과 Instagram을 합쳐 계산할 수 있어, 당국별 뷰는 합산하지 않고 플랫폼별로 표시합니다.</p>
+    <p>플랫폼이 튀르키예 <strong>제5651호법</strong>(추가 조항 4)에 따라 반기별로 공개하는 투명성 보고서로, 통지받은 콘텐츠 삭제·접속 차단 결정에 관한 것입니다. 요청은 두 갈래: <strong>개인 신청</strong>(제9조/9-A조 — 인격권·프라이버시 침해를 신고하는 개인)과 <strong>사법·행정 당국</strong>(제8조/8-A조 — ICTA, 소비자정책 채널, 법원 명령). <strong>Meta</strong>의 Facebook·Instagram 보고서(2023 – 2025)는 두 계열을 보고서 단위 합계로 제공하고, <strong>X</strong>의 보고서(2021 – 2025)는 개인 계열만 다루되 <strong>이슈 범주</strong>(악용, 혐오 행위, 저작권, …)별로 요청량과 조치율로 세분합니다. tidy-long 데이터셋으로, 각 행은 플랫폼 × 반기 × 섹션 × 범주 × 지표로 식별되는 하나의 측정값입니다. 당국 집계는 Facebook과 Instagram을 합쳐 계산할 수 있어, 당국별 뷰는 합산하지 않고 플랫폼별로 표시합니다.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -584,11 +584,19 @@ display: flex; align-items: center; justify-content: space-between;
       </div>
 
       <div class="chart-card">
-        <h3>반기별 개인 신청</h3>
-        <p class="chart-sub">각 플랫폼의 5651호법 전용 신고 양식(제9조/9-A조)을 통해 접수된 신청을 플랫폼마다 한 선으로 표시.</p>
+        <h3>반기별 개인 신청(Meta)</h3>
+        <p class="chart-sub">Meta의 5651호법 전용 신고 양식(제9조/9-A조)을 통해 접수된 신청을 플랫폼마다 한 선으로 표시.</p>
         <div class="chart-loading" id="out-loading">불러오는 중…</div>
         <canvas id="chart-out" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-out-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>X — 이슈 범주별 개인 신고(최근 반기)</h3>
+        <p class="chart-sub">X가 가장 최근 보고 반기에 튀르키예 사용자로부터 받은 제9조/9-A조 신고량을 이슈 범주별로 표시.</p>
+        <div class="chart-loading" id="xiss-loading">불러오는 중…</div>
+        <canvas id="chart-xiss" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-xiss-table" class="sr-only"></div>
       </div>
 
     </div>
@@ -599,6 +607,15 @@ display: flex; align-items: center; justify-content: space-between;
     <h2>요청 주체별 요청(Instagram, 전체 반기)</h2>
     <p class="sub">Instagram에 대한 당국 요청을 전체 반기에 걸쳐 합산하여 출처별로 표시. 당국 집계가 Facebook과 Instagram을 합쳐 계산할 수 있어 단일 플랫폼으로 표시합니다.</p>
     <div class="results" id="outcome합계s" aria-busy="true">
+      <div class="results-loading">불러오는 중…</div>
+    </div>
+  </section>
+
+  <!-- ── X issue breakdown ──────────────────────────────────────── -->
+  <section class="data-section">
+    <h2>X — 이슈별 신고 및 조치율(최근 반기)</h2>
+    <p class="sub">X의 가장 최근 반기: 제9조/9-A조 사용자 신고량과 X가 조치한 비율을 이슈 범주별로 표시. 조치율은 개수가 아니라 백분율이므로 합산하지 마세요.</p>
+    <div class="results" id="x이슈Table" aria-busy="true">
       <div class="results-loading">불러오는 중…</div>
     </div>
   </section>
@@ -616,7 +633,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>출처: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta의 튀르키예 5651호법 투명성 보고서</a>. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">방법론</a> · <a href="/ko/api-key">API 키</a> · <a href="/ko/privacy">개인정보</a></p>
+  <p>출처: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta</a> 및 <a href="https://transparency.x.com/en/reports/countries/tr" target="_blank" rel="noopener noreferrer">X</a>의 튀르키예 5651호법 투명성 보고서. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">방법론</a> · <a href="/ko/api-key">API 키</a> · <a href="/ko/privacy">개인정보</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -850,6 +867,45 @@ display: flex; align-items: center; justify-content: space-between;
   function REQ_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests_total"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
   function AUTH_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["period","platform","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":300}; }
   function APPL_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"EQ","field_name":"metric","field_values":["applications_received"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
+  // X reports the individual stream by issue category, with a request volume and an
+  // action_rate percent. One row per (period, category, metric); SUM is a no-op
+  // pass-through since each combination is unique.
+  function XISS_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["X"]},{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests","action_rate"]}]},"group_by":["period","category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
+
+  // Render X's latest-half-year issue breakdown into both a horizontal-bar chart
+  // (request volume by issue, descending) and a three-column table (issue,
+  // requests, action rate %). Rows are [period, category, metric, n].
+  function renderX이슈s(rows) {
+    if (!rows.length) { emptyChart('xiss-loading');
+      document.getElementById('x이슈Table').removeAttribute('aria-busy');
+      document.getElementById('x이슈Table').innerHTML = '<div class="results-loading">No data available.</div>';
+      return; }
+    var latest = rows.map(function (r) { return r[0]; }).sort().pop();
+    var cur = rows.filter(function (r) { return r[0] === latest; });
+    var byCat = {};
+    cur.forEach(function (r) { (byCat[r[1]] = byCat[r[1]] || {})[r[2]] = r[3]; });
+    var cats = Object.keys(byCat).sort(function (a, b) {
+      return (byCat[b].requests || 0) - (byCat[a].requests || 0);
+    });
+    // Chart: request volume by issue (descending).
+    var labels = cats, values = cats.map(function (c) { return byCat[c].requests || 0; });
+    srTable('chart-xiss-table', ["이슈 (" + latest + ")", "신고 수"],
+      cats.map(function (c) { return [c, fmt(byCat[c].requests)]; }));
+    hbarChart('chart-xiss', 'xiss-loading', 'chart-xiss-table', labels, values);
+    // Table: issue, requests, action rate %.
+    var el = document.getElementById('x이슈Table');
+    el.removeAttribute('aria-busy');
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("X의 이슈별 신고 및 조치율, " + latest + ".") + '</caption>'
+      + '<thead><tr><th scope="col">이슈</th><th scope="col" class="num">신고 수</th><th scope="col" class="num">조치율</th></tr></thead><tbody>'
+      + cats.map(function (c) {
+          var rate = byCat[c].action_rate;
+          return '<tr><td data-label="이슈">' + esc(c) + '</td>'
+            + '<td class="num" data-label="신고 수">' + fmt(byCat[c].requests) + '</td>'
+            + '<td class="num" data-label="조치율">' + (rate == null ? '—' : esc(rate) + '%') + '</td></tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
 
   // Grouped vertical bars for the latest half-year: authority sources on the x
   // axis, one dataset per platform. Rows are [period, platform, metric, n].
@@ -919,6 +975,7 @@ display: flex; align-items: center; justify-content: space-between;
   Promise.all([soft(REQ_Q()), soft(AUTH_Q()), soft(APPL_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
   });
+  soft(XISS_Q()).then(function (d) { renderX이슈s(d.rows); });
 })();
 </script>
 </body>

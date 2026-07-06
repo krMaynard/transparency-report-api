@@ -555,9 +555,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Meta · Semestriel · 2023 – 2025</span>
+    <span class="badge">Meta + X · Semestriel · 2021 – 2025</span>
     <h1>Türkiye — Rapports de transparence de la loi n° 5651</h1>
-    <p>Les rapports de transparence semestriels que les plateformes publient au titre de la <strong>loi n° 5651</strong> de Türkiye (article additionnel 4), sur les décisions de retrait de contenu et de blocage d'accès qui leur sont notifiées. Deux flux de demandes : <strong>demandes individuelles</strong> (art. 9/9-A — personnes signalant des atteintes à leurs droits de la personnalité/vie privée) et <strong>autorités judiciaires et administratives</strong> (art. 8/8-A — l'ICTA, le canal de politique de consommation et les décisions de justice). Actuellement les rapports Facebook et Instagram de Meta, cinq semestres 2023 – 2025. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par plateforme × semestre × section × métrique. Les décomptes d'autorités peuvent regrouper Facebook + Instagram, donc les vues par autorité sont affichées par plateforme, pas additionnées.</p>
+    <p>Les rapports de transparence semestriels que les plateformes publient au titre de la <strong>loi n° 5651</strong> de Türkiye (article additionnel 4), sur les décisions de retrait de contenu et de blocage d'accès qui leur sont notifiées. Deux flux de demandes : <strong>demandes individuelles</strong> (art. 9/9-A — personnes signalant des atteintes à leurs droits de la personnalité/vie privée) et <strong>autorités judiciaires et administratives</strong> (art. 8/8-A — l'ICTA, le canal de politique de consommation et les décisions de justice). Les rapports Facebook et Instagram de <strong>Meta</strong> (2023 – 2025) donnent des totaux au niveau du rapport pour les deux flux ; les rapports de <strong>X</strong> (2021 – 2025) ne couvrent que le flux individuel mais le ventilent par <strong>catégorie de problème</strong> (abus, conduite haineuse, droit d'auteur, …) avec un volume de demandes et un taux d'action. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par plateforme × semestre × section × catégorie × métrique. Les décomptes d'autorités peuvent regrouper Facebook + Instagram, donc les vues par autorité sont affichées par plateforme, pas additionnées.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -584,11 +584,19 @@ display: flex; align-items: center; justify-content: space-between;
       </div>
 
       <div class="chart-card">
-        <h3>Demandes individuelles par semestre</h3>
-        <p class="chart-sub">Demandes reçues via le formulaire de signalement dédié à la loi 5651 des plateformes (art. 9/9-A), une ligne par plateforme.</p>
+        <h3>Demandes individuelles par semestre (Meta)</h3>
+        <p class="chart-sub">Demandes reçues via le formulaire de signalement dédié à la loi 5651 de Meta (art. 9/9-A), une ligne par plateforme.</p>
         <div class="chart-loading" id="out-loading">Chargement…</div>
         <canvas id="chart-out" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-out-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>X — signalements individuels par catégorie de problème (dernier semestre)</h3>
+        <p class="chart-sub">Volume de signalements au titre de l'art. 9/9-A que X a reçus d'utilisateurs en Türkiye, par catégorie de problème, sur le semestre le plus récent.</p>
+        <div class="chart-loading" id="xiss-loading">Chargement…</div>
+        <canvas id="chart-xiss" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-xiss-table" class="sr-only"></div>
       </div>
 
     </div>
@@ -599,6 +607,15 @@ display: flex; align-items: center; justify-content: space-between;
     <h2>Demandes par organisme demandeur (Instagram, tous les semestres)</h2>
     <p class="sub">Demandes des autorités à Instagram cumulées sur tous les semestres, par source. Affiché pour une seule plateforme car les décomptes d'autorités peuvent regrouper Facebook et Instagram.</p>
     <div class="results" id="outcomeTotals" aria-busy="true">
+      <div class="results-loading">Chargement…</div>
+    </div>
+  </section>
+
+  <!-- ── X issue breakdown ──────────────────────────────────────── -->
+  <section class="data-section">
+    <h2>X — signalements et taux d'action par problème (dernier semestre)</h2>
+    <p class="sub">Le semestre le plus récent de X : le volume de signalements d'utilisateurs au titre de l'art. 9/9-A et la part traitée par X, par catégorie de problème. Le taux d'action est un pourcentage, pas un décompte — ne l'additionnez pas.</p>
+    <div class="results" id="xProblèmeTable" aria-busy="true">
       <div class="results-loading">Chargement…</div>
     </div>
   </section>
@@ -616,7 +633,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>Source : <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Rapports de transparence loi 5651 de Türkiye de Meta</a>. Données via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Méthodologie</a> · <a href="/fr/api-key">Clé d'API</a> · <a href="/fr/privacy">Confidentialité</a></p>
+  <p>Sources : rapports de transparence loi 5651 de Türkiye de <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta</a> et <a href="https://transparency.x.com/en/reports/countries/tr" target="_blank" rel="noopener noreferrer">X</a>. Données via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Méthodologie</a> · <a href="/fr/api-key">Clé d'API</a> · <a href="/fr/privacy">Confidentialité</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -850,6 +867,45 @@ display: flex; align-items: center; justify-content: space-between;
   function REQ_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests_total"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
   function AUTH_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["period","platform","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":300}; }
   function APPL_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"EQ","field_name":"metric","field_values":["applications_received"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
+  // X reports the individual stream by issue category, with a request volume and an
+  // action_rate percent. One row per (period, category, metric); SUM is a no-op
+  // pass-through since each combination is unique.
+  function XISS_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["X"]},{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests","action_rate"]}]},"group_by":["period","category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
+
+  // Render X's latest-half-year issue breakdown into both a horizontal-bar chart
+  // (request volume by issue, descending) and a three-column table (issue,
+  // requests, action rate %). Rows are [period, category, metric, n].
+  function renderXProblèmes(rows) {
+    if (!rows.length) { emptyChart('xiss-loading');
+      document.getElementById('xProblèmeTable').removeAttribute('aria-busy');
+      document.getElementById('xProblèmeTable').innerHTML = '<div class="results-loading">No data available.</div>';
+      return; }
+    var latest = rows.map(function (r) { return r[0]; }).sort().pop();
+    var cur = rows.filter(function (r) { return r[0] === latest; });
+    var byCat = {};
+    cur.forEach(function (r) { (byCat[r[1]] = byCat[r[1]] || {})[r[2]] = r[3]; });
+    var cats = Object.keys(byCat).sort(function (a, b) {
+      return (byCat[b].requests || 0) - (byCat[a].requests || 0);
+    });
+    // Chart: request volume by issue (descending).
+    var labels = cats, values = cats.map(function (c) { return byCat[c].requests || 0; });
+    srTable('chart-xiss-table', ["Problème (" + latest + ")", "Signalements"],
+      cats.map(function (c) { return [c, fmt(byCat[c].requests)]; }));
+    hbarChart('chart-xiss', 'xiss-loading', 'chart-xiss-table', labels, values);
+    // Table: issue, requests, action rate %.
+    var el = document.getElementById('xProblèmeTable');
+    el.removeAttribute('aria-busy');
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("Signalements de X et taux d'action par problème, " + latest + ".") + '</caption>'
+      + '<thead><tr><th scope="col">Problème</th><th scope="col" class="num">Signalements</th><th scope="col" class="num">Taux d\'action</th></tr></thead><tbody>'
+      + cats.map(function (c) {
+          var rate = byCat[c].action_rate;
+          return '<tr><td data-label="Problème">' + esc(c) + '</td>'
+            + '<td class="num" data-label="Signalements">' + fmt(byCat[c].requests) + '</td>'
+            + '<td class="num" data-label="Taux d\'action">' + (rate == null ? '—' : esc(rate) + '%') + '</td></tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
 
   // Grouped vertical bars for the latest half-year: authority sources on the x
   // axis, one dataset per platform. Rows are [period, platform, metric, n].
@@ -919,6 +975,7 @@ display: flex; align-items: center; justify-content: space-between;
   Promise.all([soft(REQ_Q()), soft(AUTH_Q()), soft(APPL_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
   });
+  soft(XISS_Q()).then(function (d) { renderXProblèmes(d.rows); });
 })();
 </script>
 </body>

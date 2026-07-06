@@ -418,16 +418,19 @@ CREATE INDEX idx_taiwan_section ON taiwan_metrics(section);
 
 -- Türkiye Law No. 5651 platform transparency reports (turkey-law5651/
 -- build_turkey.py). Tidy-long: one row per measured value from the platforms'
--- six-monthly Law 5651 reports (Meta Facebook/Instagram; more platforms later).
--- Two request streams (section): individual applications (Art. 9/9-A) and
--- judicial & administrative authorities (Art. 8/8-A). Dims inline.
+-- six-monthly Law 5651 reports (Meta Facebook/Instagram + X/Twitter). Two
+-- request streams (section): individual applications (Art. 9/9-A) and judicial
+-- & administrative authorities (Art. 8/8-A). X reports the individual stream
+-- broken down by issue `category` (blank for Meta's report-level totals) with a
+-- request volume + an action_rate percent. Dims inline.
 CREATE TABLE turkey_metrics (
-    platform TEXT NOT NULL,     -- reporting service: Facebook / Instagram
+    platform TEXT NOT NULL,     -- reporting service: Facebook / Instagram / X
     period   TEXT NOT NULL,     -- reporting half-year, 'YYYY HN'
     section  TEXT NOT NULL,     -- individual_requests / authority_requests
-    metric   TEXT NOT NULL,     -- applications_received, requests_icta, ...
-    unit     TEXT NOT NULL,     -- count
-    value    INTEGER
+    category TEXT NOT NULL,     -- X issue label (Abuse/...); '' for Meta totals
+    metric   TEXT NOT NULL,     -- applications_received, requests_icta, requests, action_rate, ...
+    unit     TEXT NOT NULL,     -- count / percent
+    value    REAL               -- REAL: X action_rate is a percentage
 );
 CREATE INDEX idx_turkey_section ON turkey_metrics(section);
 
@@ -1122,7 +1125,8 @@ def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
     """
     if data is None:
         raise ValueError("turkey dataset is None")
-    expected_cols = ["platform", "period", "section", "metric", "unit", "value"]
+    expected_cols = ["platform", "period", "section", "category",
+                     "metric", "unit", "value"]
     if data.get("columns") != expected_cols:
         raise ValueError(f"turkey dataset columns {data.get('columns')} "
                          f"don't match the expected order {expected_cols}")
@@ -1134,7 +1138,7 @@ def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
         with conn:
             conn.executemany(
                 "INSERT INTO turkey_metrics (platform, period, section, "
-                "metric, unit, value) VALUES (?,?,?,?,?,?)",
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
                 rows,
             )
         return len(rows)

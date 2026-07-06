@@ -1185,12 +1185,13 @@ TABLES: dict[str, TableSpec] = {
         },
     ),
     "turkey_metrics": TableSpec(
-        "Türkiye Law No. 5651 platform transparency reports — the six-monthly reports social-network providers with >1M daily accesses from Türkiye publish (Additional Article 4) on the content-removal / access-blocking decisions notified to them. Currently Meta (platform 'Facebook' / 'Instagram'), five half-years H1 2023 → H1 2025. Two request streams (section): 'individual_requests' (Art. 9/9-A — natural/legal persons reporting personality/privacy violations via a form) and 'authority_requests' (Art. 8/8-A — the ICTA, the Consumer-Policy channel, and court orders). A tidy-long table: one row per measured value, identified by platform × period × section × metric. Pin a section AND a metric before aggregating — requests ≠ reported entities ≠ removed entities, and requests_icta/_consumer_policy/_court_orders are components of requests_total (which they may not fully sum to, as Meta doesn't categorise every request; authority counts can also bundle Facebook + Instagram).",
+        "Türkiye Law No. 5651 platform transparency reports — the six-monthly reports social-network providers with >1M daily accesses from Türkiye publish (Additional Article 4) on the content-removal / access-blocking decisions notified to them. Two publishers: Meta (platform 'Facebook' / 'Instagram', H1 2023 → H1 2025) and X (platform 'X', H1 2021 → H1 2025). Two request streams (section): 'individual_requests' (Art. 9/9-A — natural/legal persons reporting personality/privacy violations via a form) and 'authority_requests' (Art. 8/8-A — the ICTA, the Consumer-Policy channel, and court orders). Meta reports both streams as report-level totals (blank 'category'); X reports only the individual stream, broken down by issue 'category' (Abuse / Hateful Conduct / Copyright / …) with a request volume ('requests') and an 'action_rate' percentage. A tidy-long table: one row per measured value, identified by platform × period × section × category × metric. Pin a section, category AND metric before aggregating — requests ≠ reported entities ≠ removed entities, requests_icta/_consumer_policy/_court_orders are components of requests_total (which they may not fully sum to, as Meta doesn't categorise every request; authority counts can also bundle Facebook + Instagram), and action_rate is a percent (never SUM).",
         "FROM turkey_metrics f",
         {
             "platform": "f.platform",
             "period":   "f.period",
             "section":  "f.section",
+            "category": "f.category",
             "metric":   "f.metric",
             "unit":     "f.unit",
         },
@@ -3779,7 +3780,8 @@ def _leg_warnings(
             )
     # turkey_metrics keeps two request streams (individual vs authority) and,
     # within the authority stream, per-authority counts that are parts of the
-    # total (and may bundle Facebook + Instagram).
+    # total (and may bundle Facebook + Instagram); X reports per-issue-category
+    # counts alongside action_rate percentages.
     if table == "turkey_metrics" and any(
         a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
     ):
@@ -3792,9 +3794,10 @@ def _leg_warnings(
         if "metric" not in pinned:
             out.append(
                 "'turkey_metrics' reports requests, reported entities and removed "
-                "entities as separate metrics, and requests_icta/_consumer_policy/"
-                "_court_orders are parts of requests_total; this aggregate pins no "
-                "'metric'. Filter or group by 'metric'."
+                "entities as separate metrics, requests_icta/_consumer_policy/"
+                "_court_orders are parts of requests_total, and X's action_rate is "
+                "a percentage; this aggregate pins no 'metric'. Filter or group by "
+                "'metric'."
             )
     # linkedin_metrics mixes counts, percentages and banded national-security
     # ranges in one value column, across three report datasets.

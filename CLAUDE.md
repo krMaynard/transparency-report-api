@@ -40,7 +40,9 @@ devices and in Google Play, by version × country × category, 2017–2024), and
 **Türkiye's Law No. 5651 platform transparency reports** (the six-monthly
 content-removal / access-blocking figures platforms publish for Türkiye —
 individual Art. 9/9-A applications and Art. 8/8-A authority requests by
-requesting body; Meta's Facebook & Instagram, 2023–2025).
+requesting body; Meta's Facebook & Instagram 2023–2025 as report-level totals,
+plus X/Twitter 2021–2025 broken down by issue category with request volumes and
+action rates).
 
 Built to demonstrate two things:
 
@@ -330,20 +332,29 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   inside `art33_accounts_suspended`); `_leg_warnings` warns on both.
 - **Türkiye Law No. 5651 platform reports** — a single **tidy-long**
   `turkey_metrics` table (one row per measured value: `platform`/`period`/
-  `section`/`metric`/`unit` + a `value`; dims stored inline). The six-monthly
-  transparency reports platforms publish under Türkiye's Law 5651 (Additional
-  Art. 4) on the content-removal / access-blocking decisions notified to them —
-  currently **Meta** (`platform` `Facebook`/`Instagram`), five half-years
-  H1 2023 → H1 2025 (parsed from the static PDFs on `transparency.meta.com/sr/`;
-  TikTok/X/YouTube publish their own reports and slot in later). Two request
-  streams (`section`): `individual_requests` (Art. 9/9-A — personality/privacy
-  applications via a form) and `authority_requests` (Art. 8/8-A — the ICTA, the
-  Consumer-Policy channel, and court orders). Pin a `section` **and a `metric`**
-  before aggregating — requests ≠ reported entities ≠ removed entities, and
-  `requests_icta`/`_consumer_policy`/`_court_orders` are parts of
+  `section`/`category`/`metric`/`unit` + a `value`; dims stored inline). The
+  six-monthly transparency reports platforms publish under Türkiye's Law 5651
+  (Additional Art. 4) on the content-removal / access-blocking decisions notified
+  to them, from two publishers' static English PDFs: **Meta**
+  (`platform` `Facebook`/`Instagram`, H1 2023 → H1 2025, from
+  `transparency.meta.com/sr/`) and **X** (`platform` `X`, H1 2021 → H1 2025, from
+  `transparency.x.com`). Two request streams (`section`): `individual_requests`
+  (Art. 9/9-A — personality/privacy applications via a form) and
+  `authority_requests` (Art. 8/8-A — the ICTA, the Consumer-Policy channel, and
+  court orders). Meta reports both streams as report-level totals (blank
+  `category`); X reports only the individual stream, broken down by issue
+  `category` (`Abuse`/`Hateful Conduct`/`Copyright`/… kept verbatim) with a
+  request volume (`metric='requests'`) and an `action_rate` (`unit='percent'`).
+  `value` is `REAL` (to hold X's action-rate percentages). Pin a `section`
+  **and a `metric`** before aggregating — requests ≠ reported entities ≠ removed
+  entities, `requests_icta`/`_consumer_policy`/`_court_orders` are parts of
   `requests_total` (which they may not fully sum to, as Meta doesn't categorise
-  every request; authority counts can also bundle Facebook + Instagram);
-  `_leg_warnings` warns on both.
+  every request; authority counts can also bundle Facebook + Instagram), and
+  `action_rate` is a percent (never SUM); `_leg_warnings` warns on both. X's
+  per-category `requests` are additive (disjoint issues), so summing them across
+  categories is a legitimate grand total. TikTok/YouTube publish no retrievable
+  standalone Türkiye Law 5651 report (their Turkish figures live only in global
+  tools).
 - **Google government requests for user information** — a single **tidy-long**
   `google_userdata_metrics` table (one row per measured value: `dataset`/
   `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
