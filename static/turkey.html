@@ -890,18 +890,21 @@ display: flex; align-items: center; justify-content: space-between;
     // Chart: request volume by issue (descending).
     var labels = cats, values = cats.map(function (c) { return byCat[c].requests || 0; });
     srTable('chart-xiss-table', ["Issue (" + latest + ")", "Reports"],
-      cats.map(function (c) { return [c, fmt(byCat[c].requests)]; }));
+      cats.map(function (c) { var q = byCat[c].requests; return [c, q == null ? '—' : fmt(q)]; }));
     hbarChart('chart-xiss', 'xiss-loading', 'chart-xiss-table', labels, values);
-    // Table: issue, requests, action rate %.
+    // Table: issue, requests, action rate %. A category can report a request
+    // volume with no action rate (X files "n/a" — e.g. Incapacitated users,
+    // 2024 H1), so guard both cells rather than assuming both are present.
     var el = document.getElementById('xIssueTable');
     el.removeAttribute('aria-busy');
     el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
       + '<caption class="sr-only">' + esc("X reports and action rate by issue, " + latest + ".") + '</caption>'
       + '<thead><tr><th scope="col">Issue</th><th scope="col" class="num">Reports</th><th scope="col" class="num">Action rate</th></tr></thead><tbody>'
       + cats.map(function (c) {
+          var reqs = byCat[c].requests;
           var rate = byCat[c].action_rate;
           return '<tr><td data-label="Issue">' + esc(c) + '</td>'
-            + '<td class="num" data-label="Reports">' + fmt(byCat[c].requests) + '</td>'
+            + '<td class="num" data-label="Reports">' + (reqs == null ? '—' : fmt(reqs)) + '</td>'
             + '<td class="num" data-label="Action rate">' + (rate == null ? '—' : esc(rate) + '%') + '</td></tr>';
         }).join('')
       + '</tbody></table></div>';
