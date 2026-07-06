@@ -378,6 +378,14 @@ display: flex; align-items: center; justify-content: space-between;
 
     <div class="nav-section">平台 transparency</div>
 
+    <a href="/zh/cser" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 1.75c-2.6 1.4-4.3 1.6-5.25 1.6v4.9c0 3 2.15 4.85 5.25 6 3.1-1.15 5.25-3 5.25-6v-4.9C12.3 3.35 10.6 3.15 8 1.75z" stroke-linejoin="round"/>
+        <path d="M5.9 8.1 7.3 9.5l3-3.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Meta — 执行
+    </a>
+
     <a href="/zh/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
@@ -555,9 +563,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Meta · 每半年 · 2023 – 2025</span>
+    <span class="badge">Meta + X · 每半年 · 2021 – 2025</span>
     <h1>土耳其 — 第5651号法透明度报告</h1>
-    <p>各平台依据土耳其<strong>第5651号法</strong>（附加条款4）半年发布的透明度报告，内容涉及向其送达的内容移除和访问屏蔽决定。请求分两类：<strong>个人申请</strong>（第9条/9-A条——就人格权/隐私权受侵害进行举报的个人）和<strong>司法与行政当局</strong>（第8条/8-A条——ICTA、消费者政策渠道及法院命令）。目前为 Meta 的 Facebook 与 Instagram 报告，2023 – 2025 共五个半年。这是一个 tidy-long 数据集：每行是由平台 × 半年 × 板块 × 指标标识的一个测量值。当局数据可能将 Facebook 与 Instagram 合并计数，因此按当局的视图按平台分别显示，不做求和。</p>
+    <p>各平台依据土耳其<strong>第5651号法</strong>（附加条款4）半年发布的透明度报告，内容涉及向其送达的内容移除和访问屏蔽决定。请求分两类：<strong>个人申请</strong>（第9条/9-A条——就人格权/隐私权受侵害进行举报的个人）和<strong>司法与行政当局</strong>（第8条/8-A条——ICTA、消费者政策渠道及法院命令）。<strong>Meta</strong> 的 Facebook 与 Instagram 报告（2023 – 2025）以报告级总量呈现两类请求；<strong>X</strong> 的报告（2021 – 2025）仅涵盖个人类别，但按<strong>问题类别</strong>（滥用、仇恨行为、版权……）拆分，给出请求量和处理率。这是一个 tidy-long 数据集：每行是由平台 × 半年 × 板块 × 类别 × 指标标识的一个测量值。当局数据可能将 Facebook 与 Instagram 合并计数，因此按当局的视图按平台分别显示，不做求和。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -584,11 +592,19 @@ display: flex; align-items: center; justify-content: space-between;
       </div>
 
       <div class="chart-card">
-        <h3>各半年的个人申请</h3>
-        <p class="chart-sub">通过各平台专用的5651号法举报表单（第9条/9-A条）收到的申请，每个平台一条线。</p>
+        <h3>各半年的个人申请（Meta）</h3>
+        <p class="chart-sub">通过 Meta 专用的5651号法举报表单（第9条/9-A条）收到的申请，每个平台一条线。</p>
         <div class="chart-loading" id="out-loading">加载中…</div>
         <canvas id="chart-out" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-out-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>X — 按问题类别列出的个人举报（最近半年）</h3>
+        <p class="chart-sub">X 在最近报告半年内收到的、来自土耳其用户的第9条/9-A条举报量，按问题类别列出。</p>
+        <div class="chart-loading" id="xiss-loading">加载中…</div>
+        <canvas id="chart-xiss" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-xiss-table" class="sr-only"></div>
       </div>
 
     </div>
@@ -599,6 +615,15 @@ display: flex; align-items: center; justify-content: space-between;
     <h2>按请求机构列出的请求（Instagram，所有半年）</h2>
     <p class="sub">Instagram 收到的当局请求在所有半年内的合计，按来源列出。仅显示单一平台，因为当局数据可能将 Facebook 与 Instagram 合并计数。</p>
     <div class="results" id="outcome合计s" aria-busy="true">
+      <div class="results-loading">加载中…</div>
+    </div>
+  </section>
+
+  <!-- ── X issue breakdown ──────────────────────────────────────── -->
+  <section class="data-section">
+    <h2>X — 按问题列出的举报与处理率（最近半年）</h2>
+    <p class="sub">X 最近的半年：第9条/9-A条的用户举报量以及 X 处理的比例，按问题类别列出。处理率是百分比而非计数——不要求和。</p>
+    <div class="results" id="x问题Table" aria-busy="true">
       <div class="results-loading">加载中…</div>
     </div>
   </section>
@@ -616,7 +641,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>来源：<a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta 的土耳其5651号法透明度报告</a>。数据来自 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">方法论</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
+  <p>来源：<a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta</a> 与 <a href="https://transparency.x.com/en/reports/countries/tr" target="_blank" rel="noopener noreferrer">X</a> 的土耳其5651号法透明度报告。数据来自 <a href="/api">Transparency Report API</a> · <a href="/zh/methodology">方法论</a> · <a href="/zh/api-key">API 密钥</a> · <a href="/zh/privacy">隐私</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">快照：</span> <span id="prov-snap"></span> · <span class="prov-label">引用格式：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -850,6 +875,48 @@ display: flex; align-items: center; justify-content: space-between;
   function REQ_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests_total"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
   function AUTH_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["period","platform","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":300}; }
   function APPL_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"EQ","field_name":"metric","field_values":["applications_received"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
+  // X reports the individual stream by issue category, with a request volume and an
+  // action_rate percent. One row per (period, category, metric); SUM is a no-op
+  // pass-through since each combination is unique.
+  function XISS_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["X"]},{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests","action_rate"]}]},"group_by":["period","category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
+
+  // Render X's latest-half-year issue breakdown into both a horizontal-bar chart
+  // (request volume by issue, descending) and a three-column table (issue,
+  // requests, action rate %). Rows are [period, category, metric, n].
+  function renderX问题s(rows) {
+    if (!rows.length) { emptyChart('xiss-loading');
+      document.getElementById('x问题Table').removeAttribute('aria-busy');
+      document.getElementById('x问题Table').innerHTML = '<div class="results-loading">No data available.</div>';
+      return; }
+    var latest = rows.map(function (r) { return r[0]; }).sort().pop();
+    var cur = rows.filter(function (r) { return r[0] === latest; });
+    var byCat = {};
+    cur.forEach(function (r) { (byCat[r[1]] = byCat[r[1]] || {})[r[2]] = r[3]; });
+    var cats = Object.keys(byCat).sort(function (a, b) {
+      return (byCat[b].requests || 0) - (byCat[a].requests || 0);
+    });
+    // Chart: request volume by issue (descending).
+    var labels = cats, values = cats.map(function (c) { return byCat[c].requests || 0; });
+    srTable('chart-xiss-table', ["问题 (" + latest + ")", "举报数"],
+      cats.map(function (c) { var q = byCat[c].requests; return [c, q == null ? '—' : fmt(q)]; }));
+    hbarChart('chart-xiss', 'xiss-loading', 'chart-xiss-table', labels, values);
+    // Table: issue, requests, action rate %. A category can report a request
+    // volume with no action rate (X files "n/a" — e.g. Incapacitated users,
+    // 2024 H1), so guard both cells rather than assuming both are present.
+    var el = document.getElementById('x问题Table');
+    el.removeAttribute('aria-busy');
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("X 按问题列出的举报与处理率，" + latest + ".") + '</caption>'
+      + '<thead><tr><th scope="col">问题</th><th scope="col" class="num">举报数</th><th scope="col" class="num">处理率</th></tr></thead><tbody>'
+      + cats.map(function (c) {
+          var reqs = byCat[c].requests;
+          var rate = byCat[c].action_rate;
+          return '<tr><td data-label="问题">' + esc(c) + '</td>'
+            + '<td class="num" data-label="举报数">' + (reqs == null ? '—' : fmt(reqs)) + '</td>'
+            + '<td class="num" data-label="处理率">' + (rate == null ? '—' : esc(rate) + '%') + '</td></tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
 
   // Grouped vertical bars for the latest half-year: authority sources on the x
   // axis, one dataset per platform. Rows are [period, platform, metric, n].
@@ -919,6 +986,7 @@ display: flex; align-items: center; justify-content: space-between;
   Promise.all([soft(REQ_Q()), soft(AUTH_Q()), soft(APPL_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
   });
+  soft(XISS_Q()).then(function (d) { renderX问题s(d.rows); });
 })();
 </script>
 </body>

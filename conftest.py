@@ -193,23 +193,52 @@ _TAIWAN_FIXTURE = {
 seed.build_taiwan_db(_TAIWAN_FIXTURE, _DB)
 
 # A small slice of the Türkiye Law 5651 dataset (turkey-law5651.json shape):
-# Facebook + Instagram, two half-years, both request streams (individual Art.
-# 9/9-A and authority Art. 8/8-A with the per-authority breakdown).
-# [platform, period, section, metric, unit, value]
+# Meta (Facebook + Instagram, both request streams — individual Art. 9/9-A and
+# authority Art. 8/8-A with the per-authority breakdown, blank category) plus X
+# (individual stream broken down by issue category, with a requests count and an
+# action_rate percent).
+# [platform, period, section, category, metric, unit, value]
 _TURKEY_FIXTURE = {
-    "columns": ["platform", "period", "section", "metric", "unit", "value"],
+    "columns": ["platform", "period", "section", "category", "metric", "unit", "value"],
     "rows": [
-        ["Facebook", "2024 H2", "individual_requests", "applications_received", "count", 294],
-        ["Facebook", "2024 H2", "authority_requests", "requests_total", "count", 2724],
-        ["Facebook", "2024 H2", "authority_requests", "requests_icta", "count", 2350],
-        ["Facebook", "2024 H2", "authority_requests", "requests_consumer_policy", "count", 118],
-        ["Facebook", "2024 H2", "authority_requests", "requests_court_orders", "count", 256],
-        ["Instagram", "2024 H2", "individual_requests", "applications_received", "count", 303],
-        ["Instagram", "2024 H2", "authority_requests", "requests_total", "count", 2842],
-        ["Instagram", "2025 H1", "authority_requests", "requests_total", "count", 9471],
+        ["Facebook", "2024 H2", "individual_requests", "", "applications_received", "count", 294],
+        ["Facebook", "2024 H2", "authority_requests", "", "requests_total", "count", 2724],
+        ["Facebook", "2024 H2", "authority_requests", "", "requests_icta", "count", 2350],
+        ["Facebook", "2024 H2", "authority_requests", "", "requests_consumer_policy", "count", 118],
+        ["Facebook", "2024 H2", "authority_requests", "", "requests_court_orders", "count", 256],
+        ["Instagram", "2024 H2", "individual_requests", "", "applications_received", "count", 303],
+        ["Instagram", "2024 H2", "authority_requests", "", "requests_total", "count", 2842],
+        ["Instagram", "2025 H1", "authority_requests", "", "requests_total", "count", 9471],
+        ["X", "2024 H2", "individual_requests", "Abuse", "requests", "count", 228623],
+        ["X", "2024 H2", "individual_requests", "Abuse", "action_rate", "percent", 52.87],
+        ["X", "2024 H2", "individual_requests", "Copyright", "requests", "count", 6083],
+        ["X", "2024 H2", "individual_requests", "Copyright", "action_rate", "percent", 68.95],
+        ["X", "2025 H1", "individual_requests", "Abuse", "requests", "count", 563954],
+        ["X", "2025 H1", "individual_requests", "Abuse", "action_rate", "percent", 0.05],
     ],
 }
 seed.build_turkey_db(_TURKEY_FIXTURE, _DB)
+
+# A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
+# Instagram, a couple of policy areas and quarters, mixing count metrics
+# (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),
+# plus a 'Cross-Policy Data' aggregate row.
+# [app, policy_area, metric, period, unit, value]
+_CSER_FIXTURE = {
+    "columns": ["app", "policy_area", "metric", "period", "unit", "value"],
+    "rows": [
+        ["Facebook", "Hateful Conduct", "Content Actioned", "2025 Q3", "count", 8100000],
+        ["Facebook", "Hateful Conduct", "Content Actioned", "2025 Q4", "count", 7500000],
+        ["Facebook", "Hateful Conduct", "Proactive rate", "2025 Q4", "percent", 94.4],
+        ["Facebook", "Hateful Conduct", "Lowerbound Prevalence", "2025 Q4", "percent", 0.06],
+        ["Facebook", "Hateful Conduct", "Upperbound Prevalence", "2025 Q4", "percent", 0.08],
+        ["Facebook", "Spam", "Content Actioned", "2025 Q4", "count", 1200000000],
+        ["Facebook", "Spam", "Proactive rate", "2025 Q4", "percent", 99.7],
+        ["Facebook", "Cross-Policy Data", "Content Appealed", "2025 Q4", "count", 500000],
+        ["Instagram", "Hateful Conduct", "Content Actioned", "2025 Q4", "count", 3300000],
+    ],
+}
+seed.build_cser_db(_CSER_FIXTURE, _DB)
 
 # A small slice of the Google user-data dataset (google-user-data.json shape).
 # [dataset, period, country, iso2, product, legal_process, assisting_country,

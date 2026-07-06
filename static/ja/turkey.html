@@ -378,6 +378,14 @@ display: flex; align-items: center; justify-content: space-between;
 
     <div class="nav-section">プラットフォーム transparency</div>
 
+    <a href="/ja/cser" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 1.75c-2.6 1.4-4.3 1.6-5.25 1.6v4.9c0 3 2.15 4.85 5.25 6 3.1-1.15 5.25-3 5.25-6v-4.9C12.3 3.35 10.6 3.15 8 1.75z" stroke-linejoin="round"/>
+        <path d="M5.9 8.1 7.3 9.5l3-3.1" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Meta — 執行状況
+    </a>
+
     <a href="/ja/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
@@ -555,9 +563,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Meta · 半期ごと · 2023 – 2025</span>
+    <span class="badge">Meta + X · 半期ごと · 2021 – 2025</span>
     <h1>トルコ — 法律第5651号 透明性レポート</h1>
-    <p>プラットフォームがトルコの<strong>法律第5651号</strong>（追加条項4）に基づき公表する半期ごとの透明性レポート。通知されたコンテンツ削除・アクセス遮断の決定に関するものです。要請は2系統：<strong>個人からの申請</strong>（第9条/9-A条 — 人格権・プライバシー侵害を申し立てる個人）と<strong>司法・行政当局</strong>（第8条/8-A条 — ICTA、消費者政策チャネル、裁判所命令）。現在は Meta の Facebook・Instagram レポート、2023 – 2025 の5半期分。tidy-long データセットで、各行はプラットフォーム × 半期 × セクション × メトリクスで識別される1つの測定値です。当局の件数は Facebook と Instagram をまとめて計上することがあるため、当局別のビューは合算せずプラットフォーム別に表示します。</p>
+    <p>プラットフォームがトルコの<strong>法律第5651号</strong>（追加条項4）に基づき公表する半期ごとの透明性レポート。通知されたコンテンツ削除・アクセス遮断の決定に関するものです。要請は2系統：<strong>個人からの申請</strong>（第9条/9-A条 — 人格権・プライバシー侵害を申し立てる個人）と<strong>司法・行政当局</strong>（第8条/8-A条 — ICTA、消費者政策チャネル、裁判所命令）。<strong>Meta</strong> の Facebook・Instagram レポート（2023 – 2025）は両系統をレポート単位の合計で示し、<strong>X</strong> のレポート（2021 – 2025）は個人系統のみを対象としつつ、<strong>問題カテゴリ</strong>（不適切行為、ヘイト行為、著作権、…）別に要請数と対応率で内訳を示します。tidy-long データセットで、各行はプラットフォーム × 半期 × セクション × カテゴリ × メトリクスで識別される1つの測定値です。当局の件数は Facebook と Instagram をまとめて計上することがあるため、当局別のビューは合算せずプラットフォーム別に表示します。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -584,11 +592,19 @@ display: flex; align-items: center; justify-content: space-between;
       </div>
 
       <div class="chart-card">
-        <h3>個人からの申請（半期ごと）</h3>
-        <p class="chart-sub">各プラットフォームの法律5651号専用の報告フォーム（第9条/9-A条）を通じて受け取った申請を、プラットフォームごとに1本の線で表示。</p>
+        <h3>個人からの申請（半期ごと・Meta）</h3>
+        <p class="chart-sub">Meta の法律5651号専用の報告フォーム（第9条/9-A条）を通じて受け取った申請を、プラットフォームごとに1本の線で表示。</p>
         <div class="chart-loading" id="out-loading">読み込み中…</div>
         <canvas id="chart-out" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-out-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card wide">
+        <h3>X — 個人からの報告（問題カテゴリ別・直近の半期）</h3>
+        <p class="chart-sub">X がトルコのユーザーから受け取った第9条/9-A条の報告数を、直近の報告半期に問題カテゴリ別に表示。</p>
+        <div class="chart-loading" id="xiss-loading">読み込み中…</div>
+        <canvas id="chart-xiss" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-xiss-table" class="sr-only"></div>
       </div>
 
     </div>
@@ -599,6 +615,15 @@ display: flex; align-items: center; justify-content: space-between;
     <h2>要請元別の要請（Instagram、全半期）</h2>
     <p class="sub">Instagram に対する当局の要請を全半期で合計し、要請元別に表示。当局の件数は Facebook と Instagram をまとめて計上することがあるため、単一プラットフォームで表示しています。</p>
     <div class="results" id="outcome合計s" aria-busy="true">
+      <div class="results-loading">読み込み中…</div>
+    </div>
+  </section>
+
+  <!-- ── X issue breakdown ──────────────────────────────────────── -->
+  <section class="data-section">
+    <h2>X — 問題別の報告数と対応率（直近の半期）</h2>
+    <p class="sub">X の直近の半期：第9条/9-A条のユーザー報告数と、X が対応した割合を問題カテゴリ別に表示。対応率は件数ではなく割合なので合計しないでください。</p>
+    <div class="results" id="x問題Table" aria-busy="true">
       <div class="results-loading">読み込み中…</div>
     </div>
   </section>
@@ -616,7 +641,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>ソース: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta のトルコ 法律5651号 透明性レポート</a>。データ提供: <a href="/api">Transparency Report API</a> · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p>ソース: <a href="https://transparency.meta.com/reports/regulatory-transparency-reports/" target="_blank" rel="noopener noreferrer">Meta</a> と <a href="https://transparency.x.com/en/reports/countries/tr" target="_blank" rel="noopener noreferrer">X</a> のトルコ 法律5651号 透明性レポート。データ提供: <a href="/api">Transparency Report API</a> · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -850,6 +875,48 @@ display: flex; align-items: center; justify-content: space-between;
   function REQ_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests_total"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
   function AUTH_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["period","platform","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":300}; }
   function APPL_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"EQ","field_name":"metric","field_values":["applications_received"]}]},"group_by":["period","platform"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
+  // X reports the individual stream by issue category, with a request volume and an
+  // action_rate percent. One row per (period, category, metric); SUM is a no-op
+  // pass-through since each combination is unique.
+  function XISS_Q() { return {"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["X"]},{"operation":"EQ","field_name":"section","field_values":["individual_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests","action_rate"]}]},"group_by":["period","category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
+
+  // Render X's latest-half-year issue breakdown into both a horizontal-bar chart
+  // (request volume by issue, descending) and a three-column table (issue,
+  // requests, action rate %). Rows are [period, category, metric, n].
+  function renderX問題s(rows) {
+    if (!rows.length) { emptyChart('xiss-loading');
+      document.getElementById('x問題Table').removeAttribute('aria-busy');
+      document.getElementById('x問題Table').innerHTML = '<div class="results-loading">No data available.</div>';
+      return; }
+    var latest = rows.map(function (r) { return r[0]; }).sort().pop();
+    var cur = rows.filter(function (r) { return r[0] === latest; });
+    var byCat = {};
+    cur.forEach(function (r) { (byCat[r[1]] = byCat[r[1]] || {})[r[2]] = r[3]; });
+    var cats = Object.keys(byCat).sort(function (a, b) {
+      return (byCat[b].requests || 0) - (byCat[a].requests || 0);
+    });
+    // Chart: request volume by issue (descending).
+    var labels = cats, values = cats.map(function (c) { return byCat[c].requests || 0; });
+    srTable('chart-xiss-table', ["問題 (" + latest + ")", "報告数"],
+      cats.map(function (c) { var q = byCat[c].requests; return [c, q == null ? '—' : fmt(q)]; }));
+    hbarChart('chart-xiss', 'xiss-loading', 'chart-xiss-table', labels, values);
+    // Table: issue, requests, action rate %. A category can report a request
+    // volume with no action rate (X files "n/a" — e.g. Incapacitated users,
+    // 2024 H1), so guard both cells rather than assuming both are present.
+    var el = document.getElementById('x問題Table');
+    el.removeAttribute('aria-busy');
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc("X の問題別の報告数と対応率、" + latest + ".") + '</caption>'
+      + '<thead><tr><th scope="col">問題</th><th scope="col" class="num">報告数</th><th scope="col" class="num">対応率</th></tr></thead><tbody>'
+      + cats.map(function (c) {
+          var reqs = byCat[c].requests;
+          var rate = byCat[c].action_rate;
+          return '<tr><td data-label="問題">' + esc(c) + '</td>'
+            + '<td class="num" data-label="報告数">' + (reqs == null ? '—' : fmt(reqs)) + '</td>'
+            + '<td class="num" data-label="対応率">' + (rate == null ? '—' : esc(rate) + '%') + '</td></tr>';
+        }).join('')
+      + '</tbody></table></div>';
+  }
 
   // Grouped vertical bars for the latest half-year: authority sources on the x
   // axis, one dataset per platform. Rows are [period, platform, metric, n].
@@ -919,6 +986,7 @@ display: flex; align-items: center; justify-content: space-between;
   Promise.all([soft(REQ_Q()), soft(AUTH_Q()), soft(APPL_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
   });
+  soft(XISS_Q()).then(function (d) { renderX問題s(d.rows); });
 })();
 </script>
 </body>

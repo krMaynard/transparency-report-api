@@ -81,6 +81,11 @@ _DEFAULT_TAIWAN_SOURCE = os.getenv(
 _DEFAULT_TURKEY_SOURCE = os.getenv(
     "SEED_TURKEY_SOURCE_JSON", os.path.join(HERE, "data", "turkey-law5651.json")
 )
+# Meta Community Standards Enforcement Report — vendored in-repo (from the
+# sibling data repo's meta-cser/build_cser.py).
+_DEFAULT_CSER_SOURCE = os.getenv(
+    "SEED_CSER_SOURCE_JSON", os.path.join(HERE, "data", "meta-cser.json")
+)
 # Google government requests for user information — vendored in-repo (from the
 # sibling data repo's google-user-data/build_userdata.py).
 _DEFAULT_GOOGLE_UD_SOURCE = os.getenv(
@@ -418,18 +423,36 @@ CREATE INDEX idx_taiwan_section ON taiwan_metrics(section);
 
 -- Türkiye Law No. 5651 platform transparency reports (turkey-law5651/
 -- build_turkey.py). Tidy-long: one row per measured value from the platforms'
--- six-monthly Law 5651 reports (Meta Facebook/Instagram; more platforms later).
--- Two request streams (section): individual applications (Art. 9/9-A) and
--- judicial & administrative authorities (Art. 8/8-A). Dims inline.
+-- six-monthly Law 5651 reports (Meta Facebook/Instagram + X/Twitter). Two
+-- request streams (section): individual applications (Art. 9/9-A) and judicial
+-- & administrative authorities (Art. 8/8-A). X reports the individual stream
+-- broken down by issue `category` (blank for Meta's report-level totals) with a
+-- request volume + an action_rate percent. Dims inline.
 CREATE TABLE turkey_metrics (
-    platform TEXT NOT NULL,     -- reporting service: Facebook / Instagram
+    platform TEXT NOT NULL,     -- reporting service: Facebook / Instagram / X
     period   TEXT NOT NULL,     -- reporting half-year, 'YYYY HN'
     section  TEXT NOT NULL,     -- individual_requests / authority_requests
-    metric   TEXT NOT NULL,     -- applications_received, requests_icta, ...
-    unit     TEXT NOT NULL,     -- count
-    value    INTEGER
+    category TEXT NOT NULL,     -- X issue label (Abuse/...); '' for Meta totals
+    metric   TEXT NOT NULL,     -- applications_received, requests_icta, requests, action_rate, ...
+    unit     TEXT NOT NULL,     -- count / percent
+    value    REAL               -- REAL: X action_rate is a percentage
 );
 CREATE INDEX idx_turkey_section ON turkey_metrics(section);
+
+-- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
+-- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
+-- onward. Tidy-long: one row per measured value. `policy_area` 'Cross-Policy
+-- Data' is an across-policy aggregate (not a peer of the individual areas);
+-- `unit` is count or percent (prevalence/proactive-rate/precision are rates).
+CREATE TABLE cser_metrics (
+    app         TEXT NOT NULL,  -- Facebook / Instagram
+    policy_area TEXT NOT NULL,  -- violation type; 'Cross-Policy Data' = aggregate
+    metric      TEXT NOT NULL,  -- Content Actioned, Prevalence, Proactive rate, ...
+    period      TEXT NOT NULL,  -- reporting quarter, 'YYYY Qn'
+    unit        TEXT NOT NULL,  -- count / percent
+    value       REAL
+);
+CREATE INDEX idx_cser_policy ON cser_metrics(policy_area);
 
 -- Google government requests for user information (google-user-data/
 -- build_userdata.py). Tidy-long: one row per measured value from the biannual
@@ -1122,7 +1145,8 @@ def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
     """
     if data is None:
         raise ValueError("turkey dataset is None")
-    expected_cols = ["platform", "period", "section", "metric", "unit", "value"]
+    expected_cols = ["platform", "period", "section", "category",
+                     "metric", "unit", "value"]
     if data.get("columns") != expected_cols:
         raise ValueError(f"turkey dataset columns {data.get('columns')} "
                          f"don't match the expected order {expected_cols}")
@@ -1134,7 +1158,36 @@ def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
         with conn:
             conn.executemany(
                 "INSERT INTO turkey_metrics (platform, period, section, "
-                "metric, unit, value) VALUES (?,?,?,?,?,?)",
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
+def build_cser_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the cser_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long meta-cser.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("cser dataset is None")
+    expected_cols = ["app", "policy_area", "metric", "period", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"cser dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("cser dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO cser_metrics (app, policy_area, metric, period, "
+                "unit, value) VALUES (?,?,?,?,?,?)",
                 rows,
             )
         return len(rows)
@@ -1565,6 +1618,8 @@ def main() -> None:
                         help="Path to taiwan-anti-fraud.json")
     parser.add_argument("--turkey-source", default=_DEFAULT_TURKEY_SOURCE,
                         help="Path to turkey-law5651.json")
+    parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
+                        help="Path to meta-cser.json")
     parser.add_argument("--google-ud-source", default=_DEFAULT_GOOGLE_UD_SOURCE,
                         help="Path to google-user-data.json")
     parser.add_argument("--microsoft-source", default=_DEFAULT_MICROSOFT_SOURCE,
@@ -1706,6 +1761,17 @@ def main() -> None:
               f"{len({r[1] for r in turkey_data['rows']})} periods")
     else:
         print(f"  (skipping Türkiye Law 5651 — not found: {args.turkey_source})")
+
+    if os.path.isfile(args.cser_source):
+        with open(args.cser_source, "r", encoding="utf-8") as f:
+            cser_data = json.load(f)
+        cser_rows = build_cser_db(cser_data, args.db)
+        print(f"  meta CSER: {cser_rows} metric rows across "
+              f"{len({r[0] for r in cser_data['rows']})} apps, "
+              f"{len({r[1] for r in cser_data['rows']})} policy areas, "
+              f"{len({r[3] for r in cser_data['rows']})} quarters")
+    else:
+        print(f"  (skipping Meta CSER — not found: {args.cser_source})")
 
     if os.path.isfile(args.google_ud_source):
         with open(args.google_ud_source, "r", encoding="utf-8") as f:
