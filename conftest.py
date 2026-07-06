@@ -219,6 +219,27 @@ _TURKEY_FIXTURE = {
 }
 seed.build_turkey_db(_TURKEY_FIXTURE, _DB)
 
+# A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
+# Instagram, a couple of policy areas and quarters, mixing count metrics
+# (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),
+# plus a 'Cross-Policy Data' aggregate row.
+# [app, policy_area, metric, period, unit, value]
+_CSER_FIXTURE = {
+    "columns": ["app", "policy_area", "metric", "period", "unit", "value"],
+    "rows": [
+        ["Facebook", "Hateful Conduct", "Content Actioned", "2025 Q3", "count", 8100000],
+        ["Facebook", "Hateful Conduct", "Content Actioned", "2025 Q4", "count", 7500000],
+        ["Facebook", "Hateful Conduct", "Proactive rate", "2025 Q4", "percent", 94.4],
+        ["Facebook", "Hateful Conduct", "Lowerbound Prevalence", "2025 Q4", "percent", 0.06],
+        ["Facebook", "Hateful Conduct", "Upperbound Prevalence", "2025 Q4", "percent", 0.08],
+        ["Facebook", "Spam", "Content Actioned", "2025 Q4", "count", 1200000000],
+        ["Facebook", "Spam", "Proactive rate", "2025 Q4", "percent", 99.7],
+        ["Facebook", "Cross-Policy Data", "Content Appealed", "2025 Q4", "count", 500000],
+        ["Instagram", "Hateful Conduct", "Content Actioned", "2025 Q4", "count", 3300000],
+    ],
+}
+seed.build_cser_db(_CSER_FIXTURE, _DB)
+
 # A small slice of the Google user-data dataset (google-user-data.json shape).
 # [dataset, period, country, iso2, product, legal_process, assisting_country,
 #  metric, unit, value_low, value_high]

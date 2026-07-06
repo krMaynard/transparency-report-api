@@ -33,7 +33,7 @@ STATIC = os.path.join(ROOT, "static")
 PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-tos.html",
                "ca-ab587.html",
                "apple.html", "github.html", "snap.html",
-               "india.html", "korea.html", "taiwan.html", "turkey.html",
+               "india.html", "korea.html", "taiwan.html", "turkey.html", "cser.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
                "disruptions.html", "android.html", "narratives.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
@@ -52,6 +52,7 @@ SUFFIX = {
     "korea.html": "korea",
     "taiwan.html": "taiwan",
     "turkey.html": "turkey",
+    "cser.html": "cser",
     "user-data.html": "user-data",
     "microsoft.html": "microsoft",
     "linkedin.html": "linkedin",
@@ -120,7 +121,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/ca-ab587', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/turkey', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -10996,15 +10997,15 @@ _TR_NAV = {
     "es": "Ley 5651 (Türkiye)", "fr": "Loi 5651 (Türkiye)", "de": "Türkei — Gesetz 5651",
     "it": "Legge 5651 (Türkiye)", "ja": "トルコ 5651号法", "zh": "土耳其 5651号法", "ko": "튀르키예 5651호법",
 }
-_TR_CARD_DESC_EN = "The six-monthly content-removal reports platforms publish under Türkiye's Law No. 5651 — individual and authority requests by requesting body, from Meta's Facebook &amp; Instagram reports."
+_TR_CARD_DESC_EN = "The six-monthly content-removal reports platforms publish under Türkiye's Law No. 5651 — individual and authority requests by requesting body, from Meta's Facebook &amp; Instagram and X's reports."
 _TR_CARD_DESC = {
-    "es": "Los informes semestrales de retirada de contenidos que las plataformas publican bajo la Ley N.º 5651 de Türkiye: solicitudes individuales y de autoridades por organismo solicitante, a partir de los informes de Facebook e Instagram de Meta.",
-    "fr": "Les rapports semestriels de retrait de contenu que les plateformes publient au titre de la loi n° 5651 de Türkiye : demandes individuelles et des autorités par organisme demandeur, d'après les rapports Facebook et Instagram de Meta.",
-    "de": "Die halbjährlichen Berichte zur Inhaltsentfernung, die Plattformen nach dem türkischen Gesetz Nr. 5651 veröffentlichen — Anfragen von Einzelpersonen und Behörden nach anfragender Stelle, aus Metas Facebook- und Instagram-Berichten.",
-    "it": "I report semestrali sulla rimozione di contenuti che le piattaforme pubblicano ai sensi della Legge n. 5651 della Türkiye: richieste individuali e delle autorità per ente richiedente, dai report di Facebook e Instagram di Meta.",
-    "ja": "プラットフォームがトルコの法律第5651号に基づき公表する半期ごとのコンテンツ削除レポート。個人および当局からの要請を要請元別に、Meta の Facebook・Instagram レポートから。",
-    "zh": "各平台依据土耳其第5651号法半年发布的内容移除报告——按请求机构列出的个人和当局请求，来自 Meta 的 Facebook 与 Instagram 报告。",
-    "ko": "플랫폼이 튀르키예 제5651호법에 따라 반기별로 공개하는 콘텐츠 삭제 보고서 — 요청 주체별 개인·당국 요청. Meta의 Facebook·Instagram 보고서 기반.",
+    "es": "Los informes semestrales de retirada de contenidos que las plataformas publican bajo la Ley N.º 5651 de Türkiye: solicitudes individuales y de autoridades por organismo solicitante, a partir de los informes de Facebook e Instagram de Meta y de X.",
+    "fr": "Les rapports semestriels de retrait de contenu que les plateformes publient au titre de la loi n° 5651 de Türkiye : demandes individuelles et des autorités par organisme demandeur, d'après les rapports Facebook et Instagram de Meta et ceux de X.",
+    "de": "Die halbjährlichen Berichte zur Inhaltsentfernung, die Plattformen nach dem türkischen Gesetz Nr. 5651 veröffentlichen — Anfragen von Einzelpersonen und Behörden nach anfragender Stelle, aus Metas Facebook- und Instagram-Berichten und denen von X.",
+    "it": "I report semestrali sulla rimozione di contenuti che le piattaforme pubblicano ai sensi della Legge n. 5651 della Türkiye: richieste individuali e delle autorità per ente richiedente, dai report di Facebook e Instagram di Meta e da quelli di X.",
+    "ja": "プラットフォームがトルコの法律第5651号に基づき公表する半期ごとのコンテンツ削除レポート。個人および当局からの要請を要請元別に、Meta の Facebook・Instagram レポートと X のレポートから。",
+    "zh": "各平台依据土耳其第5651号法半年发布的内容移除报告——按请求机构列出的个人和当局请求，来自 Meta 的 Facebook 与 Instagram 报告以及 X 的报告。",
+    "ko": "플랫폼이 튀르키예 제5651호법에 따라 반기별로 공개하는 콘텐츠 삭제 보고서 — 요청 주체별 개인·당국 요청. Meta의 Facebook·Instagram 보고서와 X의 보고서 기반.",
 }
 _TR_PAGE = {
     "Türkiye Law No. 5651 transparency reports — Transparency Report API": {
@@ -11276,6 +11277,222 @@ for _loc in _NEW_PAGE_LOCALES:
             if _o in _tr_text and _o not in _tr_own:
                 PAGES[_loc]["turkey.html"].append((_o, _n))
                 _tr_own.add(_o)
+
+# ── Meta CSER (Community Standards Enforcement Report) ───────────────────────
+_CSER_NAV = {
+    "es": "Meta — Aplicación", "fr": "Meta — Application", "de": "Meta — Durchsetzung",
+    "it": "Meta — Applicazione", "ja": "Meta — 執行状況", "zh": "Meta — 执行", "ko": "Meta — 집행",
+}
+_CSER_CARD_DESC_EN = "Meta's voluntary Community Standards Enforcement Report — prevalence, content actioned, proactive rate and appeals for Facebook &amp; Instagram, by policy area, quarterly since 2017."
+_CSER_CARD_DESC = {
+    "es": "El Informe voluntario de aplicación de las Normas Comunitarias de Meta: prevalencia, contenido sobre el que se actuó, tasa proactiva y apelaciones para Facebook e Instagram, por área de política, trimestral desde 2017.",
+    "fr": "Le rapport volontaire de Meta sur l'application des Standards de la communauté : prévalence, contenu traité, taux proactif et appels pour Facebook et Instagram, par domaine de règles, trimestriel depuis 2017.",
+    "de": "Metas freiwilliger Bericht zur Durchsetzung der Gemeinschaftsstandards — Verbreitung, bearbeitete Inhalte, proaktive Rate und Einsprüche für Facebook und Instagram, nach Richtlinienbereich, vierteljährlich seit 2017.",
+    "it": "Il report volontario di Meta sull'applicazione degli Standard della community: prevalenza, contenuti su cui è stata presa un'azione, tasso proattivo e ricorsi per Facebook e Instagram, per area di policy, trimestrale dal 2017.",
+    "ja": "Meta の自主的なコミュニティ規定施行レポート。Facebook・Instagram における蔓延度、措置したコンテンツ、事前対応率、異議申し立てを、ポリシー領域別に、2017年以降四半期ごとに掲載。",
+    "zh": "Meta 自愿发布的《社群守则执行报告》——Facebook 与 Instagram 的违规内容触达率、已处理内容、主动处理率与申诉，按政策领域列出，自2017年起按季度发布。",
+    "ko": "Meta의 자발적 커뮤니티 규정 시행 보고서 — Facebook·Instagram의 노출률, 조치한 콘텐츠, 선제적 조치율, 이의제기를 정책 영역별로 2017년부터 분기별 제공.",
+}
+_CSER_PAGE = {
+    "Meta Community Standards Enforcement Report — Transparency Report API": {
+        "es": "Informe de aplicación de las Normas Comunitarias de Meta — Transparency Report API",
+        "fr": "Rapport d'application des Standards de la communauté de Meta — Transparency Report API",
+        "de": "Meta-Bericht zur Durchsetzung der Gemeinschaftsstandards — Transparency Report API",
+        "it": "Report di Meta sull'applicazione degli Standard della community — Transparency Report API",
+        "ja": "Meta コミュニティ規定施行レポート — Transparency Report API",
+        "zh": "Meta 社群守则执行报告 — Transparency Report API",
+        "ko": "Meta 커뮤니티 규정 시행 보고서 — Transparency Report API",
+    },
+    "Meta · Voluntary · Quarterly · 2017 – 2025": {
+        "es": "Meta · Voluntario · Trimestral · 2017 – 2025", "fr": "Meta · Volontaire · Trimestriel · 2017 – 2025",
+        "de": "Meta · Freiwillig · Vierteljährlich · 2017 – 2025", "it": "Meta · Volontario · Trimestrale · 2017 – 2025",
+        "ja": "Meta · 自主的 · 四半期ごと · 2017 – 2025", "zh": "Meta · 自愿 · 每季度 · 2017 – 2025", "ko": "Meta · 자발적 · 분기별 · 2017 – 2025",
+    },
+    "Meta — Community Standards Enforcement Report": {
+        "es": "Meta — Informe de aplicación de las Normas Comunitarias",
+        "fr": "Meta — Rapport d'application des Standards de la communauté",
+        "de": "Meta — Bericht zur Durchsetzung der Gemeinschaftsstandards",
+        "it": "Meta — Report sull'applicazione degli Standard della community",
+        "ja": "Meta — コミュニティ規定施行レポート",
+        "zh": "Meta — 社群守则执行报告",
+        "ko": "Meta — 커뮤니티 규정 시행 보고서",
+    },
+    "Meta's flagship <strong>voluntary</strong> transparency report — how much violating content it actioned on <strong>Facebook</strong> and <strong>Instagram</strong> across ~16 policy areas, quarterly since 2017 Q4. Unlike the DSA or Türkiye Law 5651 reports, the CSER isn't filed under any single law; Meta publishes it of its own accord (now under the \"Integrity Reports\" umbrella). Headline metrics: <strong>prevalence</strong> (how often violating content is seen), <strong>content actioned</strong> and <strong>removed</strong>, the <strong>proactive rate</strong> (share caught before a user reported it), and <strong>appeals / restores</strong>. A tidy-long dataset: each row is one measured value identified by app × policy area × metric × quarter. Prevalence and rates are percentages (never summed); <code>Cross-Policy Data</code> is an across-policy aggregate, so it's excluded from the per-policy breakdowns below.": {
+        "es": "El principal informe de transparencia <strong>voluntario</strong> de Meta: cuánto contenido infractor abordó en <strong>Facebook</strong> e <strong>Instagram</strong> en ~16 áreas de política, trimestralmente desde el 4.º trimestre de 2017. A diferencia de los informes de la DSA o de la Ley 5651 de Türkiye, el CSER no se presenta bajo ninguna ley concreta; Meta lo publica por iniciativa propia (ahora bajo el paraguas de los \"Informes de integridad\"). Métricas principales: <strong>prevalencia</strong> (con qué frecuencia se ve contenido infractor), <strong>contenido sobre el que se actuó</strong> y <strong>eliminado</strong>, la <strong>tasa proactiva</strong> (proporción detectada antes de que un usuario lo denunciara) y <strong>apelaciones / restauraciones</strong>. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por app × área de política × métrica × trimestre. La prevalencia y las tasas son porcentajes (nunca se suman); <code>Cross-Policy Data</code> es un agregado entre políticas, por lo que se excluye de los desgloses por política siguientes.",
+        "fr": "Le principal rapport de transparence <strong>volontaire</strong> de Meta : la quantité de contenu enfreignant les règles qu'il a traitée sur <strong>Facebook</strong> et <strong>Instagram</strong> dans ~16 domaines de règles, chaque trimestre depuis le 4e trimestre 2017. Contrairement aux rapports DSA ou loi 5651 de Türkiye, le CSER n'est déposé au titre d'aucune loi précise ; Meta le publie de sa propre initiative (désormais sous l'égide des « Rapports d'intégrité »). Métriques phares : <strong>prévalence</strong> (fréquence à laquelle du contenu enfreignant est vu), <strong>contenu traité</strong> et <strong>supprimé</strong>, le <strong>taux proactif</strong> (part détectée avant tout signalement d'un utilisateur) et <strong>appels / rétablissements</strong>. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par app × domaine de règles × métrique × trimestre. La prévalence et les taux sont des pourcentages (jamais additionnés) ; <code>Cross-Policy Data</code> est un agrégat inter-règles, donc exclu des ventilations par domaine ci-dessous.",
+        "de": "Metas wichtigster <strong>freiwilliger</strong> Transparenzbericht — wie viele verstoßende Inhalte es auf <strong>Facebook</strong> und <strong>Instagram</strong> in ~16 Richtlinienbereichen bearbeitet hat, vierteljährlich seit Q4 2017. Anders als die DSA- oder Türkei-Gesetz-5651-Berichte wird der CSER unter keinem einzelnen Gesetz eingereicht; Meta veröffentlicht ihn aus eigenem Antrieb (jetzt unter dem Dach der „Integritätsberichte“). Kennzahlen: <strong>Verbreitung</strong> (wie oft verstoßende Inhalte gesehen werden), <strong>bearbeitete</strong> und <strong>entfernte Inhalte</strong>, die <strong>proaktive Rate</strong> (Anteil, der vor einer Nutzermeldung erkannt wurde) und <strong>Einsprüche / Wiederherstellungen</strong>. Ein Tidy-long-Datensatz: jede Zeile ist ein Messwert, identifiziert durch App × Richtlinienbereich × Metrik × Quartal. Verbreitung und Raten sind Prozentsätze (nie summieren); <code>Cross-Policy Data</code> ist ein übergreifender Aggregatwert und daher aus den nachstehenden Aufschlüsselungen ausgeschlossen.",
+        "it": "Il principale report di trasparenza <strong>volontario</strong> di Meta: quanti contenuti che violano le regole ha gestito su <strong>Facebook</strong> e <strong>Instagram</strong> in ~16 aree di policy, ogni trimestre dal 4° trimestre 2017. A differenza dei report DSA o della Legge 5651 della Türkiye, il CSER non è depositato ai sensi di alcuna singola legge; Meta lo pubblica di propria iniziativa (ora sotto l'ombrello dei \"Report sull'integrità\"). Metriche principali: <strong>prevalenza</strong> (quanto spesso i contenuti che violano le regole vengono visti), <strong>contenuti su cui è stata presa un'azione</strong> e <strong>rimossi</strong>, il <strong>tasso proattivo</strong> (quota individuata prima di una segnalazione) e <strong>ricorsi / ripristini</strong>. Un set di dati tidy-long: ogni riga è un valore misurato identificato da app × area di policy × metrica × trimestre. Prevalenza e tassi sono percentuali (mai sommate); <code>Cross-Policy Data</code> è un aggregato tra policy, quindi escluso dalle suddivisioni per policy sottostanti.",
+        "ja": "Meta を代表する<strong>自主的</strong>な透明性レポート。<strong>Facebook</strong>・<strong>Instagram</strong> において約16のポリシー領域で違反コンテンツにどれだけ措置したかを、2017年第4四半期以降四半期ごとに掲載します。DSA やトルコ法律5651号の報告と異なり、CSER は特定の法律に基づくものではなく、Meta が自らの判断で公表しています（現在は「インテグリティレポート」の傘下）。主な指標：<strong>蔓延度</strong>（違反コンテンツが見られる頻度）、<strong>措置したコンテンツ</strong>と<strong>削除数</strong>、<strong>事前対応率</strong>（ユーザー報告前に検出した割合）、<strong>異議申し立て／復元</strong>。tidy-long データセットで、各行はアプリ × ポリシー領域 × 指標 × 四半期で識別される1つの測定値です。蔓延度と各種率は割合です（合計しないでください）。<code>Cross-Policy Data</code> はポリシー横断の集計値のため、以下のポリシー別内訳からは除外しています。",
+        "zh": "Meta 最重要的<strong>自愿</strong>透明度报告——它在 <strong>Facebook</strong> 与 <strong>Instagram</strong> 上针对约16个政策领域处理了多少违规内容，自2017年第四季度起按季度发布。与 DSA 或土耳其5651号法报告不同，CSER 并非依据某一部法律提交，而是 Meta 自主发布（现纳入“诚信报告”体系）。核心指标：<strong>触达率</strong>（违规内容被看到的频率）、<strong>已处理</strong>与<strong>已移除</strong>内容、<strong>主动处理率</strong>（在用户举报前发现的比例），以及<strong>申诉／恢复</strong>。这是一个 tidy-long 数据集：每行是由 应用 × 政策领域 × 指标 × 季度 标识的一个测量值。触达率和各类比率是百分比（不要求和）；<code>Cross-Policy Data</code> 是跨政策的汇总项，因此已从下方按政策的细分中排除。",
+        "ko": "Meta의 대표적인 <strong>자발적</strong> 투명성 보고서 — <strong>Facebook</strong>·<strong>Instagram</strong>에서 약 16개 정책 영역에 걸쳐 위반 콘텐츠에 얼마나 조치했는지를 2017년 4분기부터 분기별로 공개합니다. DSA나 튀르키예 5651호법 보고서와 달리 CSER는 특정 법률에 따라 제출되는 것이 아니라 Meta가 자체적으로 공개합니다(현재는 \"인테그리티 보고서\" 산하). 주요 지표: <strong>노출률</strong>(위반 콘텐츠가 보이는 빈도), <strong>조치한 콘텐츠</strong> 및 <strong>삭제 수</strong>, <strong>선제적 조치율</strong>(사용자 신고 전에 발견한 비율), <strong>이의제기 / 복원</strong>. tidy-long 데이터셋으로, 각 행은 앱 × 정책 영역 × 지표 × 분기로 식별되는 하나의 측정값입니다. 노출률과 각종 비율은 백분율입니다(합산 금지). <code>Cross-Policy Data</code>는 정책 전반의 집계값이므로 아래 정책별 세부 내역에서는 제외됩니다.",
+    },
+    "Prevalence over time (Facebook)": {
+        "es": "Prevalencia a lo largo del tiempo (Facebook)", "fr": "Prévalence au fil du temps (Facebook)",
+        "de": "Verbreitung im Zeitverlauf (Facebook)", "it": "Prevalenza nel tempo (Facebook)",
+        "ja": "蔓延度の推移（Facebook）", "zh": "触达率随时间变化（Facebook）", "ko": "노출률 추이(Facebook)",
+    },
+    "Upper-bound prevalence — the estimated share of views that were of violating content — each quarter, one line per policy area (the five Meta reports prevalence for). A percentage; lower is better.": {
+        "es": "Prevalencia de límite superior — la proporción estimada de visualizaciones que fueron de contenido infractor — por trimestre, una línea por área de política (las cinco para las que Meta informa prevalencia). Un porcentaje; cuanto más bajo, mejor.",
+        "fr": "Prévalence de la borne supérieure — la part estimée des vues qui portaient sur du contenu enfreignant les règles — par trimestre, une ligne par domaine de règles (les cinq pour lesquels Meta indique la prévalence). Un pourcentage ; plus bas est meilleur.",
+        "de": "Obergrenze der Verbreitung — der geschätzte Anteil der Aufrufe, die verstoßende Inhalte betrafen — je Quartal, eine Linie pro Richtlinienbereich (die fünf, für die Meta die Verbreitung angibt). Ein Prozentsatz; niedriger ist besser.",
+        "it": "Prevalenza del limite superiore — la quota stimata di visualizzazioni relative a contenuti che violano le regole — per trimestre, una linea per area di policy (le cinque per cui Meta riporta la prevalenza). Una percentuale; più basso è meglio.",
+        "ja": "上限の蔓延度 — 違反コンテンツだった閲覧の推定割合 — を四半期ごとに、ポリシー領域ごとに1本の線で表示（Meta が蔓延度を報告している5領域）。割合で、低いほど良好です。",
+        "zh": "触达率上限——违规内容浏览量的估计占比——按季度显示，每个政策领域一条线（Meta 报告触达率的五个领域）。为百分比；越低越好。",
+        "ko": "상한 노출률 — 위반 콘텐츠였던 조회의 추정 비율 — 을 분기별로, 정책 영역마다 한 선으로 표시(Meta가 노출률을 보고하는 다섯 영역). 백분율이며 낮을수록 좋습니다.",
+    },
+    "Content actioned by policy area (latest quarter, Facebook)": {
+        "es": "Contenido sobre el que se actuó por área de política (último trimestre, Facebook)",
+        "fr": "Contenu traité par domaine de règles (dernier trimestre, Facebook)",
+        "de": "Bearbeitete Inhalte nach Richtlinienbereich (letztes Quartal, Facebook)",
+        "it": "Contenuti su cui è stata presa un'azione per area di policy (ultimo trimestre, Facebook)",
+        "ja": "措置したコンテンツ（ポリシー領域別・直近の四半期・Facebook）",
+        "zh": "按政策领域列出的已处理内容（最近季度，Facebook）",
+        "ko": "정책 영역별 조치한 콘텐츠(최근 분기, Facebook)",
+    },
+    "Pieces of content Meta took action on in the most recent quarter, by policy area.": {
+        "es": "Elementos de contenido sobre los que Meta actuó en el trimestre más reciente, por área de política.",
+        "fr": "Éléments de contenu sur lesquels Meta a agi au trimestre le plus récent, par domaine de règles.",
+        "de": "Inhalte, gegen die Meta im jüngsten Quartal vorgegangen ist, nach Richtlinienbereich.",
+        "it": "Elementi di contenuto su cui Meta ha agito nel trimestre più recente, per area di policy.",
+        "ja": "直近の四半期に Meta が措置したコンテンツ件数を、ポリシー領域別に表示。",
+        "zh": "Meta 在最近季度采取行动的内容条目，按政策领域列出。",
+        "ko": "가장 최근 분기에 Meta가 조치한 콘텐츠 건수를 정책 영역별로 표시.",
+    },
+    "Proactive rate by policy area (latest quarter, Facebook)": {
+        "es": "Tasa proactiva por área de política (último trimestre, Facebook)",
+        "fr": "Taux proactif par domaine de règles (dernier trimestre, Facebook)",
+        "de": "Proaktive Rate nach Richtlinienbereich (letztes Quartal, Facebook)",
+        "it": "Tasso proattivo per area di policy (ultimo trimestre, Facebook)",
+        "ja": "事前対応率（ポリシー領域別・直近の四半期・Facebook）",
+        "zh": "按政策领域列出的主动处理率（最近季度，Facebook）",
+        "ko": "정책 영역별 선제적 조치율(최근 분기, Facebook)",
+    },
+    "The share of actioned content Meta found itself before anyone reported it, by policy area. A percentage.": {
+        "es": "La proporción del contenido sobre el que se actuó que Meta detectó antes de que nadie lo denunciara, por área de política. Un porcentaje.",
+        "fr": "La part du contenu traité que Meta a détectée avant tout signalement, par domaine de règles. Un pourcentage.",
+        "de": "Der Anteil der bearbeiteten Inhalte, den Meta selbst fand, bevor jemand sie meldete, nach Richtlinienbereich. Ein Prozentsatz.",
+        "it": "La quota dei contenuti su cui è stata presa un'azione che Meta ha individuato prima di qualsiasi segnalazione, per area di policy. Una percentuale.",
+        "ja": "措置したコンテンツのうち、誰かが報告する前に Meta 自身が検出した割合を、ポリシー領域別に表示。割合です。",
+        "zh": "在任何人举报之前 Meta 自行发现的已处理内容占比，按政策领域列出。为百分比。",
+        "ko": "조치한 콘텐츠 중 누군가 신고하기 전에 Meta가 직접 발견한 비율을 정책 영역별로 표시. 백분율입니다.",
+    },
+    "Prevalence range by policy area (latest quarter, Facebook)": {
+        "es": "Rango de prevalencia por área de política (último trimestre, Facebook)",
+        "fr": "Plage de prévalence par domaine de règles (dernier trimestre, Facebook)",
+        "de": "Verbreitungsbereich nach Richtlinienbereich (letztes Quartal, Facebook)",
+        "it": "Intervallo di prevalenza per area di policy (ultimo trimestre, Facebook)",
+        "ja": "蔓延度の範囲（ポリシー領域別・直近の四半期・Facebook）",
+        "zh": "按政策领域列出的触达率区间（最近季度，Facebook）",
+        "ko": "정책 영역별 노출률 범위(최근 분기, Facebook)",
+    },
+    "Meta reports prevalence as a lower–upper bound. Percentages, not counts — don't sum them.": {
+        "es": "Meta informa la prevalencia como un límite inferior–superior. Son porcentajes, no recuentos — no los sumes.",
+        "fr": "Meta indique la prévalence sous forme de borne inférieure–supérieure. Ce sont des pourcentages, pas des décomptes — ne les additionnez pas.",
+        "de": "Meta gibt die Verbreitung als Unter-/Obergrenze an. Prozentsätze, keine Anzahlen — nicht summieren.",
+        "it": "Meta riporta la prevalenza come limite inferiore–superiore. Sono percentuali, non conteggi — non sommarle.",
+        "ja": "Meta は蔓延度を下限〜上限で報告します。件数ではなく割合なので合計しないでください。",
+        "zh": "Meta 以下限–上限的形式报告触达率。是百分比而非计数——不要求和。",
+        "ko": "Meta는 노출률을 하한–상한으로 보고합니다. 개수가 아니라 백분율이므로 합산하지 마세요.",
+    },
+    "The number of reported values per metric across the whole dataset. Counts of rows, not summed quantities.": {
+        "es": "El número de valores declarados por métrica en todo el conjunto de datos. Recuentos de filas, no cantidades sumadas.",
+        "fr": "Le nombre de valeurs déclarées par métrique dans l'ensemble du jeu de données. Décomptes de lignes, pas des quantités additionnées.",
+        "de": "Die Anzahl der gemeldeten Werte je Metrik über den gesamten Datensatz. Zeilenzahlen, keine summierten Mengen.",
+        "it": "Il numero di valori dichiarati per metrica nell'intero set di dati. Conteggi di righe, non quantità sommate.",
+        "ja": "データセット全体における指標ごとの報告値の数。合計した量ではなく行数です。",
+        "zh": "整个数据集中每个指标的报告值数量。是行数，而非求和的数量。",
+        "ko": "전체 데이터셋에서 지표별 보고된 값의 개수. 합산한 수량이 아니라 행 수입니다.",
+    },
+    'Source: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Meta Community Standards Enforcement Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a>': {
+        "es": 'Fuente: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Informe de aplicación de las Normas Comunitarias de Meta</a>. Datos vía <a href="/api">Transparency Report API</a> · <a href="/methodology">Metodología</a> · <a href="/api-key">Clave de API</a> · <a href="/privacy">Privacidad</a>',
+        "fr": 'Source : <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Rapport d\'application des Standards de la communauté de Meta</a>. Données via <a href="/api">Transparency Report API</a> · <a href="/methodology">Méthodologie</a> · <a href="/api-key">Clé d\'API</a> · <a href="/privacy">Confidentialité</a>',
+        "de": 'Quelle: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Metas Bericht zur Durchsetzung der Gemeinschaftsstandards</a>. Daten über <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodik</a> · <a href="/api-key">API-Schlüssel</a> · <a href="/privacy">Datenschutz</a>',
+        "it": 'Fonte: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Report di Meta sull\'applicazione degli Standard della community</a>. Dati via <a href="/api">Transparency Report API</a> · <a href="/methodology">Metodologia</a> · <a href="/api-key">Chiave API</a> · <a href="/privacy">Privacy</a>',
+        "ja": 'ソース: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Meta コミュニティ規定施行レポート</a>。データ提供: <a href="/api">Transparency Report API</a> · <a href="/methodology">方法論</a> · <a href="/api-key">API キー</a> · <a href="/privacy">プライバシー</a>',
+        "zh": '来源：<a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Meta 社群守则执行报告</a>。数据来自 <a href="/api">Transparency Report API</a> · <a href="/methodology">方法论</a> · <a href="/api-key">API 密钥</a> · <a href="/privacy">隐私</a>',
+        "ko": '출처: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Meta 커뮤니티 규정 시행 보고서</a>. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/methodology">방법론</a> · <a href="/api-key">API 키</a> · <a href="/privacy">개인정보</a>',
+    },
+    "“Meta Community Standards Enforcement Report, via the Transparency Report API (": {
+        "es": "“Informe de aplicación de las Normas Comunitarias de Meta, vía la Transparency Report API (",
+        "fr": "“Rapport d'application des Standards de la communauté de Meta, via la Transparency Report API (",
+        "de": "“Metas Bericht zur Durchsetzung der Gemeinschaftsstandards, über die Transparency Report API (",
+        "it": "“Report di Meta sull'applicazione degli Standard della community, tramite la Transparency Report API (",
+        "ja": "“Meta コミュニティ規定施行レポート、Transparency Report API 経由 (",
+        "zh": "“Meta 社群守则执行报告，经由 Transparency Report API (",
+        "ko": "“Meta 커뮤니티 규정 시행 보고서, Transparency Report API 경유 (",
+    },
+    '"Facebook prevalence range by policy area, "': {
+        "es": '"Rango de prevalencia de Facebook por área de política, "',
+        "fr": '"Plage de prévalence Facebook par domaine de règles, "',
+        "de": '"Facebook-Verbreitungsbereich nach Richtlinienbereich, "',
+        "it": '"Intervallo di prevalenza di Facebook per area di policy, "',
+        "ja": '"Facebook のポリシー領域別の蔓延度の範囲、"',
+        "zh": '"Facebook 按政策领域列出的触达率区间，"',
+        "ko": '"Facebook의 정책 영역별 노출률 범위, "',
+    },
+    "Reported values per metric in the CSER dataset.": {
+        "es": "Valores declarados por métrica en el conjunto de datos del CSER.",
+        "fr": "Valeurs déclarées par métrique dans le jeu de données du CSER.",
+        "de": "Gemeldete Werte je Metrik im CSER-Datensatz.",
+        "it": "Valori dichiarati per metrica nel set di dati del CSER.",
+        "ja": "CSER データセットにおける指標ごとの報告値。",
+        "zh": "CSER 数据集中每个指标的报告值。",
+        "ko": "CSER 데이터셋의 지표별 보고된 값.",
+    },
+    "Failed to load metric coverage: ": {
+        "es": "No se pudo cargar la cobertura de métricas: ", "fr": "Impossible de charger la couverture des métriques : ",
+        "de": "Die Metrikabdeckung konnte nicht geladen werden: ", "it": "Impossibile caricare la copertura delle metriche: ",
+        "ja": "指標のカバレッジを読み込めませんでした: ", "zh": "无法加载指标覆盖情况：", "ko": "지표 커버리지를 불러오지 못했습니다: ",
+    },
+    "Content actioned": {
+        # Passed as a single-quoted JS string arg, so the Italian apostrophe must
+        # stay backslash-escaped to keep the literal valid.
+        "es": "Contenido sobre el que se actuó", "fr": "Contenu traité", "de": "Bearbeitete Inhalte",
+        "it": "Contenuti su cui è stata presa un\\'azione", "ja": "措置したコンテンツ", "zh": "已处理内容", "ko": "조치한 콘텐츠",
+    },
+    "Proactive rate": {
+        "es": "Tasa proactiva", "fr": "Taux proactif", "de": "Proaktive Rate", "it": "Tasso proattivo",
+        "ja": "事前対応率", "zh": "主动处理率", "ko": "선제적 조치율",
+    },
+    "Policy area": {
+        "es": "Área de política", "fr": "Domaine de règles", "de": "Richtlinienbereich",
+        "it": "Area di policy", "ja": "ポリシー領域", "zh": "政策领域", "ko": "정책 영역",
+    },
+    "Lower bound": {
+        "es": "Límite inferior", "fr": "Borne inférieure", "de": "Untergrenze",
+        "it": "Limite inferiore", "ja": "下限", "zh": "下限", "ko": "하한",
+    },
+    "Upper bound": {
+        "es": "Límite superior", "fr": "Borne supérieure", "de": "Obergrenze",
+        "it": "Limite superiore", "ja": "上限", "zh": "上限", "ko": "상한",
+    },
+    "Reported values": {
+        "es": "Valores declarados", "fr": "Valeurs déclarées", "de": "Gemeldete Werte",
+        "it": "Valori dichiarati", "ja": "報告値", "zh": "报告值", "ko": "보고된 값",
+    },
+    "Metric": {
+        "es": "Métrica", "fr": "Métrique", "de": "Metrik", "it": "Metrica",
+        "ja": "指標", "zh": "指标", "ko": "지표",
+    },
+    "Quarter": {
+        "es": "Trimestre", "fr": "Trimestre", "de": "Quartal", "it": "Trimestre",
+        "ja": "四半期", "zh": "季度", "ko": "분기",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    COMMON[_loc].append(("      Meta — Enforcement\n    </a>", f"      {_CSER_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Meta — Enforcement</h3>", f"<h3>{_CSER_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_CSER_CARD_DESC_EN, _CSER_CARD_DESC[_loc]))
+    PAGES[_loc]["cser.html"] = [(_en, _tr[_loc]) for _en, _tr in _CSER_PAGE.items()]
+    _cser_text = open(os.path.join(STATIC, "cser.html"), encoding="utf-8").read()
+    _cser_own = {_o for _o, _ in PAGES[_loc]["cser.html"]}
+    # Inherit shared chart/dataset chrome from sibling pages (Trends, "Interactive
+    # views…", Loading…, provenance, "What the report covers", "No data available.").
+    for _src in ("microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _cser_text and _o not in _cser_own:
+                PAGES[_loc]["cser.html"].append((_o, _n))
+                _cser_own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

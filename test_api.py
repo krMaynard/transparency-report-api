@@ -3257,6 +3257,86 @@ class TestTurkeyTable:
         assert all(r[3] for r in data["rows"] if r[0] == "X")
 
 
+class TestCserTable:
+    def test_cser_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "cser_metrics" in names
+
+    def test_cser_fields_endpoint(self):
+        body = client.get("/api/fields?table=cser_metrics", headers=MOMO).json()
+        assert {"app", "policy_area", "metric", "period", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_cser_content_actioned_trend(self):
+        # Facebook Hateful Conduct content actioned: 2025 Q3 8.1M, Q4 7.5M.
+        job = _submit_and_wait({
+            "table": "cser_metrics", "group_by": ["period"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "app", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "policy_area", "field_values": ["Hateful Conduct"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["Content Actioned"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2025 Q3", 8100000], ["2025 Q4", 7500000]]
+
+    def test_cser_proactive_rate_is_percent(self):
+        job = _submit_and_wait({
+            "table": "cser_metrics", "fields": ["unit", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "app", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "policy_area", "field_values": ["Spam"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["Proactive rate"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["percent", 99.7]]
+
+    def test_cser_unpinned_sum_warns(self):
+        # A SUM pinning neither metric nor policy_area would mix counts with
+        # percentages and add the Cross-Policy Data aggregate to its parts.
+        r = client.post("/api/explore", json={
+            "table": "cser_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "metric" in warnings and "policy_area" in warnings
+
+    def test_cser_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "cser_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric", "field_values": ["Content Actioned"]},
+                {"operation": "EQ", "field_name": "policy_area", "field_values": ["Hateful Conduct"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
+
+    def test_cser_page_served(self):
+        r = client.get("/cser")
+        assert r.status_code == 200
+        assert '"table":"cser_metrics"' in r.text and "Community Standards Enforcement" in r.text
+
+    def test_vendored_cser_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("meta-cser.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["app", "policy_area", "metric", "period", "unit", "value"]
+        assert data["rows"] and all(len(r) == 6 for r in data["rows"])
+        assert {r[4] for r in data["rows"]} == {"count", "percent"}
+        assert {r[0] for r in data["rows"]} == {"Facebook", "Instagram"}
+        # No N/A cells leaked through as a value.
+        assert all(isinstance(r[5], (int, float)) for r in data["rows"])
+
+
 class TestGoogleUserDataTable:
     def test_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
