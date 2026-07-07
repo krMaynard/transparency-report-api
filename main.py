@@ -3400,7 +3400,7 @@ _FTS_TERM = re.compile(
 )
 _MARK_OPEN = chr(0xE000)
 _MARK_CLOSE = chr(0xE001)
-_NARRATIVE_SOURCES = ("ny-tos", "dsa", "ca-ab587", "japan")
+_NARRATIVE_SOURCES = ("ny-tos", "dsa", "ca-ab587", "ca-ab2013", "japan")
 
 
 def _fts_match(q: str) -> str:
@@ -3420,17 +3420,19 @@ def narratives(
     limit: int = Query(30, ge=1, le=100),
 ) -> JSONResponse:
     """Public full-text search over the **narrative** report text — the prose,
-    not the numbers. Four corpora (`source`): `ny-tos` (New York Terms-of-Service
+    not the numbers. Five corpora (`source`): `ny-tos` (New York Terms-of-Service
     filings — how platforms describe defining/enforcing their hate-speech /
     extremism / disinformation / harassment / foreign-interference policies),
-    `ca-ab587` (the California AB 587 analogue), `dsa` (the EU DSA reports'
-    Table-11 qualitative descriptions — how each service describes its
-    content-moderation approach) and `japan` (LY Corporation's Media Transparency
-    Report — stored bilingually, English translation + Japanese original, since
-    the source is Japanese-only). One result per matching page / description /
-    section, ranked by relevance (BM25), with a highlighted snippet; ny-tos
-    results deep-link into the archived PDF. Filter by `source` / `company` /
-    `period`. IP-rate-limited (query is user-driven), no auth."""
+    `ca-ab587` (the California AB 587 analogue), `ca-ab2013` (Google's California
+    AB 2013 AI Training Data Transparency Summary — how it describes the datasets
+    used to train its generative-AI products), `dsa` (the EU DSA reports' Table-11
+    qualitative descriptions — how each service describes its content-moderation
+    approach) and `japan` (LY Corporation's Media Transparency Report — stored
+    bilingually, English translation + Japanese original, since the source is
+    Japanese-only). One result per matching page / description / section, ranked
+    by relevance (BM25), with a highlighted snippet; ny-tos results deep-link into
+    the archived PDF. Filter by `source` / `company` / `period`. IP-rate-limited
+    (query is user-driven), no auth."""
     if _key_store.incr(f"narratives:{_client_ip(request)}", EXPLORE_RATE_WINDOW) > EXPLORE_RATE_MAX:
         raise HTTPException(
             status_code=429,

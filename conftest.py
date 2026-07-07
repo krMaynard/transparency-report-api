@@ -635,6 +635,24 @@ _JAPAN_NARRATIVES_FIXTURE = {
 }
 seed.build_japan_narratives(_JAPAN_NARRATIVES_FIXTURE, _DB)
 
+# A tiny slice of the California AB 2013 narratives (source='ca-ab2013') — Google's
+# AI Training Data Transparency Summary prose, same page-per-row shape.
+_CA_AB2013_NARRATIVES_FIXTURE = {
+    "columns": ["company", "platform", "period", "page", "heading", "text"],
+    "rows": [
+        ["Google", "", "2026", 2, "Data sources",
+         "The training datasets are characterized by their large-scale and diverse "
+         "nature, including data sourced from publicly available datasets, licensed "
+         "data obtained via commercial licensing agreements, data obtained by "
+         "crawlers, data collected from our users, and synthetically generated data."],
+        ["Google", "", "2026", 2, "Training-data size",
+         "The models are trained on a large corpus of training data sets "
+         "representing more than 1 trillion tokens of text, 1 billion images, "
+         "1 million hours of video, and 1 million hours of audio."],
+    ],
+}
+seed.build_ca_ab2013_narratives(_CA_AB2013_NARRATIVES_FIXTURE, _DB)
+
 # Index the DSA Table-11 qualitative prose (source='dsa') from the seeded t11
 # rows — the same code path seed.main() runs after the harmonised append.
 seed.build_dsa_narratives(_DB)

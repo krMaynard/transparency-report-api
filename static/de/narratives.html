@@ -636,15 +636,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Volltextsuche</span>
     <h1>Den Text der Transparenzberichte durchsuchen</h1>
-    <p>Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien, die qualitativen Abschnitte der EU-DSA-Berichte und den japanischen Media-Transparency-Report von LY Corporation (ins Englische übersetzt).</p>
+    <p>Volltextsuche across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings, Google's California AB 2013 AI-training summary, the EU DSA reports' qualitative sections, and LY Corporation's Japanese Media Transparency Report (translated to English).</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Volltextsuche im <strong>Fließtext</strong> von vier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben), die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt) und der japanische <strong>Media Transparency Report</strong> von LY Corporation nach Japans 情プラ法 (zweisprachig gespeichert — eine englische Übersetzung plus das japanische Original — und damit in beiden Sprachen durchsuchbar). Jedes Ergebnis ist eine Seite, Beschreibung oder ein Abschnitt, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Volltextsuche across the <strong>prose</strong> of five corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference), Google's California AB 2013 AI Training Data Transparency Summary (how it describes the datasets used to train its generative-AI products), the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach), and LY Corporation's Japanese <strong>Media Transparency Report</strong> under Japan's 情プラ法 (stored bilingually — an English translation plus the Japanese original — so it's searchable in either language). Each result is one page, description or section, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Suche <input id="nq" type="search" placeholder="z. B. Hassrede, Einsprüche, Algorithmus" autocomplete="off" /></label>
-      <label>Quelle <select id="nsrc"><option value="">Alle</option><option value="ny-tos">NY-ToS-Berichte</option><option value="ca-ab587">CA-AB-587-Berichte</option><option value="dsa">DSA-Berichte</option><option value="japan">Japan (LY Corp)</option></select></label>
+      <label>Quelle <select id="nsrc"><option value="">Alle</option><option value="ny-tos">NY-ToS-Berichte</option><option value="ca-ab587">CA-AB-587-Berichte</option><option value="ca-ab2013">CA AB 2013 (AI training)</option><option value="dsa">DSA-Berichte</option><option value="japan">Japan (LY Corp)</option></select></label>
       <label>Unternehmen <select id="nco"><option value="">Alle</option></select></label>
       <label>Zeitraum <select id="nper"><option value="">Alle</option></select></label>
       <button id="nbtn" type="button">Suchen</button>
@@ -693,7 +693,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "ca-ab2013": "CA AB 2013", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
 
 let nAbort = null;
 
