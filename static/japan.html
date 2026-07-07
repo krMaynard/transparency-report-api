@@ -700,7 +700,9 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Helpers ───────────────────────────────────────────────────────────────
   function fmt(n) {
     if (n == null) return '—';
-    return Number(n).toLocaleString('en-US');
+    // Format numbers in the page's own locale (set on <html lang>), so the
+    // localized pages use locale-appropriate thousands separators.
+    return Number(n).toLocaleString(document.documentElement.lang || 'en-US');
   }
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');

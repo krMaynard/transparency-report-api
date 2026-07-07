@@ -11202,6 +11202,14 @@ _JP_PAGE = {
     ">Posts<": {"es": ">Publicaciones<", "fr": ">Publications<", "de": ">Beiträge<", "it": ">Post<", "ja": ">投稿数<", "zh": ">投稿数<", "ko": ">게시물<"},
     ">Removed<": {"es": ">Retiradas<", "fr": ">Retirées<", "de": ">Entfernt<", "it": ">Rimossi<", "ja": ">削除数<", "zh": ">删除数<", "ko": ">삭제<"},
     ">Removal rate<": {"es": ">Tasa de retirada<", "fr": ">Taux de retrait<", "de": ">Entfernungsquote<", "it": ">Tasso di rimozione<", "ja": ">削除割合<", "zh": ">删除率<", "ko": ">삭제율<"},
+    # data-label attributes drive the mobile stacked-table column headers
+    # (content: attr(data-label)); translate them like the <th> text.
+    'data-label="Service"': {"es": 'data-label="Servicio"', "fr": 'data-label="Service"', "de": 'data-label="Dienst"', "it": 'data-label="Servizio"', "ja": 'data-label="サービス"', "zh": 'data-label="服务"', "ko": 'data-label="서비스"'},
+    'data-label="Posts"': {"es": 'data-label="Publicaciones"', "fr": 'data-label="Publications"', "de": 'data-label="Beiträge"', "it": 'data-label="Post"', "ja": 'data-label="投稿数"', "zh": 'data-label="投稿数"', "ko": 'data-label="게시물"'},
+    'data-label="Removed"': {"es": 'data-label="Retiradas"', "fr": 'data-label="Retirées"', "de": 'data-label="Entfernt"', "it": 'data-label="Rimossi"', "ja": 'data-label="削除数"', "zh": 'data-label="删除数"', "ko": 'data-label="삭제"'},
+    'data-label="Removal rate"': {"es": 'data-label="Tasa de retirada"', "fr": 'data-label="Taux de retrait"', "de": 'data-label="Entfernungsquote"', "it": 'data-label="Tasso di rimozione"', "ja": 'data-label="削除割合"', "zh": 'data-label="删除率"', "ko": 'data-label="삭제율"'},
+    '"Quarter", p1)': {"es": '"Trimestre", p1)', "fr": '"Trimestre", p1)', "de": '"Quartal", p1)', "it": '"Trimestre", p1)', "ja": '"四半期", p1)', "zh": '"季度", p1)', "ko": '"분기", p1)'},
+    "No data available.": {"es": "No hay datos disponibles.", "fr": "Aucune donnée disponible.", "de": "Keine Daten verfügbar.", "it": "Nessun dato disponibile.", "ja": "利用できるデータがありません。", "zh": "无可用数据。", "ko": "사용할 수 있는 데이터가 없습니다."},
     '"Service", "Removed"': {"es": '"Servicio", "Retiradas"', "fr": '"Service", "Retirées"', "de": '"Dienst", "Entfernt"', "it": '"Servizio", "Rimossi"', "ja": '"サービス", "削除数"', "zh": '"服务", "删除数"', "ko": '"서비스", "삭제"'},
     '"Quarter", "Removed"': {"es": '"Trimestre", "Retiradas"', "fr": '"Trimestre", "Retirées"', "de": '"Quartal", "Entfernt"', "it": '"Trimestre", "Rimossi"', "ja": '"四半期", "削除数"', "zh": '"季度", "删除数"', "ko": '"분기", "삭제"'},
 }

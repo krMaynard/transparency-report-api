@@ -700,7 +700,9 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Helpers ───────────────────────────────────────────────────────────────
   function fmt(n) {
     if (n == null) return '—';
-    return Number(n).toLocaleString('en-US');
+    // Format numbers in the page's own locale (set on <html lang>), so the
+    // localized pages use locale-appropriate thousands separators.
+    return Number(n).toLocaleString(document.documentElement.lang || 'en-US');
   }
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -723,7 +725,7 @@ display: flex; align-items: center; justify-content: space-between;
     var el = document.getElementById(elId);
     el.removeAttribute('aria-busy');
     if (!rows.length) {
-      el.innerHTML = '<div class="results-loading">No data available.</div>';
+      el.innerHTML = '<div class="results-loading">사용할 수 있는 데이터가 없습니다.</div>';
       return;
     }
     el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
@@ -781,7 +783,7 @@ display: flex; align-items: center; justify-content: space-between;
   // No-data state: keep the canvas hidden and reuse the loading slot for the
   // message, so empty is distinguishable from loading and from broken.
   function emptyChart(loadingId) {
-    document.getElementById(loadingId).textContent = "No data available.";
+    document.getElementById(loadingId).textContent = "사용할 수 있는 데이터가 없습니다.";
   }
 
   // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
@@ -891,7 +893,7 @@ display: flex; align-items: center; justify-content: space-between;
     if (!rate.rows.length) { emptyChart('rate-loading'); } else {
       var rr = rate.rows.map(function (r) { return [QLABEL[r[0]] || r[0], r[1], r[2]]; });
       var p1 = pivot(rr);
-      seriesTable('chart-rate-table', "Quarter", p1);
+      seriesTable('chart-rate-table', "분기", p1);
       linesChart('chart-rate', 'rate-loading', 'chart-rate-table', p1.labels, p1.dsets);
     }
     if (!rem.rows.length) { emptyChart('rem-loading'); } else {
@@ -917,17 +919,17 @@ display: flex; align-items: center; justify-content: space-between;
       var svcs = Object.keys(by).sort(function (a, b) { return (by[b].posts || 0) - (by[a].posts || 0); });
       var el = document.getElementById('summaryTable');
       el.removeAttribute('aria-busy');
-      if (!svcs.length) { el.innerHTML = '<div class="results-loading">No data available.</div>'; }
+      if (!svcs.length) { el.innerHTML = '<div class="results-loading">사용할 수 있는 데이터가 없습니다.</div>'; }
       else {
         el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
           + '<caption class="sr-only">' + esc("LY Corp 서비스별 2024회계연도 게시물·삭제·삭제율.") + '</caption>'
           + '<thead><tr><th scope="col">서비스</th><th scope="col" class="num">게시물</th><th scope="col" class="num">삭제</th><th scope="col" class="num">삭제율</th></tr></thead><tbody>'
           + svcs.map(function (svc) {
               var m = by[svc];
-              return '<tr><td data-label="Service">' + esc(svc) + '</td>'
-                + '<td class="num" data-label="Posts">' + (m.posts == null ? '—' : fmt(m.posts)) + '</td>'
-                + '<td class="num" data-label="Removed">' + (m.posts_removed == null ? '—' : fmt(m.posts_removed)) + '</td>'
-                + '<td class="num" data-label="Removal rate">' + (m.removal_rate == null ? '—' : esc(m.removal_rate) + '%') + '</td></tr>';
+              return '<tr><td data-label="서비스">' + esc(svc) + '</td>'
+                + '<td class="num" data-label="게시물">' + (m.posts == null ? '—' : fmt(m.posts)) + '</td>'
+                + '<td class="num" data-label="삭제">' + (m.posts_removed == null ? '—' : fmt(m.posts_removed)) + '</td>'
+                + '<td class="num" data-label="삭제율">' + (m.removal_rate == null ? '—' : esc(m.removal_rate) + '%') + '</td></tr>';
             }).join('')
           + '</tbody></table></div>';
       }
@@ -943,13 +945,13 @@ display: flex; align-items: center; justify-content: space-between;
       var svcs2 = Object.keys(q).sort();
       var el2 = document.getElementById('quarterTable');
       el2.removeAttribute('aria-busy');
-      if (!svcs2.length) { el2.innerHTML = '<div class="results-loading">No data available.</div>'; }
+      if (!svcs2.length) { el2.innerHTML = '<div class="results-loading">사용할 수 있는 데이터가 없습니다.</div>'; }
       else {
         el2.innerHTML = '<div class="table-scroll"><table class="recordtable">'
           + '<caption class="sr-only">' + esc("서비스별 2024회계연도 분기별 삭제 게시물 수.") + '</caption>'
           + '<thead><tr><th scope="col">서비스</th>' + QORDER.map(function (p) { return '<th scope="col" class="num">' + esc(QLABEL[p]) + '</th>'; }).join('') + '</tr></thead><tbody>'
           + svcs2.map(function (svc) {
-              return '<tr><td data-label="Service">' + esc(svc) + '</td>'
+              return '<tr><td data-label="서비스">' + esc(svc) + '</td>'
                 + QORDER.map(function (p) { var v = q[svc][p]; return '<td class="num" data-label="' + esc(QLABEL[p]) + '">' + (v == null ? '—' : fmt(v)) + '</td>'; }).join('')
                 + '</tr>';
             }).join('')
