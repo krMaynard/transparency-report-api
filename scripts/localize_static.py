@@ -11025,6 +11025,30 @@ for _loc in _SG_NAV:
     PAGES[_loc]["home.html"].append(("<h3>Singapore</h3>", f"<h3>{_SG_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_SG_CARD_DESC_EN, _SG_CARD_DESC[_loc]))
 
+# Japan 情プラ法 — English-only dataset page (Japanese-source, dense), like
+# Singapore/mandates: only the nav label + home card are localized (the law's
+# own abbreviation 情プラ法 is kept as its proper name).
+_JP_NAV = {
+    "es": "Japón 情プラ法", "fr": "Japon 情プラ法", "de": "Japan 情プラ法",
+    "it": "Giappone 情プラ法", "ja": "日本 情プラ法", "zh": "日本 情プラ法", "ko": "일본 情プラ法",
+}
+_JP_CARD_DESC_EN = ("Japan’s Information Distribution Platform Act (情プラ法) implementation "
+                    "statistics — LY Corporation’s Media Transparency Report: posts, removals "
+                    "and removal rate for Yahoo! Chiebukuro, LINE OpenChat, VOOM and more.")
+_JP_CARD_DESC = {
+    "es": "Estadísticas de aplicación de la Ley de Plataformas de Distribución de Información de Japón (情プラ法): el Informe de Transparencia de Medios de LY Corporation — publicaciones, retiradas y tasa de retirada de Yahoo! Chiebukuro, LINE OpenChat, VOOM y más.",
+    "fr": "Statistiques d'application de la loi japonaise sur les plateformes de distribution d'informations (情プラ法) : le rapport de transparence des médias de LY Corporation — publications, retraits et taux de retrait pour Yahoo! Chiebukuro, LINE OpenChat, VOOM, etc.",
+    "de": "Umsetzungsstatistiken zu Japans Gesetz über Informationsverteilungsplattformen (情プラ法) — LY Corporations Medien-Transparenzbericht: Beiträge, Entfernungen und Entfernungsquote für Yahoo! Chiebukuro, LINE OpenChat, VOOM und mehr.",
+    "it": "Statistiche di attuazione della legge giapponese sulle piattaforme di distribuzione delle informazioni (情プラ法): il report sulla trasparenza dei media di LY Corporation — post, rimozioni e tasso di rimozione per Yahoo! Chiebukuro, LINE OpenChat, VOOM e altri.",
+    "ja": "日本の情報流通プラットフォーム対処法（情プラ法）の実施状況統計 — LY コーポレーションのメディア透明性レポート。Yahoo!知恵袋、LINE オープンチャット、VOOM ほかの投稿件数・削除件数・削除割合。",
+    "zh": "日本《信息流通平台应对法》（情プラ法）实施统计——LY 公司的媒体透明度报告：Yahoo! 知惠袋、LINE 开放聊天、VOOM 等的投稿数、删除数与删除率。",
+    "ko": "일본 정보유통플랫폼대처법(情プラ法) 시행 통계 — LY 코퍼레이션의 미디어 투명성 보고서: Yahoo! 지혜주머니, LINE 오픈챗, VOOM 등의 게시물·삭제 건수와 삭제율.",
+}
+for _loc in _JP_NAV:
+    COMMON[_loc].append(("      Japan 情プラ法\n    </a>", f"      {_JP_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Japan 情プラ法</h3>", f"<h3>{_JP_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_JP_CARD_DESC_EN, _JP_CARD_DESC[_loc]))
+
 
 # ── Türkiye Law No. 5651 platform transparency reports page ──────────────────
 # Sidebar-nav label + home feature-card, then the page-unique strings; shared

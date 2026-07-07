@@ -279,7 +279,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Sixteen non-DSA datasets ride alongside, each exposed as an ordinary query table
+Seventeen non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -398,6 +398,21 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `section` **and** `metric` before aggregating, and never mix the
   `percent`/`days`/`hours`/`count` units; `_leg_warnings` warns on all three.
   The `/singapore` dataset page is English-only (like `/mandates`).
+- **Japan 情プラ法 (Information Distribution Platform Act)** — a single
+  **tidy-long** `japan_metrics` table (one row per measured value: `service`/
+  `period`/`metric`/`unit` + a `value`; dims inline). The annual
+  implementation-status statistics MIC-designated large providers must publish
+  under Art. 28 of the amended Provider Liability Limitation Act (情プラ法, in
+  force Apr 2025). Currently **LY Corporation only** (the other designated
+  providers — Google/Meta/TikTok/X — publish only qualitative Art. 21 criteria
+  so far), covering its five services (Yahoo! Chiebukuro, Yahoo! Finance boards,
+  LINE OpenChat, LINE VOOM, Yahoo! News comments) from its FY2024 Media
+  Transparency Report. `period` is a FY2024 quarter (`2024-04..2024-06` …
+  `2025-01..2025-03`) or the annual total (`2024-04..2025-03`); `metric` is
+  `posts`/`posts_removed` (count) or `removal_rate` (percent). Pin a `metric`
+  before aggregating — never SUM `removal_rate`, and don't add the quarters to
+  the annual-total row; `_leg_warnings` warns on both. The `/japan` dataset page
+  is English-only (like `/singapore`/`/mandates`).
 - **Google government requests for user information** — a single **tidy-long**
   `google_userdata_metrics` table (one row per measured value: `dataset`/
   `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
@@ -785,6 +800,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/turkey` | — | Public Türkiye Law No. 5651 transparency-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/cser` | — | Public Meta Community Standards Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/singapore` | — | Public Singapore IMDA Online Safety dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
+| GET | `/japan` | — | Public Japan 情プラ法 (LY Corporation) dataset page (web UI over `POST /api/explore`; English-only) |
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |

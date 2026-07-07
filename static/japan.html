@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Dati della legge antifrode di Taiwan — Transparency Report API</title>
-<meta name="description" content="Taiwan Anti-Fraud Act transparency data — fraud websites DNS-blocked under Article 42 of the Fraud Crime Hazard Prevention Act, per month and official site category, from the National Police Agency's public registry." />
+<title>Japan Information Distribution Platform Act (情プラ法) — Transparency Report API</title>
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) implementation statistics — LY Corporation's Media Transparency Report: posts, removals and removal rate per service." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -254,35 +254,35 @@ display: flex; align-items: center; justify-content: space-between;
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Vai al contenuto</a>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <!-- ── Site banner ──────────────────────────────────────────────────────── -->
 <div class="page-header">
-<nav class="site-nav" aria-label="Sito">
+<nav class="site-nav" aria-label="Site">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Lavori</a>
-      <a href="https://kieranmaynard.com/transparency.html">Prodotti</a>
-      <a href="https://kieranmaynard.com/consulting.html">Consulenza</a>
+      <a href="https://kieranmaynard.com/work.html">Work</a>
+      <a href="https://kieranmaynard.com/transparency.html">Products</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
       <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contatti</a>
+      <a href="https://kieranmaynard.com/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="Lingua" title="Lingua">
+      <summary class="lang-current" aria-label="Language" title="Language">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>Italiano</span>
+        <span>English</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/taiwan"><span>English</span></a></li>
-        <li><a class="lang-opt" href="/es/taiwan"><span>Español</span></a></li>
-        <li><a class="lang-opt" href="/fr/taiwan"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/taiwan"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt is-current" href="/it/taiwan" aria-current="page"><span>Italiano</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/ja/taiwan"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/taiwan"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/taiwan"><span>한국어</span></a></li>
+        <li><a class="lang-opt is-current" href="/japan" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/es"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it"><span>Italiano</span></a></li>
+        <li><a class="lang-opt" href="/ja"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko"><span>한국어</span></a></li>
       </ul>
     </details>
   </div>
@@ -290,15 +290,15 @@ display: flex; align-items: center; justify-content: space-between;
 
 <header class="topbar">
   <div class="topbar-left">
-    <button type="button" class="hamburger" id="hamburger" aria-label="Attiva/disattiva navigazione" aria-expanded="false" aria-controls="sidebar">
+    <button type="button" class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/it/" class="topbar-brand">Transparency Report API</a>
+    <a href="/" class="topbar-brand">Transparency Report API</a>
   </div>
   <div class="topbar-right">
-    <button type="button" class="theme-toggle" aria-label="Attiva/disattiva modalità scura" aria-pressed="false" data-theme-toggle>
+    <button type="button" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false" data-theme-toggle>
       <svg class="theme-icon-dark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
     </button>
@@ -308,18 +308,18 @@ display: flex; align-items: center; justify-content: space-between;
 
 <div class="app-body">
 
-<aside class="sidebar" id="sidebar" aria-label="Navigazione dell'applicazione">
+<aside class="sidebar" id="sidebar" aria-label="Application navigation">
   <nav>
-    <a href="/it/" class="nav-item">
+    <a href="/" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
       </svg>
       Home
     </a>
 
-    <div class="nav-section">Normativa</div>
+    <div class="nav-section">Regulatory</div>
 
-    <a href="/it/reports" class="nav-item">
+    <a href="/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
@@ -328,7 +328,7 @@ display: flex; align-items: center; justify-content: space-between;
       DSA
     </a>
 
-    <a href="/it/ny-tos" class="nav-item">
+    <a href="/ny-tos" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h6l3 3v9.5a.5.5 0 0 1-.5.5h-8.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5z"/>
         <path d="M9.25 1.9v3.1h3.1M5.25 8.5h5.5M5.25 11h5.5" stroke-linecap="round"/>
@@ -336,7 +336,7 @@ display: flex; align-items: center; justify-content: space-between;
       NY ToS
     </a>
 
-    <a href="/it/ca-ab587" class="nav-item">
+    <a href="/ca-ab587" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
         <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
@@ -344,36 +344,36 @@ display: flex; align-items: center; justify-content: space-between;
       CA AB 587
     </a>
 
-    <a href="/it/india" class="nav-item">
+    <a href="/india" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3.25" y="2.75" width="9.5" height="11.5" rx="1"/>
         <path d="M6 1.5h4v2.5H6zM5.5 7.25h5M5.5 9.75h5M5.5 12.25h3" stroke-linecap="round"/>
       </svg>
-      Regole IT India
+      India IT Rules
     </a>
 
-    <a href="/it/korea" class="nav-item">
+    <a href="/korea" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.25 3.25h11.5v7.5H8.25l-3 2.75v-2.75h-2a.999.999 0 0 1-1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
       </svg>
-      Corea
+      Korea
     </a>
 
-    <a href="/it/taiwan" class="nav-item is-active" aria-current="page">
+    <a href="/taiwan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 2.1 14.6 13.4H1.4L8 2.1z" stroke-linejoin="round"/>
         <path d="M8 6.6v3M8 11.7h.01" stroke-linecap="round"/>
       </svg>
-      Antifrode Taiwan
+      Taiwan Anti-Fraud
     </a>
 
-    <a href="/it/turkey" class="nav-item">
+    <a href="/turkey" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M10.6 3.2a5 5 0 1 0 0 9.6 4 4 0 0 1 0-9.6z"/>
         <path d="M12.4 6.0l1.3 1-1.5.5.1 1.6-1-1.2-1.5.5.8-1.4-.9-1.2 1.6.3z" stroke-linejoin="round"/>
       </svg>
-      Legge 5651 (Türkiye)
+      Türkiye Law 5651
     </a>
 
     <a href="/singapore" class="nav-item">
@@ -384,12 +384,12 @@ display: flex; align-items: center; justify-content: space-between;
       Singapore
     </a>
 
-    <a href="/japan" class="nav-item">
+    <a href="/japan" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.5 3.25h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6.5l-3 2.25V11.25h-1a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
       </svg>
-      Giappone 情プラ法
+      Japan 情プラ法
     </a>
 
     <a href="/mandates" class="nav-item">
@@ -398,44 +398,44 @@ display: flex; align-items: center; justify-content: space-between;
         <path d="M4 4.4 2 8.8h4L4 4.4zM12 4.4l-2 4.4h4l-2-4.4z" stroke-linejoin="round"/>
         <path d="M5.5 13.6h5" stroke-linecap="round"/>
       </svg>
-      Obblighi di rendicontazione
+      Reporting mandates
     </a>
 
-    <div class="nav-section">Trasparenza delle piattaforme</div>
+    <div class="nav-section">Platform transparency</div>
 
-    <a href="/it/cser" class="nav-item">
+    <a href="/cser" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75c-2.6 1.4-4.3 1.6-5.25 1.6v4.9c0 3 2.15 4.85 5.25 6 3.1-1.15 5.25-3 5.25-6v-4.9C12.3 3.35 10.6 3.15 8 1.75z" stroke-linejoin="round"/>
         <path d="M5.9 8.1 7.3 9.5l3-3.1" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Meta — Applicazione
+      Meta — Enforcement
     </a>
 
-    <a href="/it/removals" class="nav-item">
+    <a href="/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Google — Rimozioni
+      Google — Removals
     </a>
 
-    <a href="/it/user-data" class="nav-item">
+    <a href="/user-data" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1.75a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2zM2.4 13.6c0-2.6 2.5-4.1 5.6-4.1s5.6 1.5 5.6 4.1v.65H2.4z"/>
       </svg>
-      Google — Dati utente
+      Google — User Data
     </a>
 
-    <a href="/it/disruptions" class="nav-item">
+    <a href="/disruptions" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 13.4h.01" stroke-linecap="round"/>
         <path d="M5.4 10.8a3.7 3.7 0 0 1 5.2 0M3 8.4a7 7 0 0 1 10 0" stroke-linecap="round"/>
         <path d="M2.4 2.4l11.2 11.2" stroke-linecap="round"/>
       </svg>
-      Google — Interruzioni
+      Google — Disruptions
     </a>
 
-    <a href="/it/android" class="nav-item">
+    <a href="/android" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75 3 3.4v3.9c0 3 2.1 5.6 5 6.45 2.9-.85 5-3.45 5-6.45V3.4L8 1.75z" stroke-linejoin="round"/>
         <path d="M5.8 8.1 7.3 9.6l3-3.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -443,7 +443,7 @@ display: flex; align-items: center; justify-content: space-between;
       Google — Android
     </a>
 
-    <a href="/it/apple" class="nav-item">
+    <a href="/apple" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="4.25" y="1.75" width="7.5" height="12.5" rx="1.5"/>
         <path d="M6.75 12.5h2.5" stroke-linecap="round"/>
@@ -451,21 +451,21 @@ display: flex; align-items: center; justify-content: space-between;
       Apple
     </a>
 
-    <a href="/it/snap" class="nav-item">
+    <a href="/snap" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.9c-1.85 0-3 1.35-3 3.25 0 1.15.2 1.75-.35 2.35-.4.45-1.15.45-1.15.95 0 .5.95.65 1.3.9.3.55-.45 1.1-.15 1.5.3.35 1.05-.1 1.65.2.5.25.85 1.1 1.85 1.1s1.35-.85 1.85-1.1c.6-.3 1.35.15 1.65-.2.3-.4-.45-.95-.15-1.5.35-.25 1.3-.4 1.3-.9 0-.5-.75-.5-1.15-.95-.55-.6-.35-1.2-.35-2.35 0-1.9-1.15-3.25-3-3.25z"/>
       </svg>
       Snap
     </a>
 
-    <a href="/it/github" class="nav-item">
+    <a href="/github" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
       </svg>
       GitHub
     </a>
 
-    <a href="/it/microsoft" class="nav-item">
+    <a href="/microsoft" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="2" y="2" width="5.4" height="5.4"/>
         <rect x="8.6" y="2" width="5.4" height="5.4"/>
@@ -475,7 +475,7 @@ display: flex; align-items: center; justify-content: space-between;
       Microsoft
     </a>
 
-    <a href="/it/linkedin" class="nav-item">
+    <a href="/linkedin" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="5" width="12" height="8.75" rx="1.25"/>
         <path d="M5.75 5V3.5A1.25 1.25 0 0 1 7 2.25h2a1.25 1.25 0 0 1 1.25 1.25V5M2 8.25h12" stroke-linecap="round"/>
@@ -483,14 +483,14 @@ display: flex; align-items: center; justify-content: space-between;
       LinkedIn
     </a>
 
-    <a href="/it/tiktok" class="nav-item">
+    <a href="/tiktok" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
       </svg>
       TikTok
     </a>
 
-    <a href="/it/discord" class="nav-item">
+    <a href="/discord" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M13.35 3.5A12.3 12.3 0 0 0 10.3 2.5l-.16.31a11.4 11.4 0 0 1 2.7.87A9.6 9.6 0 0 0 8 2.6a9.6 9.6 0 0 0-4.84 1.08 11.4 11.4 0 0 1 2.7-.87L5.7 2.5a12.3 12.3 0 0 0-3.05 1A13 13 0 0 0 .8 11.6a11 11 0 0 0 3.35 1.7l.5-.83a7.5 7.5 0 0 1-1.18-.57l.29-.22a6.8 6.8 0 0 0 5.85 0l.29.22a7.5 7.5 0 0 1-1.18.57l.5.83A11 11 0 0 0 15.2 11.6a13 13 0 0 0-1.85-8.1zM5.65 9.9c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.5 1.23-1.1 1.23zm4.7 0c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.49 1.23-1.1 1.23z"/>
       </svg>
@@ -498,48 +498,48 @@ display: flex; align-items: center; justify-content: space-between;
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">Strumenti</div>
+    <div class="nav-section">Tools</div>
 
-    <a href="/it/api-key" class="nav-item">
+    <a href="/api-key" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
       </svg>
-      Chiave API
+      API key
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      Riferimento API
+      API Reference
     </a>
 
-    <a href="/it/mcp" class="nav-item">
+    <a href="/mcp" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
         <rect x="2" y="9" width="12" height="4.5" rx="1"/>
         <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
       </svg>
-      Server MCP
+      MCP server
     </a>
 
-    <a href="/it/catalog" class="nav-item">
+    <a href="/catalog" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      Posizioni dei report
+      Report locations
     </a>
 
-    <a href="/it/narratives" class="nav-item">
+    <a href="/narratives" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
         <path d="M10.4 10.4 14 14" stroke-linecap="round"/>
       </svg>
-      Ricerca nei testi
+      Narrative search
     </a>
 
-    <a href="/it/schema" class="nav-item">
+    <a href="/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
@@ -547,15 +547,15 @@ display: flex; align-items: center; justify-content: space-between;
       Schema
     </a>
 
-    <a href="/it/methodology" class="nav-item">
+    <a href="/methodology" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
         <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
       </svg>
-      Metodologia
+      Methodology
     </a>
 
-    <a href="/it/privacy" class="nav-item">
+    <a href="/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
@@ -578,7 +578,7 @@ display: flex; align-items: center; justify-content: space-between;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Di <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/it/privacy">Privacy</a></div>
+  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -588,70 +588,67 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Taiwan · Mensile · 2025 – 2026</span>
-    <h1>Dati della legge antifrode di Taiwan</h1>
-    <p>Dati di applicazione pubblicati ai sensi della legge taiwanese sulla prevenzione dei danni da reati di frode (詐欺犯罪危害防制條例): il registro dell'Agenzia nazionale di polizia dei siti web fraudolenti la cui risoluzione DNS è stata sospesa ai sensi dell'articolo 42, aggregato in conteggi di siti bloccati per mese × categoria ufficiale del sito (網站性質 — etichette mantenute nel cinese originale). Il set di dati è indicizzato per editore: i primi report di trasparenza antifrode obbligatori delle piattaforme designate (Google, LINE, TikTok — quello di Meta non è ancora recuperabile) compaiono ora accanto al flusso di polizia qui sotto.</p>
+    <span class="badge">LY Corporation · Annual · FY2024</span>
+    <h1>Japan — Information Distribution Platform Act (情プラ法)</h1>
+    <p>Japan's amended Provider Liability Limitation Act — the <strong>Information Distribution Platform Act</strong> (情プラ法, in force April 2025) — requires MIC-designated large providers to publish annual content-moderation statistics (Art. 28). <strong>LY Corporation</strong> is the one designated provider publishing figures so far (Google, Meta, TikTok and X publish only qualitative criteria pages), so this covers LY Corp's five services — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM and Yahoo! News comments — from its FY2024 Media Transparency Report. A tidy-long dataset: each row is one measured value identified by service × period × metric (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Pin a metric before aggregating — posts, removals and the rate aren't comparable, never sum the rate, and don't add the quarters to the annual total.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
   <section class="data-section" aria-label="Charts">
-    <h2>Tendenze</h2>
-    <p class="sub">Viste interattive delle cifre dichiarate. Ogni grafico ha un'alternativa testuale per gli screen reader.</p>
+    <h2>Trends</h2>
+    <p class="sub">Interactive views of the reported figures. Each chart has a text alternative for screen readers.</p>
     <div class="chart-grid">
 
       <div class="chart-card wide">
-        <h3>Siti fraudolenti bloccati via DNS al mese</h3>
-        <p class="chart-sub">Domini la cui risoluzione DNS è stata sospesa ai sensi dell'articolo 42 della legge, per mese.</p>
-        <div class="chart-loading" id="mon-loading">Caricamento…</div>
-        <canvas id="chart-mon" height="140" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-mon-table" class="sr-only"></div>
+        <h3>Removal rate per quarter, by service</h3>
+        <p class="chart-sub">Share of posts removed (投稿削除割合) each FY2024 quarter, one line per service. A comparable rate across services of very different sizes.</p>
+        <div class="chart-loading" id="rate-loading">Loading…</div>
+        <canvas id="chart-rate" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-rate-table" class="sr-only"></div>
       </div>
 
-      <div class="chart-card wide">
-        <h3>Siti bloccati per categoria</h3>
-        <p class="chart-sub">Totale dei domini bloccati per etichetta ufficiale di categoria del sito (網站性質), tutti i mesi combinati.</p>
-        <div class="chart-loading" id="cat-loading">Caricamento…</div>
-        <canvas id="chart-cat" height="340" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-cat-table" class="sr-only"></div>
+      <div class="chart-card">
+        <h3>Posts removed (FY2024), by service</h3>
+        <p class="chart-sub">Total posts removed (投稿削除件数) over FY2024, per service.</p>
+        <div class="chart-loading" id="rem-loading">Loading…</div>
+        <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-rem-table" class="sr-only"></div>
+      </div>
+
+      <div class="chart-card">
+        <h3>Posts removed per quarter — LINE OpenChat</h3>
+        <p class="chart-sub">OpenChat is by far the largest surface; its per-quarter removals shown on their own scale.</p>
+        <div class="chart-loading" id="oc-loading">Loading…</div>
+        <canvas id="chart-oc" height="220" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-oc-table" class="sr-only"></div>
       </div>
 
     </div>
   </section>
 
-  <!-- ── Totali mensili ─────────────────────────────────────────── -->
   <section class="data-section">
-    <h2>Totali mensili</h2>
-    <p class="sub">Conteggi dei domini bloccati per mese — le cifre esatte dietro il grafico qui sopra.</p>
-    <div class="results" id="monthlyTotals" aria-busy="true">
-      <div class="results-loading">Caricamento…</div>
+    <h2>FY2024 summary, by service</h2>
+    <p class="sub">Each service's annual totals: posts, posts removed, and the removal rate. Posts and removals are counts; the rate is a percentage — don't sum across them.</p>
+    <div class="results" id="summaryTable" aria-busy="true">
+      <div class="results-loading">Loading…</div>
     </div>
   </section>
 
-  <!-- ── Totali per categoria ─────────────────────────────────────── -->
   <section class="data-section">
-    <h2>Totali per categoria</h2>
-    <p class="sub">Conteggi dei domini bloccati per etichetta ufficiale di categoria del sito, tutti i mesi combinati.</p>
-    <div class="results" id="categoryTotals" aria-busy="true">
-      <div class="results-loading">Caricamento…</div>
+    <h2>Posts removed by quarter</h2>
+    <p class="sub">The per-quarter removal counts behind the annual totals, per service.</p>
+    <div class="results" id="quarterTable" aria-busy="true">
+      <div class="results-loading">Loading…</div>
     </div>
   </section>
 
-  <!-- ── Report obbligatori delle piattaforme ─────────────────────────────── -->
-  <section class="data-section">
-    <h2>Report obbligatori delle piattaforme</h2>
-    <p class="sub">I primi report di trasparenza antifrode delle piattaforme pubblicitarie designate ai sensi della legge: notifiche governative ricevute e annunci, URL e account oggetto di provvedimenti. Ogni piattaforma copre una propria finestra temporale, quindi le cifre non sono comparabili tra piattaforme.</p>
-    <div class="results" id="platformReports" aria-busy="true">
-      <div class="results-loading">Caricamento…</div>
-    </div>
-  </section>
-
-  <p class="hint">Affina o estendi queste query nel <a href="/it/reports">generatore di query</a> (fissa una <code>section</code> prima di aggregare), sfoglia l'elenco completo dei campi nella pagina <a href="/it/schema">Schema</a> o leggi la <a href="/it/methodology">Metodologia</a>.</p>
+  <p class="hint">Refine or extend these in the <a href="/reports">query builder</a> (pin a <code>metric</code> before aggregating), browse the full field list on the <a href="/schema">Schema</a> page, or read the <a href="/methodology">Methodology</a>.</p>
 </main>
 
 <footer>
-  <p>Fonte: registro delle sospensioni DNS ex articolo 42 dell'Agenzia nazionale di polizia, tramite il portale open data di Taiwan (<a href="https://data.gov.tw/dataset/176455" target="_blank" rel="noopener noreferrer">data.gov.tw, set di dati 176455</a>). Report obbligatori delle piattaforme: Google, LINE e TikTok (prima tornata 2025; fonti archiviate nel repository dei dati). Dati tramite la <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Metodologia</a> · <a href="/it/api-key">Chiave API</a> · <a href="/it/privacy">Privacy</a></p>
-  <p class="provenance" id="provenance" hidden><span class="prov-label">Istantanea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citare come:</span> <span id="prov-cite"></span></p>
+  <p>Source: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">Snapshot:</span> <span id="prov-snap"></span> · <span class="prov-label">Cite as:</span> <span id="prov-cite"></span></p>
 </footer>
 
 </div>
@@ -755,8 +752,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“Dati della legge antifrode di Taiwan, tramite la Transparency Report API (istantanea di " + generated + ''
-      + (version ? ', versione del set di dati ' + version : '') + ').”';
+      "“Japan 情プラ法 statistics (LY Corporation), via the Transparency Report API (" + generated + ' snapshot'
+      + (version ? ', dataset version ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -836,122 +833,138 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  // Chart queries. Filter values are snake_case dataset codes, so the
-  // localization generator's prose find/replace can never rewrite them.
-  function MON_Q() { return {"table":"taiwan_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["dns_blocked_sites"]},{"operation":"EQ","field_name":"metric","field_values":["sites_blocked"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function CAT_Q() { return {"table":"taiwan_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["dns_blocked_sites"]},{"operation":"EQ","field_name":"metric","field_values":["sites_blocked"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20}; }
-
-  function renderCharts(mon, cat) {
-    if (!mon.rows.length) { emptyChart('mon-loading'); } else {
-      srTable('chart-mon-table', ["Mese", "Siti bloccati"],
-        mon.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
-      vbarsChart('chart-mon', 'mon-loading', 'chart-mon-table',
-        mon.rows.map(function (r) { return r[0]; }),
-        [{ label: "Siti bloccati", data: mon.rows.map(function (r) { return r[1]; }) }]);
-    }
-    if (!cat.rows.length) { emptyChart('cat-loading'); } else {
-      srTable('chart-cat-table', ["Categoria", "Siti bloccati"],
-        cat.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
-      hbarChart('chart-cat', 'cat-loading', 'chart-cat-table',
-        cat.rows.map(function (r) { return r[0]; }),
-        cat.rows.map(function (r) { return r[1]; }));
-    }
+  function linesChart(id, loadId, tableId, labels, dsets) {
+    if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    showChart(id, loadId);
+    new Chart(document.getElementById(id), {
+      type: 'line',
+      data: { labels: labels, datasets: dsets.map(function (ds, i) {
+        return { label: ds.label, data: ds.data, borderColor: PALETTE[i % PALETTE.length],
+                 backgroundColor: PALETTE[i % PALETTE.length] + '22', borderWidth: 2,
+                 pointRadius: 2.5, tension: 0.3, fill: dsets.length === 1 };
+      }) },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+      },
+    });
   }
 
-
-  // Labels + display order for the platform-report metrics ("\u2014 " marks a
-  // sub-figure of the metric above it).
-  var METRIC_INFO = [
-    ['government_requests', "Richieste governative di rimozione ricevute"],
-    ['moda_notifications', "Notifiche MODA ricevute"],
-    ['notifications_ad_cases', "— casi pubblicitari confermati"],
-    ['notifications_ugc_cases', "— casi di contenuti generati dagli utenti"],
-    ['urls_named', "URL/link citati nelle richieste"],
-    ['urls_removed', "URL rimossi (totale)"],
-    ['urls_removed_legal', "— per violazione di un ordine legale"],
-    ['urls_removed_policy', "— per violazione delle policy della piattaforma"],
-    ['urls_not_actioned', "URL non processabili"],
-    ['ads_removed', "Annunci rimossi (art. 32)"],
-    ['ad_accounts_suspended', "Account pubblicitari sospesi"],
-    ['advertiser_accounts_banned', "Account inserzionisti bannati"],
-    ['art32_ad_dispositions', "Provvedimenti validi di rimozione annunci (art. 32)"],
-    ['art32_service_suspension_dispositions', "Provvedimenti validi di sospensione del servizio (art. 32)"],
-    ['sitc_removal_notices', "Notifiche di rimozione ai sensi della legge sui titoli"],
-    ['art33_accounts_suspended', "Account sospesi ai sensi dell'art. 33"],
-    ['art33_accounts_suspended_cib_project', "— tramite l'operazione congiunta con il CIB"],
-    ['fraud_ads_removed_taiwan', "Annunci fraudolenti rimossi proattivamente (mirati a Taiwan)"],
-    ['advertisers_actioned_taiwan', "— inserzionisti sanzionati"],
-    ['videos_removed_taiwan', "Video rimossi a Taiwan (tutte le violazioni)"],
-    ['fraud_videos_removed_taiwan', "— video di frode e truffa"],
-    ['videos_removed_global', "Video rimossi a livello globale (tutte le violazioni)"],
-  ];
-  function renderPlatformReports(rows) {
-    var el = document.getElementById('platformReports');
-    el.removeAttribute('aria-busy');
-    if (!rows.length) {
-      el.innerHTML = '<div class="results-loading">' + "No data available." + '</div>';
-      return;
-    }
-    var order = {};
-    METRIC_INFO.forEach(function (m, i) { order[m[0]] = i; });
-    rows = rows.slice().sort(function (a, b) {
-      if (a[0] !== b[0]) return a[0] < b[0] ? -1 : 1;
-      var oa = order[a[2]] != null ? order[a[2]] : 999;
-      var ob = order[b[2]] != null ? order[b[2]] : 999;
-      return oa - ob;
+  // Pivot [x, series, n] rows into { labels, keys, dsets } for a line chart.
+  function pivot(rows, seriesLabels) {
+    var labels = [], bySeries = {};
+    rows.forEach(function (r) {
+      if (labels.indexOf(r[0]) < 0) labels.push(r[0]);
+      (bySeries[r[1]] = bySeries[r[1]] || {})[r[0]] = r[2];
     });
-    var heads = ["Piattaforma", "Copertura", "Statistica", "Valore"];
-    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
-      + '<caption class="sr-only">' + esc("Statistiche dei report antifrode obbligatori delle piattaforme designate.") + '</caption>'
-      + '<thead><tr><th scope="col">' + esc(heads[0]) + '</th><th scope="col">' + esc(heads[1]) + '</th><th scope="col">' + esc(heads[2]) + '</th><th scope="col" class="num">' + esc(heads[3]) + '</th></tr></thead><tbody>'
-      + rows.map(function (r) {
-          var m = order[r[2]] != null ? METRIC_INFO[order[r[2]]][1] : r[2];
-          return '<tr>'
-            + '<td data-label="' + esc(heads[0]) + '">' + esc(r[0]) + '</td>'
-            + '<td data-label="' + esc(heads[1]) + '">' + esc(r[1]) + '</td>'
-            + '<td data-label="' + esc(heads[2]) + '">' + esc(m) + '</td>'
-            + '<td class="num" data-label="' + esc(heads[3]) + '">' + fmt(r[3]) + '</td>'
-            + '</tr>';
-        }).join('')
-      + '</tbody></table></div>';
+    var keys = Object.keys(bySeries).sort();
+    return { labels: labels, keys: keys, bySeries: bySeries, dsets: keys.map(function (k) {
+      return { label: (seriesLabels && seriesLabels[k]) || k,
+               data: labels.map(function (x) { return bySeries[k][x] == null ? null : bySeries[k][x]; }) };
+    }) };
+  }
+
+  // Accessible mirror table for a pivoted line chart (one column per series).
+  function seriesTable(tableId, head, p) {
+    srTable(tableId, [head].concat(p.dsets.map(function (d) { return d.label; })),
+      p.labels.map(function (x) {
+        return [x].concat(p.keys.map(function (k) { return fmt(p.bySeries[k][x]); }));
+      }));
+  }
+
+  // Chart queries. Filter values are metric/period codes, so the localization
+  // generator's prose find/replace can never rewrite them.
+  var ANNUAL = "2024-04..2025-03";
+  var QLABEL = {
+    "2024-04..2024-06": "Q1 (Apr–Jun)", "2024-07..2024-09": "Q2 (Jul–Sep)",
+    "2024-10..2024-12": "Q3 (Oct–Dec)", "2025-01..2025-03": "Q4 (Jan–Mar)",
+  };
+  var QORDER = ["2024-04..2024-06", "2024-07..2024-09", "2024-10..2024-12", "2025-01..2025-03"];
+  function RATE_Q() { return {"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["removal_rate"]},{"operation":"IN","field_name":"period","field_values":["2024-04..2024-06","2024-07..2024-09","2024-10..2024-12","2025-01..2025-03"]}]},"group_by":["period","service"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
+  function REM_Q() { return {"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["posts_removed"]},{"operation":"EQ","field_name":"period","field_values":["2024-04..2025-03"]}]},"group_by":["service"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":30}; }
+  function OC_Q() { return {"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"service","field_values":["LINE OpenChat"]},{"operation":"EQ","field_name":"metric","field_values":["posts_removed"]},{"operation":"IN","field_name":"period","field_values":["2024-04..2024-06","2024-07..2024-09","2024-10..2024-12","2025-01..2025-03"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":10}; }
+
+  function renderCharts(rate, rem, oc) {
+    // Removal rate per quarter, lines (x = quarter label, series = service).
+    if (!rate.rows.length) { emptyChart('rate-loading'); } else {
+      var rr = rate.rows.map(function (r) { return [QLABEL[r[0]] || r[0], r[1], r[2]]; });
+      var p1 = pivot(rr);
+      seriesTable('chart-rate-table', "Quarter", p1);
+      linesChart('chart-rate', 'rate-loading', 'chart-rate-table', p1.labels, p1.dsets);
+    }
+    if (!rem.rows.length) { emptyChart('rem-loading'); } else {
+      srTable('chart-rem-table', ["Service", "Removed"], rem.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-rem', 'rem-loading', 'chart-rem-table',
+        rem.rows.map(function (r) { return r[0]; }), rem.rows.map(function (r) { return r[1]; }));
+    }
+    if (!oc.rows.length) { emptyChart('oc-loading'); } else {
+      var labels = oc.rows.map(function (r) { return QLABEL[r[0]] || r[0]; });
+      var values = oc.rows.map(function (r) { return r[1]; });
+      srTable('chart-oc-table', ["Quarter", "Removed"], oc.rows.map(function (r) { return [QLABEL[r[0]] || r[0], fmt(r[1])]; }));
+      vbarsChart('chart-oc', 'oc-loading', 'chart-oc-table', labels, [{ label: '', data: values }]);
+    }
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
-    // Totals: SUM of blocked sites per month.
+    // FY2024 summary per service: posts, posts_removed, removal_rate.
     try {
-      var d = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["dns_blocked_sites"]},{"operation":"EQ","field_name":"metric","field_values":["sites_blocked"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50});
-      renderTable('monthlyTotals', d.rows || [], "Siti fraudolenti bloccati via DNS ai sensi dell'articolo 42, totalizzati per mese.", "Mese", "Siti bloccati");
+      var d = await explore({"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"period","field_values":["2024-04..2025-03"]}]},"group_by":["service","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"max_count":100});
+      var by = {};
+      (d.rows || []).forEach(function (r) { (by[r[0]] = by[r[0]] || {})[r[1]] = r[2]; });
+      var svcs = Object.keys(by).sort(function (a, b) { return (by[b].posts || 0) - (by[a].posts || 0); });
+      var el = document.getElementById('summaryTable');
+      el.removeAttribute('aria-busy');
+      if (!svcs.length) { el.innerHTML = '<div class="results-loading">No data available.</div>'; }
+      else {
+        el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+          + '<caption class="sr-only">' + esc("FY2024 posts, removals and removal rate by LY Corp service.") + '</caption>'
+          + '<thead><tr><th scope="col">Service</th><th scope="col" class="num">Posts</th><th scope="col" class="num">Removed</th><th scope="col" class="num">Removal rate</th></tr></thead><tbody>'
+          + svcs.map(function (svc) {
+              var m = by[svc];
+              return '<tr><td data-label="Service">' + esc(svc) + '</td>'
+                + '<td class="num" data-label="Posts">' + (m.posts == null ? '—' : fmt(m.posts)) + '</td>'
+                + '<td class="num" data-label="Removed">' + (m.posts_removed == null ? '—' : fmt(m.posts_removed)) + '</td>'
+                + '<td class="num" data-label="Removal rate">' + (m.removal_rate == null ? '—' : esc(m.removal_rate) + '%') + '</td></tr>';
+            }).join('')
+          + '</tbody></table></div>';
+      }
       fillProvenance(d.generated, d.version);
     } catch (err) {
-      showError('monthlyTotals', "Impossibile caricare i totali mensili: " + err.message);
+      showError('summaryTable', "Failed to load the FY2024 summary: " + err.message);
     }
-
-    // Totals: SUM of blocked sites per official site category.
+    // Posts removed by quarter, per service (service rows × quarter columns).
     try {
-      var d2 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["dns_blocked_sites"]},{"operation":"EQ","field_name":"metric","field_values":["sites_blocked"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20});
-      renderTable('categoryTotals', d2.rows || [], "Siti fraudolenti bloccati via DNS ai sensi dell'articolo 42, totalizzati per categoria di sito.", "Categoria", "Siti bloccati");
+      var d2 = await explore({"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["posts_removed"]},{"operation":"IN","field_name":"period","field_values":["2024-04..2024-06","2024-07..2024-09","2024-10..2024-12","2025-01..2025-03"]}]},"group_by":["service","period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"max_count":100});
+      var q = {};
+      (d2.rows || []).forEach(function (r) { (q[r[0]] = q[r[0]] || {})[r[1]] = r[2]; });
+      var svcs2 = Object.keys(q).sort();
+      var el2 = document.getElementById('quarterTable');
+      el2.removeAttribute('aria-busy');
+      if (!svcs2.length) { el2.innerHTML = '<div class="results-loading">No data available.</div>'; }
+      else {
+        el2.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+          + '<caption class="sr-only">' + esc("Posts removed per FY2024 quarter by service.") + '</caption>'
+          + '<thead><tr><th scope="col">Service</th>' + QORDER.map(function (p) { return '<th scope="col" class="num">' + esc(QLABEL[p]) + '</th>'; }).join('') + '</tr></thead><tbody>'
+          + svcs2.map(function (svc) {
+              return '<tr><td data-label="Service">' + esc(svc) + '</td>'
+                + QORDER.map(function (p) { var v = q[svc][p]; return '<td class="num" data-label="' + esc(QLABEL[p]) + '">' + (v == null ? '—' : fmt(v)) + '</td>'; }).join('')
+                + '</tr>';
+            }).join('')
+          + '</tbody></table></div>';
+      }
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('categoryTotals', "Impossibile caricare i totali per categoria: " + err.message);
-    }
-
-    // Report obbligatori delle piattaforme: every reported figure, publisher by publisher.
-    try {
-      var d3 = await explore({"table":"taiwan_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["afa_transparency_report","platform_enforcement"]}]},"group_by":["publisher","period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"publisher","order":"asc"}],"max_count":60});
-      renderPlatformReports(d3.rows || []);
-    } catch (err) {
-      showError('platformReports', "Impossibile caricare i report delle piattaforme: " + err.message);
+      showError('quarterTable', "Failed to load the quarterly removals: " + err.message);
     }
   }
-
   load();
 
-  // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
-  // single failure can't block the rest of the page.
-  var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(MON_Q()), soft(CAT_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1]);
+  var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
+  Promise.all([soft(RATE_Q()), soft(REM_Q()), soft(OC_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2]);
   });
 })();
 </script>

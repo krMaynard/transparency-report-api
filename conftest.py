@@ -262,6 +262,25 @@ _SINGAPORE_FIXTURE = {
 }
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
+# A small slice of the Japan 情プラ法 dataset (japan-info-platform.json shape):
+# LY Corporation services, a quarter + the annual total, mixing count metrics
+# (posts, posts_removed) with a percent (removal_rate).
+# [service, period, metric, unit, value]
+_JAPAN_FIXTURE = {
+    "columns": ["service", "period", "metric", "unit", "value"],
+    "rows": [
+        ["Yahoo! Chiebukuro", "2024-04..2024-06", "posts", "count", 17294266],
+        ["Yahoo! Chiebukuro", "2024-04..2024-06", "posts_removed", "count", 111889],
+        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts", "count", 66199309],
+        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts_removed", "count", 444727],
+        ["Yahoo! Chiebukuro", "2024-04..2025-03", "removal_rate", "percent", 0.7],
+        ["LINE OpenChat", "2024-04..2025-03", "posts", "count", 5514828787],
+        ["LINE OpenChat", "2024-04..2025-03", "posts_removed", "count", 6980935],
+        ["LINE OpenChat", "2024-04..2025-03", "removal_rate", "percent", 0.1],
+    ],
+}
+seed.build_japan_db(_JAPAN_FIXTURE, _DB)
+
 # A small slice of the Google user-data dataset (google-user-data.json shape).
 # [dataset, period, country, iso2, product, legal_process, assisting_country,
 #  metric, unit, value_low, value_high]
