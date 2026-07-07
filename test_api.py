@@ -3360,6 +3360,65 @@ class TestTcoTable:
         assert r.status_code == 200 and "tco_metrics" in r.text
 
 
+class TestAiTrainingTable:
+    def test_ai_training_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "ai_training_metrics" in names
+
+    def test_ai_training_fields_endpoint(self):
+        body = client.get("/api/fields?table=ai_training_metrics", headers=MOMO).json()
+        assert {"provider", "model", "released", "section", "field",
+                "value"} <= set(body["dimensions"]["fields"])
+        assert "size_rank" in body["measures"]["fields"]
+
+    def test_ai_training_text_size_rank_by_model(self):
+        # The comparable size_rank isolates the text modality: Google's Gemini 3
+        # discloses the largest band (rank 3), Microsoft's phi-4 the middle (rank 2).
+        job = _submit_and_wait({
+            "table": "ai_training_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["modality"]},
+                {"operation": "EQ", "field_name": "field", "field_values": ["Text"]},
+            ]},
+            "group_by": ["model"],
+            "aggregates": [{"function": "MAX", "field_name": "size_rank", "alias": "n"}],
+            "sort": [{"field_name": "n", "order": "desc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        ranks = {r[0]: r[1] for r in body["rows"]}
+        assert ranks["Gemini 3 Pro family"] == 3 and ranks["phi-4"] == 2
+
+    def test_ai_training_size_rank_sum_warns(self):
+        # size_rank is an ordinal band rank — SUMming it is meaningless.
+        r = client.post("/api/explore", json={
+            "table": "ai_training_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "size_rank", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "size_rank" in warnings and "SUM" in warnings
+
+    def test_ai_training_bands_raw_values(self):
+        # A fields (no-aggregate) selection returns the filed band text per model.
+        r = client.post("/api/explore", json={
+            "table": "ai_training_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["modality"]},
+                {"operation": "EQ", "field_name": "field", "field_values": ["Text"]},
+            ]},
+            "fields": ["provider", "value"],
+        })
+        assert r.status_code == 200
+        vals = {row[0]: row[1] for row in r.json()["rows"]}
+        assert vals["Google"] == "More than 10 trillion tokens"
+        assert vals["Microsoft"] == "1 billion to 10 trillion tokens"
+
+    def test_ai_training_page_served(self):
+        r = client.get("/ai-training")
+        assert r.status_code == 200 and "ai_training_metrics" in r.text
+
+
 class TestCserTable:
     def test_cser_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
