@@ -279,7 +279,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Fifteen non-DSA datasets ride alongside, each exposed as an ordinary query table
+Sixteen non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -378,6 +378,26 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   additive quantities; `_leg_warnings` warns when a SUM/AVG pins no `metric` or
   `policy_area`. `N/A` cells (a metric not reported for a policy × quarter) are
   dropped at build time.
+- **Singapore IMDA Online Safety reports** — a single **tidy-long**
+  `singapore_metrics` table (one row per measured value: `service`/`period`/
+  `section`/`category`/`metric`/`unit` + a `value`; dims stored inline). The
+  annual online safety reports the six Designated Social Media Services
+  (Facebook, Instagram, TikTok, X, YouTube, HardwareZone) file under Singapore's
+  **Code of Practice for Online Safety** (IMDA, Broadcasting Act), plus IMDA's
+  own Online Safety Assessment Reports (OSAR). Two streams (`section`):
+  `assessment` (IMDA's normalized, cross-service Mystery-Shopper benchmark —
+  `action_rate` in `percent` and `time_to_action` in `days`, per service for the
+  2024 and 2025 rounds, transcribed from the OSAR chart tables) and
+  `platform_report` (each service's own Singapore figures for 2024-04..2025-03,
+  parsed from the report PDFs — Meta's per-category `content_actioned_sg` +
+  `proactive_rate_sg`, YouTube's by-reason `flags_received_sg`/
+  `videos_removed_sg`, TikTok's headline figures, X's
+  `median_time_to_action_hours`; HardwareZone reports no Singapore statistics so
+  it appears only in `assessment`). `platform_report` metric names are each
+  vendor's own and are **not** comparable across services — pin `service`,
+  `section` **and** `metric` before aggregating, and never mix the
+  `percent`/`days`/`hours`/`count` units; `_leg_warnings` warns on all three.
+  The `/singapore` dataset page is English-only (like `/mandates`).
 - **Google government requests for user information** — a single **tidy-long**
   `google_userdata_metrics` table (one row per measured value: `dataset`/
   `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
@@ -764,6 +784,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/taiwan` | — | Public Taiwan Anti-Fraud Act dataset page (web UI over `POST /api/explore`) |
 | GET | `/turkey` | — | Public Türkiye Law No. 5651 transparency-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/cser` | — | Public Meta Community Standards Enforcement Report dataset page (web UI over `POST /api/explore`) |
+| GET | `/singapore` | — | Public Singapore IMDA Online Safety dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |

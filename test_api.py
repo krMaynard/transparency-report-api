@@ -3337,6 +3337,83 @@ class TestCserTable:
         assert all(isinstance(r[5], (int, float)) for r in data["rows"])
 
 
+class TestSingaporeTable:
+    def test_singapore_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "singapore_metrics" in names
+
+    def test_singapore_fields_endpoint(self):
+        body = client.get("/api/fields?table=singapore_metrics", headers=MOMO).json()
+        assert {"service", "period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_singapore_action_rate_trend(self):
+        # Facebook action rate rose 53% (2024) -> 81% (2025).
+        job = _submit_and_wait({
+            "table": "singapore_metrics", "fields": ["period", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["assessment"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["action_rate"]},
+            ]},
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2023-08..2024-07", 53], ["2024-04..2025-03", 81]]
+
+    def test_singapore_platform_report_figure(self):
+        job = _submit_and_wait({
+            "table": "singapore_metrics", "fields": ["category", "unit", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["YouTube"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["flags_received_sg"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["Child Abuse", "count", 21685]]
+
+    def test_singapore_unpinned_sum_warns(self):
+        # A SUM pinning neither section nor metric mixes percent/days/count.
+        r = client.post("/api/explore", json={
+            "table": "singapore_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "section" in warnings and "metric" in warnings
+
+    def test_singapore_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "singapore_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["YouTube"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["platform_report"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["flags_received_sg"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
+
+    def test_singapore_page_served(self):
+        r = client.get("/singapore")
+        assert r.status_code == 200
+        assert '"table":"singapore_metrics"' in r.text and "Online Safety" in r.text
+
+    def test_vendored_singapore_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("singapore-online-safety.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["service", "period", "section", "category", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 7 for r in data["rows"])
+        assert {r[2] for r in data["rows"]} == {"assessment", "platform_report"}
+        assert {"Facebook", "Instagram", "TikTok", "X", "YouTube", "HardwareZone"} == {r[0] for r in data["rows"]}
+        assert all(isinstance(r[6], (int, float)) for r in data["rows"])
+
+
 class TestGoogleUserDataTable:
     def test_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
