@@ -1241,6 +1241,22 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "tiktok_cger_metrics": TableSpec(
+        "TikTok Community Guidelines Enforcement Report (CGER) — TikTok's flagship VOLUNTARY content-moderation transparency report (distinct from its law-mandated DSA report and its government/legal-request disclosures), quarterly 2020 Q3 → 2026 Q1, the Global cut. One row per measured value, identified by period × metric × policy_type × issue × task_type × task. 25 metrics: Total videos removed, Videos/Comments/Accounts removed, Fake accounts/followers/likes removed & prevented, LIVE suspensions/restores, Videos restored (counts); and Proactive removal rate, Removal rate before any views, Removal rate within 24 hours, Category share, Percentage of user reports actioned, Video/Comment removal rates (rates, a FRACTION OF 1 like 0.944 = 94.4%). 'unit' is 'count' or 'rate' — never SUM rates. The 'policy_type'/'issue' and 'task_type'/'task' pairs each carry an 'All' total alongside the breakdown rows, so summing a breakdown together with its 'All' double-counts. Pin a metric before aggregating (metrics aren't comparable), and pick a single grain ('All' vs a breakdown). The Policy/Sub-policy grain is only populated from Q4 2025 on. Global figures only (per-country/language rows are excluded from this snapshot).",
+        "FROM tiktok_cger_metrics f",
+        {
+            "period":      "f.period",
+            "metric":      "f.metric",
+            "policy_type": "f.policy_type",
+            "issue":       "f.issue",
+            "task_type":   "f.task_type",
+            "task":        "f.task",
+            "unit":        "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "google_userdata_metrics": TableSpec(
         "Google government requests for user information — the biannual bulk export of Google's Transparency Report user-data section (2009-H2 onward): requests, accounts and percentage-disclosed per country × legal process (dataset 'global'), the diplomatic/MLAT slice, Enterprise Cloud (GCP / Google Workspace) requests, and the US national-security figures (FISA content / FISA non-content / NSLs), which are banded ranges (value_low != value_high, non-additive). A tidy-long table: one row per measured value. Caution: 2012-H2..2014-H1 report an 'All' legal_process aggregate alongside the per-process split — pin legal_process before summing, and never SUM percent rows.",
         "FROM google_userdata_metrics f",
@@ -2463,6 +2479,12 @@ def japan_page() -> FileResponse:
     return _serve_page("japan.html", "Japan info-platform page")
 
 
+@app.get("/tiktok-cger", response_class=HTMLResponse)
+def tiktok_cger_page() -> FileResponse:
+    """Serve the TikTok CGER dataset page (reads POST /api/explore)."""
+    return _serve_page("tiktok-cger.html", "TikTok CGER page")
+
+
 @app.get("/user-data", response_class=HTMLResponse)
 def user_data_page() -> FileResponse:
     """Serve the Google user-data requests dataset page (reads POST /api/explore)."""
@@ -2577,6 +2599,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "cser": ("cser.html", "Meta CSER page", {}),
     "singapore": ("singapore.html", "Singapore online safety page", {}),
     "japan": ("japan.html", "Japan info-platform page", {}),
+    "tiktok-cger": ("tiktok-cger.html", "TikTok CGER page", {}),
     "user-data": ("user-data.html", "Google user data page", {}),
     "microsoft": ("microsoft.html", "Microsoft requests page", {}),
     "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
@@ -3946,6 +3969,32 @@ def _leg_warnings(
                 "'japan_metrics' includes an annual-total period "
                 "('2024-04..2025-03') alongside the FY2024 quarters, so summing "
                 "over 'period' double-counts. Filter or group by 'period'."
+            )
+    # tiktok_cger_metrics mixes count and rate metrics, and its policy/issue and
+    # task_type/task breakdowns each carry an 'All' total beside the parts.
+    if table == "tiktok_cger_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "metric" not in pinned:
+            out.append(
+                "'tiktok_cger_metrics' mixes counts (videos/accounts/comments "
+                "removed) with rates (proactive/24-hour removal rates, category "
+                "share — fractions of 1) that aren't comparable; this aggregate "
+                "pins no 'metric'. Filter or group by 'metric'."
+            )
+        if "issue" not in pinned and "policy_type" not in pinned:
+            out.append(
+                "'tiktok_cger_metrics' carries an 'All' total in 'policy_type'/"
+                "'issue' alongside the per-policy breakdown, so summing over them "
+                "double-counts. Pin a grain (filter 'issue'='All' for the total, "
+                "or group by 'issue')."
+            )
+        if "task" not in pinned and "task_type" not in pinned:
+            out.append(
+                "'tiktok_cger_metrics' carries an 'All' total in 'task_type'/"
+                "'task' alongside the moderation-system / view-band / turnaround "
+                "breakdown, so summing over them double-counts. Pin a grain "
+                "(filter 'task'='All' for the total, or group by 'task')."
             )
     # linkedin_metrics mixes counts, percentages and banded national-security
     # ranges in one value column, across three report datasets.

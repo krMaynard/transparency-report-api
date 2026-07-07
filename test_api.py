@@ -3500,6 +3500,88 @@ class TestJapanTable:
         assert {r[2] for r in data["rows"]} == {"posts", "posts_removed", "removal_rate"}
 
 
+class TestTiktokCgerTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "tiktok_cger_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=tiktok_cger_metrics", headers=MOMO).json()
+        assert {"period", "metric", "policy_type", "issue", "task_type", "task", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_videos_removed_trend(self):
+        # Global Total videos removed: 2025 Q4 175.3M, 2026 Q1 184.0M.
+        job = _submit_and_wait({
+            "table": "tiktok_cger_metrics", "group_by": ["period"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric", "field_values": ["Total videos removed"]},
+                {"operation": "EQ", "field_name": "policy_type", "field_values": ["All"]},
+                {"operation": "EQ", "field_name": "issue", "field_values": ["All"]},
+                {"operation": "EQ", "field_name": "task_type", "field_values": ["All"]},
+                {"operation": "EQ", "field_name": "task", "field_values": ["All"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2025 Q4", 175302085], ["2026 Q1", 184012576]]
+
+    def test_proactive_rate_is_fraction(self):
+        job = _submit_and_wait({
+            "table": "tiktok_cger_metrics", "fields": ["unit", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric", "field_values": ["Proactive removal rate"]},
+                {"operation": "EQ", "field_name": "issue", "field_values": ["All"]},
+                {"operation": "EQ", "field_name": "task", "field_values": ["All"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["rate", 0.994]]
+
+    def test_unpinned_sum_warns(self):
+        # A SUM pinning no metric mixes counts with rate-fractions, and summing
+        # over the policy/task 'All' totals double-counts.
+        r = client.post("/api/explore", json={
+            "table": "tiktok_cger_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "metric" in warnings and "issue" in warnings and "task" in warnings
+
+    def test_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "tiktok_cger_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric", "field_values": ["Total videos removed"]},
+                {"operation": "EQ", "field_name": "issue", "field_values": ["All"]},
+                {"operation": "EQ", "field_name": "task", "field_values": ["All"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
+
+    def test_page_served(self):
+        r = client.get("/tiktok-cger")
+        assert r.status_code == 200
+        assert '"table":"tiktok_cger_metrics"' in r.text and "Community Guidelines Enforcement" in r.text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("tiktok-cger.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["period", "metric", "policy_type", "issue",
+                                    "task_type", "task", "unit", "value"]
+        assert data["rows"] and all(len(r) == 8 for r in data["rows"])
+        assert {r[6] for r in data["rows"]} == {"count", "rate"}
+        assert all(isinstance(r[7], (int, float)) for r in data["rows"])
+
+
 class TestGoogleUserDataTable:
     def test_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
