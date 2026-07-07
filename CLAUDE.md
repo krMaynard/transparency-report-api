@@ -481,6 +481,33 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `section` **and** `metric` before aggregating, and never mix the
   `percent`/`days`/`hours`/`count` units; `_leg_warnings` warns on all three.
   The `/singapore` dataset page is English-only (like `/mandates`).
+- **Korea Network Act (illegal-sexual-content)** — a single **tidy-long**
+  `korea_network_act_metrics` table (one row per measured value: `publisher`/
+  `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The
+  **annual transparency report** online service providers must publish under
+  South Korea's **Network Act** (Art. 64-5) and **Telecommunications Business
+  Act** (Art. 22-5) on the technical/managerial measures they take against the
+  circulation of *illegal sexual content* (illegally-filmed content, deepfake /
+  "fake" images and videos, and child/youth sexual-abuse material). **Google**
+  publishes one per calendar year covering **Search and YouTube jointly**
+  (`publisher='Google'`; no per-product split); this is its 2025 report, with
+  `period` a **month** (`2025-01` … `2025-12`) — the report's annual "Total"
+  column is used only to *validate* the transcription (each row's twelve months
+  must sum to it), never stored, so summing over `period` is a legitimate annual
+  total. Four `section`s, each a **cross-cut of the SAME 115,280 requests** (so
+  NOT additive across sections): `requests_received` (by complainant — Victims/
+  User 21,859 + Agency/Gov 93,421, `metric='requests'`), `request_reasons` (by
+  reason, `metric='requests'`), `processed_result` (by outcome — Removed 92,334
+  + four `Not Removed - …` reasons + two all-zero `KCSC Assessment - …` rows,
+  `metric='urls'`) and `removal_reasons` (the 92,334 removed URLs by reason,
+  `metric='urls_removed'`). Within a section the categories are **disjoint** and
+  sum to the section total (the report's "Total" rows are dropped), so summing
+  over `category` within one section is a legitimate grand total — but pin a
+  `section` **and** `metric` first, and never sum across sections (requests
+  received ≠ processed outcomes ≠ removed URLs); the build cross-checks every
+  breakdown against the report's stated per-row and per-section totals and
+  raises on a mismatch; `_leg_warnings` warns on both dims. The
+  `/korea-network-act` dataset page is English-only (like `/mandates`).
 - **Japan 情プラ法 (Information Distribution Platform Act)** — a single
   **tidy-long** `japan_metrics` table (one row per measured value: `service`/
   `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The
@@ -943,6 +970,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/turkey` | — | Public Türkiye Law No. 5651 transparency-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/cser` | — | Public Meta Community Standards Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/singapore` | — | Public Singapore IMDA Online Safety dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
+| GET | `/korea-network-act` | — | Public Korea Network Act illegal-sexual-content dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/japan` | — | Public Japan 情プラ法 (LY Corporation) dataset page (web UI over `POST /api/explore`) |
 | GET | `/tiktok-cger` | — | Public TikTok Community Guidelines Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/tco` | — | Public EU Terrorist Content Online Regulation dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |

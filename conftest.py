@@ -346,6 +346,22 @@ _SINGAPORE_FIXTURE = {
 }
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
+# A small slice of the Korea Network Act dataset (korea-network-act.json shape):
+# two months of Google's illegal-sexual-content figures across the request /
+# removal cross-cuts. [publisher, period, section, category, metric, unit, value]
+_KOREA_NETWORK_ACT_FIXTURE = {
+    "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Google", "2025-01", "requests_received", "Victims etc. (User Requests)", "requests", "count", 1549],
+        ["Google", "2025-01", "requests_received", "Agency and Org (Gov Requests)", "requests", "count", 2377],
+        ["Google", "2025-02", "requests_received", "Victims etc. (User Requests)", "requests", "count", 1268],
+        ["Google", "2025-02", "requests_received", "Agency and Org (Gov Requests)", "requests", "count", 2971],
+        ["Google", "2025-01", "processed_result", "Removed Voluntarily by the Company", "urls", "count", 3089],
+        ["Google", "2025-01", "removal_reasons", "Child or Youth Sexual Abuse Content", "urls_removed", "count", 0],
+    ],
+}
+seed.build_korea_network_act_db(_KOREA_NETWORK_ACT_FIXTURE, _DB)
+
 # A small slice of the Japan 情プラ法 dataset (japan-info-platform.json shape):
 # LY Corp posts activity (section 'posts_activity', category 'All'), a couple of
 # YouTube sections with their 'Total' beside a reason breakdown, and a slice of
