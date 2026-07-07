@@ -314,7 +314,10 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   tables). Covers Facebook, Instagram, Twitter/X, Moj, ShareChat, Roblox, Google
   and Pinterest (+ `Meta` for report-level GAC orders; Roblox 2025-03→2026-05, with
   a redesigned layout + revised category taxonomy from 2026; Google 2021-04→ across
-  all its SSMI surfaces, `complaints_received`/`removal_actions` by complaint reason;
+  all its SSMI surfaces, `complaints_received`/`removal_actions` by complaint reason,
+  plus the half-yearly `gac_appeals` section 2023-03→ (Rule 3A(7) Grievance
+  Appellate Committee appeals by Google service × outcome —
+  `appeals_closed`/`_rejected`/`_allowed`/`_not_admitted`);
   Pinterest 2024-06→, `reports`/`voluntary_actions` by policy × object type).
   `value` is `REAL` and `unit` is `count` (exact),
   `approx_count` (Meta's abbreviated proactive figures like `2.3M` — rounded

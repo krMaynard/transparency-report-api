@@ -2870,6 +2870,22 @@ class TestIndiaTable:
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"][0][0] == 10038
 
+    def test_india_gac_appeals_by_service(self):
+        # Google's GAC appeals section: closed appeals summed across services for
+        # the half-yearly window (YouTube 3 + Gmail 4 = 7 in the fixture).
+        job = _submit_and_wait({
+            "table": "india_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["Google"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["gac_appeals"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["appeals_closed"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 7
+
     def test_india_proactive_rate_is_percent(self):
         # A proactive_rate row carries a percent unit + non-integer value.
         job = _submit_and_wait({
