@@ -240,6 +240,28 @@ _CSER_FIXTURE = {
 }
 seed.build_cser_db(_CSER_FIXTURE, _DB)
 
+# A small slice of the Singapore IMDA Online Safety dataset
+# (singapore-online-safety.json shape): the 'assessment' benchmark (action_rate
+# percent + time_to_action days per service × round) and 'platform_report'
+# per-service Singapore figures (Meta per-category, YouTube by-reason).
+# [service, period, section, category, metric, unit, value]
+_SINGAPORE_FIXTURE = {
+    "columns": ["service", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Facebook", "2023-08..2024-07", "assessment", "", "action_rate", "percent", 53],
+        ["Facebook", "2024-04..2025-03", "assessment", "", "action_rate", "percent", 81],
+        ["Facebook", "2024-04..2025-03", "assessment", "", "time_to_action", "days", 4],
+        ["TikTok", "2023-08..2024-07", "assessment", "", "action_rate", "percent", 39],
+        ["TikTok", "2024-04..2025-03", "assessment", "", "action_rate", "percent", 25],
+        ["Facebook", "2024-04..2025-03", "platform_report", "Hateful Conduct", "content_actioned_sg", "count", 26300],
+        ["Facebook", "2024-04..2025-03", "platform_report", "Hateful Conduct", "proactive_rate_sg", "percent", 90.6],
+        ["YouTube", "2024-04..2025-03", "platform_report", "Child Abuse", "flags_received_sg", "count", 21685],
+        ["YouTube", "2024-04..2025-03", "platform_report", "Child Safety", "videos_removed_sg", "count", 14644],
+        ["X", "2024-04..2025-03", "platform_report", "", "median_time_to_action_hours", "hours", 69],
+    ],
+}
+seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
+
 # A small slice of the Google user-data dataset (google-user-data.json shape).
 # [dataset, period, country, iso2, product, legal_process, assisting_country,
 #  metric, unit, value_low, value_high]

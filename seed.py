@@ -86,6 +86,12 @@ _DEFAULT_TURKEY_SOURCE = os.getenv(
 _DEFAULT_CSER_SOURCE = os.getenv(
     "SEED_CSER_SOURCE_JSON", os.path.join(HERE, "data", "meta-cser.json")
 )
+# Singapore IMDA Online Safety reports — vendored in-repo (from the sibling
+# data repo's singapore-online-safety/build_singapore.py).
+_DEFAULT_SINGAPORE_SOURCE = os.getenv(
+    "SEED_SINGAPORE_SOURCE_JSON",
+    os.path.join(HERE, "data", "singapore-online-safety.json"),
+)
 # Google government requests for user information — vendored in-repo (from the
 # sibling data repo's google-user-data/build_userdata.py).
 _DEFAULT_GOOGLE_UD_SOURCE = os.getenv(
@@ -453,6 +459,24 @@ CREATE TABLE cser_metrics (
     value       REAL
 );
 CREATE INDEX idx_cser_policy ON cser_metrics(policy_area);
+
+-- Singapore IMDA Online Safety reports (singapore-online-safety/
+-- build_singapore.py). Tidy-long: one row per measured value from the six
+-- Designated Social Media Services' annual reports + IMDA's Online Safety
+-- Assessment Reports. Two streams (section): `assessment` (IMDA's normalized
+-- Mystery-Shopper benchmark — action_rate + time_to_action per service × round)
+-- and `platform_report` (each service's own Singapore harm-category figures).
+-- Dims inline.
+CREATE TABLE singapore_metrics (
+    service  TEXT NOT NULL,     -- Facebook / Instagram / TikTok / X / YouTube / HardwareZone
+    period   TEXT NOT NULL,     -- coverage window 'YYYY-MM..YYYY-MM'
+    section  TEXT NOT NULL,     -- assessment / platform_report
+    category TEXT NOT NULL,     -- harm/reason label; '' for assessment metrics
+    metric   TEXT NOT NULL,     -- action_rate, time_to_action, content_actioned_sg, ...
+    unit     TEXT NOT NULL,     -- percent / days / hours / count
+    value    REAL
+);
+CREATE INDEX idx_singapore_section ON singapore_metrics(section);
 
 -- Google government requests for user information (google-user-data/
 -- build_userdata.py). Tidy-long: one row per measured value from the biannual
@@ -1166,6 +1190,36 @@ def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_singapore_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the singapore_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long singapore-online-safety.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("singapore dataset is None")
+    expected_cols = ["service", "period", "section", "category",
+                     "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"singapore dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("singapore dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO singapore_metrics (service, period, section, "
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_cser_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the cser_metrics table in an existing DB at db_path.
 
@@ -1620,6 +1674,8 @@ def main() -> None:
                         help="Path to turkey-law5651.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
+    parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
+                        help="Path to singapore-online-safety.json")
     parser.add_argument("--google-ud-source", default=_DEFAULT_GOOGLE_UD_SOURCE,
                         help="Path to google-user-data.json")
     parser.add_argument("--microsoft-source", default=_DEFAULT_MICROSOFT_SOURCE,
@@ -1772,6 +1828,17 @@ def main() -> None:
               f"{len({r[3] for r in cser_data['rows']})} quarters")
     else:
         print(f"  (skipping Meta CSER — not found: {args.cser_source})")
+
+    if os.path.isfile(args.singapore_source):
+        with open(args.singapore_source, "r", encoding="utf-8") as f:
+            singapore_data = json.load(f)
+        singapore_rows = build_singapore_db(singapore_data, args.db)
+        print(f"  singapore online safety: {singapore_rows} metric rows across "
+              f"{len({r[0] for r in singapore_data['rows']})} services, "
+              f"{len({r[2] for r in singapore_data['rows']})} sections")
+    else:
+        print(f"  (skipping Singapore online safety — not found: "
+              f"{args.singapore_source})")
 
     if os.path.isfile(args.google_ud_source):
         with open(args.google_ud_source, "r", encoding="utf-8") as f:

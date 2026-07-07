@@ -1213,6 +1213,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "singapore_metrics": TableSpec(
+        "Singapore IMDA Online Safety reports — the annual online safety reports the six Designated Social Media Services (Facebook, Instagram, TikTok, X, YouTube, HardwareZone) file under Singapore's Code of Practice for Online Safety (Broadcasting Act), plus IMDA's own Online Safety Assessment Reports (OSAR) benchmarking them. One row per measured value, identified by service × period × section × category × metric. Two streams (section): 'assessment' (IMDA's normalized, cross-service Mystery-Shopper benchmark — 'action_rate' on legitimate user reports, in percent, and 'time_to_action', in days, per service for the 2024 and 2025 rounds) and 'platform_report' (each service's own Singapore-specific figures for 2024-04..2025-03, heterogeneous per vendor: Meta's per-category content_actioned_sg + proactive_rate_sg, YouTube's by-reason flags_received_sg / videos_removed_sg, TikTok's headline figures, X's median_time_to_action_hours). Metric names in 'platform_report' are each vendor's own and are NOT comparable across services. Pin service, section AND metric before aggregating, and never SUM across the count / percent / days / hours unit mix.",
+        "FROM singapore_metrics f",
+        {
+            "service":  "f.service",
+            "period":   "f.period",
+            "section":  "f.section",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "google_userdata_metrics": TableSpec(
         "Google government requests for user information — the biannual bulk export of Google's Transparency Report user-data section (2009-H2 onward): requests, accounts and percentage-disclosed per country × legal process (dataset 'global'), the diplomatic/MLAT slice, Enterprise Cloud (GCP / Google Workspace) requests, and the US national-security figures (FISA content / FISA non-content / NSLs), which are banded ranges (value_low != value_high, non-additive). A tidy-long table: one row per measured value. Caution: 2012-H2..2014-H1 report an 'All' legal_process aggregate alongside the per-process split — pin legal_process before summing, and never SUM percent rows.",
         "FROM google_userdata_metrics f",
@@ -2423,6 +2438,12 @@ def cser_page() -> FileResponse:
     return _serve_page("cser.html", "Meta CSER page")
 
 
+@app.get("/singapore", response_class=HTMLResponse)
+def singapore_page() -> FileResponse:
+    """Serve the Singapore IMDA Online Safety dataset page (reads POST /api/explore)."""
+    return _serve_page("singapore.html", "Singapore online safety page")
+
+
 @app.get("/user-data", response_class=HTMLResponse)
 def user_data_page() -> FileResponse:
     """Serve the Google user-data requests dataset page (reads POST /api/explore)."""
@@ -2535,6 +2556,7 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "taiwan": ("taiwan.html", "Taiwan anti-fraud page", {}),
     "turkey": ("turkey.html", "Turkey Law 5651 page", {}),
     "cser": ("cser.html", "Meta CSER page", {}),
+    "singapore": ("singapore.html", "Singapore online safety page", {}),
     "user-data": ("user-data.html", "Google user data page", {}),
     "microsoft": ("microsoft.html", "Microsoft requests page", {}),
     "linkedin": ("linkedin.html", "LinkedIn requests page", {}),
@@ -3847,6 +3869,31 @@ def _leg_warnings(
                 "alongside the individual policy areas, so summing over "
                 "'policy_area' double-counts. Filter or group by 'policy_area' "
                 "(and exclude 'Cross-Policy Data')."
+            )
+    # singapore_metrics mixes IMDA's normalized benchmark (percent / days) with
+    # each service's own harm-category figures (counts), and the per-service
+    # metric names aren't comparable across services.
+    if table == "singapore_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'singapore_metrics' spans IMDA's cross-service 'assessment' "
+                "benchmark and each service's own 'platform_report' figures; "
+                "this aggregate pins no 'section'. Filter or group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'singapore_metrics' reports distinct metrics in incompatible "
+                "units (action_rate percent, time_to_action days, content "
+                "counts, median hours) that aren't comparable; this aggregate "
+                "pins no 'metric'. Filter or group by 'metric'."
+            )
+        if "service" not in pinned:
+            out.append(
+                "'singapore_metrics' platform_report metric names are each "
+                "vendor's own and aren't comparable across services; this "
+                "aggregate pins no 'service'. Filter or group by 'service'."
             )
     # linkedin_metrics mixes counts, percentages and banded national-security
     # ranges in one value column, across three report datasets.

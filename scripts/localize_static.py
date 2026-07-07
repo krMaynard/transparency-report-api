@@ -10998,6 +10998,33 @@ _MANDATES_NAV = {
 for _loc, _lbl in _MANDATES_NAV.items():
     COMMON[_loc].append(("      Reporting mandates\n    </a>", f"      {_lbl}\n    </a>"))
 
+# Singapore IMDA Online Safety — the dataset page itself is English-only for now
+# (a dense, chart-heavy page), like /mandates: its nav link points at the English
+# page (not in INTERNAL_HREFS) so it isn't locale-prefixed. Only the sidebar-nav
+# label and the home feature-card are localized, so the home/nav pages stay
+# leak-free.
+_SG_NAV = {
+    "es": "Singapur", "fr": "Singapour", "de": "Singapur", "it": "Singapore",
+    "ja": "シンガポール", "zh": "新加坡", "ko": "싱가포르",
+}
+_SG_CARD_DESC_EN = ("The annual online safety reports the six designated services file "
+                    "under Singapore’s Code of Practice for Online Safety, plus IMDA’s "
+                    "cross-service benchmark — action rate and time to action, and each "
+                    "service’s Singapore harm-category figures.")
+_SG_CARD_DESC = {
+    "es": "Los informes anuales de seguridad en línea que los seis servicios designados presentan conforme al Código de Prácticas de Seguridad en Línea de Singapur, más el punto de referencia comparativo de la IMDA: tasa de acción y tiempo de respuesta, y las cifras por categoría de daño en Singapur de cada servicio.",
+    "fr": "Les rapports annuels de sécurité en ligne que les six services désignés déposent au titre du Code de pratique pour la sécurité en ligne de Singapour, plus l'analyse comparative inter-services de l'IMDA : taux d'action et délai de traitement, et les chiffres par catégorie de préjudice à Singapour de chaque service.",
+    "de": "Die jährlichen Online-Sicherheitsberichte, die die sechs benannten Dienste nach Singapurs Code of Practice for Online Safety einreichen, plus IMDAs dienstübergreifender Vergleich — Handlungsquote und Bearbeitungszeit sowie die Singapur-Zahlen jedes Dienstes nach Schadenskategorie.",
+    "it": "I report annuali sulla sicurezza online che i sei servizi designati presentano ai sensi del Code of Practice for Online Safety di Singapore, più il benchmark tra servizi dell'IMDA: tasso di azione e tempo di intervento, e le cifre per categoria di danno a Singapore di ciascun servizio.",
+    "ja": "指定された6サービスがシンガポールのオンライン安全行動規範に基づき提出する年次オンライン安全レポートと、IMDA のサービス横断ベンチマーク（対応率と対応時間）、および各サービスのシンガポールにおける危害カテゴリ別の数値。",
+    "zh": "六家指定服务依据新加坡《在线安全行为准则》提交的年度在线安全报告，以及 IMDA 的跨服务基准——处理率与处理时长，还有各服务在新加坡按危害类别列出的数据。",
+    "ko": "지정된 6개 서비스가 싱가포르 온라인 안전 실무규범에 따라 제출하는 연례 온라인 안전 보고서와 IMDA의 서비스 간 벤치마크(조치율·조치 시간), 그리고 각 서비스의 싱가포르 피해 유형별 수치.",
+}
+for _loc in _SG_NAV:
+    COMMON[_loc].append(("      Singapore\n    </a>", f"      {_SG_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Singapore</h3>", f"<h3>{_SG_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_SG_CARD_DESC_EN, _SG_CARD_DESC[_loc]))
+
 
 # ── Türkiye Law No. 5651 platform transparency reports page ──────────────────
 # Sidebar-nav label + home feature-card, then the page-unique strings; shared
