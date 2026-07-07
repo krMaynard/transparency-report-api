@@ -251,7 +251,7 @@ seed.build_tco_db(_TCO_FIXTURE, _DB)
 # A small slice of the EU AI Act training-data transparency dataset
 # (ai-training-transparency.json shape): the modality size bands (with the
 # comparable size_rank), the general fields and the data-source flags for a
-# Google model and a Microsoft model.
+# Google, a Meta and a Microsoft model (Meta adds the crawled/user_data sources).
 _AI_TRAINING_FIXTURE = {
     "columns": ["provider", "model", "released", "section", "field", "value", "size_rank"],
     "rows": [
@@ -263,6 +263,10 @@ _AI_TRAINING_FIXTURE = {
          "01/2025", None],
         ["Google", "Gemini 3 Pro family", "November 2025", "data_source", "publicly_available",
          "Yes", None],
+        ["Meta", "Muse Spark", "April 2026", "modality", "Text",
+         "More than 10 trillion tokens", 3],
+        ["Meta", "Muse Spark", "April 2026", "data_source", "user_data", "Yes", None],
+        ["Meta", "Muse Spark", "April 2026", "data_source", "crawled", "Yes", None],
         ["Microsoft", "phi-4", "12-Dec-2024", "modality", "Text",
          "1 billion to 10 trillion tokens", 2],
         ["Microsoft", "phi-4", "12-Dec-2024", "modality", "Image",

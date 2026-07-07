@@ -613,7 +613,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Art. 53(1)(d) · GPAI · 2025 –</span>
     <h1>EU AI Act — AI training-data transparency</h1>
-    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Microsoft).</p>
+    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Meta + Microsoft).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -625,7 +625,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Text training-data size, by model</h3>
-        <p class="chart-sub">The banded size of each model's text training data, as a comparable rank (1–3). Google's Gemini 3 Pro discloses the largest band (&ldquo;more than 10 trillion tokens&rdquo;); Microsoft's Phi-4 models disclose the middle band.</p>
+        <p class="chart-sub">The banded size of each model's text training data, as a comparable rank (1–3). Google's Gemini 3 Pro and Meta's Muse Spark disclose the largest band (&ldquo;more than 10 trillion tokens&rdquo;); Microsoft's Phi-4 models disclose the middle band.</p>
         <div class="chart-loading" id="text-loading">Loading…</div>
         <canvas id="chart-text" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-text-table" class="sr-only"></div>
@@ -958,8 +958,8 @@ display: flex; align-items: center; justify-content: space-between;
       showError('bandsTable', "Failed to load size bands: " + err.message);
     }
     try {
-      var cols = ["data_cutoff", "publicly_available", "commercially_licensed", "third_party_private", "personal_data", "synthetic"];
-      var labels = ["Data cut-off", "Publicly available", "Commercially licensed", "Third-party private", "Personal data", "Synthetic"];
+      var cols = ["data_cutoff", "publicly_available", "commercially_licensed", "third_party_private", "personal_data", "crawled", "user_data", "synthetic"];
+      var labels = ["Data cut-off", "Publicly available", "Commercially licensed", "Third-party private", "Personal data", "Crawled", "User data", "Synthetic"];
       var d2 = await explore({"table":"ai_training_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["general","data_source"]}]},"fields":["provider","model","field","value"],"max_count":200});
       renderMatrix('sourcesTable', d2.rows || [], cols, labels,
         "Data-acquisition cut-off and data-source categories disclosed by each model.");

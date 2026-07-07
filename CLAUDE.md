@@ -409,10 +409,14 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   three bands, 0 = "Not applicable", so coarse sizes are **numerically comparable
   across providers**), **`general`** (`data_cutoff`, `ongoing_collection`) and
   **`data_source`** (`publicly_available`/`commercially_licensed`/
-  `third_party_private`/`personal_data`/`synthetic`; `value` = Yes/No/…).
+  `third_party_private`/`personal_data`/`crawled`/`user_data`/`synthetic`;
+  `value` = Yes/No/…).
   `value` is text; `size_rank` is an **ordinal rank** — compare it with
   MIN/MAX/AVG, **never SUM** (`_leg_warnings` warns on a `size_rank` SUM).
-  Coverage is a starting, expandable set (Google + Microsoft; 4 model entries).
+  Coverage is a starting, expandable set (Google + Meta + Microsoft; 5 model
+  entries) — Meta's is filed on the AI Office's full template (Image & Video
+  grouped as one "Perception" modality, recorded on both rows; `crawled` /
+  `user_data` data-source categories the others don't break out).
   The `/ai-training` dataset page is English-only (like `/mandates`).
 - **Meta Community Standards Enforcement Report (CSER)** — a single **tidy-long**
   `cser_metrics` table (one row per measured value: `app`/`policy_area`/`metric`/
