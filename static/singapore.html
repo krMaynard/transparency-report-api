@@ -276,13 +276,13 @@ display: flex; align-items: center; justify-content: space-between;
       </summary>
       <ul class="lang-menu">
         <li><a class="lang-opt is-current" href="/singapore" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/es/singapore"><span>Español</span></a></li>
-        <li><a class="lang-opt" href="/fr/singapore"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/singapore"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/it/singapore"><span>Italiano</span></a></li>
-        <li><a class="lang-opt" href="/ja/singapore"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/singapore"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/singapore"><span>한국어</span></a></li>
+        <li><a class="lang-opt" href="/es"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it"><span>Italiano</span></a></li>
+        <li><a class="lang-opt" href="/ja"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko"><span>한국어</span></a></li>
       </ul>
     </details>
   </div>
@@ -957,7 +957,7 @@ display: flex; align-items: center; justify-content: space-between;
   }
   load();
 
-  var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
+  var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
   Promise.all([soft(AR_Q()), soft(TTA_Q()), soft(YT_Q()), soft(META_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2], cs[3]);
     renderAssessment(cs[0].rows, cs[1].rows);
