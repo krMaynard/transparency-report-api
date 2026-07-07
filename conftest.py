@@ -248,6 +248,31 @@ _TCO_FIXTURE = {
 }
 seed.build_tco_db(_TCO_FIXTURE, _DB)
 
+# A small slice of the EU AI Act training-data transparency dataset
+# (ai-training-transparency.json shape): the modality size bands (with the
+# comparable size_rank), the general fields and the data-source flags for a
+# Google model and a Microsoft model.
+_AI_TRAINING_FIXTURE = {
+    "columns": ["provider", "model", "released", "section", "field", "value", "size_rank"],
+    "rows": [
+        ["Google", "Gemini 3 Pro family", "November 2025", "modality", "Text",
+         "More than 10 trillion tokens", 3],
+        ["Google", "Gemini 3 Pro family", "November 2025", "modality", "Image",
+         "More than 1 billion images", 3],
+        ["Google", "Gemini 3 Pro family", "November 2025", "general", "data_cutoff",
+         "01/2025", None],
+        ["Google", "Gemini 3 Pro family", "November 2025", "data_source", "publicly_available",
+         "Yes", None],
+        ["Microsoft", "phi-4", "12-Dec-2024", "modality", "Text",
+         "1 billion to 10 trillion tokens", 2],
+        ["Microsoft", "phi-4", "12-Dec-2024", "modality", "Image",
+         "Not applicable. Images are not part of the training", 0],
+        ["Microsoft", "phi-4", "12-Dec-2024", "general", "data_cutoff",
+         "30-Jun-2024", None],
+    ],
+}
+seed.build_ai_training_db(_AI_TRAINING_FIXTURE, _DB)
+
 # A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
 # Instagram, a couple of policy areas and quarters, mixing count metrics
 # (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),

@@ -86,6 +86,11 @@ _DEFAULT_TURKEY_SOURCE = os.getenv(
 _DEFAULT_TCO_SOURCE = os.getenv(
     "SEED_TCO_SOURCE_JSON", os.path.join(HERE, "data", "tco-regulation.json")
 )
+# EU AI Act training-data transparency summaries (ai-training-transparency/
+# build_ai_training.py).
+_DEFAULT_AI_TRAINING_SOURCE = os.getenv(
+    "SEED_AI_TRAINING_SOURCE_JSON", os.path.join(HERE, "data", "ai-training-transparency.json")
+)
 # Meta Community Standards Enforcement Report — vendored in-repo (from the
 # sibling data repo's meta-cser/build_cser.py).
 _DEFAULT_CSER_SOURCE = os.getenv(
@@ -484,6 +489,23 @@ CREATE TABLE tco_metrics (
     value     REAL
 );
 CREATE INDEX idx_tco_role ON tco_metrics(role);
+
+-- EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency summaries
+-- (ai-training-transparency/build_ai_training.py). Tidy-long: one row per
+-- disclosed field of a GPAI provider's public training-content summary. `section`
+-- is 'modality' (field = Text/Image/Audio/Video/Other; value = banded size;
+-- size_rank 1/2/3, 0 = not applicable), 'general' (data_cutoff/ongoing_collection)
+-- or 'data_source' (publicly_available/commercially_licensed/…; value Yes/No).
+CREATE TABLE ai_training_metrics (
+    provider  TEXT NOT NULL,    -- GPAI provider: Google / Microsoft / …
+    model     TEXT NOT NULL,    -- versioned model (family) name
+    released  TEXT,             -- model release / market-placement date (as disclosed)
+    section   TEXT NOT NULL,    -- modality / general / data_source
+    field     TEXT NOT NULL,    -- Text/Image/…/data_cutoff/publicly_available/…
+    value     TEXT,             -- the disclosed value (size band / date / Yes/No)
+    size_rank INTEGER           -- 1/2/3 band rank for modality sizes (0 = n/a), else NULL
+);
+CREATE INDEX idx_ai_training_model ON ai_training_metrics(model);
 
 -- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
 -- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
@@ -1292,6 +1314,36 @@ def build_tco_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_ai_training_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the ai_training_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long ai-training-transparency.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("ai training dataset is None")
+    expected_cols = ["provider", "model", "released", "section",
+                     "field", "value", "size_rank"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"ai training dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("ai training dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ai_training_metrics (provider, model, released, "
+                "section, field, value, size_rank) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_singapore_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the singapore_metrics table in an existing DB at db_path.
 
@@ -1844,6 +1896,8 @@ def main() -> None:
                         help="Path to turkey-law5651.json")
     parser.add_argument("--tco-source", default=_DEFAULT_TCO_SOURCE,
                         help="Path to tco-regulation.json")
+    parser.add_argument("--ai-training-source", default=_DEFAULT_AI_TRAINING_SOURCE,
+                        help="Path to ai-training-transparency.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
@@ -2002,6 +2056,15 @@ def main() -> None:
               f"{len({r[0] for r in tco_data['rows']})} publishers")
     else:
         print(f"  (skipping TCO Regulation — not found: {args.tco_source})")
+
+    if os.path.isfile(args.ai_training_source):
+        with open(args.ai_training_source, "r", encoding="utf-8") as f:
+            ai_data = json.load(f)
+        ai_rows = build_ai_training_db(ai_data, args.db)
+        print(f"  ai training transparency: {ai_rows} rows across "
+              f"{len({r[1] for r in ai_data['rows']})} models")
+    else:
+        print(f"  (skipping AI training transparency — not found: {args.ai_training_source})")
 
     if os.path.isfile(args.cser_source):
         with open(args.cser_source, "r", encoding="utf-8") as f:

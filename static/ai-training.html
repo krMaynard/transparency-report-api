@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>일본 정보유통플랫폼대처법(情プラ法) — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) implementation statistics — LY Corporation's Media Transparency Report: posts, removals and removal rate per service." />
+<title>EU AI Act — AI training-data transparency — Transparency Report API</title>
+<meta name="description" content="EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency — cross-provider public summaries of AI training content: per-modality data-size bands and data-source disclosures." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -254,35 +254,35 @@ display: flex; align-items: center; justify-content: space-between;
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">본문 바로가기</a>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <!-- ── Site banner ──────────────────────────────────────────────────────── -->
 <div class="page-header">
-<nav class="site-nav" aria-label="사이트">
+<nav class="site-nav" aria-label="Site">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">경력</a>
-      <a href="https://kieranmaynard.com/transparency.html">제품</a>
-      <a href="https://kieranmaynard.com/consulting.html">컨설팅</a>
-      <a href="https://kieranmaynard.com/blog.html">블로그</a>
-      <a href="https://kieranmaynard.com/contact.html">문의하기</a>
+      <a href="https://kieranmaynard.com/work.html">Work</a>
+      <a href="https://kieranmaynard.com/transparency.html">Products</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
+      <a href="https://kieranmaynard.com/blog.html">Blog</a>
+      <a href="https://kieranmaynard.com/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="언어" title="언어">
+      <summary class="lang-current" aria-label="Language" title="Language">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>한국어</span>
+        <span>English</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/japan"><span>English</span></a></li>
-        <li><a class="lang-opt" href="/es/japan"><span>Español</span></a></li>
-        <li><a class="lang-opt" href="/fr/japan"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/japan"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt" href="/it/japan"><span>Italiano</span></a></li>
-        <li><a class="lang-opt" href="/ja/japan"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/japan"><span>中文</span></a></li>
-        <li><a class="lang-opt is-current" href="/ko/japan" aria-current="page"><span>한국어</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt is-current" href="/ai-training" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/es"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it"><span>Italiano</span></a></li>
+        <li><a class="lang-opt" href="/ja"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko"><span>한국어</span></a></li>
       </ul>
     </details>
   </div>
@@ -290,15 +290,15 @@ display: flex; align-items: center; justify-content: space-between;
 
 <header class="topbar">
   <div class="topbar-left">
-    <button type="button" class="hamburger" id="hamburger" aria-label="내비게이션 전환" aria-expanded="false" aria-controls="sidebar">
+    <button type="button" class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/ko/" class="topbar-brand">Transparency Report API</a>
+    <a href="/" class="topbar-brand">Transparency Report API</a>
   </div>
   <div class="topbar-right">
-    <button type="button" class="theme-toggle" aria-label="다크 모드 전환" aria-pressed="false" data-theme-toggle>
+    <button type="button" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false" data-theme-toggle>
       <svg class="theme-icon-dark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
     </button>
@@ -308,18 +308,18 @@ display: flex; align-items: center; justify-content: space-between;
 
 <div class="app-body">
 
-<aside class="sidebar" id="sidebar" aria-label="애플리케이션 내비게이션">
+<aside class="sidebar" id="sidebar" aria-label="Application navigation">
   <nav>
-    <a href="/ko/" class="nav-item">
+    <a href="/" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
       </svg>
-      홈
+      Home
     </a>
 
-    <div class="nav-section">규제</div>
+    <div class="nav-section">Regulatory</div>
 
-    <a href="/ko/reports" class="nav-item">
+    <a href="/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
@@ -328,7 +328,7 @@ display: flex; align-items: center; justify-content: space-between;
       DSA
     </a>
 
-    <a href="/ko/ny-tos" class="nav-item">
+    <a href="/ny-tos" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h6l3 3v9.5a.5.5 0 0 1-.5.5h-8.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5z"/>
         <path d="M9.25 1.9v3.1h3.1M5.25 8.5h5.5M5.25 11h5.5" stroke-linecap="round"/>
@@ -336,7 +336,7 @@ display: flex; align-items: center; justify-content: space-between;
       NY ToS
     </a>
 
-    <a href="/ko/ca-ab587" class="nav-item">
+    <a href="/ca-ab587" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
         <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
@@ -344,36 +344,36 @@ display: flex; align-items: center; justify-content: space-between;
       CA AB 587
     </a>
 
-    <a href="/ko/india" class="nav-item">
+    <a href="/india" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3.25" y="2.75" width="9.5" height="11.5" rx="1"/>
         <path d="M6 1.5h4v2.5H6zM5.5 7.25h5M5.5 9.75h5M5.5 12.25h3" stroke-linecap="round"/>
       </svg>
-      인도 IT 규칙
+      India IT Rules
     </a>
 
-    <a href="/ko/korea" class="nav-item">
+    <a href="/korea" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.25 3.25h11.5v7.5H8.25l-3 2.75v-2.75h-2a.999.999 0 0 1-1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
       </svg>
-      한국
+      Korea
     </a>
 
-    <a href="/ko/taiwan" class="nav-item">
+    <a href="/taiwan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 2.1 14.6 13.4H1.4L8 2.1z" stroke-linejoin="round"/>
         <path d="M8 6.6v3M8 11.7h.01" stroke-linecap="round"/>
       </svg>
-      대만 사기 방지
+      Taiwan Anti-Fraud
     </a>
 
-    <a href="/ko/turkey" class="nav-item">
+    <a href="/turkey" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M10.6 3.2a5 5 0 1 0 0 9.6 4 4 0 0 1 0-9.6z"/>
         <path d="M12.4 6.0l1.3 1-1.5.5.1 1.6-1-1.2-1.5.5.8-1.4-.9-1.2 1.6.3z" stroke-linejoin="round"/>
       </svg>
-      튀르키예 5651호법
+      Türkiye Law 5651
     </a>
 
     <a href="/singapore" class="nav-item">
@@ -381,15 +381,15 @@ display: flex; align-items: center; justify-content: space-between;
         <path d="M8 1.75 3.25 3.5v4.1c0 2.9 2 5.4 4.75 6.15 2.75-.75 4.75-3.25 4.75-6.15V3.5L8 1.75z" stroke-linejoin="round"/>
         <path d="M6 7.6 7.4 9l2.6-2.9" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      싱가포르
+      Singapore
     </a>
 
-    <a href="/ko/japan" class="nav-item is-active" aria-current="page">
+    <a href="/japan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.5 3.25h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6.5l-3 2.25V11.25h-1a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
       </svg>
-      일본 情プラ法
+      Japan 情プラ法
     </a>
 
     <a href="/tco" class="nav-item">
@@ -400,7 +400,7 @@ display: flex; align-items: center; justify-content: space-between;
       EU TCO
     </a>
 
-    <a href="/ai-training" class="nav-item">
+    <a href="/ai-training" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
         <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
@@ -414,51 +414,51 @@ display: flex; align-items: center; justify-content: space-between;
         <path d="M4 4.4 2 8.8h4L4 4.4zM12 4.4l-2 4.4h4l-2-4.4z" stroke-linejoin="round"/>
         <path d="M5.5 13.6h5" stroke-linecap="round"/>
       </svg>
-      보고 의무
+      Reporting mandates
     </a>
 
-    <div class="nav-section">플랫폼 투명성</div>
+    <div class="nav-section">Platform transparency</div>
 
-    <a href="/ko/tiktok-cger" class="nav-item">
+    <a href="/tiktok-cger" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
       </svg>
-      TikTok — 집행
+      TikTok — Enforcement
     </a>
 
-    <a href="/ko/cser" class="nav-item">
+    <a href="/cser" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75c-2.6 1.4-4.3 1.6-5.25 1.6v4.9c0 3 2.15 4.85 5.25 6 3.1-1.15 5.25-3 5.25-6v-4.9C12.3 3.35 10.6 3.15 8 1.75z" stroke-linejoin="round"/>
         <path d="M5.9 8.1 7.3 9.5l3-3.1" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Meta — 집행
+      Meta — Enforcement
     </a>
 
-    <a href="/ko/removals" class="nav-item">
+    <a href="/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Google — 삭제
+      Google — Removals
     </a>
 
-    <a href="/ko/user-data" class="nav-item">
+    <a href="/user-data" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1.75a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2zM2.4 13.6c0-2.6 2.5-4.1 5.6-4.1s5.6 1.5 5.6 4.1v.65H2.4z"/>
       </svg>
-      Google — 사용자 데이터
+      Google — User Data
     </a>
 
-    <a href="/ko/disruptions" class="nav-item">
+    <a href="/disruptions" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 13.4h.01" stroke-linecap="round"/>
         <path d="M5.4 10.8a3.7 3.7 0 0 1 5.2 0M3 8.4a7 7 0 0 1 10 0" stroke-linecap="round"/>
         <path d="M2.4 2.4l11.2 11.2" stroke-linecap="round"/>
       </svg>
-      Google — 중단
+      Google — Disruptions
     </a>
 
-    <a href="/ko/android" class="nav-item">
+    <a href="/android" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75 3 3.4v3.9c0 3 2.1 5.6 5 6.45 2.9-.85 5-3.45 5-6.45V3.4L8 1.75z" stroke-linejoin="round"/>
         <path d="M5.8 8.1 7.3 9.6l3-3.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -466,7 +466,7 @@ display: flex; align-items: center; justify-content: space-between;
       Google — Android
     </a>
 
-    <a href="/ko/apple" class="nav-item">
+    <a href="/apple" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="4.25" y="1.75" width="7.5" height="12.5" rx="1.5"/>
         <path d="M6.75 12.5h2.5" stroke-linecap="round"/>
@@ -474,21 +474,21 @@ display: flex; align-items: center; justify-content: space-between;
       Apple
     </a>
 
-    <a href="/ko/snap" class="nav-item">
+    <a href="/snap" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.9c-1.85 0-3 1.35-3 3.25 0 1.15.2 1.75-.35 2.35-.4.45-1.15.45-1.15.95 0 .5.95.65 1.3.9.3.55-.45 1.1-.15 1.5.3.35 1.05-.1 1.65.2.5.25.85 1.1 1.85 1.1s1.35-.85 1.85-1.1c.6-.3 1.35.15 1.65-.2.3-.4-.45-.95-.15-1.5.35-.25 1.3-.4 1.3-.9 0-.5-.75-.5-1.15-.95-.55-.6-.35-1.2-.35-2.35 0-1.9-1.15-3.25-3-3.25z"/>
       </svg>
       Snap
     </a>
 
-    <a href="/ko/github" class="nav-item">
+    <a href="/github" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
       </svg>
       GitHub
     </a>
 
-    <a href="/ko/microsoft" class="nav-item">
+    <a href="/microsoft" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="2" y="2" width="5.4" height="5.4"/>
         <rect x="8.6" y="2" width="5.4" height="5.4"/>
@@ -498,7 +498,7 @@ display: flex; align-items: center; justify-content: space-between;
       Microsoft
     </a>
 
-    <a href="/ko/linkedin" class="nav-item">
+    <a href="/linkedin" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="5" width="12" height="8.75" rx="1.25"/>
         <path d="M5.75 5V3.5A1.25 1.25 0 0 1 7 2.25h2a1.25 1.25 0 0 1 1.25 1.25V5M2 8.25h12" stroke-linecap="round"/>
@@ -506,14 +506,14 @@ display: flex; align-items: center; justify-content: space-between;
       LinkedIn
     </a>
 
-    <a href="/ko/tiktok" class="nav-item">
+    <a href="/tiktok" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
       </svg>
       TikTok
     </a>
 
-    <a href="/ko/discord" class="nav-item">
+    <a href="/discord" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M13.35 3.5A12.3 12.3 0 0 0 10.3 2.5l-.16.31a11.4 11.4 0 0 1 2.7.87A9.6 9.6 0 0 0 8 2.6a9.6 9.6 0 0 0-4.84 1.08 11.4 11.4 0 0 1 2.7-.87L5.7 2.5a12.3 12.3 0 0 0-3.05 1A13 13 0 0 0 .8 11.6a11 11 0 0 0 3.35 1.7l.5-.83a7.5 7.5 0 0 1-1.18-.57l.29-.22a6.8 6.8 0 0 0 5.85 0l.29.22a7.5 7.5 0 0 1-1.18.57l.5.83A11 11 0 0 0 15.2 11.6a13 13 0 0 0-1.85-8.1zM5.65 9.9c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.5 1.23-1.1 1.23zm4.7 0c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.49 1.23-1.1 1.23z"/>
       </svg>
@@ -521,68 +521,68 @@ display: flex; align-items: center; justify-content: space-between;
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">도구</div>
+    <div class="nav-section">Tools</div>
 
-    <a href="/ko/api-key" class="nav-item">
+    <a href="/api-key" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
       </svg>
-      API 키
+      API key
     </a>
 
     <a href="/docs" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
         <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
       </svg>
-      API 레퍼런스
+      API Reference
     </a>
 
-    <a href="/ko/mcp" class="nav-item">
+    <a href="/mcp" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
         <rect x="2" y="9" width="12" height="4.5" rx="1"/>
         <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
       </svg>
-      MCP 서버
+      MCP server
     </a>
 
-    <a href="/ko/catalog" class="nav-item">
+    <a href="/catalog" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      보고서 위치
+      Report locations
     </a>
 
-    <a href="/ko/narratives" class="nav-item">
+    <a href="/narratives" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
         <path d="M10.4 10.4 14 14" stroke-linecap="round"/>
       </svg>
-      본문 검색
+      Narrative search
     </a>
 
-    <a href="/ko/schema" class="nav-item">
+    <a href="/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
       </svg>
-      스키마
+      Schema
     </a>
 
-    <a href="/ko/methodology" class="nav-item">
+    <a href="/methodology" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
         <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
       </svg>
-      방법론
+      Methodology
     </a>
 
-    <a href="/ko/privacy" class="nav-item">
+    <a href="/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
-      개인정보
+      Privacy
     </a>
 
     <hr class="nav-hr">
@@ -601,7 +601,7 @@ display: flex; align-items: center; justify-content: space-between;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">제작: <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/ko/privacy">개인정보</a></div>
+  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -611,67 +611,59 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY 코퍼레이션 · 연간 · 2024회계연도</span>
-    <h1>일본 — 정보유통플랫폼대처법(情プラ法)</h1>
-    <p>일본의 개정된 제공자 책임제한법 — <strong>정보유통플랫폼대처법</strong>(情プラ法, 2025년 4월 시행) — 은 총무성이 지정한 대규모 제공자에게 연례 콘텐츠 관리 통계를 공개하도록 의무화합니다(제28조). 현재 수치를 공개하는 지정 제공자는 <strong>LY 코퍼레이션</strong>뿐이며(Google·Meta·TikTok·X는 정성적 기준 페이지만 공개), 본 데이터는 이 회사의 2024회계연도 미디어 투명성 보고서에서 다섯 개 서비스(Yahoo! 지혜주머니, Yahoo! 파이낸스 게시판, LINE 오픈챗, LINE VOOM, Yahoo! 뉴스 댓글)를 다룹니다. tidy-long 데이터셋으로, 각 행은 서비스 × 기간 × 지표(<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>)로 식별되는 하나의 측정값입니다. 집계 전에 지표를 고정하세요 — 게시물·삭제·비율은 비교할 수 없고, 비율은 절대 합산하지 말며, 분기를 연간 합계에 더하지 마세요.</p>
+    <span class="badge">Art. 53(1)(d) · GPAI · 2025 –</span>
+    <h1>EU AI Act — AI training-data transparency</h1>
+    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Microsoft).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
   <section class="data-section" aria-label="Charts">
-    <h2>트렌드</h2>
-    <p class="sub">보고된 수치의 인터랙티브 보기입니다. 각 차트에는 스크린 리더용 텍스트 대체가 제공됩니다.</p>
+    <h2>Disclosed training-data size</h2>
+    <p class="sub">Interactive views of the disclosed size bands. Each chart has a text alternative for screen readers. Size rank: <strong>1</strong> = smallest band (&ldquo;less than …&rdquo;), <strong>2</strong> = middle range, <strong>3</strong> = largest (&ldquo;more than …&rdquo;); <strong>0</strong> = the modality is not part of the training data.</p>
     <div class="chart-grid">
 
       <div class="chart-card wide">
-        <h3>분기별 삭제율(서비스별)</h3>
-        <p class="chart-sub">2024회계연도 각 분기의 게시물 삭제율(投稿削除割合)을 서비스마다 한 선으로 표시. 규모가 크게 다른 서비스 간에도 비교 가능한 비율입니다.</p>
-        <div class="chart-loading" id="rate-loading">불러오는 중…</div>
-        <canvas id="chart-rate" height="150" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-rate-table" class="sr-only"></div>
+        <h3>Text training-data size, by model</h3>
+        <p class="chart-sub">The banded size of each model's text training data, as a comparable rank (1–3). Google's Gemini 3 Pro discloses the largest band (&ldquo;more than 10 trillion tokens&rdquo;); Microsoft's Phi-4 models disclose the middle band.</p>
+        <div class="chart-loading" id="text-loading">Loading…</div>
+        <canvas id="chart-text" height="150" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-text-table" class="sr-only"></div>
       </div>
 
-      <div class="chart-card">
-        <h3>삭제된 게시물(2024회계연도, 서비스별)</h3>
-        <p class="chart-sub">2024회계연도 게시물 삭제 건수(投稿削除件数) 합계를 서비스별로 표시.</p>
-        <div class="chart-loading" id="rem-loading">불러오는 중…</div>
-        <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-rem-table" class="sr-only"></div>
-      </div>
-
-      <div class="chart-card">
-        <h3>분기별 삭제 게시물 — LINE 오픈챗</h3>
-        <p class="chart-sub">오픈챗은 가장 큰 서비스이므로 분기별 삭제 수를 별도의 축으로 표시합니다.</p>
-        <div class="chart-loading" id="oc-loading">불러오는 중…</div>
-        <canvas id="chart-oc" height="220" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-oc-table" class="sr-only"></div>
+      <div class="chart-card wide">
+        <h3>Disclosed size rank, by modality</h3>
+        <p class="chart-sub">The comparable size rank each model discloses for each modality. A rank of 0 means the model does not train on that modality (e.g. the text-only Phi-4).</p>
+        <div class="chart-loading" id="mod-loading">Loading…</div>
+        <canvas id="chart-mod" height="160" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-mod-table" class="sr-only"></div>
       </div>
 
     </div>
   </section>
 
   <section class="data-section">
-    <h2>2024회계연도 요약(서비스별)</h2>
-    <p class="sub">각 서비스의 연간 합계: 게시물 수, 삭제 수, 삭제율. 게시물과 삭제는 건수, 비율은 백분율입니다 — 서로 합산하지 마세요.</p>
-    <div class="results" id="summaryTable" aria-busy="true">
-      <div class="results-loading">불러오는 중…</div>
+    <h2>Training-data size bands disclosed</h2>
+    <p class="sub">The exact size band each summary discloses per modality, as filed. Bands are coarse by design (the template offers a fixed set) — &ldquo;Not applicable&rdquo; means the modality is not part of the training data.</p>
+    <div class="results" id="bandsTable" aria-busy="true">
+      <div class="results-loading">Loading…</div>
     </div>
   </section>
 
   <section class="data-section">
-    <h2>분기별 삭제 게시물</h2>
-    <p class="sub">연간 합계를 구성하는 분기별 삭제 건수를 서비스별로 표시.</p>
-    <div class="results" id="quarterTable" aria-busy="true">
-      <div class="results-loading">불러오는 중…</div>
+    <h2>Data cut-off &amp; data-source categories</h2>
+    <p class="sub">The data-acquisition cut-off and the yes/no data-source flags each summary discloses. Blank cells (&mdash;) are fields the summary does not report.</p>
+    <div class="results" id="sourcesTable" aria-busy="true">
+      <div class="results-loading">Loading…</div>
     </div>
   </section>
 
-  <p class="hint">이 쿼리는 <a href="/ko/reports">쿼리 빌더</a>에서 다듬거나 확장할 수 있고(집계 전에 <code>metric</code>을 고정), 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서, 자세한 내용은 <a href="/ko/methodology">방법론</a>에서 확인하세요.</p>
+  <p class="hint">Refine or extend these in the <a href="/reports">query builder</a> (compare <code>size_rank</code> with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>), browse the full field list on the <a href="/schema">Schema</a> page, or read the <a href="/methodology">Methodology</a>.</p>
 </main>
 
 <footer>
-  <p>출처: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY 코퍼레이션 미디어 투명성 보고서</a>. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">방법론</a> · <a href="/ko/api-key">API 키</a> · <a href="/ko/privacy">개인정보</a></p>
-  <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
+  <p>Source: providers' <a href="https://digital-strategy.ec.europa.eu/en/library/explanatory-notice-and-template-public-summary-training-content-general-purpose-ai-models" target="_blank" rel="noopener noreferrer">EU AI Act Art. 53(1)(d)</a> public summaries of training content (Google's transparency-report PDF + Microsoft's Hugging Face data summary cards). Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">Snapshot:</span> <span id="prov-snap"></span> · <span class="prov-label">Cite as:</span> <span id="prov-cite"></span></p>
 </footer>
 
 </div>
@@ -723,9 +715,7 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Helpers ───────────────────────────────────────────────────────────────
   function fmt(n) {
     if (n == null) return '—';
-    // Format numbers in the page's own locale (set on <html lang>), so the
-    // localized pages use locale-appropriate thousands separators.
-    return Number(n).toLocaleString(document.documentElement.lang || 'en-US');
+    return Number(n).toLocaleString('en-US');
   }
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -748,7 +738,7 @@ display: flex; align-items: center; justify-content: space-between;
     var el = document.getElementById(elId);
     el.removeAttribute('aria-busy');
     if (!rows.length) {
-      el.innerHTML = '<div class="results-loading">사용할 수 있는 데이터가 없습니다.</div>';
+      el.innerHTML = '<div class="results-loading">No data available.</div>';
       return;
     }
     el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
@@ -777,8 +767,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“Japan 情プラ法 statistics (LY Corporation), via the Transparency Report API (" + generated + ' 스냅샷'
-      + (version ? ', 데이터셋 버전 ' + version : '') + ').”';
+      "“EU AI Act Art. 53(1)(d) training-data transparency summaries, via the Transparency Report API (" + generated + ' snapshot'
+      + (version ? ', dataset version ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -806,7 +796,7 @@ display: flex; align-items: center; justify-content: space-between;
   // No-data state: keep the canvas hidden and reuse the loading slot for the
   // message, so empty is distinguishable from loading and from broken.
   function emptyChart(loadingId) {
-    document.getElementById(loadingId).textContent = "사용할 수 있는 데이터가 없습니다.";
+    document.getElementById(loadingId).textContent = "No data available.";
   }
 
   // Accessible data-table mirror of a chart (.sr-only) so screen-reader users
@@ -899,97 +889,90 @@ display: flex; align-items: center; justify-content: space-between;
       }));
   }
 
-  // Chart queries. Filter values are metric/period codes, so the localization
-  // generator's prose find/replace can never rewrite them.
-  var ANNUAL = "2024-04..2025-03";
-  var QLABEL = {
-    "2024-04..2024-06": "1분기(4-6월)", "2024-07..2024-09": "2분기(7-9월)",
-    "2024-10..2024-12": "3분기(10-12월)", "2025-01..2025-03": "4분기(1-3월)",
-  };
-  var QORDER = ["2024-04..2024-06", "2024-07..2024-09", "2024-10..2024-12", "2025-01..2025-03"];
-  function RATE_Q() { return {"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["removal_rate"]},{"operation":"IN","field_name":"period","field_values":["2024-04..2024-06","2024-07..2024-09","2024-10..2024-12","2025-01..2025-03"]}]},"group_by":["period","service"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":100}; }
-  function REM_Q() { return {"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["posts_removed"]},{"operation":"EQ","field_name":"period","field_values":["2024-04..2025-03"]}]},"group_by":["service"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":30}; }
-  function OC_Q() { return {"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"service","field_values":["LINE OpenChat"]},{"operation":"EQ","field_name":"metric","field_values":["posts_removed"]},{"operation":"IN","field_name":"period","field_values":["2024-04..2024-06","2024-07..2024-09","2024-10..2024-12","2025-01..2025-03"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":10}; }
+  // Render a matrix (rows = provider × model, columns = a fixed field order)
+  // into an accessible table. `rows` are [provider, model, field, value].
+  function renderMatrix(elId, rows, cols, colLabels, caption) {
+    var el = document.getElementById(elId);
+    el.removeAttribute('aria-busy');
+    if (!rows.length) {
+      el.innerHTML = '<div class="results-loading">No data available.</div>';
+      return;
+    }
+    // Group by provider+model, preserving first-seen order, pivoting field→value.
+    var order = [], byKey = {};
+    rows.forEach(function (r) {
+      var key = r[0] + ' ' + r[1];
+      if (!byKey[key]) { byKey[key] = { provider: r[0], model: r[1], vals: {} }; order.push(key); }
+      byKey[key].vals[r[2]] = r[3];
+    });
+    var head = '<th scope="col">Provider</th><th scope="col">Model</th>'
+      + colLabels.map(function (h) { return '<th scope="col">' + esc(h) + '</th>'; }).join('');
+    var body = order.map(function (key) {
+      var m = byKey[key];
+      return '<tr><td data-label="Provider">' + esc(m.provider) + '</td>'
+        + '<th scope="row" data-label="Model">' + esc(m.model) + '</th>'
+        + cols.map(function (c, i) {
+            var v = m.vals[c];
+            return '<td data-label="' + esc(colLabels[i]) + '">' + (v == null ? '&mdash;' : esc(v)) + '</td>';
+          }).join('')
+        + '</tr>';
+    }).join('');
+    el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
+      + '<caption class="sr-only">' + esc(caption) + '</caption>'
+      + '<thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
 
-  function renderCharts(rate, rem, oc) {
-    // Removal rate per quarter, lines (x = quarter label, series = service).
-    if (!rate.rows.length) { emptyChart('rate-loading'); } else {
-      var rr = rate.rows.map(function (r) { return [QLABEL[r[0]] || r[0], r[1], r[2]]; });
-      var p1 = pivot(rr);
-      seriesTable('chart-rate-table', "분기", p1);
-      linesChart('chart-rate', 'rate-loading', 'chart-rate-table', p1.labels, p1.dsets);
+  // Chart queries. Filter values are section/field codes, so the localization
+  // generator's prose find/replace can never rewrite them.
+  var MODALITIES = ["Text", "Image", "Audio", "Video", "Other"];
+  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function MOD_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]}]},"group_by":["field","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"max_count":200}; }
+
+  function renderCharts(text, mod) {
+    if (!text.rows.length) { emptyChart('text-loading'); } else {
+      srTable('chart-text-table', ["Model", "Text size rank"], text.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-text', 'text-loading', 'chart-text-table',
+        text.rows.map(function (r) { return r[0]; }), text.rows.map(function (r) { return r[1]; }));
     }
-    if (!rem.rows.length) { emptyChart('rem-loading'); } else {
-      srTable('chart-rem-table', ["서비스", "삭제"], rem.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
-      hbarChart('chart-rem', 'rem-loading', 'chart-rem-table',
-        rem.rows.map(function (r) { return r[0]; }), rem.rows.map(function (r) { return r[1]; }));
-    }
-    if (!oc.rows.length) { emptyChart('oc-loading'); } else {
-      var labels = oc.rows.map(function (r) { return QLABEL[r[0]] || r[0]; });
-      var values = oc.rows.map(function (r) { return r[1]; });
-      srTable('chart-oc-table', ["분기", "삭제"], oc.rows.map(function (r) { return [QLABEL[r[0]] || r[0], fmt(r[1])]; }));
-      vbarsChart('chart-oc', 'oc-loading', 'chart-oc-table', labels, [{ label: '', data: values }]);
+    if (!mod.rows.length) { emptyChart('mod-loading'); } else {
+      // Pivot [modality, model, rank]; order the x-axis by the template modality order.
+      var p = pivot(mod.rows);
+      var idx = function (m) { var i = MODALITIES.indexOf(m); return i < 0 ? 99 : i; };
+      p.labels.sort(function (a, b) { return idx(a) - idx(b); });
+      p.dsets.forEach(function (ds) {
+        ds.data = p.labels.map(function (x) { var v = p.bySeries[ds.label][x]; return v == null ? null : v; });
+      });
+      seriesTable('chart-mod-table', "Modality", p);
+      vbarsChart('chart-mod', 'mod-loading', 'chart-mod-table', p.labels, p.dsets);
     }
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
-    // FY2024 summary per service: posts, posts_removed, removal_rate.
     try {
-      var d = await explore({"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"period","field_values":["2024-04..2025-03"]}]},"group_by":["service","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"max_count":100});
-      var by = {};
-      (d.rows || []).forEach(function (r) { (by[r[0]] = by[r[0]] || {})[r[1]] = r[2]; });
-      var svcs = Object.keys(by).sort(function (a, b) { return (by[b].posts || 0) - (by[a].posts || 0); });
-      var el = document.getElementById('summaryTable');
-      el.removeAttribute('aria-busy');
-      if (!svcs.length) { el.innerHTML = '<div class="results-loading">사용할 수 있는 데이터가 없습니다.</div>'; }
-      else {
-        el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
-          + '<caption class="sr-only">' + esc("LY Corp 서비스별 2024회계연도 게시물·삭제·삭제율.") + '</caption>'
-          + '<thead><tr><th scope="col">서비스</th><th scope="col" class="num">게시물</th><th scope="col" class="num">삭제</th><th scope="col" class="num">삭제율</th></tr></thead><tbody>'
-          + svcs.map(function (svc) {
-              var m = by[svc];
-              return '<tr><td data-label="서비스">' + esc(svc) + '</td>'
-                + '<td class="num" data-label="게시물">' + (m.posts == null ? '—' : fmt(m.posts)) + '</td>'
-                + '<td class="num" data-label="삭제">' + (m.posts_removed == null ? '—' : fmt(m.posts_removed)) + '</td>'
-                + '<td class="num" data-label="삭제율">' + (m.removal_rate == null ? '—' : esc(m.removal_rate) + '%') + '</td></tr>';
-            }).join('')
-          + '</tbody></table></div>';
-      }
+      var d = await explore({"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]}]},"fields":["provider","model","field","value"],"max_count":200});
+      renderMatrix('bandsTable', d.rows || [], MODALITIES, MODALITIES,
+        "Training-data size band disclosed by each model, per modality.");
       fillProvenance(d.generated, d.version);
     } catch (err) {
-      showError('summaryTable', "2024회계연도 요약을 불러오지 못했습니다: " + err.message);
+      showError('bandsTable', "Failed to load size bands: " + err.message);
     }
-    // 분기별 삭제 게시물, per service (service rows × quarter columns).
     try {
-      var d2 = await explore({"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["posts_removed"]},{"operation":"IN","field_name":"period","field_values":["2024-04..2024-06","2024-07..2024-09","2024-10..2024-12","2025-01..2025-03"]}]},"group_by":["service","period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"max_count":100});
-      var q = {};
-      (d2.rows || []).forEach(function (r) { (q[r[0]] = q[r[0]] || {})[r[1]] = r[2]; });
-      var svcs2 = Object.keys(q).sort();
-      var el2 = document.getElementById('quarterTable');
-      el2.removeAttribute('aria-busy');
-      if (!svcs2.length) { el2.innerHTML = '<div class="results-loading">사용할 수 있는 데이터가 없습니다.</div>'; }
-      else {
-        el2.innerHTML = '<div class="table-scroll"><table class="recordtable">'
-          + '<caption class="sr-only">' + esc("서비스별 2024회계연도 분기별 삭제 게시물 수.") + '</caption>'
-          + '<thead><tr><th scope="col">서비스</th>' + QORDER.map(function (p) { return '<th scope="col" class="num">' + esc(QLABEL[p]) + '</th>'; }).join('') + '</tr></thead><tbody>'
-          + svcs2.map(function (svc) {
-              return '<tr><td data-label="서비스">' + esc(svc) + '</td>'
-                + QORDER.map(function (p) { var v = q[svc][p]; return '<td class="num" data-label="' + esc(QLABEL[p]) + '">' + (v == null ? '—' : fmt(v)) + '</td>'; }).join('')
-                + '</tr>';
-            }).join('')
-          + '</tbody></table></div>';
-      }
+      var cols = ["data_cutoff", "publicly_available", "commercially_licensed", "third_party_private", "personal_data", "synthetic"];
+      var labels = ["Data cut-off", "Publicly available", "Commercially licensed", "Third-party private", "Personal data", "Synthetic"];
+      var d2 = await explore({"table":"ai_training_metrics","query":{"and":[{"operation":"IN","field_name":"section","field_values":["general","data_source"]}]},"fields":["provider","model","field","value"],"max_count":200});
+      renderMatrix('sourcesTable', d2.rows || [], cols, labels,
+        "Data-acquisition cut-off and data-source categories disclosed by each model.");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('quarterTable', "분기별 삭제 수를 불러오지 못했습니다: " + err.message);
+      showError('sourcesTable', "Failed to load data sources: " + err.message);
     }
   }
   load();
 
   var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(RATE_Q()), soft(REM_Q()), soft(OC_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2]);
+  Promise.all([soft(TEXT_Q()), soft(MOD_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1]);
   });
 })();
 </script>

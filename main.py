@@ -1215,6 +1215,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "ai_training_metrics": TableSpec(
+        "EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency summaries — the public summary of training content each general-purpose AI provider must publish on the AI Office's standardised template (in force Aug 2025). One row per disclosed field, identified by provider × model × section × field. `section` is 'modality' (field = Text/Image/Audio/Video/Other; value = the banded training-data size, e.g. 'More than 10 trillion tokens'; the numeric `size_rank` = 1/2/3 across the three bands, 0 = 'Not applicable', so coarse sizes are comparable across providers), 'general' (data_cutoff, ongoing_collection) or 'data_source' (publicly_available / commercially_licensed / third_party_private / personal_data / synthetic; value = Yes/No/Not applicable). `value` is text; `size_rank` is an ordinal rank (compare with MIN/MAX, don't SUM). Cross-provider, comparable; a starting set (Google + Microsoft) that expands as more providers' summaries are archived.",
+        "FROM ai_training_metrics f",
+        {
+            "provider": "f.provider",
+            "model":    "f.model",
+            "released": "f.released",
+            "section":  "f.section",
+            "field":    "f.field",
+            "value":    "f.value",
+        },
+        {
+            "size_rank": "f.size_rank",
+        },
+    ),
     "cser_metrics": TableSpec(
         "Meta Community Standards Enforcement Report (CSER) — Meta's flagship VOLUNTARY content-moderation transparency report (not filed under any single law), Facebook + Instagram, quarterly 2017 Q4 → 2025 Q4. One row per measured value, identified by app × policy_area × metric × period. 16 policy areas (Hateful Conduct, Bullying & Harassment, Fake Accounts, Adult Nudity & Sexual Activity, Dangerous Organizations, Spam, Violence and Incitement, …); note 'policy_area' = 'Cross-Policy Data' is an ACROSS-POLICY AGGREGATE, not a peer of the individual areas. 14 metrics: Content Actioned / Removed / Appealed / Restored with|without appeal (counts), Prevalence + Lowerbound/Upperbound Prevalence + UBP, Proactive rate, Enforcement Precision Lower/Upper Bound, False Positive Lower/Upper Bound. 'unit' is 'count' or 'percent' — prevalence, proactive rate and precision are rates (never SUM). Pin a metric before aggregating (metrics aren't comparable), exclude 'Cross-Policy Data' before summing over policy areas (it double-counts), and treat the Lower/Upper bounds as the ends of a range, not additive quantities.",
         "FROM cser_metrics f",
@@ -2481,6 +2496,12 @@ def turkey_page() -> FileResponse:
 def tco_page() -> FileResponse:
     """Serve the EU Terrorist Content Online Regulation dataset page (reads POST /api/explore)."""
     return _serve_page("tco.html", "EU TCO Regulation page")
+
+
+@app.get("/ai-training", response_class=HTMLResponse)
+def ai_training_page() -> FileResponse:
+    """Serve the EU AI Act training-data transparency dataset page (reads POST /api/explore)."""
+    return _serve_page("ai-training.html", "EU AI Act training transparency page")
 
 
 @app.get("/cser", response_class=HTMLResponse)
@@ -3956,6 +3977,16 @@ def _leg_warnings(
                 "together); this aggregate pins no 'category'. Filter or group by "
                 "'category'."
             )
+    # ai_training_metrics 'size_rank' is an ordinal band rank (1/2/3), not an
+    # additive quantity — SUMming it is meaningless.
+    if table == "ai_training_metrics" and any(
+        a.function == "SUM" and a.field_name == "size_rank" for a in aggregates
+    ):
+        out.append(
+            "'ai_training_metrics.size_rank' is an ordinal training-data-size band "
+            "rank (1/2/3), not an additive count — SUM is meaningless. Use MIN / "
+            "MAX / AVG, or group by 'value' to compare the bands themselves."
+        )
     # cser_metrics mixes counts and rate-percentages across metrics, and carries
     # a 'Cross-Policy Data' aggregate alongside the per-policy-area rows.
     if table == "cser_metrics" and any(
