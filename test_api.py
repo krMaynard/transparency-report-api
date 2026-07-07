@@ -3388,6 +3388,22 @@ class TestAiTrainingTable:
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         ranks = {r[0]: r[1] for r in body["rows"]}
         assert ranks["Gemini 3 Pro family"] == 3 and ranks["phi-4"] == 2
+        assert ranks["Muse Spark"] == 3  # Meta discloses the largest text band too
+
+    def test_ai_training_meta_extra_data_sources(self):
+        # Meta's summary breaks out crawled + user_data sources the others don't.
+        r = client.post("/api/explore", json={
+            "table": "ai_training_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "provider", "field_values": ["Meta"]},
+                {"operation": "IN", "field_name": "field",
+                 "field_values": ["crawled", "user_data"]},
+            ]},
+            "fields": ["field", "value"],
+        })
+        assert r.status_code == 200
+        vals = {row[0]: row[1] for row in r.json()["rows"]}
+        assert vals.get("crawled") == "Yes" and vals.get("user_data") == "Yes"
 
     def test_ai_training_size_rank_sum_warns(self):
         # size_rank is an ordinal band rank — SUMming it is meaningless.
