@@ -11032,6 +11032,17 @@ _SG_CARD_DESC = {
 for _loc in _SG_NAV:
     COMMON[_loc].append(("      Singapore\n    </a>", f"      {_SG_NAV[_loc]}\n    </a>"))
     PAGES[_loc]["home.html"].append(("<h3>Singapore</h3>", f"<h3>{_SG_NAV[_loc]}</h3>"))
+
+# Korea Network Act — an English-only dataset page (like /tco, /ai-training):
+# only the sidebar nav label is localized (no dedicated localized page, and, like
+# tco/ai-training, no home feature card).
+_KNA_NAV = {
+    "es": "Ley de Redes de Corea", "fr": "Loi coréenne sur les réseaux",
+    "de": "Korea-Netzwerkgesetz", "it": "Legge coreana sulle reti",
+    "ja": "韓国 ネットワーク法", "zh": "韩国网络法", "ko": "한국 정보통신망법",
+}
+for _loc in _KNA_NAV:
+    COMMON[_loc].append(("      Korea Network Act\n    </a>", f"      {_KNA_NAV[_loc]}\n    </a>"))
     PAGES[_loc]["home.html"].append((_SG_CARD_DESC_EN, _SG_CARD_DESC[_loc]))
 
 # Japan 情プラ法 — English-only dataset page (Japanese-source, dense), like

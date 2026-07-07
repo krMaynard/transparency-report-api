@@ -107,6 +107,12 @@ _DEFAULT_SINGAPORE_SOURCE = os.getenv(
     "SEED_SINGAPORE_SOURCE_JSON",
     os.path.join(HERE, "data", "singapore-online-safety.json"),
 )
+# Korea Network Act (illegal-sexual-content) transparency report — vendored
+# in-repo (from the sibling data repo's korea-network-act/build_korea_network_act.py).
+_DEFAULT_KOREA_NETWORK_ACT_SOURCE = os.getenv(
+    "SEED_KOREA_NETWORK_ACT_SOURCE_JSON",
+    os.path.join(HERE, "data", "korea-network-act.json"),
+)
 # Japan 情プラ法 (Information Distribution Platform Act) — vendored in-repo (from
 # the sibling data repo's japan-info-platform/build_japan.py).
 _DEFAULT_JAPAN_SOURCE = os.getenv(
@@ -565,6 +571,24 @@ CREATE TABLE singapore_metrics (
     value    REAL
 );
 CREATE INDEX idx_singapore_section ON singapore_metrics(section);
+
+-- Korea Network Act (illegal-sexual-content) transparency report
+-- (korea-network-act/build_korea_network_act.py). Tidy-long: Google's annual
+-- reports (2020–2025) under Network Act Art. 64-5 / Telecommunications Business
+-- Act Art. 22-5 (illegal sexual content on Search + YouTube). 2024/2025 publish
+-- a monthly Jan–Dec breakdown in four cross-cut sections (period 'YYYY-MM');
+-- 2020–2023 (prose-only) + a rollup live in 'annual_summary' (period 'YYYY').
+-- Pin a section before aggregating. Dims inline.
+CREATE TABLE korea_network_act_metrics (
+    publisher TEXT NOT NULL,    -- Google (Search + YouTube, jointly)
+    period    TEXT NOT NULL,    -- month 'YYYY-MM' (detailed) or year 'YYYY' (annual_summary)
+    section   TEXT NOT NULL,    -- requests_received / request_reasons / processed_result / removal_reasons / annual_summary
+    category  TEXT NOT NULL,    -- complainant / reason / outcome label; 'All' for annual_summary
+    metric    TEXT NOT NULL,    -- requests / urls / urls_removed / urls_received
+    unit      TEXT NOT NULL,    -- count
+    value     REAL
+);
+CREATE INDEX idx_korea_net_act_section ON korea_network_act_metrics(section);
 
 -- Japan 情プラ法 (Information Distribution Platform Act) — the Art. 28
 -- implementation statistics MIC-designated providers publish
@@ -1436,6 +1460,36 @@ def build_singapore_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_korea_network_act_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the korea_network_act_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long korea-network-act.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("korea network act dataset is None")
+    expected_cols = ["publisher", "period", "section", "category",
+                     "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"korea network act dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("korea network act dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO korea_network_act_metrics (publisher, period, "
+                "section, category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_japan_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the japan_metrics table in an existing DB at db_path.
 
@@ -1975,6 +2029,8 @@ def main() -> None:
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
                         help="Path to singapore-online-safety.json")
+    parser.add_argument("--korea-network-act-source", default=_DEFAULT_KOREA_NETWORK_ACT_SOURCE,
+                        help="Path to korea-network-act.json")
     parser.add_argument("--japan-source", default=_DEFAULT_JAPAN_SOURCE,
                         help="Path to japan-info-platform.json")
     parser.add_argument("--tiktok-cger-source", default=_DEFAULT_TIKTOK_CGER_SOURCE,
@@ -2169,6 +2225,16 @@ def main() -> None:
     else:
         print(f"  (skipping Singapore online safety — not found: "
               f"{args.singapore_source})")
+
+    if os.path.isfile(args.korea_network_act_source):
+        with open(args.korea_network_act_source, "r", encoding="utf-8") as f:
+            kna_data = json.load(f)
+        kna_rows = build_korea_network_act_db(kna_data, args.db)
+        print(f"  korea network act: {kna_rows} metric rows across "
+              f"{len({r[2] for r in kna_data['rows']})} sections")
+    else:
+        print(f"  (skipping Korea Network Act — not found: "
+              f"{args.korea_network_act_source})")
 
     if os.path.isfile(args.japan_source):
         with open(args.japan_source, "r", encoding="utf-8") as f:

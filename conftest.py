@@ -346,6 +346,29 @@ _SINGAPORE_FIXTURE = {
 }
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
+# A small slice of the Korea Network Act dataset (korea-network-act.json shape):
+# a couple of months of Google's illegal-sexual-content figures (2024 + 2025)
+# across the request/removal cross-cuts, plus the annual_summary rollup series.
+# [publisher, period, section, category, metric, unit, value]
+_KOREA_NETWORK_ACT_FIXTURE = {
+    "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Google", "2025-01", "requests_received", "Victims etc. (User Requests)", "requests", "count", 1549],
+        ["Google", "2025-01", "requests_received", "Agency and Org (Gov Requests)", "requests", "count", 2377],
+        ["Google", "2025-02", "requests_received", "Victims etc. (User Requests)", "requests", "count", 1268],
+        ["Google", "2025-02", "requests_received", "Agency and Org (Gov Requests)", "requests", "count", 2971],
+        ["Google", "2025-01", "processed_result", "Removed Voluntarily by the Company", "urls", "count", 3089],
+        ["Google", "2025-01", "removal_reasons", "Child or Youth Sexual Abuse Content", "urls_removed", "count", 0],
+        ["Google", "2024-01", "requests_received", "Agency and Org (Gov Requests)", "requests", "count", 12176],
+        # annual_summary rollup (year-granularity period), a couple of years.
+        ["Google", "2020", "annual_summary", "All", "urls_received", "count", 61],
+        ["Google", "2020", "annual_summary", "All", "urls_removed", "count", 42],
+        ["Google", "2025", "annual_summary", "All", "urls_received", "count", 115280],
+        ["Google", "2025", "annual_summary", "All", "urls_removed", "count", 92334],
+    ],
+}
+seed.build_korea_network_act_db(_KOREA_NETWORK_ACT_FIXTURE, _DB)
+
 # A small slice of the Japan 情プラ法 dataset (japan-info-platform.json shape):
 # LY Corp posts activity (section 'posts_activity', category 'All'), a couple of
 # YouTube sections with their 'Total' beside a reason breakdown, and a slice of

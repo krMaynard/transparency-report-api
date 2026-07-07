@@ -3676,6 +3676,95 @@ class TestSingaporeTable:
         assert all(isinstance(r[6], (int, float)) for r in data["rows"])
 
 
+class TestKoreaNetworkActTable:
+    def test_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "korea_network_act_metrics" in names
+
+    def test_fields_endpoint(self):
+        body = client.get("/api/fields?table=korea_network_act_metrics", headers=MOMO).json()
+        assert {"publisher", "period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_requests_received_by_complainant(self):
+        # Fixture 2025 only: Victims 1549+1268=2817, Agency 2377+2971=5348
+        # (a 2024 row also exists, so pin the year via the period filter).
+        job = _submit_and_wait({
+            "table": "korea_network_act_metrics", "group_by": ["category"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["requests_received"]},
+                {"operation": "IN", "field_name": "period", "field_values": ["2025-01", "2025-02"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "n", "order": "desc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["Agency and Org (Gov Requests)", 5348], ["Victims etc. (User Requests)", 2817]]
+
+    def test_annual_summary_series(self):
+        # annual_summary is a year-granularity rollup; urls_received per year.
+        job = _submit_and_wait({
+            "table": "korea_network_act_metrics", "group_by": ["period"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["annual_summary"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["urls_received"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2020", 61], ["2025", 115280]]
+
+    def test_unpinned_sum_warns(self):
+        # A SUM pinning no section mixes the four cross-cuts of the same requests.
+        r = client.post("/api/explore", json={
+            "table": "korea_network_act_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "section" in warnings and "metric" in warnings
+
+    def test_page_served(self):
+        r = client.get("/korea-network-act")
+        assert r.status_code == 200
+        assert '"table":"korea_network_act_metrics"' in r.text and "Network Act" in r.text
+
+    def test_vendored_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("korea-network-act.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["publisher", "period", "section", "category", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 7 for r in data["rows"])
+        assert {r[0] for r in data["rows"]} == {"Google"}
+        assert {r[2] for r in data["rows"]} == {
+            "requests_received", "request_reasons", "processed_result",
+            "removal_reasons", "annual_summary"}
+        # Detailed monthly sections cover 2024 + 2025 (twelve months each);
+        # annual_summary covers 2020–2025 with a year-granularity period.
+        monthly = {r[1] for r in data["rows"] if r[2] != "annual_summary"}
+        assert monthly == {f"20{yy}-{m:02d}" for yy in ("24", "25") for m in range(1, 13)}
+        assert {r[1] for r in data["rows"] if r[2] == "annual_summary"} == {
+            str(y) for y in range(2020, 2026)}
+        # Each year's cross-cut sections reconcile to that report's stated totals.
+        def sec_total(sec, year):
+            return sum(r[6] for r in data["rows"]
+                       if r[2] == sec and r[1].startswith(f"{year}-"))
+        assert sec_total("requests_received", 2025) == 115280
+        assert sec_total("removal_reasons", 2025) == 92334
+        assert sec_total("requests_received", 2024) == 158052
+        assert sec_total("processed_result", 2024) == 158044  # 8 fewer than received (source quirk)
+        assert sec_total("removal_reasons", 2024) == 142211
+        # annual_summary series (urls_received) grows across the six reports.
+        recv = {int(r[1]): r[6] for r in data["rows"]
+                if r[2] == "annual_summary" and r[4] == "urls_received"}
+        assert recv == {2020: 61, 2021: 31281, 2022: 47162,
+                        2023: 90616, 2024: 158052, 2025: 115280}
+
+
 class TestJapanTable:
     def test_japan_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]

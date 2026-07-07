@@ -1275,6 +1275,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "korea_network_act_metrics": TableSpec(
+        "Korea Network Act illegal-sexual-content transparency report — the annual report online service providers must publish under South Korea's Network Act (Art. 64-5) and Telecommunications Business Act (Art. 22-5) on the technical/managerial measures they take against the circulation of illegal sexual content (illegally-filmed content, deepfake / 'fake' images and videos, and child/youth sexual-abuse material). Google publishes one per calendar year covering Search and YouTube jointly; this holds all six reports so far (2020 → 2025). One row per measured value identified by publisher × period × section × category × metric. The 2024 and 2025 reports publish a full MONTHLY breakdown, in four sections each a cross-cut of the SAME requests (NOT additive across sections), with 'period' a month ('YYYY-MM'): 'requests_received' (removal requests by complainant — 'Victims etc. (User Requests)' + 'Agency and Org (Gov Requests)', metric 'requests'), 'request_reasons' (the same requests by reason — Illegal Photos and Videos / Fake Images and Videos / Child or Youth Sexual Abuse Content, metric 'requests'), 'processed_result' (the same requests by outcome — 'Removed Voluntarily by the Company' + four 'Not Removed - …' reasons + two 'KCSC Assessment - …' rows, metric 'urls') and 'removal_reasons' (the removed URLs by reason, metric 'urls_removed'). Within a monthly section the categories are DISJOINT and sum to the section total (the report's 'Total' rows are dropped), so summing over 'category' within one section is a legitimate grand total, and summing over 'period' within a year gives the annual total — but pin a 'section' (and 'metric') first, and never sum across sections (requests received ≠ processed outcomes ≠ removed URLs). The 2020–2023 reports are prose-only; their headline figures, plus a rollup of 2024/2025, live in section 'annual_summary' (category 'All', 'period' a YEAR 'YYYY', metric 'urls_received' / 'urls_removed') — a comparable 2020→2025 series that sits BESIDE the monthly sections (a rollup of them, so don't sum it together with them).",
+        "FROM korea_network_act_metrics f",
+        {
+            "publisher": "f.publisher",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "japan_metrics": TableSpec(
         "Japan Information Distribution Platform Act (情プラ法, in force Apr 2025) — the annual implementation-status statistics MIC-designated large providers must publish under Art. 28. Three providers so far: LY Corporation (Media Transparency Report — its five services Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM, Yahoo! News comments), Google (YouTube), and Meta (its designated services Facebook, Instagram, Threads — each reported separately). One row per measured value, identified by service × period × section × category × metric. LY Corp's rows are in section 'posts_activity' (category 'All'): `metric` is `posts`/`posts_removed` (counts) or `removal_rate` (percent), per FY2024 quarter ('2024-04..2024-06' … '2025-01..2025-03') or the annual total ('2024-04..2025-03'). YouTube's rows cover 2025-07-26..2026-03-31 across sections legal_requests / legal_extended_review_notifications / legal_items / legal_removals (the legal stream) and user_flags / policy_removals / policy_detection_source / suspensions / appeals / platform (the policy stream); `category` is a reason (Defamation, Child Safety, Automated detection, …) with 'Total' the section aggregate, and `metric` names the measure (requests / items / items_removed / flags / videos_removed / accounts_terminated / appeals / reinstatements / monthly_active_users / …). Meta's rows (Facebook/Instagram/Threads, 2025-07-30..2026-03-31) cover sections requests_received / decisions_within_7d / decisions_after_7d / requests_no_action (the IDPA rights-report channel, `category` = a reporting reason like Portrait rights / Invasion of privacy), content_actions / account_actions / user_report_actions / user_report_reviewed / proactive_actions / account_suspensions (enforcement, `category` = a violation type like Spam / Fraud and Deception / Local Law Violations), appeals (metric per appeal type, category 'All') and platform (content_pieces / monthly_active_users, unit approx_count as Meta rounds them). Meta's per-category breakdowns are the report's own 'most prevalent categories' — an ILLUSTRATIVE SUBSET, not an exhaustive partition — so the 'Total' category is NOT the sum of the listed categories (and Meta's own figures don't always reconcile; the 'after 7 days' total can even sit below one of its categories). Metrics and sections are NOT comparable (LY Corp posts vs YouTube flags vs Meta actions; percent/approx_count vs count), and every section carries a 'Total'/'All' category beside its breakdown. Pin service, section AND category before aggregating; never SUM `removal_rate` (percent), don't add YouTube's policy_removals and policy_detection_source together (two cross-cuts of the same removed videos), and don't treat Meta's 'Total' as the sum of its listed categories.",
         "FROM japan_metrics f",
@@ -2538,6 +2553,12 @@ def cser_page() -> FileResponse:
 def singapore_page() -> FileResponse:
     """Serve the Singapore IMDA Online Safety dataset page (reads POST /api/explore)."""
     return _serve_page("singapore.html", "Singapore online safety page")
+
+
+@app.get("/korea-network-act", response_class=HTMLResponse)
+def korea_network_act_page() -> FileResponse:
+    """Serve the Korea Network Act dataset page (reads POST /api/explore)."""
+    return _serve_page("korea-network-act.html", "Korea Network Act page")
 
 
 @app.get("/japan", response_class=HTMLResponse)
@@ -4084,6 +4105,27 @@ def _leg_warnings(
                 "'singapore_metrics' platform_report metric names are each "
                 "vendor's own and aren't comparable across services; this "
                 "aggregate pins no 'service'. Filter or group by 'service'."
+            )
+    # korea_network_act_metrics has four monthly sections that are cross-cuts of
+    # the same requests (by complainant / reason / outcome, plus removed-by-reason)
+    # plus an 'annual_summary' rollup, so summing across sections multiply-counts.
+    if table == "korea_network_act_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'korea_network_act_metrics' has four monthly sections that are "
+                "cross-cuts of the SAME requests (requests_received by "
+                "complainant, request_reasons by reason, processed_result by "
+                "outcome, removal_reasons by reason) plus an 'annual_summary' "
+                "rollup of them; summing across them multiply-counts the same "
+                "requests. Filter or group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'korea_network_act_metrics' mixes 'requests', 'urls' and "
+                "'urls_removed' metrics that count different things; this "
+                "aggregate pins no 'metric'. Filter or group by 'metric'."
             )
     # japan_metrics spans three providers (LY Corp posts activity, YouTube's
     # legal/policy actions by reason, and Meta's FB/IG/Threads enforcement by

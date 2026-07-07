@@ -481,6 +481,39 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `section` **and** `metric` before aggregating, and never mix the
   `percent`/`days`/`hours`/`count` units; `_leg_warnings` warns on all three.
   The `/singapore` dataset page is English-only (like `/mandates`).
+- **Korea Network Act (illegal-sexual-content)** — a single **tidy-long**
+  `korea_network_act_metrics` table (one row per measured value: `publisher`/
+  `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The
+  **annual transparency report** online service providers must publish under
+  South Korea's **Network Act** (Art. 64-5) and **Telecommunications Business
+  Act** (Art. 22-5) on the technical/managerial measures they take against the
+  circulation of *illegal sexual content* (illegally-filmed content, deepfake /
+  "fake" images and videos, and child/youth sexual-abuse material). **Google**
+  publishes one per calendar year covering **Search and YouTube jointly**
+  (`publisher='Google'`; no per-product split); this holds **all six reports so
+  far (2020 → 2025)**. The **2024 and 2025** reports publish a full **monthly**
+  breakdown (`period` a month `YYYY-MM`) in four `section`s, each a **cross-cut
+  of the SAME requests** (so NOT additive across sections): `requests_received`
+  (by complainant — Victims/User + Agency/Gov, `metric='requests'`),
+  `request_reasons` (by reason, `metric='requests'`), `processed_result` (by
+  outcome — Removed + four `Not Removed - …` reasons + two `KCSC Assessment - …`
+  rows, `metric='urls'`) and `removal_reasons` (the removed URLs by reason,
+  `metric='urls_removed'`). Within a monthly section the categories are
+  **disjoint** and sum to the section total (the report's "Total" rows are
+  dropped), so summing over `category` within one section — or over `period`
+  within a year — is a legitimate grand/annual total. The **2020–2023** reports
+  are prose-only (2020 covers just 10–31 Dec, the law's implementation date);
+  their headline URL counts, plus a rollup of 2024/2025, live in section
+  **`annual_summary`** (`category='All'`, `period` a **year** `YYYY`, `metric`
+  `urls_received` / `urls_removed`) — a comparable **2020→2025 series** that sits
+  *beside* the monthly sections (a rollup of them, so don't sum it together with
+  them). Pin a `section` **and** `metric` first, and never sum across sections
+  (requests received ≠ processed outcomes ≠ removed URLs). The build cross-checks
+  every monthly breakdown against the report's stated per-section totals and the
+  derived annual against `annual_summary`, raising on a mismatch (note 2024's
+  requests-received 158,052 vs processed 158,044 differ by 8 — a source quirk,
+  preserved); `_leg_warnings` warns on both dims. The `/korea-network-act`
+  dataset page is English-only (like `/mandates`).
 - **Japan 情プラ法 (Information Distribution Platform Act)** — a single
   **tidy-long** `japan_metrics` table (one row per measured value: `service`/
   `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The
@@ -943,6 +976,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/turkey` | — | Public Türkiye Law No. 5651 transparency-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/cser` | — | Public Meta Community Standards Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/singapore` | — | Public Singapore IMDA Online Safety dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
+| GET | `/korea-network-act` | — | Public Korea Network Act illegal-sexual-content dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/japan` | — | Public Japan 情プラ法 (LY Corporation) dataset page (web UI over `POST /api/explore`) |
 | GET | `/tiktok-cger` | — | Public TikTok Community Guidelines Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/tco` | — | Public EU Terrorist Content Online Regulation dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
