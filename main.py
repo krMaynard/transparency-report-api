@@ -3290,16 +3290,27 @@ def ca_ab587_reports(
 
 
 # Full-text search over the report narratives (seeded into the FTS5
-# `report_narratives` table by seed.build_ny_tos_narratives + build_dsa_narratives).
-# Two `source`s: 'ny-tos' (one row per page of a NY ToS filing, deep-linkable into
-# the archived PDF) and 'dsa' (one row per DSA Table-11 qualitative description).
-# Prose, not the structured numbers. Matches are highlighted with private-use
-# sentinels the client HTML-escapes then swaps for <mark>, so raw DB text can
-# never inject markup.
-_FTS_TERM = re.compile(r"[0-9A-Za-z]+")
+# `report_narratives` table by seed.build_ny_tos_narratives / build_ca_ab587_narratives
+# / build_japan_narratives / build_dsa_narratives). Four `source`s: 'ny-tos' (one
+# row per page of a NY ToS filing, deep-linkable into the archived PDF), 'ca-ab587'
+# (one row per page of a California AB 587 filing), 'dsa' (one row per DSA Table-11
+# qualitative description) and 'japan' (one row per section of LY Corporation's
+# Media Transparency Report, stored bilingually — English translation + Japanese
+# original — since the source report is Japanese-only). Prose, not the structured
+# numbers. Matches are highlighted with private-use sentinels the client
+# HTML-escapes then swaps for <mark>, so raw DB text can never inject markup.
+# A "word" token is an ASCII alphanumeric run OR a run of CJK characters
+# (hiragana / katakana / kana half-width / CJK ideographs). The Japanese corpus
+# (`source='japan'`, the bilingual LY Corporation report prose) is stored with a
+# `unicode61` tokenizer that treats CJK as searchable text, so accepting CJK runs
+# here lets Japanese queries match it; no other corpus contains CJK, so this is a
+# no-op for them. Quoting each token still neutralises every FTS5 operator.
+_FTS_TERM = re.compile(
+    r"[0-9A-Za-z]+|[぀-ヿㇰ-ㇿｦ-ﾟ㐀-䶿一-鿿]+"
+)
 _MARK_OPEN = chr(0xE000)
 _MARK_CLOSE = chr(0xE001)
-_NARRATIVE_SOURCES = ("ny-tos", "dsa", "ca-ab587")
+_NARRATIVE_SOURCES = ("ny-tos", "dsa", "ca-ab587", "japan")
 
 
 def _fts_match(q: str) -> str:
@@ -3319,14 +3330,17 @@ def narratives(
     limit: int = Query(30, ge=1, le=100),
 ) -> JSONResponse:
     """Public full-text search over the **narrative** report text — the prose,
-    not the numbers. Two corpora (`source`): `ny-tos` (New York Terms-of-Service
+    not the numbers. Four corpora (`source`): `ny-tos` (New York Terms-of-Service
     filings — how platforms describe defining/enforcing their hate-speech /
-    extremism / disinformation / harassment / foreign-interference policies) and
-    `dsa` (the EU DSA reports' Table-11 qualitative descriptions — how each
-    service describes its content-moderation approach). One result per matching
-    page (ny-tos) or description (dsa), ranked by relevance (BM25), with a
-    highlighted snippet; ny-tos results deep-link into the archived PDF. Filter by
-    `source` / `company` / `period`. IP-rate-limited (query is user-driven), no auth."""
+    extremism / disinformation / harassment / foreign-interference policies),
+    `ca-ab587` (the California AB 587 analogue), `dsa` (the EU DSA reports'
+    Table-11 qualitative descriptions — how each service describes its
+    content-moderation approach) and `japan` (LY Corporation's Media Transparency
+    Report — stored bilingually, English translation + Japanese original, since
+    the source is Japanese-only). One result per matching page / description /
+    section, ranked by relevance (BM25), with a highlighted snippet; ny-tos
+    results deep-link into the archived PDF. Filter by `source` / `company` /
+    `period`. IP-rate-limited (query is user-driven), no auth."""
     if _key_store.incr(f"narratives:{_client_ip(request)}", EXPLORE_RATE_WINDOW) > EXPLORE_RATE_MAX:
         raise HTTPException(
             status_code=429,

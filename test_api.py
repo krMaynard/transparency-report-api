@@ -1667,12 +1667,14 @@ class TestCAAB587Reports:
 class TestNarratives:
     def test_public_index_spans_all_sources(self):
         # No query: returns the facet lists + how much prose is searchable across
-        # all corpora (3 NY ToS pages + 1 DSA description + 2 CA AB 587 pages).
+        # all corpora (3 NY ToS pages + 1 DSA description + 2 CA AB 587 pages +
+        # 2 Japan sections).
         d = client.get("/api/narratives").json()  # no X-API-Key
         assert d["searched"] is False
-        assert d["page_total"] == 6
-        assert d["sources"] == ["ny-tos", "dsa", "ca-ab587"]
-        assert {"Snap Inc", "TikTok Inc", "YouTube", "Reddit, Inc."} <= set(d["companies"])
+        assert d["page_total"] == 8
+        assert d["sources"] == ["ny-tos", "dsa", "ca-ab587", "japan"]
+        assert {"Snap Inc", "TikTok Inc", "YouTube", "Reddit, Inc.",
+                "LY Corporation"} <= set(d["companies"])
         assert d["results"] == []
         assert d["mark_open"] and d["mark_close"]  # highlight sentinels present
 
@@ -1683,6 +1685,8 @@ class TestNarratives:
         assert dsa["companies"] == ["YouTube"] and dsa["page_total"] == 1
         ab = client.get("/api/narratives", params={"source": "ca-ab587"}).json()
         assert set(ab["companies"]) == {"Snap Inc.", "Reddit, Inc."} and ab["page_total"] == 2
+        jp = client.get("/api/narratives", params={"source": "japan"}).json()
+        assert jp["companies"] == ["LY Corporation"] and jp["page_total"] == 2
 
     def test_ca_ab587_source_indexed(self):
         # The CA AB 587 prose (source='ca-ab587') is searchable and scoped by source.
@@ -1695,6 +1699,25 @@ class TestNarratives:
         # "extremism" is unique to the CA corpus — not in the NY ToS pages.
         assert client.get("/api/narratives",
                           params={"q": "extremism", "source": "ny-tos"}).json()["total"] == 0
+
+    def test_japan_source_bilingual(self):
+        # The LY Corporation report prose (source='japan') is stored bilingually,
+        # so it's searchable in English…
+        d = client.get("/api/narratives",
+                       params={"q": "supercomputer kukai", "source": "japan"}).json()
+        assert d["total"] == 1
+        hit = d["results"][0]
+        assert hit["source"] == "japan" and hit["company"] == "LY Corporation"
+        assert hit["page"] == 61 and hit["archived_url"] is None
+        # …and in Japanese: the unicode61 tokenizer indexes the original text at
+        # the level of punctuation/bracket-delimited runs, so a quoted term like
+        # 「利用のルール」 is matchable.
+        jp = client.get("/api/narratives", params={"q": "利用のルール", "source": "japan"}).json()
+        assert jp["total"] >= 1
+        assert jp["results"][0]["platform"] == "Yahoo! Chiebukuro"
+        # "kukai" is unique to the Japan corpus — not in the other sources.
+        assert client.get("/api/narratives",
+                          params={"q": "kukai", "source": "dsa"}).json()["total"] == 0
 
     def test_full_text_search_ranks_and_links(self):
         d = client.get("/api/narratives", params={"q": "hate speech"}).json()

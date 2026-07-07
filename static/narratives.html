@@ -605,15 +605,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Full-text search</span>
     <h1>Search the report narratives</h1>
-    <p>Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings and the EU DSA reports' qualitative sections.</p>
+    <p>Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings, the EU DSA reports' qualitative sections, and LY Corporation's Japanese Media Transparency Report (translated to English).</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Full-text search across the <strong>prose</strong> of three corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference) and the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach). Each result is one page or description, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Full-text search across the <strong>prose</strong> of four corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference), the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach), and LY Corporation's Japanese <strong>Media Transparency Report</strong> under Japan's 情プラ法 (stored bilingually — an English translation plus the Japanese original — so it's searchable in either language). Each result is one page, description or section, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Search <input id="nq" type="search" placeholder="e.g. hate speech, appeals, algorithm" autocomplete="off" /></label>
-      <label>Source <select id="nsrc"><option value="">All</option><option value="ny-tos">NY ToS filings</option><option value="ca-ab587">CA AB 587 filings</option><option value="dsa">DSA reports</option></select></label>
+      <label>Source <select id="nsrc"><option value="">All</option><option value="ny-tos">NY ToS filings</option><option value="ca-ab587">CA AB 587 filings</option><option value="dsa">DSA reports</option><option value="japan">Japan (LY Corp)</option></select></label>
       <label>Company <select id="nco"><option value="">All</option></select></label>
       <label>Period <select id="nper"><option value="">All</option></select></label>
       <button id="nbtn" type="button">Search</button>
@@ -662,7 +662,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
 
 let nAbort = null;
 
