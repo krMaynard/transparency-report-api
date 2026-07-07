@@ -92,6 +92,12 @@ _DEFAULT_SINGAPORE_SOURCE = os.getenv(
     "SEED_SINGAPORE_SOURCE_JSON",
     os.path.join(HERE, "data", "singapore-online-safety.json"),
 )
+# Japan 情プラ法 (Information Distribution Platform Act) — vendored in-repo (from
+# the sibling data repo's japan-info-platform/build_japan.py).
+_DEFAULT_JAPAN_SOURCE = os.getenv(
+    "SEED_JAPAN_SOURCE_JSON",
+    os.path.join(HERE, "data", "japan-info-platform.json"),
+)
 # Google government requests for user information — vendored in-repo (from the
 # sibling data repo's google-user-data/build_userdata.py).
 _DEFAULT_GOOGLE_UD_SOURCE = os.getenv(
@@ -477,6 +483,21 @@ CREATE TABLE singapore_metrics (
     value    REAL
 );
 CREATE INDEX idx_singapore_section ON singapore_metrics(section);
+
+-- Japan 情プラ法 (Information Distribution Platform Act) — LY Corporation's
+-- Media Transparency Report (japan-info-platform/build_japan.py). LY Corp is the
+-- one MIC-designated provider currently publishing the Art. 28 implementation
+-- statistics. Tidy-long: one row per measured value, per service × period
+-- (FY2024 quarter or annual total) × metric (posts / posts_removed /
+-- removal_rate). Dims inline.
+CREATE TABLE japan_metrics (
+    service TEXT NOT NULL,      -- Yahoo! Chiebukuro / LINE OpenChat / ...
+    period  TEXT NOT NULL,      -- coverage window 'YYYY-MM..YYYY-MM'
+    metric  TEXT NOT NULL,      -- posts / posts_removed / removal_rate
+    unit    TEXT NOT NULL,      -- count / percent
+    value   REAL
+);
+CREATE INDEX idx_japan_service ON japan_metrics(service);
 
 -- Google government requests for user information (google-user-data/
 -- build_userdata.py). Tidy-long: one row per measured value from the biannual
@@ -1220,6 +1241,35 @@ def build_singapore_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_japan_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the japan_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long japan-info-platform.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("japan dataset is None")
+    expected_cols = ["service", "period", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"japan dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("japan dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO japan_metrics (service, period, metric, unit, value) "
+                "VALUES (?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_cser_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the cser_metrics table in an existing DB at db_path.
 
@@ -1676,6 +1726,8 @@ def main() -> None:
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
                         help="Path to singapore-online-safety.json")
+    parser.add_argument("--japan-source", default=_DEFAULT_JAPAN_SOURCE,
+                        help="Path to japan-info-platform.json")
     parser.add_argument("--google-ud-source", default=_DEFAULT_GOOGLE_UD_SOURCE,
                         help="Path to google-user-data.json")
     parser.add_argument("--microsoft-source", default=_DEFAULT_MICROSOFT_SOURCE,
@@ -1839,6 +1891,15 @@ def main() -> None:
     else:
         print(f"  (skipping Singapore online safety — not found: "
               f"{args.singapore_source})")
+
+    if os.path.isfile(args.japan_source):
+        with open(args.japan_source, "r", encoding="utf-8") as f:
+            japan_data = json.load(f)
+        japan_rows = build_japan_db(japan_data, args.db)
+        print(f"  japan 情プラ法: {japan_rows} metric rows across "
+              f"{len({r[0] for r in japan_data['rows']})} services")
+    else:
+        print(f"  (skipping Japan 情プラ法 — not found: {args.japan_source})")
 
     if os.path.isfile(args.google_ud_source):
         with open(args.google_ud_source, "r", encoding="utf-8") as f:

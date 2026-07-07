@@ -3414,6 +3414,69 @@ class TestSingaporeTable:
         assert all(isinstance(r[6], (int, float)) for r in data["rows"])
 
 
+class TestJapanTable:
+    def test_japan_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "japan_metrics" in names
+
+    def test_japan_fields_endpoint(self):
+        body = client.get("/api/fields?table=japan_metrics", headers=MOMO).json()
+        assert {"service", "period", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_japan_annual_posts(self):
+        # LINE OpenChat FY2024 annual posts = 5,514,828,787 (fixture).
+        job = _submit_and_wait({
+            "table": "japan_metrics", "fields": ["value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["LINE OpenChat"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2024-04..2025-03"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["posts"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [[5514828787]]
+
+    def test_japan_removal_rate_is_percent(self):
+        job = _submit_and_wait({
+            "table": "japan_metrics", "fields": ["unit", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["Yahoo! Chiebukuro"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["removal_rate"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["percent", 0.7]]
+
+    def test_japan_unpinned_sum_warns(self):
+        # A SUM pinning neither metric nor period mixes counts/percent and adds
+        # the annual-total row to its own quarters.
+        r = client.post("/api/explore", json={
+            "table": "japan_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "metric" in warnings and "period" in warnings
+
+    def test_japan_page_served(self):
+        r = client.get("/japan")
+        assert r.status_code == 200
+        assert '"table":"japan_metrics"' in r.text and "情プラ法" in r.text
+
+    def test_vendored_japan_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("japan-info-platform.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["service", "period", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 5 for r in data["rows"])
+        assert {r[3] for r in data["rows"]} == {"count", "percent"}
+        assert {r[2] for r in data["rows"]} == {"posts", "posts_removed", "removal_rate"}
+
+
 class TestGoogleUserDataTable:
     def test_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
