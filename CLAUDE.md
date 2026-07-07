@@ -485,26 +485,41 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The
   Art. 28 implementation-status statistics MIC-designated large providers must
   publish under the amended Provider Liability Limitation Act (情プラ法, in force
-  Apr 2025). **Two providers** so far (Meta/TikTok/X still publish only
-  qualitative Art. 21 criteria): **LY Corporation** — its five services (Yahoo!
-  Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM, Yahoo! News
-  comments) from its FY2024 Media Transparency Report, in section
-  `posts_activity` (category `All`): `metric` `posts`/`posts_removed` (count) or
-  `removal_rate` (percent), per FY2024 quarter (`2024-04..2024-06` …
-  `2025-01..2025-03`) or the annual total (`2024-04..2025-03`) — and **Google
-  (YouTube)** from its `2025-07-26..2026-03-31` report, across sections
-  `legal_requests`/`legal_extended_review_notifications`/`legal_items`/
-  `legal_removals` (the legal stream) and `user_flags`/`policy_removals`/
-  `policy_detection_source`/`suspensions`/`appeals`/`platform` (the policy
-  stream), with `category` a reason (`Total` = the section aggregate) and
-  `metric` the measure (`requests`/`items_removed`/`flags`/`videos_removed`/
-  `accounts_terminated`/…). Metrics and sections aren't comparable, and every
-  YouTube section keeps a `Total`/`All` category beside its breakdown — pin
+  Apr 2025). **Three providers** so far (TikTok/X still publish only qualitative
+  Art. 21 criteria): **LY Corporation** — its five services (Yahoo! Chiebukuro,
+  Yahoo! Finance boards, LINE OpenChat, LINE VOOM, Yahoo! News comments) from its
+  FY2024 Media Transparency Report, in section `posts_activity` (category `All`):
+  `metric` `posts`/`posts_removed` (count) or `removal_rate` (percent), per
+  FY2024 quarter (`2024-04..2024-06` … `2025-01..2025-03`) or the annual total
+  (`2024-04..2025-03`); **Google (YouTube)** from its `2025-07-26..2026-03-31`
+  report, across sections `legal_requests`/`legal_extended_review_notifications`/
+  `legal_items`/`legal_removals` (the legal stream) and `user_flags`/
+  `policy_removals`/`policy_detection_source`/`suspensions`/`appeals`/`platform`
+  (the policy stream), with `category` a reason (`Total` = the section aggregate)
+  and `metric` the measure (`requests`/`items_removed`/`flags`/`videos_removed`/
+  `accounts_terminated`/…); and **Meta** — its designated services **Facebook**,
+  **Instagram** and **Threads** (each reported separately, `2025-07-30..2026-03-31`),
+  across sections `requests_received`/`decisions_within_7d`/`decisions_after_7d`/
+  `requests_no_action` (the IDPA rights-report channel, `category` = a reporting
+  reason like Portrait rights / Invasion of privacy), `content_actions`/
+  `account_actions`/`user_report_actions`/`user_report_reviewed`/`proactive_actions`/
+  `account_suspensions` (enforcement, `category` = a violation type like Spam /
+  Fraud and Deception / Local Law Violations), `appeals` (metric per appeal type,
+  category `All`) and `platform` (`content_pieces`/`monthly_active_users`, unit
+  `approx_count` — Meta rounds them). Metrics and sections aren't comparable, and
+  every section keeps a `Total`/`All` category beside its breakdown — pin
   `service`, `section`, `category` **and** `metric` before aggregating; never SUM
   `removal_rate`, don't add LY Corp's quarters to its annual total, and don't add
   YouTube's `policy_removals` and `policy_detection_source` (two cross-cuts of the
-  same removed videos); `_leg_warnings` warns on all four dims. The `/japan`
-  dataset page is localized into all seven locales.
+  same removed videos); `_leg_warnings` warns on all four dims. **Meta caveat:**
+  its per-policy breakdowns are the report's own "most prevalent" categories — an
+  ILLUSTRATIVE SUBSET, not a partition — so the `Total` category is a superset,
+  **not** the sum of the listed categories (and Meta's own figures don't fully
+  reconcile: `decisions_after_7d`'s Threads `Total` even sits below one of its
+  categories, per the report's logging-issue footnotes). Two Meta tables are
+  omitted (regulator requests 5.3.4 has a non-per-service column + Meta-flagged
+  non-disaggregation; court orders 5.3.5 are all-zero). The `/japan` dataset page
+  is localized into all seven locales.
 - **TikTok Community Guidelines Enforcement Report (CGER)** — a single
   **tidy-long** `tiktok_cger_metrics` table (one row per measured value:
   `period`/`metric`/`policy_type`/`issue`/`task_type`/`task`/`unit` + a `value`;

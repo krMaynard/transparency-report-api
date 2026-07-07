@@ -3717,6 +3717,23 @@ class TestJapanTable:
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"] == [["Defamation", 155], ["Trademark", 117]]
 
+    def test_japan_meta_content_actions_by_service(self):
+        # Meta reports each designated service separately; Facebook content_actions
+        # for Spam = 420,954 (fixture), and the 'Total' is a superset (not a sum
+        # of the listed categories).
+        job = _submit_and_wait({
+            "table": "japan_metrics", "fields": ["category", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["content_actions"]},
+                {"operation": "IN", "field_name": "category", "field_values": ["Spam", "Fraud and Deception"]},
+            ]},
+            "sort": [{"field_name": "value", "order": "desc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["Spam", 420954], ["Fraud and Deception", 112817]]
+
     def test_japan_unpinned_sum_warns(self):
         # A SUM pinning none of section/metric/category/period mixes providers,
         # units, and totals with their own breakdowns.
@@ -3742,6 +3759,8 @@ class TestJapanTable:
         assert data["rows"] and all(len(r) == 7 for r in data["rows"])
         services = {r[0] for r in data["rows"]}
         assert "YouTube" in services and "LINE OpenChat" in services
+        # Meta reports Facebook, Instagram and Threads each as a separate service.
+        assert {"Facebook", "Instagram", "Threads"} <= services
         # LY Corp lives in posts_activity; YouTube brings the legal/policy sections.
         yt_sections = {r[2] for r in data["rows"] if r[0] == "YouTube"}
         assert {"legal_removals", "policy_removals", "user_flags", "suspensions"} <= yt_sections
@@ -3749,6 +3768,14 @@ class TestJapanTable:
         lr = [r for r in data["rows"] if r[0] == "YouTube" and r[2] == "legal_removals"]
         total = next(r[6] for r in lr if r[3] == "Total")
         assert sum(r[6] for r in lr if r[3] != "Total") == total == 289
+        # Meta's content_actions carries its own sections + a 'Total' that is a
+        # SUPERSET of the listed 'most prevalent' categories (not their sum).
+        fb_sections = {r[2] for r in data["rows"] if r[0] == "Facebook"}
+        assert {"content_actions", "account_actions", "appeals", "platform"} <= fb_sections
+        ca = [r for r in data["rows"] if r[0] == "Facebook" and r[2] == "content_actions"]
+        ca_total = next(r[6] for r in ca if r[3] == "Total")
+        assert ca_total == 891693
+        assert sum(r[6] for r in ca if r[3] != "Total") < ca_total  # illustrative subset
 
 
 class TestTiktokCgerTable:
