@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>日本 情報流通プラットフォーム対処法（情プラ法） — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) implementation statistics — LY Corporation's Media Transparency Report: posts, removals and removal rate per service." />
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, plus Google (YouTube)'s legal and policy actions by reason." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -251,6 +251,7 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .yt-h { font-size: 14px; margin: 4px 0 10px; color: var(--fg); }
 </style>
 </head>
 <body>
@@ -603,9 +604,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY コーポレーション · 年次 · 2024年度</span>
+    <span class="badge">LY コーポレーション + YouTube · 第28条</span>
     <h1>日本 — 情報流通プラットフォーム対処法（情プラ法）</h1>
-    <p>改正されたプロバイダ責任制限法 — <strong>情報流通プラットフォーム対処法</strong>（情プラ法、2025年4月施行） — は、総務省が指定する大規模提供者に対し、年次のコンテンツモデレーション統計の公表を義務付けています（第28条）。現時点で数値を公表している指定提供者は <strong>LY コーポレーション</strong> のみで（Google・Meta・TikTok・X は定性的な基準ページのみ）、本データは同社の2024年度メディア透明性レポートから、5つのサービス（Yahoo!知恵袋、Yahoo!ファイナンス掲示板、LINE オープンチャット、LINE VOOM、Yahoo!ニュース コメント）を対象としています。tidy-long データセットで、各行はサービス × 期間 × 指標（<code>posts</code>、<code>posts_removed</code>、<code>removal_rate</code>）で識別される1つの測定値です。集計の前に指標を固定してください — 投稿・削除・割合は比較できず、割合は決して合計せず、四半期を年度合計に足さないでください。</p>
+    <p>改正されたプロバイダ責任制限法 — <strong>情報流通プラットフォーム対処法</strong>（情プラ法、2025年4月施行） — は、総務省が指定する大規模提供者にコンテンツモデレーション統計の公表を義務付けています（第28条）。現時点で数値を公表している提供者は2社です（Meta・TikTok・X は依然として定性的な基準ページのみ）。<strong>LY コーポレーション</strong>は2024年度メディア透明性レポートから5つのサービス（Yahoo!知恵袋、Yahoo!ファイナンス掲示板、LINE オープンチャット、LINE VOOM、Yahoo!ニュース コメント）を、<strong>Google（YouTube）</strong>は2025年7月26日〜2026年3月31日のレポートを対象としています。tidy-long データセットで、各行はサービス × 期間 × セクション × カテゴリ × 指標で識別される1つの測定値です。指標とセクションは比較できません — 集計の前に <code>section</code>・<code>category</code>・<code>metric</code> を固定し、割合は決して合計せず、セクションの <code>合計</code> をその内訳に足さないでください。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -658,11 +659,30 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <p class="hint">これらは<a href="/ja/reports">クエリビルダー</a>で絞り込み・拡張でき（集計の前に <code>metric</code> を固定）、全フィールド一覧は<a href="/ja/schema">スキーマ</a>ページで確認、詳細は<a href="/ja/methodology">方法論</a>をご覧ください。</p>
+  <section class="data-section">
+    <h2>YouTube（Google）</h2>
+    <p class="sub">Google の YouTube 情プラ法レポートは <strong>2025年7月26日〜2026年3月31日</strong> を対象とする日本固有の数値で、LY Corp の2024年度の表とは期間が異なるため比較できません。YouTube の日本の月間アクティブユーザーは <span id="ytMau">…</span> でした。以下の各内訳は、その <em>合計</em> 行を除いています。</p>
+    <h3 class="yt-h">理由別の法的削除</h3>
+    <div class="results" id="ytLegal" aria-busy="true"><div class="results-loading">読み込み中…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — ポリシー違反で削除された動画（理由別）</h2>
+    <p class="sub">日本で YouTube コミュニティ ガイドラインに基づき削除された動画（ポリシー理由別）。大半はユーザー・団体・政府ではなく自動システムが最初に検出しました（削除の <span id="ytAuto">…</span>）。</p>
+    <div class="results" id="ytPolicy" aria-busy="true"><div class="results-loading">読み込み中…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — ユーザー報告（理由別）</h2>
+    <p class="sub">日本の IP アドレスから送信されたエンドユーザーの報告（報告者が選択した理由別）。</p>
+    <div class="results" id="ytFlags" aria-busy="true"><div class="results-loading">読み込み中…</div></div>
+  </section>
+
+  <p class="hint"><a href="/ja/reports">クエリビルダー</a>で絞り込みや拡張ができます（集計の前に <code>section</code>・<code>category</code>・<code>metric</code> を固定してください）。全フィールドは<a href="/ja/schema">スキーマ</a>ページで確認でき、<a href="/ja/methodology">方法論</a>もご覧いただけます。</p>
 </main>
 
 <footer>
-  <p>出典：<a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY コーポレーション メディア透明性レポート</a>。データ提供：<a href="/api">Transparency Report API</a> · <a href="/ja/methodology">方法論</a> · <a href="/ja/api-key">API キー</a> · <a href="/ja/privacy">プライバシー</a></p>
+  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a> and Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> (Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/ja/methodology">Methodology</a> · <a href="/ja/api-key">API key</a> · <a href="/ja/privacy">プライバシー</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">スナップショット：</span> <span id="prov-snap"></span> · <span class="prov-label">引用方法：</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -982,6 +1002,41 @@ display: flex; align-items: center; justify-content: space-between;
   var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
   Promise.all([soft(RATE_Q()), soft(REM_Q()), soft(OC_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
+  });
+
+  // ── YouTube（Google） — Information Platform Act report ──────────────────────
+  var YT_PERIOD = "2025-07-26..2026-03-31";
+  function ytQ(section, metric) {
+    return {"table":"japan_metrics","fields":["category","value"],"query":{"and":[
+      {"operation":"EQ","field_name":"service","field_values":["YouTube"]},
+      {"operation":"EQ","field_name":"period","field_values":[YT_PERIOD]},
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"EQ","field_name":"metric","field_values":[metric]}
+    ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
+  }
+  function ytRender(elId, section, metric, caption, numHead) {
+    soft(ytQ(section, metric)).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== '合計'; });
+      renderTable(elId, rows, caption, "理由", numHead);
+    });
+  }
+  ytRender('ytLegal', 'legal_removals', 'items_removed', "YouTube の法的削除（理由別）。", "削除された項目");
+  ytRender('ytPolicy', 'policy_removals', 'videos_removed', "YouTube のポリシー動画削除（理由別）。", "削除された動画");
+  ytRender('ytFlags', 'user_flags', 'flags', "YouTube のユーザー報告（理由別）。", "報告数");
+  // Headline: MAU, and the automated share of policy removals.
+  soft(ytQ('platform', 'monthly_active_users')).then(function (d) {
+    var el = document.getElementById('ytMau');
+    if (el && d.rows.length) el.textContent = fmt(d.rows[0][1]);
+  });
+  soft(ytQ('policy_detection_source', 'videos_removed')).then(function (d) {
+    var el = document.getElementById('ytAuto');
+    if (!el) return;
+    var total = 0, auto = 0;
+    d.rows.forEach(function (r) {
+      if (r[0] === '合計') total = r[1];
+      else if (r[0] === 'Automated detection') auto = r[1];
+    });
+    if (total && auto) el.textContent = (100 * auto / total).toFixed(1) + '%';
   });
 })();
 </script>

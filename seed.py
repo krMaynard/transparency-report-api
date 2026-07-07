@@ -518,20 +518,26 @@ CREATE TABLE singapore_metrics (
 );
 CREATE INDEX idx_singapore_section ON singapore_metrics(section);
 
--- Japan 情プラ法 (Information Distribution Platform Act) — LY Corporation's
--- Media Transparency Report (japan-info-platform/build_japan.py). LY Corp is the
--- one MIC-designated provider currently publishing the Art. 28 implementation
--- statistics. Tidy-long: one row per measured value, per service × period
--- (FY2024 quarter or annual total) × metric (posts / posts_removed /
--- removal_rate). Dims inline.
+-- Japan 情プラ法 (Information Distribution Platform Act) — the Art. 28
+-- implementation statistics MIC-designated providers publish
+-- (japan-info-platform/build_japan.py). Two providers so far: LY Corporation
+-- (Media Transparency Report — posts/removals per service × FY2024 quarter, in
+-- section 'posts_activity') and Google/YouTube (Japan IP Act report, 2025-07-26..
+-- 2026-03-31 — legal/policy actions by reason across sections legal_requests /
+-- legal_items / legal_removals / user_flags / policy_removals /
+-- policy_detection_source / suspensions / appeals / platform, category = reason
+-- or 'Total'). Tidy-long: one row per measured value. Dims inline.
 CREATE TABLE japan_metrics (
-    service TEXT NOT NULL,      -- Yahoo! Chiebukuro / LINE OpenChat / ...
-    period  TEXT NOT NULL,      -- coverage window 'YYYY-MM..YYYY-MM'
-    metric  TEXT NOT NULL,      -- posts / posts_removed / removal_rate
-    unit    TEXT NOT NULL,      -- count / percent
-    value   REAL
+    service  TEXT NOT NULL,     -- Yahoo! Chiebukuro / LINE OpenChat / YouTube / ...
+    period   TEXT NOT NULL,     -- coverage window 'YYYY-MM..YYYY-MM'
+    section  TEXT NOT NULL,     -- posts_activity / legal_removals / user_flags / ...
+    category TEXT NOT NULL,     -- reason label; 'All' (LY Corp) or 'Total' (YouTube aggregate)
+    metric   TEXT NOT NULL,     -- posts / videos_removed / flags / accounts_terminated / ...
+    unit     TEXT NOT NULL,     -- count / percent
+    value    REAL
 );
 CREATE INDEX idx_japan_service ON japan_metrics(service);
+CREATE INDEX idx_japan_section ON japan_metrics(section);
 
 -- TikTok Community Guidelines Enforcement Report (tiktok-cger/build_cger.py).
 -- TikTok's voluntary quarterly content-moderation report, 2020 Q3 onward, the
@@ -1331,7 +1337,7 @@ def build_japan_db(data: dict[str, Any], db_path: str) -> int:
     """
     if data is None:
         raise ValueError("japan dataset is None")
-    expected_cols = ["service", "period", "metric", "unit", "value"]
+    expected_cols = ["service", "period", "section", "category", "metric", "unit", "value"]
     if data.get("columns") != expected_cols:
         raise ValueError(f"japan dataset columns {data.get('columns')} "
                          f"don't match the expected order {expected_cols}")
@@ -1342,8 +1348,9 @@ def build_japan_db(data: dict[str, Any], db_path: str) -> int:
     try:
         with conn:
             conn.executemany(
-                "INSERT INTO japan_metrics (service, period, metric, unit, value) "
-                "VALUES (?,?,?,?,?)",
+                "INSERT INTO japan_metrics "
+                "(service, period, section, category, metric, unit, value) "
+                "VALUES (?,?,?,?,?,?,?)",
                 rows,
             )
         return len(rows)

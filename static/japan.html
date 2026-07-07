@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Japan Information Distribution Platform Act (情プラ法) — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) implementation statistics — LY Corporation's Media Transparency Report: posts, removals and removal rate per service." />
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, plus Google (YouTube)'s legal and policy actions by reason." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -251,6 +251,7 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .yt-h { font-size: 14px; margin: 4px 0 10px; color: var(--fg); }
 </style>
 </head>
 <body>
@@ -603,9 +604,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY Corporation · Annual · FY2024</span>
+    <span class="badge">LY Corp + YouTube · Art. 28</span>
     <h1>Japan — Information Distribution Platform Act (情プラ法)</h1>
-    <p>Japan's amended Provider Liability Limitation Act — the <strong>Information Distribution Platform Act</strong> (情プラ法, in force April 2025) — requires MIC-designated large providers to publish annual content-moderation statistics (Art. 28). <strong>LY Corporation</strong> is the one designated provider publishing figures so far (Google, Meta, TikTok and X publish only qualitative criteria pages), so this covers LY Corp's five services — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM and Yahoo! News comments — from its FY2024 Media Transparency Report. A tidy-long dataset: each row is one measured value identified by service × period × metric (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Pin a metric before aggregating — posts, removals and the rate aren't comparable, never sum the rate, and don't add the quarters to the annual total.</p>
+    <p>Japan's amended Provider Liability Limitation Act — the <strong>Information Distribution Platform Act</strong> (情プラ法, in force April 2025) — requires MIC-designated large providers to publish content-moderation statistics (Art. 28). Two providers publish figures so far (Meta, TikTok and X still publish only qualitative criteria pages): <strong>LY Corporation</strong>, covering its five services — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM and Yahoo! News comments — from its FY2024 Media Transparency Report, and <strong>Google (YouTube)</strong>, from its 26 Jul 2025 – 31 Mar 2026 report. A tidy-long dataset: each row is one measured value identified by service × period × section × category × metric. Metrics and sections aren't comparable — pin a <code>section</code>, <code>category</code> and <code>metric</code> before aggregating, never sum a rate, and don't add a section's <code>Total</code> to its own breakdown.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -658,11 +659,30 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <p class="hint">Refine or extend these in the <a href="/reports">query builder</a> (pin a <code>metric</code> before aggregating), browse the full field list on the <a href="/schema">Schema</a> page, or read the <a href="/methodology">Methodology</a>.</p>
+  <section class="data-section">
+    <h2>YouTube (Google)</h2>
+    <p class="sub">Google's YouTube Information Platform Act report covers <strong>26 Jul 2025 – 31 Mar 2026</strong> — Japan-specific figures on a different schedule from LY Corp's FY2024 tables, so the two aren't comparable. YouTube reported <span id="ytMau">…</span> monthly active users in Japan. Each breakdown below excludes its own <em>Total</em> row.</p>
+    <h3 class="yt-h">Legal removals by reason</h3>
+    <div class="results" id="ytLegal" aria-busy="true"><div class="results-loading">Loading…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — videos removed for policy, by reason</h2>
+    <p class="sub">Videos removed under YouTube's Community Guidelines in Japan, by policy reason. Most were first detected by automated systems (<span id="ytAuto">…</span> of removals) rather than by users, organisations or government.</p>
+    <div class="results" id="ytPolicy" aria-busy="true"><div class="results-loading">Loading…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — user flags by reason</h2>
+    <p class="sub">End-user flags submitted from Japan IP addresses, by the reason the flagger selected.</p>
+    <div class="results" id="ytFlags" aria-busy="true"><div class="results-loading">Loading…</div></div>
+  </section>
+
+  <p class="hint">Refine or extend these in the <a href="/reports">query builder</a> (pin a <code>section</code>, <code>category</code> and <code>metric</code> before aggregating), browse the full field list on the <a href="/schema">Schema</a> page, or read the <a href="/methodology">Methodology</a>.</p>
 </main>
 
 <footer>
-  <p>Source: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
+  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a> and Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> (Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Snapshot:</span> <span id="prov-snap"></span> · <span class="prov-label">Cite as:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -982,6 +1002,41 @@ display: flex; align-items: center; justify-content: space-between;
   var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
   Promise.all([soft(RATE_Q()), soft(REM_Q()), soft(OC_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
+  });
+
+  // ── YouTube (Google) — Information Platform Act report ──────────────────────
+  var YT_PERIOD = "2025-07-26..2026-03-31";
+  function ytQ(section, metric) {
+    return {"table":"japan_metrics","fields":["category","value"],"query":{"and":[
+      {"operation":"EQ","field_name":"service","field_values":["YouTube"]},
+      {"operation":"EQ","field_name":"period","field_values":[YT_PERIOD]},
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"EQ","field_name":"metric","field_values":[metric]}
+    ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
+  }
+  function ytRender(elId, section, metric, caption, numHead) {
+    soft(ytQ(section, metric)).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== 'Total'; });
+      renderTable(elId, rows, caption, "Reason", numHead);
+    });
+  }
+  ytRender('ytLegal', 'legal_removals', 'items_removed', "YouTube legal removals by reason.", "Items removed");
+  ytRender('ytPolicy', 'policy_removals', 'videos_removed', "YouTube policy video removals by reason.", "Videos removed");
+  ytRender('ytFlags', 'user_flags', 'flags', "YouTube user flags by reason.", "Flags");
+  // Headline: MAU, and the automated share of policy removals.
+  soft(ytQ('platform', 'monthly_active_users')).then(function (d) {
+    var el = document.getElementById('ytMau');
+    if (el && d.rows.length) el.textContent = fmt(d.rows[0][1]);
+  });
+  soft(ytQ('policy_detection_source', 'videos_removed')).then(function (d) {
+    var el = document.getElementById('ytAuto');
+    if (!el) return;
+    var total = 0, auto = 0;
+    d.rows.forEach(function (r) {
+      if (r[0] === 'Total') total = r[1];
+      else if (r[0] === 'Automated detection') auto = r[1];
+    });
+    if (total && auto) el.textContent = (100 * auto / total).toFixed(1) + '%';
   });
 })();
 </script>

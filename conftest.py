@@ -288,20 +288,23 @@ _SINGAPORE_FIXTURE = {
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
 # A small slice of the Japan 情プラ法 dataset (japan-info-platform.json shape):
-# LY Corporation services, a quarter + the annual total, mixing count metrics
-# (posts, posts_removed) with a percent (removal_rate).
-# [service, period, metric, unit, value]
+# LY Corp posts activity (section 'posts_activity', category 'All') plus a couple
+# of YouTube sections with their 'Total' beside a reason breakdown.
+# [service, period, section, category, metric, unit, value]
 _JAPAN_FIXTURE = {
-    "columns": ["service", "period", "metric", "unit", "value"],
+    "columns": ["service", "period", "section", "category", "metric", "unit", "value"],
     "rows": [
-        ["Yahoo! Chiebukuro", "2024-04..2024-06", "posts", "count", 17294266],
-        ["Yahoo! Chiebukuro", "2024-04..2024-06", "posts_removed", "count", 111889],
-        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts", "count", 66199309],
-        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts_removed", "count", 444727],
-        ["Yahoo! Chiebukuro", "2024-04..2025-03", "removal_rate", "percent", 0.7],
-        ["LINE OpenChat", "2024-04..2025-03", "posts", "count", 5514828787],
-        ["LINE OpenChat", "2024-04..2025-03", "posts_removed", "count", 6980935],
-        ["LINE OpenChat", "2024-04..2025-03", "removal_rate", "percent", 0.1],
+        ["Yahoo! Chiebukuro", "2024-04..2024-06", "posts_activity", "All", "posts", "count", 17294266],
+        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts_activity", "All", "posts", "count", 66199309],
+        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts_activity", "All", "posts_removed", "count", 444727],
+        ["Yahoo! Chiebukuro", "2024-04..2025-03", "posts_activity", "All", "removal_rate", "percent", 0.7],
+        ["LINE OpenChat", "2024-04..2025-03", "posts_activity", "All", "posts", "count", 5514828787],
+        # YouTube: legal_removals by reason (Total 289 = 155 + 117 + 17 here),
+        ["YouTube", "2025-07-26..2026-03-31", "legal_removals", "Total", "items_removed", "count", 289],
+        ["YouTube", "2025-07-26..2026-03-31", "legal_removals", "Defamation", "items_removed", "count", 155],
+        ["YouTube", "2025-07-26..2026-03-31", "legal_removals", "Trademark", "items_removed", "count", 117],
+        # and a headline platform figure.
+        ["YouTube", "2025-07-26..2026-03-31", "platform", "All", "monthly_active_users", "count", 106400000],
     ],
 }
 seed.build_japan_db(_JAPAN_FIXTURE, _DB)
