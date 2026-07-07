@@ -152,6 +152,10 @@ _INDIA_FIXTURE = {
         ["Twitter", "2022-10", "grievances", "Abuse / Harassment",
          "grievances_received", "count", 582],
         ["Moj", "2021-06", "complaints", "", "complaints_received", "count", 1958124],
+        # Google's half-yearly GAC (Grievance Appellate Committee) appeals report.
+        ["Google", "2023-10..2024-03", "gac_appeals", "YouTube", "appeals_closed", "count", 3],
+        ["Google", "2023-10..2024-03", "gac_appeals", "Gmail", "appeals_closed", "count", 4],
+        ["Google", "2023-10..2024-03", "gac_appeals", "Gmail", "appeals_not_admitted", "count", 1],
     ],
 }
 seed.build_india_db(_INDIA_FIXTURE, _DB)
