@@ -219,6 +219,31 @@ _TURKEY_FIXTURE = {
 }
 seed.build_turkey_db(_TURKEY_FIXTURE, _DB)
 
+# A small slice of the EU TCO Regulation dataset (tco-regulation.json shape): the
+# authority stream (per-Member-State removal orders issued, incl. Romania, + an EU
+# summary) and the platform stream (Art. 7 enforcement figures).
+_TCO_FIXTURE = {
+    "columns": ["publisher", "role", "period", "section", "category",
+                "metric", "unit", "value"],
+    "rows": [
+        ["European Commission", "authority", "2022-06..2023-12", "removal_orders_issued",
+         "Germany", "removal_orders_issued", "count", 249],
+        ["European Commission", "authority", "2022-06..2023-12", "removal_orders_issued",
+         "Romania", "removal_orders_issued", "count", 2],
+        ["European Commission", "authority", "2022-06..2023-12", "removal_orders_issued",
+         "EU", "total_removal_orders_issued", "count", 349],
+        ["Spotify", "platform", "2024", "platform_enforcement",
+         "Spotify for Creators", "content_removed_via_orders", "count", 25],
+        ["Spotify", "platform", "2024", "platform_enforcement",
+         "Spotify", "content_removed_proactive", "count", 449],
+        ["Meta", "platform", "2023", "platform_enforcement",
+         "Facebook", "content_removed_via_orders", "count", 10],
+        ["Meta", "platform", "2023", "platform_enforcement",
+         "Facebook", "content_removed_proactive", "approx_count", 6100000],
+    ],
+}
+seed.build_tco_db(_TCO_FIXTURE, _DB)
+
 # A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
 # Instagram, a couple of policy areas and quarters, mixing count metrics
 # (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),

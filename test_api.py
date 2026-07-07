@@ -3280,6 +3280,68 @@ class TestTurkeyTable:
         assert all(r[3] for r in data["rows"] if r[0] == "X")
 
 
+class TestTcoTable:
+    def test_tco_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "tco_metrics" in names
+
+    def test_tco_fields_endpoint(self):
+        body = client.get("/api/fields?table=tco_metrics", headers=MOMO).json()
+        assert {"publisher", "role", "period", "section", "category", "metric",
+                "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_tco_removal_orders_by_member_state(self):
+        # Per-Member-State removal orders issued (authority stream). Filtering on
+        # metric=removal_orders_issued isolates the per-country rows — the 'EU'
+        # summary uses a different metric name, so it's excluded.
+        job = _submit_and_wait({
+            "table": "tco_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric",
+                 "field_values": ["removal_orders_issued"]},
+            ]},
+            "group_by": ["category"],
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "n", "order": "desc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        cats = {r[0]: r[1] for r in body["rows"]}
+        assert cats["Germany"] == 249 and cats["Romania"] == 2
+        assert "EU" not in cats  # the summary total isn't mixed into the per-country cut
+
+    def test_tco_unpinned_sum_warns(self):
+        # A SUM pinning none of publisher / metric / category mixes incomparable
+        # metrics and publishers, and the EU summary total with its own parts.
+        r = client.post("/api/explore", json={
+            "table": "tco_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "publisher" in warnings and "metric" in warnings and "category" in warnings
+
+    def test_tco_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "tco_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "publisher",
+                 "field_values": ["European Commission"]},
+                {"operation": "EQ", "field_name": "metric",
+                 "field_values": ["removal_orders_issued"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["Romania"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
+
+    def test_tco_page_served(self):
+        r = client.get("/tco")
+        assert r.status_code == 200 and "tco_metrics" in r.text
+
+
 class TestCserTable:
     def test_cser_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
