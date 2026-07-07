@@ -401,7 +401,7 @@ display: flex; align-items: center;
       싱가포르
     </a>
 
-    <a href="/japan" class="nav-item">
+    <a href="/ko/japan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.5 3.25h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6.5l-3 2.25V11.25h-1a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
@@ -612,15 +612,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">전문 검색</span>
     <h1>투명성 보고서 본문 검색</h1>
-    <p>플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕과 캘리포니아의 서비스 약관 보고서와 EU DSA 보고서의 정성적 섹션을 아우릅니다.</p>
+    <p>플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕과 캘리포니아의 서비스 약관 보고서, EU DSA 보고서의 정성적 섹션, 그리고 LY 코퍼레이션의 일본어 미디어 투명성 보고서(영어 번역)를 아우릅니다.</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">세 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서와 캘리포니아 AB 587 제출물(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명)와 EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지). 각 결과는 한 페이지 또는 하나의 기술이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.</p>
+    <p class="sub">네 개 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서와 캘리포니아 AB 587 제출물(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명), EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지), 그리고 일본 情プラ法에 따른 LY 코퍼레이션의 일본어 <strong>미디어 투명성 보고서</strong>(영어 번역과 일본어 원문을 함께 저장하여 어느 언어로도 검색 가능). 각 결과는 한 페이지·기술·섹션이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.</p>
     <div class="controls">
       <label>검색 <input id="nq" type="search" placeholder="예: 혐오 표현, 이의 제기, 알고리즘" autocomplete="off" /></label>
-      <label>출처 <select id="nsrc"><option value="">전체</option><option value="ny-tos">뉴욕 ToS 보고서</option><option value="ca-ab587">CA AB 587 보고서</option><option value="dsa">DSA 보고서</option></select></label>
+      <label>출처 <select id="nsrc"><option value="">전체</option><option value="ny-tos">뉴욕 ToS 보고서</option><option value="ca-ab587">CA AB 587 보고서</option><option value="dsa">DSA 보고서</option><option value="japan">일본(LY 코퍼레이션)</option></select></label>
       <label>회사 <select id="nco"><option value="">전체</option></select></label>
       <label>기간 <select id="nper"><option value="">전체</option></select></label>
       <button id="nbtn" type="button">검색</button>
@@ -669,7 +669,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
 
 let nAbort = null;
 

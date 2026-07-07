@@ -151,6 +151,12 @@ _DEFAULT_CA_AB587_SOURCE = os.getenv(
 _DEFAULT_CA_AB587_NARRATIVES_SOURCE = os.getenv(
     "SEED_CA_AB587_NARRATIVES_JSON", os.path.join(HERE, "data", "ca-ab587-narratives.json")
 )
+# Japan 情プラ法 — LY Corporation's Media Transparency Report prose, vendored
+# in-repo (from the sibling data repo's japan-info-platform/build_japan_narratives.py).
+# Bilingual (English translation + Japanese original) since the source is JA-only.
+_DEFAULT_JAPAN_NARRATIVES_SOURCE = os.getenv(
+    "SEED_JAPAN_NARRATIVES_JSON", os.path.join(HERE, "data", "japan-narratives.json")
+)
 
 
 def _category_label(code: str, labels: dict[str, str] | None) -> str:
@@ -1676,6 +1682,13 @@ def build_ca_ab587_narratives(data: dict[str, Any], db_path: str) -> int:
     return _build_narratives(data, db_path, "ca-ab587")
 
 
+def build_japan_narratives(data: dict[str, Any], db_path: str) -> int:
+    """Populate report_narratives with LY Corporation's Media Transparency Report
+    prose (source='japan'). Bilingual: each `text` is an English translation
+    followed by the Japanese original (the source report is Japanese-only)."""
+    return _build_narratives(data, db_path, "japan")
+
+
 # A qualitative cell shorter than this (after trimming) is a placeholder — a bare
 # "N/A", a dash, a "-", a lone URL fragment — not searchable prose, so it's skipped.
 _DSA_NARRATIVE_MIN_CHARS = 60
@@ -1760,6 +1773,8 @@ def main() -> None:
                         help="Path to ca-ab587-reports.csv (California AB 587 catalogue)")
     parser.add_argument("--ca-ab587-narratives", default=_DEFAULT_CA_AB587_NARRATIVES_SOURCE,
                         help="Path to ca-ab587-narratives.json")
+    parser.add_argument("--japan-narratives", default=_DEFAULT_JAPAN_NARRATIVES_SOURCE,
+                        help="Path to japan-narratives.json (LY Corp report prose)")
     parser.add_argument("--apple-source", default=_DEFAULT_APPLE_SOURCE,
                         help="Path to apple-transparency.json")
     parser.add_argument("--github-source", default=_DEFAULT_GITHUB_SOURCE,
@@ -2052,6 +2067,14 @@ def main() -> None:
               f"{len({r[1] or r[0] for r in ab_nar_data['rows']})} platforms")
     else:
         print(f"  (skipping CA AB 587 narratives — not found: {args.ca_ab587_narratives})")
+
+    if os.path.isfile(args.japan_narratives):
+        with open(args.japan_narratives, "r", encoding="utf-8") as f:
+            jp_nar_data = json.load(f)
+        jp_nar_rows = build_japan_narratives(jp_nar_data, args.db)
+        print(f"  japan narratives: {jp_nar_rows} bilingual sections")
+    else:
+        print(f"  (skipping Japan narratives — not found: {args.japan_narratives})")
 
     # Append the non-VLOP harmonised-template reports into the same star schema
     # (from the vendored snapshot, or the sibling repo's extracted CSVs in dev).

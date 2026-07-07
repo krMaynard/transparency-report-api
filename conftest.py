@@ -519,6 +519,25 @@ _CA_AB587_NARRATIVES_FIXTURE = {
 }
 seed.build_ca_ab587_narratives(_CA_AB587_NARRATIVES_FIXTURE, _DB)
 
+# A tiny slice of the Japan narratives (source='japan'), same section-per-row
+# shape. Each `text` is bilingual — an English translation followed by the
+# Japanese original — so both languages are searchable (the source report is
+# JA-only). [company, platform, period, page, heading, text]
+_JAPAN_NARRATIVES_FIXTURE = {
+    "columns": ["company", "platform", "period", "page", "heading", "text"],
+    "rows": [
+        ["LY Corporation", "Yahoo! Chiebukuro", "2024-04..2025-03", 6,
+         "Yahoo! Chiebukuro — responding to violations",
+         "When a post is judged to violate the rules of use it is removed.\n\n"
+         "投稿が「利用のルール」に違反したと判断された場合は、投稿を削除します。"],
+        ["LY Corporation", "", "2024-04..2025-03", 61,
+         "Common — monitoring framework: AI systems",
+         "LINE Yahoo combines AI with human review on its supercomputer kukai.\n\n"
+         "LINE ヤフーは、AI と専門チームによる人の目を組み合わせて監視しています。"],
+    ],
+}
+seed.build_japan_narratives(_JAPAN_NARRATIVES_FIXTURE, _DB)
+
 # Index the DSA Table-11 qualitative prose (source='dsa') from the seeded t11
 # rows — the same code path seed.main() runs after the harmonised append.
 seed.build_dsa_narratives(_DB)

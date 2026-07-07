@@ -401,7 +401,7 @@ display: flex; align-items: center;
       Singapur
     </a>
 
-    <a href="/japan" class="nav-item">
+    <a href="/de/japan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.5 3.25h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6.5l-3 2.25V11.25h-1a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
@@ -612,15 +612,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">Volltextsuche</span>
     <h1>Den Text der Transparenzberichte durchsuchen</h1>
-    <p>Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien und die qualitativen Abschnitte der EU-DSA-Berichte.</p>
+    <p>Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien, die qualitativen Abschnitte der EU-DSA-Berichte und den japanischen Media-Transparency-Report von LY Corporation (ins Englische übersetzt).</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">Volltextsuche im <strong>Fließtext</strong> dreier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben) und die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt). Jedes Ergebnis ist eine Seite oder Beschreibung, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).</p>
+    <p class="sub">Volltextsuche im <strong>Fließtext</strong> von vier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben), die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt) und der japanische <strong>Media Transparency Report</strong> von LY Corporation nach Japans 情プラ法 (zweisprachig gespeichert — eine englische Übersetzung plus das japanische Original — und damit in beiden Sprachen durchsuchbar). Jedes Ergebnis ist eine Seite, Beschreibung oder ein Abschnitt, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>Suche <input id="nq" type="search" placeholder="z. B. Hassrede, Einsprüche, Algorithmus" autocomplete="off" /></label>
-      <label>Quelle <select id="nsrc"><option value="">Alle</option><option value="ny-tos">NY-ToS-Berichte</option><option value="ca-ab587">CA-AB-587-Berichte</option><option value="dsa">DSA-Berichte</option></select></label>
+      <label>Quelle <select id="nsrc"><option value="">Alle</option><option value="ny-tos">NY-ToS-Berichte</option><option value="ca-ab587">CA-AB-587-Berichte</option><option value="dsa">DSA-Berichte</option><option value="japan">Japan (LY Corp)</option></select></label>
       <label>Unternehmen <select id="nco"><option value="">Alle</option></select></label>
       <label>Zeitraum <select id="nper"><option value="">Alle</option></select></label>
       <button id="nbtn" type="button">Suchen</button>
@@ -669,7 +669,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
 
 let nAbort = null;
 

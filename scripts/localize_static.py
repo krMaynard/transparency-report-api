@@ -33,7 +33,7 @@ STATIC = os.path.join(ROOT, "static")
 PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-tos.html",
                "ca-ab587.html",
                "apple.html", "github.html", "snap.html",
-               "india.html", "korea.html", "taiwan.html", "turkey.html", "cser.html",
+               "india.html", "korea.html", "taiwan.html", "turkey.html", "cser.html", "japan.html",
                "tiktok-cger.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
                "disruptions.html", "android.html", "narratives.html",
@@ -54,6 +54,7 @@ SUFFIX = {
     "taiwan.html": "taiwan",
     "turkey.html": "turkey",
     "cser.html": "cser",
+    "japan.html": "japan",
     "tiktok-cger.html": "tiktok-cger",
     "user-data.html": "user-data",
     "microsoft.html": "microsoft",
@@ -123,7 +124,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/ca-ab587', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/tiktok-cger', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/japan', '/tiktok-cger', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -10687,23 +10688,23 @@ _NAR_PAGE = {
         "zh": "检索透明度报告正文",
         "ko": "투명성 보고서 본문 검색",
     },
-    "Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings and the EU DSA reports' qualitative sections.": {
-        "es": "Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y California y las secciones cualitativas de los informes de la DSA de la UE.",
-        "fr": "Recherche plein texte dans la prose des rapports de transparence des plateformes : le langage qu'elles emploient pour décrire comment elles définissent et appliquent leurs politiques de modération de contenu. Couvre les dépôts de conditions d'utilisation de New York et de Californie et les sections qualitatives des rapports DSA de l'UE.",
-        "de": "Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien und die qualitativen Abschnitte der EU-DSA-Berichte.",
-        "it": "Ricerca full-text nella prosa dei report di trasparenza delle piattaforme: il linguaggio con cui descrivono come definiscono e applicano le loro policy di moderazione dei contenuti. Comprende i report sulle condizioni di servizio di New York e della California e le sezioni qualitative dei report DSA dell'UE.",
-        "ja": "プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークとカリフォルニアの利用規約報告書と、EU DSA 報告書の定性的セクションを対象とします。",
-        "zh": "对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约和加利福尼亚州的《服务条款》报告以及欧盟 DSA 报告的定性部分。",
-        "ko": "플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕과 캘리포니아의 서비스 약관 보고서와 EU DSA 보고서의 정성적 섹션을 아우릅니다.",
+    "Full-text search across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings, the EU DSA reports' qualitative sections, and LY Corporation's Japanese Media Transparency Report (translated to English).": {
+        "es": "Búsqueda de texto completo en la prosa de los informes de transparencia de las plataformas: el lenguaje que usan para describir cómo definen y aplican sus políticas de moderación de contenidos. Abarca los informes de condiciones de servicio de Nueva York y California, las secciones cualitativas de los informes de la DSA de la UE y el Informe de Transparencia de Medios japonés de LY Corporation (traducido al inglés).",
+        "fr": "Recherche plein texte dans la prose des rapports de transparence des plateformes : le langage qu'elles emploient pour décrire comment elles définissent et appliquent leurs politiques de modération de contenu. Couvre les dépôts de conditions d'utilisation de New York et de Californie, les sections qualitatives des rapports DSA de l'UE et le Rapport de transparence des médias japonais de LY Corporation (traduit en anglais).",
+        "de": "Volltextsuche im Fließtext der Transparenzberichte von Plattformen — die Sprache, mit der sie beschreiben, wie sie ihre Richtlinien zur Inhaltsmoderation definieren und durchsetzen. Umfasst die Nutzungsbedingungen-Berichte aus New York und Kalifornien, die qualitativen Abschnitte der EU-DSA-Berichte und den japanischen Media-Transparency-Report von LY Corporation (ins Englische übersetzt).",
+        "it": "Ricerca full-text nella prosa dei report di trasparenza delle piattaforme: il linguaggio con cui descrivono come definiscono e applicano le loro policy di moderazione dei contenuti. Comprende i report sulle condizioni di servizio di New York e della California, le sezioni qualitative dei report DSA dell'UE e il Media Transparency Report giapponese di LY Corporation (tradotto in inglese).",
+        "ja": "プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークとカリフォルニアの利用規約報告書、EU DSA 報告書の定性的セクション、および LY コーポレーションの日本語のメディア透明性レポート（英訳）を対象とします。",
+        "zh": "对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约和加利福尼亚州的《服务条款》报告、欧盟 DSA 报告的定性部分，以及 LY 集团日文《媒体透明度报告》（已译为英文）。",
+        "ko": "플랫폼 투명성 보고서 본문에 대한 전문 검색입니다. 각 플랫폼이 콘텐츠 조정 정책을 어떻게 정의하고 집행하는지 설명하는 문구입니다. 뉴욕과 캘리포니아의 서비스 약관 보고서, EU DSA 보고서의 정성적 섹션, 그리고 LY 코퍼레이션의 일본어 미디어 투명성 보고서(영어 번역)를 아우릅니다.",
     },
-    "Full-text search across the <strong>prose</strong> of three corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference) and the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach). Each result is one page or description, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).": {
-        "es": "Búsqueda de texto completo en la <strong>prosa</strong> de tres corpus: los informes de condiciones de servicio de redes sociales de Nueva York y los informes AB 587 de California (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera) y las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos). Cada resultado es una página o descripción, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).",
-        "fr": "Recherche plein texte dans la <strong>prose</strong> de trois corpus : les dépôts de conditions d'utilisation des réseaux sociaux de New York et les dépôts AB 587 de Californie (comment les plateformes décrivent la définition et l'application de leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère) et les descriptions qualitatives du tableau 11 des rapports DSA de l'UE (comment chaque service décrit son approche de modération de contenu). Chaque résultat est une page ou une description, classée par pertinence ; les résultats de New York renvoient au PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).",
-        "de": "Volltextsuche im <strong>Fließtext</strong> dreier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben) und die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt). Jedes Ergebnis ist eine Seite oder Beschreibung, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).",
-        "it": "Ricerca full-text nella <strong>prosa</strong> di tre corpora: i report sulle condizioni di servizio dei social media di New York e le presentazioni AB 587 della California (come le piattaforme descrivono la definizione e l'applicazione delle regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera) e le descrizioni qualitative della Tabella 11 dei report DSA dell'UE (come ciascun servizio descrive il proprio approccio alla moderazione dei contenuti). Ogni risultato è una pagina o descrizione, ordinata per pertinenza; i risultati di New York rimandano al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).",
-        "ja": "3 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書とカリフォルニア州 AB 587 の提出書類（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）と、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）です。各結果は 1 ページまたは 1 件の記述で、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。",
-        "zh": "对三个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告和加利福尼亚州 AB 587 提交文件（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）以及欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式）。每条结果是一页或一条描述，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。",
-        "ko": "세 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서와 캘리포니아 AB 587 제출물(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명)와 EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지). 각 결과는 한 페이지 또는 하나의 기술이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.",
+    "Full-text search across the <strong>prose</strong> of four corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference), the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach), and LY Corporation's Japanese <strong>Media Transparency Report</strong> under Japan's 情プラ法 (stored bilingually — an English translation plus the Japanese original — so it's searchable in either language). Each result is one page, description or section, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).": {
+        "es": "Búsqueda de texto completo en la <strong>prosa</strong> de cuatro corpus: los informes de condiciones de servicio de redes sociales de Nueva York y los informes AB 587 de California (cómo describen las plataformas la definición y aplicación de sus normas sobre discurso de odio, extremismo, desinformación, acoso e injerencia política extranjera), las descripciones cualitativas de la Tabla 11 de los informes de la DSA de la UE (cómo describe cada servicio su enfoque de moderación de contenidos) y el <strong>Informe de Transparencia de Medios</strong> japonés de LY Corporation, publicado bajo la 情プラ法 de Japón (almacenado de forma bilingüe —una traducción al inglés más el original en japonés— para poder buscarlo en cualquiera de los dos idiomas). Cada resultado es una página, descripción o sección, ordenada por relevancia; los resultados de Nueva York enlazan al PDF archivado. Servido por el endpoint público de solo lectura <code>GET /api/narratives</code> (SQLite FTS5).",
+        "fr": "Recherche plein texte dans la <strong>prose</strong> de quatre corpus : les dépôts de conditions d'utilisation des réseaux sociaux de New York et les dépôts AB 587 de Californie (comment les plateformes décrivent la définition et l'application de leurs règles sur le discours de haine, l'extrémisme, la désinformation, le harcèlement et l'ingérence politique étrangère), les descriptions qualitatives du tableau 11 des rapports DSA de l'UE (comment chaque service décrit son approche de modération de contenu) et le <strong>Rapport de transparence des médias</strong> japonais de LY Corporation, publié au titre de la 情プラ法 japonaise (stocké de façon bilingue — une traduction anglaise et l'original japonais — pour être recherché dans l'une ou l'autre langue). Chaque résultat est une page, une description ou une section, classée par pertinence ; les résultats de New York renvoient au PDF archivé. Fourni par l'endpoint public en lecture seule <code>GET /api/narratives</code> (SQLite FTS5).",
+        "de": "Volltextsuche im <strong>Fließtext</strong> von vier Korpora: die New Yorker Social-Media-Nutzungsbedingungen-Berichte und die kalifornischen AB-587-Einreichungen (wie Plattformen die Definition und Durchsetzung ihrer Regeln zu Hassrede, Extremismus, Desinformation, Belästigung und ausländischer politischer Einflussnahme beschreiben), die qualitativen Beschreibungen aus Tabelle 11 der EU-DSA-Berichte (wie jeder Dienst seinen Ansatz zur Inhaltsmoderation beschreibt) und der japanische <strong>Media Transparency Report</strong> von LY Corporation nach Japans 情プラ法 (zweisprachig gespeichert — eine englische Übersetzung plus das japanische Original — und damit in beiden Sprachen durchsuchbar). Jedes Ergebnis ist eine Seite, Beschreibung oder ein Abschnitt, nach Relevanz sortiert; New-York-Ergebnisse verlinken auf das archivierte PDF. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/narratives</code> (SQLite FTS5).",
+        "it": "Ricerca full-text nella <strong>prosa</strong> di quattro corpora: i report sulle condizioni di servizio dei social media di New York e le presentazioni AB 587 della California (come le piattaforme descrivono la definizione e l'applicazione delle regole su incitamento all'odio, estremismo, disinformazione, molestie e ingerenza politica straniera), le descrizioni qualitative della Tabella 11 dei report DSA dell'UE (come ciascun servizio descrive il proprio approccio alla moderazione dei contenuti) e il <strong>Media Transparency Report</strong> giapponese di LY Corporation, pubblicato ai sensi della 情プラ法 giapponese (memorizzato in forma bilingue — una traduzione in inglese più l'originale giapponese — così da poterlo cercare in entrambe le lingue). Ogni risultato è una pagina, descrizione o sezione, ordinata per pertinenza; i risultati di New York rimandano al PDF archiviato. Servito dall'endpoint pubblico di sola lettura <code>GET /api/narratives</code> (SQLite FTS5).",
+        "ja": "4 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書とカリフォルニア州 AB 587 の提出書類（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）、および日本の情プラ法に基づく LY コーポレーションの<strong>メディア透明性レポート</strong>（英訳と日本語原文を併録して保存しており、いずれの言語でも検索できます）です。各結果は 1 ページ・1 件の記述・1 セクションで、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。",
+        "zh": "对四个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告和加利福尼亚州 AB 587 提交文件（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）、欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式），以及依据日本情プラ法发布的 LY 集团日文<strong>《媒体透明度报告》</strong>（以双语保存——英文译文加日文原文——因此可用任一语言检索）。每条结果是一页、一条描述或一节，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。",
+        "ko": "네 개 코퍼스 <strong>본문</strong>에 대한 전문 검색입니다: 뉴욕 소셜미디어 서비스 약관 보고서와 캘리포니아 AB 587 제출물(각 플랫폼이 혐오 표현·극단주의·허위정보·괴롭힘·외국의 정치적 개입을 어떻게 정의하고 집행하는지 설명), EU DSA 보고서 표 11의 정성적 기술(각 서비스가 콘텐츠 조정 방식을 어떻게 설명하는지), 그리고 일본 情プラ法에 따른 LY 코퍼레이션의 일본어 <strong>미디어 투명성 보고서</strong>(영어 번역과 일본어 원문을 함께 저장하여 어느 언어로도 검색 가능). 각 결과는 한 페이지·기술·섹션이며 관련도순으로 정렬됩니다. 뉴욕 결과는 보관된 PDF로 연결됩니다. 공개 읽기 전용 <code>GET /api/narratives</code>(SQLite FTS5)가 제공합니다.",
     },
     "<label>Source <select": {
         "es": "<label>Fuente <select", "fr": "<label>Source <select",
@@ -10719,6 +10720,12 @@ _NAR_PAGE = {
         "es": ">Informes DSA</option>", "fr": ">Rapports DSA</option>",
         "de": ">DSA-Berichte</option>", "it": ">Report DSA</option>",
         "ja": ">DSA 報告書</option>", "zh": ">DSA 报告</option>", "ko": ">DSA 보고서</option>",
+    },
+    ">Japan (LY Corp)</option>": {
+        "es": ">Japón (LY Corp)</option>", "fr": ">Japon (LY Corp)</option>",
+        "de": ">Japan (LY Corp)</option>", "it": ">Giappone (LY Corp)</option>",
+        "ja": ">日本（LY コーポレーション）</option>", "zh": ">日本（LY 集团）</option>",
+        "ko": ">일본(LY 코퍼레이션)</option>",
     },
     "<label>Company <select": {
         "es": "<label>Empresa <select", "fr": "<label>Entreprise <select",
@@ -11046,10 +11053,191 @@ _JP_CARD_DESC = {
     "zh": "日本《信息流通平台应对法》（情プラ法）实施统计——LY 公司的媒体透明度报告：Yahoo! 知惠袋、LINE 开放聊天、VOOM 等的投稿数、删除数与删除率。",
     "ko": "일본 정보유통플랫폼대처법(情プラ法) 시행 통계 — LY 코퍼레이션의 미디어 투명성 보고서: Yahoo! 지혜주머니, LINE 오픈챗, VOOM 등의 게시물·삭제 건수와 삭제율.",
 }
+_JP_PAGE = {
+    "Japan Information Distribution Platform Act (情プラ法) — Transparency Report API": {
+        "es": "Ley de Plataformas de Distribución de Información de Japón (情プラ法) — Transparency Report API",
+        "fr": "Loi japonaise sur les plateformes de distribution d'informations (情プラ法) — Transparency Report API",
+        "de": "Japans Gesetz über Informationsverteilungsplattformen (情プラ法) — Transparency Report API",
+        "it": "Legge giapponese sulle piattaforme di distribuzione delle informazioni (情プラ法) — Transparency Report API",
+        "ja": "日本 情報流通プラットフォーム対処法（情プラ法） — Transparency Report API",
+        "zh": "日本《信息流通平台应对法》（情プラ法） — Transparency Report API",
+        "ko": "일본 정보유통플랫폼대처법(情プラ法) — Transparency Report API",
+    },
+    "LY Corporation · Annual · FY2024": {
+        "es": "LY Corporation · Anual · Ejercicio 2024", "fr": "LY Corporation · Annuel · Exercice 2024",
+        "de": "LY Corporation · Jährlich · GJ2024", "it": "LY Corporation · Annuale · Esercizio 2024",
+        "ja": "LY コーポレーション · 年次 · 2024年度", "zh": "LY 公司 · 年度 · 2024财年", "ko": "LY 코퍼레이션 · 연간 · 2024회계연도",
+    },
+    "Japan — Information Distribution Platform Act (情プラ法)": {
+        "es": "Japón — Ley de Plataformas de Distribución de Información (情プラ法)",
+        "fr": "Japon — Loi sur les plateformes de distribution d'informations (情プラ法)",
+        "de": "Japan — Gesetz über Informationsverteilungsplattformen (情プラ法)",
+        "it": "Giappone — Legge sulle piattaforme di distribuzione delle informazioni (情プラ法)",
+        "ja": "日本 — 情報流通プラットフォーム対処法（情プラ法）",
+        "zh": "日本 — 《信息流通平台应对法》（情プラ法）",
+        "ko": "일본 — 정보유통플랫폼대처법(情プラ法)",
+    },
+    "Japan's amended Provider Liability Limitation Act — the <strong>Information Distribution Platform Act</strong> (情プラ法, in force April 2025) — requires MIC-designated large providers to publish annual content-moderation statistics (Art. 28). <strong>LY Corporation</strong> is the one designated provider publishing figures so far (Google, Meta, TikTok and X publish only qualitative criteria pages), so this covers LY Corp's five services — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM and Yahoo! News comments — from its FY2024 Media Transparency Report. A tidy-long dataset: each row is one measured value identified by service × period × metric (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Pin a metric before aggregating — posts, removals and the rate aren't comparable, never sum the rate, and don't add the quarters to the annual total.": {
+        "es": "La Ley de Limitación de Responsabilidad de los Proveedores de Japón, reformada — la <strong>Ley de Plataformas de Distribución de Información</strong> (情プラ法, en vigor desde abril de 2025) — obliga a los grandes proveedores designados por el MIC a publicar estadísticas anuales de moderación de contenidos (art. 28). <strong>LY Corporation</strong> es el único proveedor designado que publica cifras hasta ahora (Google, Meta, TikTok y X solo publican páginas de criterios cualitativos), por lo que esto cubre los cinco servicios de LY Corp — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM y Yahoo! News comments — de su Informe de Transparencia de Medios del ejercicio 2024. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por servicio × período × métrica (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Fija una métrica antes de agregar: las publicaciones, las retiradas y la tasa no son comparables, nunca sumes la tasa y no añadas los trimestres al total anual.",
+        "fr": "La loi japonaise sur la limitation de la responsabilité des fournisseurs, modifiée — la <strong>loi sur les plateformes de distribution d'informations</strong> (情プラ法, en vigueur depuis avril 2025) — impose aux grands fournisseurs désignés par le MIC de publier des statistiques annuelles de modération des contenus (art. 28). <strong>LY Corporation</strong> est le seul fournisseur désigné à publier des chiffres à ce jour (Google, Meta, TikTok et X ne publient que des pages de critères qualitatifs), ce qui couvre donc les cinq services de LY Corp — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM et Yahoo! News comments — d'après son rapport de transparence des médias de l'exercice 2024. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par service × période × métrique (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Épinglez une métrique avant d'agréger : les publications, les retraits et le taux ne sont pas comparables, ne sommez jamais le taux et n'ajoutez pas les trimestres au total annuel.",
+        "de": "Japans novelliertes Gesetz zur Beschränkung der Anbieterhaftung — das <strong>Gesetz über Informationsverteilungsplattformen</strong> (情プラ法, in Kraft seit April 2025) — verpflichtet die vom MIC benannten großen Anbieter, jährliche Statistiken zur Inhaltsmoderation zu veröffentlichen (Art. 28). <strong>LY Corporation</strong> ist bisher der einzige benannte Anbieter, der Zahlen veröffentlicht (Google, Meta, TikTok und X veröffentlichen nur qualitative Kriterienseiten), daher deckt dies die fünf Dienste von LY Corp ab — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM und Yahoo! News comments — aus seinem Medien-Transparenzbericht für das Geschäftsjahr 2024. Ein Tidy-long-Datensatz: jede Zeile ist ein Messwert, identifiziert durch Dienst × Zeitraum × Metrik (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Fixieren Sie eine Metrik vor dem Aggregieren — Beiträge, Entfernungen und die Quote sind nicht vergleichbar, summieren Sie die Quote nie und addieren Sie die Quartale nicht zum Jahresergebnis.",
+        "it": "La legge giapponese sulla limitazione della responsabilità dei provider, modificata — la <strong>legge sulle piattaforme di distribuzione delle informazioni</strong> (情プラ法, in vigore da aprile 2025) — impone ai grandi provider designati dal MIC di pubblicare statistiche annuali sulla moderazione dei contenuti (art. 28). <strong>LY Corporation</strong> è finora l'unico provider designato a pubblicare cifre (Google, Meta, TikTok e X pubblicano solo pagine di criteri qualitativi), quindi questo copre i cinque servizi di LY Corp — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM e Yahoo! News comments — dal suo report sulla trasparenza dei media dell'esercizio 2024. Un set di dati tidy-long: ogni riga è un valore misurato identificato da servizio × periodo × metrica (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Fissa una metrica prima di aggregare: post, rimozioni e tasso non sono comparabili, non sommare mai il tasso e non aggiungere i trimestri al totale annuale.",
+        "ja": "改正されたプロバイダ責任制限法 — <strong>情報流通プラットフォーム対処法</strong>（情プラ法、2025年4月施行） — は、総務省が指定する大規模提供者に対し、年次のコンテンツモデレーション統計の公表を義務付けています（第28条）。現時点で数値を公表している指定提供者は <strong>LY コーポレーション</strong> のみで（Google・Meta・TikTok・X は定性的な基準ページのみ）、本データは同社の2024年度メディア透明性レポートから、5つのサービス（Yahoo!知恵袋、Yahoo!ファイナンス掲示板、LINE オープンチャット、LINE VOOM、Yahoo!ニュース コメント）を対象としています。tidy-long データセットで、各行はサービス × 期間 × 指標（<code>posts</code>、<code>posts_removed</code>、<code>removal_rate</code>）で識別される1つの測定値です。集計の前に指標を固定してください — 投稿・削除・割合は比較できず、割合は決して合計せず、四半期を年度合計に足さないでください。",
+        "zh": "日本修订后的《提供商责任限制法》——即<strong>《信息流通平台应对法》</strong>（情プラ法，2025年4月施行）——要求总务省指定的大型提供商公布年度内容审核统计（第28条）。目前只有 <strong>LY 公司</strong>这一家指定提供商公布数据（Google、Meta、TikTok 与 X 仅公布定性标准页面），因此本数据涵盖 LY 公司的五项服务——Yahoo! 知惠袋、Yahoo! 财经论坛、LINE 开放聊天、LINE VOOM 与 Yahoo! 新闻评论——取自其2024财年媒体透明度报告。这是一个 tidy-long 数据集：每行是由服务 × 期间 × 指标（<code>posts</code>、<code>posts_removed</code>、<code>removal_rate</code>）标识的一个测量值。聚合前请固定一个指标——投稿、删除与比率不可比较，切勿对比率求和，也不要把各季度加到年度合计上。",
+        "ko": "일본의 개정된 제공자 책임제한법 — <strong>정보유통플랫폼대처법</strong>(情プラ法, 2025년 4월 시행) — 은 총무성이 지정한 대규모 제공자에게 연례 콘텐츠 관리 통계를 공개하도록 의무화합니다(제28조). 현재 수치를 공개하는 지정 제공자는 <strong>LY 코퍼레이션</strong>뿐이며(Google·Meta·TikTok·X는 정성적 기준 페이지만 공개), 본 데이터는 이 회사의 2024회계연도 미디어 투명성 보고서에서 다섯 개 서비스(Yahoo! 지혜주머니, Yahoo! 파이낸스 게시판, LINE 오픈챗, LINE VOOM, Yahoo! 뉴스 댓글)를 다룹니다. tidy-long 데이터셋으로, 각 행은 서비스 × 기간 × 지표(<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>)로 식별되는 하나의 측정값입니다. 집계 전에 지표를 고정하세요 — 게시물·삭제·비율은 비교할 수 없고, 비율은 절대 합산하지 말며, 분기를 연간 합계에 더하지 마세요.",
+    },
+    "Removal rate per quarter, by service": {
+        "es": "Tasa de retirada por trimestre, por servicio", "fr": "Taux de retrait par trimestre, par service",
+        "de": "Entfernungsquote pro Quartal, nach Dienst", "it": "Tasso di rimozione per trimestre, per servizio",
+        "ja": "四半期ごとの削除割合（サービス別）", "zh": "各季度的删除率（按服务）", "ko": "분기별 삭제율(서비스별)",
+    },
+    "Share of posts removed (投稿削除割合) each FY2024 quarter, one line per service. A comparable rate across services of very different sizes.": {
+        "es": "Proporción de publicaciones retiradas (投稿削除割合) en cada trimestre del ejercicio 2024, una línea por servicio. Una tasa comparable entre servicios de tamaños muy distintos.",
+        "fr": "Part des publications retirées (投稿削除割合) à chaque trimestre de l'exercice 2024, une ligne par service. Un taux comparable entre des services de tailles très différentes.",
+        "de": "Anteil entfernter Beiträge (投稿削除割合) je Quartal des GJ2024, eine Linie pro Dienst. Eine über Dienste sehr unterschiedlicher Größe vergleichbare Quote.",
+        "it": "Quota di post rimossi (投稿削除割合) in ogni trimestre dell'esercizio 2024, una linea per servizio. Un tasso comparabile tra servizi di dimensioni molto diverse.",
+        "ja": "2024年度の各四半期における投稿削除割合を、サービスごとに1本の線で表示。規模の大きく異なるサービス間で比較できる割合です。",
+        "zh": "2024财年各季度的投稿删除率，每个服务一条线。这是在规模差异极大的服务之间可比较的比率。",
+        "ko": "2024회계연도 각 분기의 게시물 삭제율(投稿削除割合)을 서비스마다 한 선으로 표시. 규모가 크게 다른 서비스 간에도 비교 가능한 비율입니다.",
+    },
+    "Posts removed (FY2024), by service": {
+        "es": "Publicaciones retiradas (ejercicio 2024), por servicio", "fr": "Publications retirées (exercice 2024), par service",
+        "de": "Entfernte Beiträge (GJ2024), nach Dienst", "it": "Post rimossi (esercizio 2024), per servizio",
+        "ja": "削除された投稿（2024年度、サービス別）", "zh": "已删除的投稿（2024财年，按服务）", "ko": "삭제된 게시물(2024회계연도, 서비스별)",
+    },
+    "Total posts removed (投稿削除件数) over FY2024, per service.": {
+        "es": "Total de publicaciones retiradas (投稿削除件数) durante el ejercicio 2024, por servicio.",
+        "fr": "Total des publications retirées (投稿削除件数) sur l'exercice 2024, par service.",
+        "de": "Gesamtzahl entfernter Beiträge (投稿削除件数) im GJ2024, nach Dienst.",
+        "it": "Totale dei post rimossi (投稿削除件数) nell'esercizio 2024, per servizio.",
+        "ja": "2024年度の投稿削除件数の合計を、サービスごとに表示。",
+        "zh": "2024财年投稿删除件数总计，按服务显示。",
+        "ko": "2024회계연도 게시물 삭제 건수(投稿削除件数) 합계를 서비스별로 표시.",
+    },
+    "Posts removed per quarter — LINE OpenChat": {
+        "es": "Publicaciones retiradas por trimestre — LINE OpenChat", "fr": "Publications retirées par trimestre — LINE OpenChat",
+        "de": "Entfernte Beiträge pro Quartal — LINE OpenChat", "it": "Post rimossi per trimestre — LINE OpenChat",
+        "ja": "四半期ごとの削除投稿数 — LINE オープンチャット", "zh": "各季度删除的投稿数 — LINE 开放聊天", "ko": "분기별 삭제 게시물 — LINE 오픈챗",
+    },
+    "OpenChat is by far the largest surface; its per-quarter removals shown on their own scale.": {
+        "es": "OpenChat es con diferencia la superficie más grande; sus retiradas por trimestre se muestran en su propia escala.",
+        "fr": "OpenChat est de loin la plus grande surface ; ses retraits par trimestre sont affichés à leur propre échelle.",
+        "de": "OpenChat ist die mit Abstand größte Fläche; seine Entfernungen je Quartal werden auf eigener Skala gezeigt.",
+        "it": "OpenChat è di gran lunga la superficie più grande; le sue rimozioni per trimestre sono mostrate su una scala propria.",
+        "ja": "オープンチャットは突出して大きなサービスのため、四半期ごとの削除数を独自のスケールで表示しています。",
+        "zh": "开放聊天是规模最大的服务，其各季度删除数按其自身的刻度显示。",
+        "ko": "오픈챗은 가장 큰 서비스이므로 분기별 삭제 수를 별도의 축으로 표시합니다.",
+    },
+    "FY2024 summary, by service": {
+        "es": "Resumen del ejercicio 2024, por servicio", "fr": "Résumé de l'exercice 2024, par service",
+        "de": "Zusammenfassung GJ2024, nach Dienst", "it": "Riepilogo esercizio 2024, per servizio",
+        "ja": "2024年度サマリー（サービス別）", "zh": "2024财年汇总（按服务）", "ko": "2024회계연도 요약(서비스별)",
+    },
+    "Each service's annual totals: posts, posts removed, and the removal rate. Posts and removals are counts; the rate is a percentage — don't sum across them.": {
+        "es": "Totales anuales de cada servicio: publicaciones, publicaciones retiradas y la tasa de retirada. Las publicaciones y las retiradas son recuentos; la tasa es un porcentaje: no los sumes entre sí.",
+        "fr": "Totaux annuels de chaque service : publications, publications retirées et taux de retrait. Les publications et les retraits sont des décomptes ; le taux est un pourcentage — ne les additionnez pas entre eux.",
+        "de": "Jahressummen je Dienst: Beiträge, entfernte Beiträge und die Entfernungsquote. Beiträge und Entfernungen sind Zählwerte; die Quote ist ein Prozentsatz — nicht miteinander summieren.",
+        "it": "Totali annuali di ciascun servizio: post, post rimossi e tasso di rimozione. Post e rimozioni sono conteggi; il tasso è una percentuale — non sommarli tra loro.",
+        "ja": "各サービスの年度合計：投稿数、削除数、削除割合。投稿数と削除数は件数、割合はパーセントです — 互いに合計しないでください。",
+        "zh": "各服务的年度合计：投稿数、删除数与删除率。投稿数与删除数是计数，比率是百分比——不要相互求和。",
+        "ko": "각 서비스의 연간 합계: 게시물 수, 삭제 수, 삭제율. 게시물과 삭제는 건수, 비율은 백분율입니다 — 서로 합산하지 마세요.",
+    },
+    "Posts removed by quarter": {
+        "es": "Publicaciones retiradas por trimestre", "fr": "Publications retirées par trimestre",
+        "de": "Entfernte Beiträge nach Quartal", "it": "Post rimossi per trimestre",
+        "ja": "四半期ごとの削除投稿数", "zh": "各季度删除的投稿数", "ko": "분기별 삭제 게시물",
+    },
+    "The per-quarter removal counts behind the annual totals, per service.": {
+        "es": "Los recuentos de retiradas por trimestre detrás de los totales anuales, por servicio.",
+        "fr": "Les décomptes de retraits par trimestre derrière les totaux annuels, par service.",
+        "de": "Die Entfernungszahlen je Quartal hinter den Jahressummen, nach Dienst.",
+        "it": "I conteggi delle rimozioni per trimestre dietro i totali annuali, per servizio.",
+        "ja": "年度合計の内訳となる四半期ごとの削除件数を、サービスごとに表示。",
+        "zh": "年度合计背后各季度的删除计数，按服务显示。",
+        "ko": "연간 합계를 구성하는 분기별 삭제 건수를 서비스별로 표시.",
+    },
+    "Refine or extend these in the <a href=\"/reports\">query builder</a> (pin a <code>metric</code> before aggregating), browse the full field list on the <a href=\"/schema\">Schema</a> page, or read the <a href=\"/methodology\">Methodology</a>.": {
+        "es": "Refina o amplía estas consultas en el <a href=\"/reports\">generador de consultas</a> (fija una <code>metric</code> antes de agregar), consulta la lista completa de campos en la página de <a href=\"/schema\">Esquema</a> o lee la <a href=\"/methodology\">Metodología</a>.",
+        "fr": "Affinez ou étendez ces requêtes dans le <a href=\"/reports\">générateur de requêtes</a> (épinglez une <code>metric</code> avant d'agréger), parcourez la liste complète des champs sur la page <a href=\"/schema\">Schéma</a>, ou lisez la <a href=\"/methodology\">Méthodologie</a>.",
+        "de": "Verfeinern oder erweitern Sie diese im <a href=\"/reports\">Abfrage-Builder</a> (fixieren Sie eine <code>metric</code> vor dem Aggregieren), durchsuchen Sie die vollständige Feldliste auf der <a href=\"/schema\">Schema</a>-Seite oder lesen Sie die <a href=\"/methodology\">Methodik</a>.",
+        "it": "Affina o estendi queste query nel <a href=\"/reports\">generatore di query</a> (fissa una <code>metric</code> prima di aggregare), sfoglia l'elenco completo dei campi nella pagina <a href=\"/schema\">Schema</a> o leggi la <a href=\"/methodology\">Metodologia</a>.",
+        "ja": "これらは<a href=\"/reports\">クエリビルダー</a>で絞り込み・拡張でき（集計の前に <code>metric</code> を固定）、全フィールド一覧は<a href=\"/schema\">スキーマ</a>ページで確認、詳細は<a href=\"/methodology\">方法論</a>をご覧ください。",
+        "zh": "可在<a href=\"/reports\">查询构建器</a>中细化或扩展这些查询（聚合前请固定一个 <code>metric</code>），在<a href=\"/schema\">架构</a>页面浏览完整字段列表，或阅读<a href=\"/methodology\">方法论</a>。",
+        "ko": "이 쿼리는 <a href=\"/reports\">쿼리 빌더</a>에서 다듬거나 확장할 수 있고(집계 전에 <code>metric</code>을 고정), 전체 필드 목록은 <a href=\"/schema\">스키마</a> 페이지에서, 자세한 내용은 <a href=\"/methodology\">방법론</a>에서 확인하세요.",
+    },
+    "<p>Source: <a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">LY Corporation Media Transparency Report</a>. Data via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Methodology</a> · <a href=\"/api-key\">API key</a> · <a href=\"/privacy\">Privacy</a></p>": {
+        "es": "<p>Fuente: <a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">Informe de Transparencia de Medios de LY Corporation</a>. Datos vía <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Metodología</a> · <a href=\"/api-key\">Clave API</a> · <a href=\"/privacy\">Privacidad</a></p>",
+        "fr": "<p>Source : <a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">Rapport de transparence des médias de LY Corporation</a>. Données via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Méthodologie</a> · <a href=\"/api-key\">Clé API</a> · <a href=\"/privacy\">Confidentialité</a></p>",
+        "de": "<p>Quelle: <a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">Medien-Transparenzbericht von LY Corporation</a>. Daten über <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Methodik</a> · <a href=\"/api-key\">API-Schlüssel</a> · <a href=\"/privacy\">Datenschutz</a></p>",
+        "it": "<p>Fonte: <a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">Report sulla trasparenza dei media di LY Corporation</a>. Dati via <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">Metodologia</a> · <a href=\"/api-key\">Chiave API</a> · <a href=\"/privacy\">Privacy</a></p>",
+        "ja": "<p>出典：<a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">LY コーポレーション メディア透明性レポート</a>。データ提供：<a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">方法論</a> · <a href=\"/api-key\">API キー</a> · <a href=\"/privacy\">プライバシー</a></p>",
+        "zh": "<p>来源：<a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">LY 公司媒体透明度报告</a>。数据来自 <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">方法论</a> · <a href=\"/api-key\">API 密钥</a> · <a href=\"/privacy\">隐私</a></p>",
+        "ko": "<p>출처: <a href=\"https://www.lycorp.co.jp/ja/company/transparency/media-transparency/\" target=\"_blank\" rel=\"noopener noreferrer\">LY 코퍼레이션 미디어 투명성 보고서</a>. 데이터 제공: <a href=\"/api\">Transparency Report API</a> · <a href=\"/methodology\">방법론</a> · <a href=\"/api-key\">API 키</a> · <a href=\"/privacy\">개인정보</a></p>",
+    },
+    "FY2024 posts, removals and removal rate by LY Corp service.": {
+        "es": "Publicaciones, retiradas y tasa de retirada del ejercicio 2024 por servicio de LY Corp.",
+        "fr": "Publications, retraits et taux de retrait de l'exercice 2024 par service LY Corp.",
+        "de": "Beiträge, Entfernungen und Entfernungsquote im GJ2024 nach LY-Corp-Dienst.",
+        "it": "Post, rimozioni e tasso di rimozione dell'esercizio 2024 per servizio LY Corp.",
+        "ja": "LY Corp サービス別の2024年度の投稿数・削除数・削除割合。",
+        "zh": "按 LY Corp 服务列出的2024财年投稿数、删除数与删除率。",
+        "ko": "LY Corp 서비스별 2024회계연도 게시물·삭제·삭제율.",
+    },
+    "Posts removed per FY2024 quarter by service.": {
+        "es": "Publicaciones retiradas por trimestre del ejercicio 2024 por servicio.",
+        "fr": "Publications retirées par trimestre de l'exercice 2024 par service.",
+        "de": "Entfernte Beiträge je GJ2024-Quartal nach Dienst.",
+        "it": "Post rimossi per trimestre dell'esercizio 2024 per servizio.",
+        "ja": "サービス別の2024年度四半期ごとの削除投稿数。",
+        "zh": "按服务列出的2024财年各季度删除投稿数。",
+        "ko": "서비스별 2024회계연도 분기별 삭제 게시물 수.",
+    },
+    "Failed to load the FY2024 summary: ": {
+        "es": "No se pudo cargar el resumen del ejercicio 2024: ", "fr": "Impossible de charger le résumé de l'exercice 2024 : ",
+        "de": "Die GJ2024-Zusammenfassung konnte nicht geladen werden: ", "it": "Impossibile caricare il riepilogo dell'esercizio 2024: ",
+        "ja": "2024年度サマリーを読み込めませんでした: ", "zh": "无法加载2024财年汇总：", "ko": "2024회계연도 요약을 불러오지 못했습니다: ",
+    },
+    "Failed to load the quarterly removals: ": {
+        "es": "No se pudieron cargar las retiradas trimestrales: ", "fr": "Impossible de charger les retraits trimestriels : ",
+        "de": "Die Quartalsentfernungen konnten nicht geladen werden: ", "it": "Impossibile caricare le rimozioni trimestrali: ",
+        "ja": "四半期ごとの削除数を読み込めませんでした: ", "zh": "无法加载各季度删除数：", "ko": "분기별 삭제 수를 불러오지 못했습니다: ",
+    },
+    "Q1 (Apr–Jun)": {"es": "T1 (abr–jun)", "fr": "T1 (avr–juin)", "de": "Q1 (Apr–Jun)", "it": "T1 (apr–giu)", "ja": "第1四半期（4-6月）", "zh": "第一季度（4-6月）", "ko": "1분기(4-6월)"},
+    "Q2 (Jul–Sep)": {"es": "T2 (jul–sep)", "fr": "T2 (juil–sep)", "de": "Q2 (Jul–Sep)", "it": "T2 (lug–set)", "ja": "第2四半期（7-9月）", "zh": "第二季度（7-9月）", "ko": "2분기(7-9월)"},
+    "Q3 (Oct–Dec)": {"es": "T3 (oct–dic)", "fr": "T3 (oct–déc)", "de": "Q3 (Okt–Dez)", "it": "T3 (ott–dic)", "ja": "第3四半期（10-12月）", "zh": "第三季度（10-12月）", "ko": "3분기(10-12월)"},
+    "Q4 (Jan–Mar)": {"es": "T4 (ene–mar)", "fr": "T4 (janv–mars)", "de": "Q4 (Jan–Mär)", "it": "T4 (gen–mar)", "ja": "第4四半期（1-3月）", "zh": "第四季度（1-3月）", "ko": "4분기(1-3월)"},
+    ">Service<": {"es": ">Servicio<", "fr": ">Service<", "de": ">Dienst<", "it": ">Servizio<", "ja": ">サービス<", "zh": ">服务<", "ko": ">서비스<"},
+    ">Posts<": {"es": ">Publicaciones<", "fr": ">Publications<", "de": ">Beiträge<", "it": ">Post<", "ja": ">投稿数<", "zh": ">投稿数<", "ko": ">게시물<"},
+    ">Removed<": {"es": ">Retiradas<", "fr": ">Retirées<", "de": ">Entfernt<", "it": ">Rimossi<", "ja": ">削除数<", "zh": ">删除数<", "ko": ">삭제<"},
+    ">Removal rate<": {"es": ">Tasa de retirada<", "fr": ">Taux de retrait<", "de": ">Entfernungsquote<", "it": ">Tasso di rimozione<", "ja": ">削除割合<", "zh": ">删除率<", "ko": ">삭제율<"},
+    # data-label attributes drive the mobile stacked-table column headers
+    # (content: attr(data-label)); translate them like the <th> text.
+    'data-label="Service"': {"es": 'data-label="Servicio"', "fr": 'data-label="Service"', "de": 'data-label="Dienst"', "it": 'data-label="Servizio"', "ja": 'data-label="サービス"', "zh": 'data-label="服务"', "ko": 'data-label="서비스"'},
+    'data-label="Posts"': {"es": 'data-label="Publicaciones"', "fr": 'data-label="Publications"', "de": 'data-label="Beiträge"', "it": 'data-label="Post"', "ja": 'data-label="投稿数"', "zh": 'data-label="投稿数"', "ko": 'data-label="게시물"'},
+    'data-label="Removed"': {"es": 'data-label="Retiradas"', "fr": 'data-label="Retirées"', "de": 'data-label="Entfernt"', "it": 'data-label="Rimossi"', "ja": 'data-label="削除数"', "zh": 'data-label="删除数"', "ko": 'data-label="삭제"'},
+    'data-label="Removal rate"': {"es": 'data-label="Tasa de retirada"', "fr": 'data-label="Taux de retrait"', "de": 'data-label="Entfernungsquote"', "it": 'data-label="Tasso di rimozione"', "ja": 'data-label="削除割合"', "zh": 'data-label="删除率"', "ko": 'data-label="삭제율"'},
+    '"Quarter", p1)': {"es": '"Trimestre", p1)', "fr": '"Trimestre", p1)', "de": '"Quartal", p1)', "it": '"Trimestre", p1)', "ja": '"四半期", p1)', "zh": '"季度", p1)', "ko": '"분기", p1)'},
+    "No data available.": {"es": "No hay datos disponibles.", "fr": "Aucune donnée disponible.", "de": "Keine Daten verfügbar.", "it": "Nessun dato disponibile.", "ja": "利用できるデータがありません。", "zh": "无可用数据。", "ko": "사용할 수 있는 데이터가 없습니다."},
+    '"Service", "Removed"': {"es": '"Servicio", "Retiradas"', "fr": '"Service", "Retirées"', "de": '"Dienst", "Entfernt"', "it": '"Servizio", "Rimossi"', "ja": '"サービス", "削除数"', "zh": '"服务", "删除数"', "ko": '"서비스", "삭제"'},
+    '"Quarter", "Removed"': {"es": '"Trimestre", "Retiradas"', "fr": '"Trimestre", "Retirées"', "de": '"Quartal", "Entfernt"', "it": '"Trimestre", "Rimossi"', "ja": '"四半期", "削除数"', "zh": '"季度", "删除数"', "ko": '"분기", "삭제"'},
+}
 for _loc in _JP_NAV:
     COMMON[_loc].append(("      Japan 情プラ法\n    </a>", f"      {_JP_NAV[_loc]}\n    </a>"))
     PAGES[_loc]["home.html"].append(("<h3>Japan 情プラ法</h3>", f"<h3>{_JP_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_JP_CARD_DESC_EN, _JP_CARD_DESC[_loc]))
+    PAGES[_loc]["japan.html"] = [(_en, _tr[_loc]) for _en, _tr in _JP_PAGE.items()]
+    # Inherit the shared chrome (Trends, the chart intro, Loading…, No data
+    # available., the Snapshot:/Cite as: provenance labels) from pages defined
+    # earlier in this file (turkey/cser come after japan, so aren't available).
+    _jp_text = open(os.path.join(STATIC, "japan.html"), encoding="utf-8").read()
+    _jp_own = {_o for _o, _ in PAGES[_loc]["japan.html"]}
+    for _src in ("snap.html", "microsoft.html", "korea.html", "india.html"):
+        if _src not in PAGES[_loc]:
+            continue
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _jp_text and _o not in _jp_own:
+                PAGES[_loc]["japan.html"].append((_o, _n))
+                _jp_own.add(_o)
 
 
 # ── Türkiye Law No. 5651 platform transparency reports page ──────────────────
