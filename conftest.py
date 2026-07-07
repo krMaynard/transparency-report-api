@@ -281,6 +281,28 @@ _AI_TRAINING_FIXTURE = {
 }
 seed.build_ai_training_db(_AI_TRAINING_FIXTURE, _DB)
 
+# A small slice of the regional content-moderation transparency-law dataset
+# (regional-transparency.json shape): a Texas HB 20 enforcement figure + a reason
+# breakdown, and an Austria KoPl-G complaints row.
+_REGIONAL_FIXTURE = {
+    "columns": ["jurisdiction", "platform", "period", "section", "category",
+                "metric", "unit", "value"],
+    "rows": [
+        ["Texas (HB 20)", "YouTube", "2025-H1", "enforcement", "",
+         "videos_removed", "count", 20025866],
+        ["Texas (HB 20)", "YouTube", "2025-H1", "enforcement", "", "appeals", "count", 1289571],
+        ["Texas (HB 20)", "YouTube", "2025-H1", "removals_by_reason", "Child Safety",
+         "videos_removed", "count", 11501052],
+        ["Texas (HB 20)", "YouTube", "2025-H2", "monetization", "",
+         "demonetizations", "count", 2475575],
+        ["Austria (KoPl-G)", "YouTube", "2022-H1", "complaints", "",
+         "reported_items", "count", 5],
+        ["Austria (KoPl-G)", "YouTube", "2022-H1", "complaints", "",
+         "removed_items", "count", 0],
+    ],
+}
+seed.build_regional_db(_REGIONAL_FIXTURE, _DB)
+
 # A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
 # Instagram, a couple of policy areas and quarters, mixing count metrics
 # (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),

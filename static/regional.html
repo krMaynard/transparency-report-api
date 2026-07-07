@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Report di Meta sull'applicazione degli Standard della community — Transparency Report API</title>
-<meta name="description" content="Meta's Community Standards Enforcement Report — the voluntary quarterly content-moderation statistics Meta publishes for Facebook and Instagram: prevalence, content actioned, proactive rate and appeals, by policy area since 2017." />
+<title>Regional content-moderation transparency laws — Transparency Report API</title>
+<meta name="description" content="YouTube transparency reports filed under Texas HB 20 (§120.053) and Austria's Kommunikationsplattformen-Gesetz (KoPl-G) — content moderation, enforcement and complaints figures." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -254,35 +254,35 @@ display: flex; align-items: center; justify-content: space-between;
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main">Vai al contenuto</a>
+<a class="skip-link" href="#main">Skip to content</a>
 
 <!-- ── Site banner ──────────────────────────────────────────────────────── -->
 <div class="page-header">
-<nav class="site-nav" aria-label="Sito">
+<nav class="site-nav" aria-label="Site">
   <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Lavori</a>
-      <a href="https://kieranmaynard.com/transparency.html">Prodotti</a>
-      <a href="https://kieranmaynard.com/consulting.html">Consulenza</a>
+      <a href="https://kieranmaynard.com/work.html">Work</a>
+      <a href="https://kieranmaynard.com/transparency.html">Products</a>
+      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
       <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contatti</a>
+      <a href="https://kieranmaynard.com/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
-      <summary class="lang-current" aria-label="Lingua" title="Lingua">
+      <summary class="lang-current" aria-label="Language" title="Language">
         <svg class="lang-globe" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>
-        <span>Italiano</span>
+        <span>English</span>
         <svg class="lang-caret" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 6l4 4 4-4"/></svg>
       </summary>
       <ul class="lang-menu">
-        <li><a class="lang-opt" href="/cser"><span>English</span></a></li>
-        <li><a class="lang-opt" href="/es/cser"><span>Español</span></a></li>
-        <li><a class="lang-opt" href="/fr/cser"><span>Français</span></a></li>
-        <li><a class="lang-opt" href="/de/cser"><span>Deutsch</span></a></li>
-        <li><a class="lang-opt is-current" href="/it/cser" aria-current="page"><span>Italiano</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
-        <li><a class="lang-opt" href="/ja/cser"><span>日本語</span></a></li>
-        <li><a class="lang-opt" href="/zh/cser"><span>中文</span></a></li>
-        <li><a class="lang-opt" href="/ko/cser"><span>한국어</span></a></li>
+        <li><a class="lang-opt is-current" href="/regional" aria-current="page"><span>English</span><svg class="lang-check" viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.5 8.5l3 3 6-7"/></svg></a></li>
+        <li><a class="lang-opt" href="/es"><span>Español</span></a></li>
+        <li><a class="lang-opt" href="/fr"><span>Français</span></a></li>
+        <li><a class="lang-opt" href="/de"><span>Deutsch</span></a></li>
+        <li><a class="lang-opt" href="/it"><span>Italiano</span></a></li>
+        <li><a class="lang-opt" href="/ja"><span>日本語</span></a></li>
+        <li><a class="lang-opt" href="/zh"><span>中文</span></a></li>
+        <li><a class="lang-opt" href="/ko"><span>한국어</span></a></li>
       </ul>
     </details>
   </div>
@@ -290,15 +290,15 @@ display: flex; align-items: center; justify-content: space-between;
 
 <header class="topbar">
   <div class="topbar-left">
-    <button type="button" class="hamburger" id="hamburger" aria-label="Attiva/disattiva navigazione" aria-expanded="false" aria-controls="sidebar">
+    <button type="button" class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false" aria-controls="sidebar">
       <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
         <line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/>
       </svg>
     </button>
-    <a href="/it/" class="topbar-brand">Transparency Report API</a>
+    <a href="/" class="topbar-brand">Transparency Report API</a>
   </div>
   <div class="topbar-right">
-    <button type="button" class="theme-toggle" aria-label="Attiva/disattiva modalità scura" aria-pressed="false" data-theme-toggle>
+    <button type="button" class="theme-toggle" aria-label="Toggle dark mode" aria-pressed="false" data-theme-toggle>
       <svg class="theme-icon-dark" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
       <svg class="theme-icon-light" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"/></svg>
     </button>
@@ -308,18 +308,18 @@ display: flex; align-items: center; justify-content: space-between;
 
 <div class="app-body">
 
-<aside class="sidebar" id="sidebar" aria-label="Navigazione dell'applicazione">
+<aside class="sidebar" id="sidebar" aria-label="Application navigation">
   <nav>
-    <a href="/it/" class="nav-item">
+    <a href="/" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1.4 1 7v7.5a.5.5 0 0 0 .5.5H6V10h4v5h4.5a.5.5 0 0 0 .5-.5V7L8 1.4z"/>
       </svg>
       Home
     </a>
 
-    <div class="nav-section">Normativa</div>
+    <div class="nav-section">Regulatory</div>
 
-    <a href="/it/reports" class="nav-item">
+    <a href="/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
         <rect x="6" y="5" width="3" height="10" rx="1"/>
@@ -328,7 +328,7 @@ display: flex; align-items: center; justify-content: space-between;
       DSA
     </a>
 
-    <a href="/it/ny-tos" class="nav-item">
+    <a href="/ny-tos" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h6l3 3v9.5a.5.5 0 0 1-.5.5h-8.5a.5.5 0 0 1-.5-.5v-12a.5.5 0 0 1 .5-.5z"/>
         <path d="M9.25 1.9v3.1h3.1M5.25 8.5h5.5M5.25 11h5.5" stroke-linecap="round"/>
@@ -336,7 +336,7 @@ display: flex; align-items: center; justify-content: space-between;
       NY ToS
     </a>
 
-    <a href="/it/ca-ab587" class="nav-item">
+    <a href="/ca-ab587" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3" y="1.75" width="10" height="12.5" rx="1"/>
         <path d="M5.5 5h5M5.5 8h5M5.5 11h3" stroke-linecap="round"/>
@@ -344,36 +344,36 @@ display: flex; align-items: center; justify-content: space-between;
       CA AB 587
     </a>
 
-    <a href="/it/india" class="nav-item">
+    <a href="/india" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="3.25" y="2.75" width="9.5" height="11.5" rx="1"/>
         <path d="M6 1.5h4v2.5H6zM5.5 7.25h5M5.5 9.75h5M5.5 12.25h3" stroke-linecap="round"/>
       </svg>
-      Regole IT India
+      India IT Rules
     </a>
 
-    <a href="/it/korea" class="nav-item">
+    <a href="/korea" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.25 3.25h11.5v7.5H8.25l-3 2.75v-2.75h-2a.999.999 0 0 1-1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
       </svg>
-      Corea
+      Korea
     </a>
 
-    <a href="/it/taiwan" class="nav-item">
+    <a href="/taiwan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 2.1 14.6 13.4H1.4L8 2.1z" stroke-linejoin="round"/>
         <path d="M8 6.6v3M8 11.7h.01" stroke-linecap="round"/>
       </svg>
-      Antifrode Taiwan
+      Taiwan Anti-Fraud
     </a>
 
-    <a href="/it/turkey" class="nav-item">
+    <a href="/turkey" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M10.6 3.2a5 5 0 1 0 0 9.6 4 4 0 0 1 0-9.6z"/>
         <path d="M12.4 6.0l1.3 1-1.5.5.1 1.6-1-1.2-1.5.5.8-1.4-.9-1.2 1.6.3z" stroke-linejoin="round"/>
       </svg>
-      Legge 5651 (Türkiye)
+      Türkiye Law 5651
     </a>
 
     <a href="/singapore" class="nav-item">
@@ -384,12 +384,12 @@ display: flex; align-items: center; justify-content: space-between;
       Singapore
     </a>
 
-    <a href="/it/japan" class="nav-item">
+    <a href="/japan" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M2.5 3.25h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H6.5l-3 2.25V11.25h-1a1 1 0 0 1-1-1v-6a1 1 0 0 1 1-1z" stroke-linejoin="round"/>
         <path d="M5 6.25h6M5 8.25h4" stroke-linecap="round"/>
       </svg>
-      Giappone 情プラ法
+      Japan 情プラ法
     </a>
 
     <a href="/tco" class="nav-item">
@@ -408,7 +408,7 @@ display: flex; align-items: center; justify-content: space-between;
       EU AI Act
     </a>
 
-    <a href="/regional" class="nav-item">
+    <a href="/regional" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75 2.75 4v3.5c0 3 2.2 5.5 5.25 6.75 3.05-1.25 5.25-3.75 5.25-6.75V4L8 1.75z" stroke-linejoin="round"/>
         <path d="M5.75 8h4.5M8 5.75v4.5" stroke-linecap="round"/>
@@ -416,48 +416,57 @@ display: flex; align-items: center; justify-content: space-between;
       Regional laws
     </a>
 
-    <div class="nav-section">Trasparenza delle piattaforme</div>
+    <a href="/mandates" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <path d="M8 2.4v11.2M4 4.4h8" stroke-linecap="round"/>
+        <path d="M4 4.4 2 8.8h4L4 4.4zM12 4.4l-2 4.4h4l-2-4.4z" stroke-linejoin="round"/>
+        <path d="M5.5 13.6h5" stroke-linecap="round"/>
+      </svg>
+      Reporting mandates
+    </a>
 
-    <a href="/it/cser" class="nav-item is-active" aria-current="page">
+    <div class="nav-section">Platform transparency</div>
+
+    <a href="/tiktok-cger" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
+      </svg>
+      TikTok — Enforcement
+    </a>
+
+    <a href="/cser" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75c-2.6 1.4-4.3 1.6-5.25 1.6v4.9c0 3 2.15 4.85 5.25 6 3.1-1.15 5.25-3 5.25-6v-4.9C12.3 3.35 10.6 3.15 8 1.75z" stroke-linejoin="round"/>
         <path d="M5.9 8.1 7.3 9.5l3-3.1" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
-      Meta — Applicazione
+      Meta — Enforcement
     </a>
 
-    <a href="/it/tiktok-cger" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
-      </svg>
-      TikTok — Applicazione
-    </a>
-
-    <a href="/it/removals" class="nav-item">
+    <a href="/removals" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <circle cx="8" cy="8" r="6.25"/>
         <path d="M5.5 10.5l5-5M5.5 5.5l5 5" stroke-linecap="round"/>
       </svg>
-      Google — Rimozioni
+      Google — Removals
     </a>
 
-    <a href="/it/user-data" class="nav-item">
+    <a href="/user-data" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1.75a3.1 3.1 0 1 1 0 6.2 3.1 3.1 0 0 1 0-6.2zM2.4 13.6c0-2.6 2.5-4.1 5.6-4.1s5.6 1.5 5.6 4.1v.65H2.4z"/>
       </svg>
-      Google — Dati utente
+      Google — User Data
     </a>
 
-    <a href="/it/disruptions" class="nav-item">
+    <a href="/disruptions" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 13.4h.01" stroke-linecap="round"/>
         <path d="M5.4 10.8a3.7 3.7 0 0 1 5.2 0M3 8.4a7 7 0 0 1 10 0" stroke-linecap="round"/>
         <path d="M2.4 2.4l11.2 11.2" stroke-linecap="round"/>
       </svg>
-      Google — Interruzioni
+      Google — Disruptions
     </a>
 
-    <a href="/it/android" class="nav-item">
+    <a href="/android" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.75 3 3.4v3.9c0 3 2.1 5.6 5 6.45 2.9-.85 5-3.45 5-6.45V3.4L8 1.75z" stroke-linejoin="round"/>
         <path d="M5.8 8.1 7.3 9.6l3-3.2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -465,7 +474,7 @@ display: flex; align-items: center; justify-content: space-between;
       Google — Android
     </a>
 
-    <a href="/it/apple" class="nav-item">
+    <a href="/apple" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="4.25" y="1.75" width="7.5" height="12.5" rx="1.5"/>
         <path d="M6.75 12.5h2.5" stroke-linecap="round"/>
@@ -473,21 +482,21 @@ display: flex; align-items: center; justify-content: space-between;
       Apple
     </a>
 
-    <a href="/it/snap" class="nav-item">
+    <a href="/snap" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M8 1.9c-1.85 0-3 1.35-3 3.25 0 1.15.2 1.75-.35 2.35-.4.45-1.15.45-1.15.95 0 .5.95.65 1.3.9.3.55-.45 1.1-.15 1.5.3.35 1.05-.1 1.65.2.5.25.85 1.1 1.85 1.1s1.35-.85 1.85-1.1c.6-.3 1.35.15 1.65-.2.3-.4-.45-.95-.15-1.5.35-.25 1.3-.4 1.3-.9 0-.5-.75-.5-1.15-.95-.55-.6-.35-1.2-.35-2.35 0-1.9-1.15-3.25-3-3.25z"/>
       </svg>
       Snap
     </a>
 
-    <a href="/it/github" class="nav-item">
+    <a href="/github" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 .5a7.5 7.5 0 0 0-2.371 14.617c.375.069.512-.163.512-.362 0-.178-.006-.651-.01-1.278-2.086.454-2.526-1.006-2.526-1.006-.341-.866-.832-1.097-.832-1.097-.68-.465.051-.456.051-.456.752.053 1.147.772 1.147.772.668 1.145 1.753.814 2.18.623.068-.484.261-.814.475-1.001-1.665-.19-3.416-.833-3.416-3.707 0-.819.293-1.488.772-2.013-.077-.19-.334-.952.074-1.986 0 0 .629-.201 2.061.768a7.182 7.182 0 0 1 1.876-.252c.637.003 1.278.086 1.876.252 1.431-.969 2.059-.768 2.059-.768.409 1.034.152 1.796.075 1.986.481.525.771 1.194.771 2.013 0 2.882-1.754 3.516-3.424 3.702.269.232.508.69.508 1.39 0 1.003-.009 1.813-.009 2.059 0 .201.135.435.516.361A7.501 7.501 0 0 0 8 .5z"/>
       </svg>
       GitHub
     </a>
 
-    <a href="/it/microsoft" class="nav-item">
+    <a href="/microsoft" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="2" y="2" width="5.4" height="5.4"/>
         <rect x="8.6" y="2" width="5.4" height="5.4"/>
@@ -497,7 +506,7 @@ display: flex; align-items: center; justify-content: space-between;
       Microsoft
     </a>
 
-    <a href="/it/linkedin" class="nav-item">
+    <a href="/linkedin" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="2" y="5" width="12" height="8.75" rx="1.25"/>
         <path d="M5.75 5V3.5A1.25 1.25 0 0 1 7 2.25h2a1.25 1.25 0 0 1 1.25 1.25V5M2 8.25h12" stroke-linecap="round"/>
@@ -505,14 +514,14 @@ display: flex; align-items: center; justify-content: space-between;
       LinkedIn
     </a>
 
-    <a href="/it/tiktok" class="nav-item">
+    <a href="/tiktok" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9.4 1.5c.19 1.63 1.32 2.86 2.93 3.02v1.94c-.94 0-1.86-.29-2.63-.82v4.3a3.68 3.68 0 1 1-3.68-3.68c.2 0 .4.02.6.05v1.98a1.72 1.72 0 1 0 1.2 1.65V1.5H9.4z"/>
       </svg>
       TikTok
     </a>
 
-    <a href="/it/discord" class="nav-item">
+    <a href="/discord" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M13.35 3.5A12.3 12.3 0 0 0 10.3 2.5l-.16.31a11.4 11.4 0 0 1 2.7.87A9.6 9.6 0 0 0 8 2.6a9.6 9.6 0 0 0-4.84 1.08 11.4 11.4 0 0 1 2.7-.87L5.7 2.5a12.3 12.3 0 0 0-3.05 1A13 13 0 0 0 .8 11.6a11 11 0 0 0 3.35 1.7l.5-.83a7.5 7.5 0 0 1-1.18-.57l.29-.22a6.8 6.8 0 0 0 5.85 0l.29.22a7.5 7.5 0 0 1-1.18.57l.5.83A11 11 0 0 0 15.2 11.6a13 13 0 0 0-1.85-8.1zM5.65 9.9c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.5 1.23-1.1 1.23zm4.7 0c-.6 0-1.1-.55-1.1-1.23 0-.68.49-1.23 1.1-1.23s1.11.56 1.1 1.23c0 .68-.49 1.23-1.1 1.23z"/>
       </svg>
@@ -520,25 +529,48 @@ display: flex; align-items: center; justify-content: space-between;
     </a>
 
     <hr class="nav-hr">
-    <div class="nav-section">Strumenti</div>
+    <div class="nav-section">Tools</div>
 
-    <a href="/it/catalog" class="nav-item">
+    <a href="/api-key" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
+      </svg>
+      API key
+    </a>
+
+    <a href="/docs" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
+      </svg>
+      API Reference
+    </a>
+
+    <a href="/mcp" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
+        <rect x="2" y="9" width="12" height="4.5" rx="1"/>
+        <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
+      </svg>
+      MCP server
+    </a>
+
+    <a href="/catalog" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
         <path d="M8 1.75c-2.35 0-4.25 1.9-4.25 4.25 0 2.95 4.25 8 4.25 8s4.25-5.05 4.25-8c0-2.35-1.9-4.25-4.25-4.25z"/>
         <circle cx="8" cy="6" r="1.55"/>
       </svg>
-      Posizioni dei report
+      Report locations
     </a>
 
-    <a href="/it/narratives" class="nav-item">
+    <a href="/narratives" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <circle cx="7" cy="7" r="4.25"/>
         <path d="M10.4 10.4 14 14" stroke-linecap="round"/>
       </svg>
-      Ricerca nei testi
+      Narrative search
     </a>
 
-    <a href="/it/schema" class="nav-item">
+    <a href="/schema" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <rect x="1.75" y="2.75" width="12.5" height="10.5" rx="1.5"/>
         <path d="M1.75 6.25h12.5M6 6.25v7" stroke-linecap="round"/>
@@ -546,38 +578,15 @@ display: flex; align-items: center; justify-content: space-between;
       Schema
     </a>
 
-    <a href="/it/methodology" class="nav-item">
+    <a href="/methodology" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
         <path d="M3.5 1.75h5.5l3.25 3.25v9a.5.5 0 0 1-.5.5h-8.25a.5.5 0 0 1-.5-.5v-11.75a.75.75 0 0 1 .75-.75z"/>
         <path d="M9 1.75v3.5h3.25M5.25 8.25h5.5M5.25 10.75h5.5" stroke-linecap="round"/>
       </svg>
-      Metodologia
+      Methodology
     </a>
 
-    <a href="/it/api-key" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
-        <path d="M9.5 1a4.5 4.5 0 0 0-4.28 5.86L1 11.08V15h3.92l.5-.5v-1.5h1.5v-1.5h1.2l.96-.96A4.5 4.5 0 1 0 9.5 1zm1.25 3.75a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/>
-      </svg>
-      Chiave API
-    </a>
-
-    <a href="/docs" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
-        <path d="M5 4L1.5 8 5 12M11 4l3.5 4L11 12M9 3l-2 10"/>
-      </svg>
-      Riferimento API
-    </a>
-
-    <a href="/it/mcp" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-        <rect x="2" y="2.5" width="12" height="4.5" rx="1"/>
-        <rect x="2" y="9" width="12" height="4.5" rx="1"/>
-        <path d="M4.4 4.75h.01M4.4 11.25h.01" stroke-linecap="round"/>
-      </svg>
-      Server MCP
-    </a>
-
-    <a href="/it/privacy" class="nav-item">
+    <a href="/privacy" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1 3 3v4.5c0 3 2.1 5.8 5 6.5 2.9-.7 5-3.5 5-6.5V3L8 1z"/>
       </svg>
@@ -600,7 +609,7 @@ display: flex; align-items: center; justify-content: space-between;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Di <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/it/privacy">Privacy</a></div>
+  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -610,69 +619,59 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Meta · Volontario · Trimestrale · 2017 – 2025</span>
-    <h1>Meta — Report sull'applicazione degli Standard della community</h1>
-    <p>Il principale report di trasparenza <strong>volontario</strong> di Meta: quanti contenuti che violano le regole ha gestito su <strong>Facebook</strong> e <strong>Instagram</strong> in ~16 aree di policy, ogni trimestre dal 4° trimestre 2017. A differenza dei report DSA o della Legge 5651 della Türkiye, il CSER non è depositato ai sensi di alcuna singola legge; Meta lo pubblica di propria iniziativa (ora sotto l'ombrello dei "Report sull'integrità"). Metricahe principali: <strong>prevalenza</strong> (quanto spesso i contenuti che violano le regole vengono visti), <strong>contenuti su cui è stata presa un'azione</strong> e <strong>rimossi</strong>, il <strong>tasso proattivo</strong> (quota individuata prima di una segnalazione) e <strong>ricorsi / ripristini</strong>. Un set di dati tidy-long: ogni riga è un valore misurato identificato da app × area di policy × metrica × trimestre. Prevalenza e tassi sono percentuali (mai sommate); <code>Cross-Policy Data</code> è un aggregato tra policy, quindi escluso dalle suddivisioni per policy sottostanti.</p>
+    <span class="badge">Texas HB 20 · Austria KoPl-G · YouTube</span>
+    <h1>Regional content-moderation transparency laws</h1>
+    <p>Two content-moderation laws require platforms to publish periodic transparency reports; Google files both for <strong>YouTube</strong>. <strong>Texas HB 20</strong> (Business &amp; Commerce Code &sect;120.053) mandates half-yearly reporting on monetization, Community-Guidelines enforcement (videos removed / appealed / reinstated), flags by flagger type, and removals by detection source, reason and country of upload. <strong>Austria's KoPl-G</strong> (Kommunikationsplattformen-Gesetz &sect;4) mandates biannual reporting on complaints about allegedly-illegal <em>textual</em> content (comments) &mdash; figures are sparse, as YouTube notes the webform is &ldquo;de facto not used.&rdquo; Each row is one measured value by jurisdiction × period × section × category × metric. Metric scope is each report's own &mdash; pin a <code>jurisdiction</code>, <code>section</code> and <code>metric</code> before aggregating, and note the reason/detection breakdowns each partition the <code>videos_removed</code> total.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
   <section class="data-section" aria-label="Charts">
-    <h2>Tendenze</h2>
-    <p class="sub">Viste interattive delle cifre dichiarate. Ogni grafico ha un'alternativa testuale per gli screen reader.</p>
+    <h2>Trends</h2>
+    <p class="sub">Interactive views of the reported figures. Each chart has a text alternative for screen readers.</p>
     <div class="chart-grid">
 
       <div class="chart-card wide">
-        <h3>Prevalenza nel tempo (Facebook)</h3>
-        <p class="chart-sub">Prevalenza del limite superiore — la quota stimata di visualizzazioni relative a contenuti che violano le regole — per trimestre, una linea per area di policy (le cinque per cui Meta riporta la prevalenza). Una percentuale; più basso è meglio.</p>
-        <div class="chart-loading" id="prev-loading">Caricamento…</div>
-        <canvas id="chart-prev" height="140" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-prev-table" class="sr-only"></div>
+        <h3>YouTube videos removed, by reason (Texas HB 20)</h3>
+        <p class="chart-sub">Videos removed for Community-Guidelines violations, by policy category, in the latest full Texas &sect;120.053 report. The reason breakdown partitions the period's total videos-removed figure.</p>
+        <div class="chart-loading" id="reason-loading">Loading…</div>
+        <canvas id="chart-reason" height="160" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-reason-table" class="sr-only"></div>
       </div>
 
-      <div class="chart-card">
-        <h3>Contenuti su cui è stata presa un'azione per area di policy (ultimo trimestre, Facebook)</h3>
-        <p class="chart-sub">Elementi di contenuto su cui Meta ha agito nel trimestre più recente, per area di policy.</p>
-        <div class="chart-loading" id="act-loading">Caricamento…</div>
-        <canvas id="chart-act" height="240" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-act-table" class="sr-only"></div>
-      </div>
-
-      <div class="chart-card">
-        <h3>Tasso proattivo per area di policy (ultimo trimestre, Facebook)</h3>
-        <p class="chart-sub">La quota dei contenuti su cui è stata presa un'azione che Meta ha individuato prima di qualsiasi segnalazione, per area di policy. Una percentuale.</p>
-        <div class="chart-loading" id="pro-loading">Caricamento…</div>
-        <canvas id="chart-pro" height="240" aria-hidden="true" class="hidden"></canvas>
-        <div id="chart-pro-table" class="sr-only"></div>
+      <div class="chart-card wide">
+        <h3>YouTube videos removed, by country of upload (Texas HB 20)</h3>
+        <p class="chart-sub">Videos removed by the uploader's country/region (based on IP at upload), in the latest full Texas report. Content removed for violating YouTube's guidelines is removed globally.</p>
+        <div class="chart-loading" id="country-loading">Loading…</div>
+        <canvas id="chart-country" height="200" aria-hidden="true" class="hidden"></canvas>
+        <div id="chart-country-table" class="sr-only"></div>
       </div>
 
     </div>
   </section>
 
-  <!-- ── Prevalence range table ─────────────────────────────────── -->
   <section class="data-section">
-    <h2>Intervallo di prevalenza per area di policy (ultimo trimestre, Facebook)</h2>
-    <p class="sub">Meta riporta la prevalenza come limite inferiore–superiore. Sono percentuali, non conteggi — non sommarle.</p>
-    <div class="results" id="prevTable" aria-busy="true">
-      <div class="results-loading">Caricamento…</div>
+    <h2>Community-Guidelines enforcement, by period (Texas HB 20)</h2>
+    <p class="sub">The headline global Community-Guidelines figures YouTube files under Texas &sect;120.053 each half-year: videos removed, appeals received, and reinstatements. From 2025-H2 these point to the global enforcement report instead.</p>
+    <div class="results" id="enforcementTable" aria-busy="true">
+      <div class="results-loading">Loading…</div>
     </div>
   </section>
 
-  <!-- ── Cosa copre il report ─────────────────────────────────── -->
   <section class="data-section">
-    <h2>Cosa copre il report</h2>
-    <p class="sub">Il numero di valori dichiarati per metrica nell'intero set di dati. Conteggi di righe, non quantità sommate.</p>
-    <div class="results" id="metricCoverage" aria-busy="true">
-      <div class="results-loading">Caricamento…</div>
+    <h2>KoPl-G complaints, by period (Austria)</h2>
+    <p class="sub">Complaints about allegedly-illegal comments reported and removed under Austria's KoPl-G. The counts are single-digit &mdash; YouTube's report notes the KoPl-G reporting webform is de facto unused.</p>
+    <div class="results" id="austriaTable" aria-busy="true">
+      <div class="results-loading">Loading…</div>
     </div>
   </section>
 
-  <p class="hint">Refine or extend these in the <a href="/it/reports">query builder</a> (pin a <code>metric</code> before aggregating), browse the full field list on the <a href="/it/schema">Schema</a> page, or read the <a href="/it/methodology">Methodology</a>.</p>
+  <p class="hint">Refine or extend these in the <a href="/reports">query builder</a> (pin a <code>jurisdiction</code>, <code>section</code> and <code>metric</code> before aggregating), browse the full field list on the <a href="/schema">Schema</a> page, or read the <a href="/methodology">Methodology</a>.</p>
 </main>
 
 <footer>
-  <p>Fonte: <a href="https://transparency.meta.com/reports/community-standards-enforcement/" target="_blank" rel="noopener noreferrer">Report di Meta sull'applicazione degli Standard della community</a>. Dati via <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Metodologia</a> · <a href="/it/api-key">Chiave API</a> · <a href="/it/privacy">Privacy</a></p>
-  <p class="provenance" id="provenance" hidden><span class="prov-label">Istantanea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citare come:</span> <span id="prov-cite"></span></p>
+  <p>Source: <a href="https://statutes.capitol.texas.gov/Docs/BC/htm/BC.120.htm" target="_blank" rel="noopener noreferrer">Texas Business &amp; Commerce Code &sect;120.053</a> (HB 20) + Austria's Kommunikationsplattformen-Gesetz (KoPl-G) &sect;4 — YouTube reports on Google's transparency-report bucket. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
+  <p class="provenance" id="provenance" hidden><span class="prov-label">Snapshot:</span> <span id="prov-snap"></span> · <span class="prov-label">Cite as:</span> <span id="prov-cite"></span></p>
 </footer>
 
 </div>
@@ -776,8 +775,8 @@ display: flex; align-items: center; justify-content: space-between;
     if (!generated) return;
     document.getElementById('prov-snap').textContent = generated;
     document.getElementById('prov-cite').textContent =
-      "“Report di Meta sull'applicazione degli Standard della community, tramite la Transparency Report API (" + generated + ''
-      + (version ? ', versione del set di dati ' + version : '') + ').”';
+      "“Regional content-moderation transparency-law reports (Texas HB 20 / Austria KoPl-G), via the Transparency Report API (" + generated + ' snapshot'
+      + (version ? ', dataset version ' + version : '') + ').”';
     document.getElementById('provenance').hidden = false;
   }
 
@@ -898,90 +897,80 @@ display: flex; align-items: center; justify-content: space-between;
       }));
   }
 
-  // Chart queries. Filter values are Meta's own metric / policy-area labels, so
-  // the localization generator's prose find/replace can never rewrite them.
-  // Each is scoped to Facebook and one metric; SUM over (period, policy_area) is
-  // a no-op pass-through since each combination is a single reported value.
-  function PREV_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Upperbound Prevalence"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-  function ACT_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Content Actioned"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-  function PRO_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Tasso proattivo"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-  function PREVRANGE_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"IN","field_name":"metric","field_values":["Lowerbound Prevalence","Upperbound Prevalence"]}]},"group_by":["period","policy_area","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-
-  // Given rows [period, policy_area, n], keep only the latest period and return
-  // [{area, value}] sorted by value descending.
-  function latestByArea(rows) {
-    if (!rows.length) return { latest: null, items: [] };
-    var latest = rows.map(function (r) { return r[0]; }).sort().pop();
-    var items = rows.filter(function (r) { return r[0] === latest; })
-      .map(function (r) { return { area: r[1], value: r[2] }; })
-      .sort(function (a, b) { return b.value - a.value; });
-    return { latest: latest, items: items };
-  }
-
-  // A latest-quarter horizontal-bar chart of one metric by policy area.
-  function renderLatestHbar(rows, chartId, loadId, tableId, numHead, fmtVal) {
-    var r = latestByArea(rows);
-    if (!r.items.length) { emptyChart(loadId); return; }
-    var labels = r.items.map(function (i) { return i.area; });
-    var values = r.items.map(function (i) { return i.value; });
-    srTable(tableId, [numHead + " (" + r.latest + ")", numHead],
-      r.items.map(function (i) { return [i.area, fmtVal(i.value)]; }));
-    hbarChart(chartId, loadId, tableId, labels, values);
-  }
-
-  // Prevalence trend: pivot [period, policy_area, n] into one line per area.
-  function renderPrevTrend(rows) {
-    if (!rows.length) { emptyChart('prev-loading'); return; }
-    var p = pivot(rows);
-    seriesTable('chart-prev-table', "Trimestre", p);
-    linesChart('chart-prev', 'prev-loading', 'chart-prev-table', p.labels, p.dsets);
-  }
-
-  // Prevalence lower–upper range per policy area, latest quarter (3-col table).
-  function renderPrevRange(rows) {
-    var el = document.getElementById('prevTable');
+  // Pivot [rowKey, metric, value] rows into an accessible table with a fixed
+  // metric-column order (rows = the row key, e.g. period).
+  function pivotTable(elId, rows, rowLabel, cols, colLabels, caption) {
+    var el = document.getElementById(elId);
     el.removeAttribute('aria-busy');
     if (!rows.length) { el.innerHTML = '<div class="results-loading">No data available.</div>'; return; }
-    var latest = rows.map(function (r) { return r[0]; }).sort().pop();
-    var byArea = {};
-    rows.filter(function (r) { return r[0] === latest; })
-        .forEach(function (r) { (byArea[r[1]] = byArea[r[1]] || {})[r[2]] = r[3]; });
-    var areas = Object.keys(byArea).sort(function (a, b) {
-      return (byArea[b]['Upperbound Prevalence'] || 0) - (byArea[a]['Upperbound Prevalence'] || 0);
+    var order = [], byKey = {};
+    rows.forEach(function (r) {
+      if (!byKey[r[0]]) { byKey[r[0]] = {}; order.push(r[0]); }
+      byKey[r[0]][r[1]] = r[2];
     });
-    var pct = function (v) { return v == null ? '—' : v + '%'; };
+    order.sort();
+    var head = '<th scope="col">' + esc(rowLabel) + '</th>'
+      + colLabels.map(function (h) { return '<th scope="col" class="num">' + esc(h) + '</th>'; }).join('');
+    var body = order.map(function (k) {
+      return '<tr><th scope="row" data-label="' + esc(rowLabel) + '">' + esc(k) + '</th>'
+        + cols.map(function (c, i) {
+            var v = byKey[k][c];
+            return '<td class="num" data-label="' + esc(colLabels[i]) + '">' + (v == null ? '&mdash;' : fmt(v)) + '</td>';
+          }).join('') + '</tr>';
+    }).join('');
     el.innerHTML = '<div class="table-scroll"><table class="recordtable">'
-      + '<caption class="sr-only">' + esc("Intervallo di prevalenza di Facebook per area di policy, " + latest + ".") + '</caption>'
-      + '<thead><tr><th scope="col">Area di policy</th><th scope="col" class="num">Limite inferiore</th><th scope="col" class="num">Limite superiore</th></tr></thead><tbody>'
-      + areas.map(function (a) {
-          return '<tr><td data-label="Area di policy">' + esc(a) + '</td>'
-            + '<td class="num" data-label="Limite inferiore">' + pct(byArea[a]['Lowerbound Prevalence']) + '</td>'
-            + '<td class="num" data-label="Limite superiore">' + pct(byArea[a]['Upperbound Prevalence']) + '</td></tr>';
-        }).join('')
-      + '</tbody></table></div>';
+      + '<caption class="sr-only">' + esc(caption) + '</caption>'
+      + '<thead><tr>' + head + '</tr></thead><tbody>' + body + '</tbody></table></div>';
+  }
+
+  // Chart queries. The latest full Texas report is 2025-H1 (2025-H2 was reduced
+  // to monetization + age-restrictions). Filter values are jurisdiction/section
+  // codes, so the localization generator's prose find/replace can't rewrite them.
+  var TX = "Texas (HB 20)", TX_PERIOD = "2025-H1";
+  function REASON_Q() { return {"table":"regional_metrics","query":{"and":[{"operation":"EQ","field_name":"jurisdiction","field_values":[TX]},{"operation":"EQ","field_name":"section","field_values":["removals_by_reason"]},{"operation":"EQ","field_name":"metric","field_values":["videos_removed"]},{"operation":"EQ","field_name":"period","field_values":[TX_PERIOD]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20}; }
+  function COUNTRY_Q() { return {"table":"regional_metrics","query":{"and":[{"operation":"EQ","field_name":"jurisdiction","field_values":[TX]},{"operation":"EQ","field_name":"section","field_values":["removals_by_country"]},{"operation":"EQ","field_name":"metric","field_values":["videos_removed"]},{"operation":"EQ","field_name":"period","field_values":[TX_PERIOD]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":16}; }
+
+  function renderCharts(reason, country) {
+    if (!reason.rows.length) { emptyChart('reason-loading'); } else {
+      srTable('chart-reason-table', ["Reason", "Videos removed"], reason.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-reason', 'reason-loading', 'chart-reason-table',
+        reason.rows.map(function (r) { return r[0]; }), reason.rows.map(function (r) { return r[1]; }));
+    }
+    if (!country.rows.length) { emptyChart('country-loading'); } else {
+      srTable('chart-country-table', ["Country", "Videos removed"], country.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      hbarChart('chart-country', 'country-loading', 'chart-country-table',
+        country.rows.map(function (r) { return r[0]; }), country.rows.map(function (r) { return r[1]; }));
+    }
   }
 
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
-    // Coverage: COUNT of reported values per metric across the dataset.
     try {
-      var d2 = await explore({"table":"cser_metrics","group_by":["metric"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":30});
-      renderTable('metricCoverage', (d2.rows || []), "Valori dichiarati per metrica nel set di dati del CSER.", "Metrica", "Valori dichiarati");
+      var d = await explore({"table":"regional_metrics","query":{"and":[{"operation":"EQ","field_name":"jurisdiction","field_values":[TX]},{"operation":"EQ","field_name":"section","field_values":["enforcement"]}]},"fields":["period","metric","value"],"max_count":100});
+      pivotTable('enforcementTable', d.rows || [], "Period",
+        ["videos_removed", "appeals", "reinstatements"],
+        ["Videos removed", "Appeals", "Reinstatements"],
+        "YouTube Community-Guidelines enforcement filed under Texas HB 20, by period.");
+      fillProvenance(d.generated, d.version);
+    } catch (err) {
+      showError('enforcementTable', "Failed to load enforcement figures: " + err.message);
+    }
+    try {
+      var d2 = await explore({"table":"regional_metrics","query":{"and":[{"operation":"EQ","field_name":"jurisdiction","field_values":["Austria (KoPl-G)"]},{"operation":"EQ","field_name":"section","field_values":["complaints"]}]},"fields":["period","metric","value"],"max_count":100});
+      pivotTable('austriaTable', d2.rows || [], "Period",
+        ["reported_items", "removed_items"], ["Reported items", "Removed items"],
+        "KoPl-G complaints reported and removed on YouTube in Austria, by period.");
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {
-      showError('metricCoverage', "Impossibile caricare la copertura delle metriche: " + err.message);
+      showError('austriaTable', "Failed to load KoPl-G complaints: " + err.message);
     }
   }
-
   load();
 
-  // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
-  // single failure can't block the rest of the page.
-  var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  soft(PREV_Q()).then(function (d) { renderPrevTrend(d.rows); });
-  soft(ACT_Q()).then(function (d) { renderLatestHbar(d.rows, 'chart-act', 'act-loading', 'chart-act-table', 'Contenuti su cui è stata presa un\'azione', fmt); });
-  soft(PRO_Q()).then(function (d) { renderLatestHbar(d.rows, 'chart-pro', 'pro-loading', 'chart-pro-table', 'Tasso proattivo', function (v) { return v + '%'; }); });
-  soft(PREVRANGE_Q()).then(function (d) { renderPrevRange(d.rows); });
+  var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
+  Promise.all([soft(REASON_Q()), soft(COUNTRY_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1]);
+  });
 })();
 </script>
 </body>

@@ -1215,6 +1215,22 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "regional_metrics": TableSpec(
+        "Regional content-moderation transparency-law reports — YouTube reports Google files under Texas HB 20 (Business & Commerce Code §120.053) and Austria's Kommunikationsplattformen-Gesetz (KoPl-G §4). One row per measured value, identified by jurisdiction × platform × period × section × category × metric. jurisdiction is 'Texas (HB 20)' or 'Austria (KoPl-G)'; platform is YouTube. Texas sections: 'monetization' (demonetizations), 'age_restrictions', 'enforcement' (videos_removed / appeals / reinstatements — global CG figures), 'coordinated_influence' (channels / actions), 'human_flags' (flags received by flagger type — category User/Organization/Government), 'removals_by_detection' (videos_removed by source of first detection — category Automated + the human types), 'removals_by_reason' (videos_removed by CG category — category the reason; the reason and detection breakdowns each partition videos_removed exactly) and 'removals_by_country' (videos_removed by upload country). From 2025-H2 Texas reduced to monetization + age_restrictions only. Austria section 'complaints': reported_items / removed_items (sparse — YouTube's KoPl-G webform is 'de facto not used'). unit is 'count'. Metric scope is each report's own — pin jurisdiction, section AND metric before aggregating, and don't sum a breakdown together with the enforcement total.",
+        "FROM regional_metrics f",
+        {
+            "jurisdiction": "f.jurisdiction",
+            "platform":     "f.platform",
+            "period":       "f.period",
+            "section":      "f.section",
+            "category":     "f.category",
+            "metric":       "f.metric",
+            "unit":         "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "ai_training_metrics": TableSpec(
         "EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency summaries — the public summary of training content each general-purpose AI provider must publish on the AI Office's standardised template (in force Aug 2025). One row per disclosed field, identified by provider × model × section × field. `section` is 'modality' (field = Text/Image/Audio/Video/Other; value = the banded training-data size, e.g. 'More than 10 trillion tokens'; the numeric `size_rank` = 1/2/3 across the three bands, 0 = 'Not applicable', so coarse sizes are comparable across providers), 'general' (data_cutoff, ongoing_collection) or 'data_source' (publicly_available / commercially_licensed / third_party_private / personal_data / synthetic; value = Yes/No/Not applicable). `value` is text; `size_rank` is an ordinal rank (compare with MIN/MAX, don't SUM). Cross-provider, comparable; a starting set (Google + Microsoft) that expands as more providers' summaries are archived.",
         "FROM ai_training_metrics f",
@@ -2498,6 +2514,12 @@ def turkey_page() -> FileResponse:
 def tco_page() -> FileResponse:
     """Serve the EU Terrorist Content Online Regulation dataset page (reads POST /api/explore)."""
     return _serve_page("tco.html", "EU TCO Regulation page")
+
+
+@app.get("/regional", response_class=HTMLResponse)
+def regional_page() -> FileResponse:
+    """Serve the regional content-moderation transparency-law dataset page (reads POST /api/explore)."""
+    return _serve_page("regional.html", "Regional transparency-law page")
 
 
 @app.get("/ai-training", response_class=HTMLResponse)
@@ -3989,6 +4011,33 @@ def _leg_warnings(
             "rank (1/2/3), not an additive count — SUM is meaningless. Use MIN / "
             "MAX / AVG, or group by 'value' to compare the bands themselves."
         )
+    # regional_metrics holds two jurisdictions' own metrics, and its breakdown
+    # sections each partition the enforcement 'videos_removed' total (summing a
+    # breakdown together with the total, or across jurisdictions, double-counts).
+    if table == "regional_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "jurisdiction" not in pinned:
+            out.append(
+                "'regional_metrics' holds Texas (HB 20) and Austria (KoPl-G) "
+                "reports whose metrics aren't comparable; this aggregate pins no "
+                "'jurisdiction'. Filter or group by 'jurisdiction'."
+            )
+        if "section" not in pinned:
+            out.append(
+                "'regional_metrics' breakdown sections (removals_by_reason / "
+                "_detection / _country) each partition the same 'videos_removed' "
+                "total, so summing a breakdown together with the 'enforcement' "
+                "total double-counts; this aggregate pins no 'section'. Filter or "
+                "group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'regional_metrics' reports distinct metrics (videos_removed, "
+                "demonetizations, appeals, flags, reported_items, …) that aren't "
+                "comparable; this aggregate pins no 'metric'. Filter or group by "
+                "'metric'."
+            )
     # cser_metrics mixes counts and rate-percentages across metrics, and carries
     # a 'Cross-Policy Data' aggregate alongside the per-policy-area rows.
     if table == "cser_metrics" and any(
