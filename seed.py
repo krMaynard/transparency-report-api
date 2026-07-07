@@ -91,6 +91,11 @@ _DEFAULT_TCO_SOURCE = os.getenv(
 _DEFAULT_AI_TRAINING_SOURCE = os.getenv(
     "SEED_AI_TRAINING_SOURCE_JSON", os.path.join(HERE, "data", "ai-training-transparency.json")
 )
+# Regional content-moderation transparency-law reports (regional-transparency/
+# build_regional.py) — Texas HB 20 + Austria KoPl-G YouTube reports.
+_DEFAULT_REGIONAL_SOURCE = os.getenv(
+    "SEED_REGIONAL_SOURCE_JSON", os.path.join(HERE, "data", "regional-transparency.json")
+)
 # Meta Community Standards Enforcement Report — vendored in-repo (from the
 # sibling data repo's meta-cser/build_cser.py).
 _DEFAULT_CSER_SOURCE = os.getenv(
@@ -506,6 +511,22 @@ CREATE TABLE ai_training_metrics (
     size_rank INTEGER           -- 1/2/3 band rank for modality sizes (0 = n/a), else NULL
 );
 CREATE INDEX idx_ai_training_model ON ai_training_metrics(model);
+
+-- Regional content-moderation transparency-law reports (regional-transparency/
+-- build_regional.py). YouTube reports filed under Texas HB 20 (§120.053) and
+-- Austria's KoPl-G. Tidy-long: one row per measured value, by jurisdiction ×
+-- period × section × category × metric. Metric scope is each report's own.
+CREATE TABLE regional_metrics (
+    jurisdiction TEXT NOT NULL,  -- 'Texas (HB 20)' / 'Austria (KoPl-G)'
+    platform     TEXT NOT NULL,  -- YouTube
+    period       TEXT NOT NULL,  -- reporting half-year ('YYYY-Hn')
+    section      TEXT NOT NULL,  -- monetization / enforcement / removals_by_reason / complaints / …
+    category     TEXT NOT NULL,  -- reason / country / flagger type / detection source ('' where none)
+    metric       TEXT NOT NULL,  -- videos_removed / demonetizations / appeals / reported_items / …
+    unit         TEXT NOT NULL,  -- count
+    value        REAL
+);
+CREATE INDEX idx_regional_jurisdiction ON regional_metrics(jurisdiction);
 
 -- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
 -- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
@@ -1320,6 +1341,36 @@ def build_tco_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_regional_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the regional_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long regional-transparency.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("regional dataset is None")
+    expected_cols = ["jurisdiction", "platform", "period", "section",
+                     "category", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"regional dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("regional dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO regional_metrics (jurisdiction, platform, period, "
+                "section, category, metric, unit, value) VALUES (?,?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_ai_training_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the ai_training_metrics table in an existing DB at db_path.
 
@@ -1905,6 +1956,8 @@ def main() -> None:
                         help="Path to tco-regulation.json")
     parser.add_argument("--ai-training-source", default=_DEFAULT_AI_TRAINING_SOURCE,
                         help="Path to ai-training-transparency.json")
+    parser.add_argument("--regional-source", default=_DEFAULT_REGIONAL_SOURCE,
+                        help="Path to regional-transparency.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
@@ -2072,6 +2125,15 @@ def main() -> None:
               f"{len({r[1] for r in ai_data['rows']})} models")
     else:
         print(f"  (skipping AI training transparency — not found: {args.ai_training_source})")
+
+    if os.path.isfile(args.regional_source):
+        with open(args.regional_source, "r", encoding="utf-8") as f:
+            regional_data = json.load(f)
+        regional_rows = build_regional_db(regional_data, args.db)
+        print(f"  regional law reports: {regional_rows} rows across "
+              f"{len({r[0] for r in regional_data['rows']})} jurisdictions")
+    else:
+        print(f"  (skipping regional law reports — not found: {args.regional_source})")
 
     if os.path.isfile(args.cser_source):
         with open(args.cser_source, "r", encoding="utf-8") as f:

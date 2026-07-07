@@ -68,7 +68,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), the EU Terrorist Content Online Regulation transparency reports (`build_tco_db`, `--tco-source`), the EU AI Act training-data transparency summaries (`build_ai_training_db`, `--ai-training-source`), the Meta Community Standards Enforcement Report (`build_cser_db`, `--cser-source`), the TikTok Community Guidelines Enforcement Report (`build_tiktok_cger_db`, `--tiktok-cger-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), the Japan LY Corp report narratives (`build_japan_narratives`, `--japan-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), the EU Terrorist Content Online Regulation transparency reports (`build_tco_db`, `--tco-source`), the EU AI Act training-data transparency summaries (`build_ai_training_db`, `--ai-training-source`), the regional content-moderation transparency-law reports (`build_regional_db`, `--regional-source`), the Meta Community Standards Enforcement Report (`build_cser_db`, `--cser-source`), the TikTok Community Guidelines Enforcement Report (`build_tiktok_cger_db`, `--tiktok-cger-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), the Japan LY Corp report narratives (`build_japan_narratives`, `--japan-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -84,6 +84,7 @@ Built to demonstrate two things:
 | `data/tiktok-cger.json` | Vendored snapshot of TikTok's Community Guidelines Enforcement Report (sibling `dsa-transparency-data/tiktok-cger/build_cger.py`) — a tidy-long `columns`+`rows` list (global `All`-location cut); seeded into the `tiktok_cger_metrics` table by `seed.build_tiktok_cger_db` |
 | `data/tco-regulation.json` | Vendored snapshot of the EU Terrorist Content Online Regulation transparency reports (sibling `dsa-transparency-data/tco-regulation/build_tco.py`) — a tidy-long `columns`+`rows` list across the authority (Art. 8 / Commission) and platform (Art. 7) streams; seeded into the `tco_metrics` table by `seed.build_tco_db` |
 | `data/ai-training-transparency.json` | Vendored snapshot of the EU AI Act Art. 53(1)(d) training-data transparency summaries (sibling `dsa-transparency-data/ai-training-transparency/build_ai_training.py`) — a tidy-long `columns`+`rows` list across providers' public summaries of training content (Google PDF + Microsoft Hugging Face cards); seeded into the `ai_training_metrics` table by `seed.build_ai_training_db` |
+| `data/regional-transparency.json` | Vendored snapshot of the regional content-moderation transparency-law reports (sibling `dsa-transparency-data/regional-transparency/build_regional.py`) — a tidy-long `columns`+`rows` list of YouTube's Texas HB 20 (§120.053) + Austria KoPl-G (§4) reports; seeded into the `regional_metrics` table by `seed.build_regional_db` |
 | `data/google-user-data.json` | Vendored snapshot of Google's government requests for user information (sibling `dsa-transparency-data/google-user-data/build_userdata.py`) — a tidy-long `columns`+`rows` list; seeded into the `google_userdata_metrics` table by `seed.build_google_userdata_db` |
 | `data/microsoft-lerr.json` | Vendored snapshot of the Microsoft Law Enforcement Requests Report (sibling `dsa-transparency-data/microsoft-lerr/build_microsoft.py`) — a tidy-long `columns`+`rows` list; seeded into the `microsoft_metrics` table by `seed.build_microsoft_db` |
 | `data/linkedin-transparency.json` | Vendored snapshot of the LinkedIn Government Requests Report (sibling `dsa-transparency-data/linkedin-transparency/build_linkedin.py`) — a tidy-long `columns`+`rows` list; seeded into the `linkedin_metrics` table by `seed.build_linkedin_db` |
@@ -110,6 +111,7 @@ Built to demonstrate two things:
 | `static/tiktok-cger.html` | Public TikTok Community Guidelines Enforcement Report dataset page (served at `/tiktok-cger`) — Trends charts (videos removed, proactive rate, videos by policy) + removal-quality-rates table over `POST /api/explore` (`tiktok_cger_metrics`) |
 | `static/tco.html` | Public EU Terrorist Content Online Regulation dataset page (served at `/tco`) — charts (removal orders issued by Member State, content removed via orders by platform) + tables over `POST /api/explore` (`tco_metrics`); English-only, like `/mandates` |
 | `static/ai-training.html` | Public EU AI Act training-data transparency dataset page (served at `/ai-training`) — charts (text training-data size by model, size rank by modality) + size-band + data-source matrix tables over `POST /api/explore` (`ai_training_metrics`); English-only, like `/mandates` |
+| `static/regional.html` | Public regional content-moderation transparency-law dataset page (served at `/regional`) — charts (YouTube videos removed by reason + by country, Texas HB 20) + Texas enforcement-by-period + Austria KoPl-G complaints tables over `POST /api/explore` (`regional_metrics`); English-only, like `/mandates` |
 | `static/user-data.html` | Public Google user-data requests dataset page (served at `/user-data`) — Trends charts + overview tables over `POST /api/explore` (`google_userdata_metrics`) |
 | `static/microsoft.html` | Public Microsoft LERR dataset page (served at `/microsoft`) — Trends charts + overview tables over `POST /api/explore` (`microsoft_metrics`) |
 | `static/linkedin.html` | Public LinkedIn Government Requests dataset page (served at `/linkedin`) — Trends charts + overview tables over `POST /api/explore` (`linkedin_metrics`) |
@@ -289,7 +291,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Twenty non-DSA datasets ride alongside, each exposed as an ordinary query table
+Twenty-one non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -421,6 +423,25 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   grouped as one "Perception" modality, recorded on both rows; `crawled` /
   `user_data` data-source categories the others don't break out).
   The `/ai-training` dataset page is English-only (like `/mandates`).
+- **Regional content-moderation transparency-law reports** — a single
+  **tidy-long** `regional_metrics` table (one row per measured value:
+  `jurisdiction`/`platform`/`period`/`section`/`category`/`metric`/`unit` + a
+  `value`; dims inline). The periodic content-moderation reports platforms file
+  under sub-national / national statutes, both filed by Google for **YouTube**:
+  **Texas HB 20** (Business & Commerce Code §120.053, half-yearly 2024-H2→ —
+  `monetization`, `age_restrictions`, `enforcement` (videos_removed / appeals /
+  reinstatements), `coordinated_influence`, `human_flags`,
+  `removals_by_detection`, `removals_by_reason`, `removals_by_country`; reduced
+  to monetization + age_restrictions from 2025-H2) and **Austria KoPl-G**
+  (Kommunikationsplattformen-Gesetz §4, biannual 2021-H2→ — `complaints`:
+  reported_items / removed_items, sparse as the webform is "de facto not used").
+  `unit` is `count`. Metric scope is each report's own — pin `jurisdiction`,
+  `section` **and** `metric` before aggregating, and note the reason/detection
+  breakdowns each partition the `enforcement` `videos_removed` total (summing a
+  breakdown with the total double-counts); `_leg_warnings` warns on all three.
+  The build cross-checks that each full Texas report's reason and detection
+  breakdowns sum back to `videos_removed`. The `/regional` dataset page is
+  English-only (like `/mandates`).
 - **Meta Community Standards Enforcement Report (CSER)** — a single **tidy-long**
   `cser_metrics` table (one row per measured value: `app`/`policy_area`/`metric`/
   `period`/`unit` + a `value`; dims stored inline). Meta's flagship **voluntary**
@@ -903,6 +924,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/tiktok-cger` | — | Public TikTok Community Guidelines Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/tco` | — | Public EU Terrorist Content Online Regulation dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/ai-training` | — | Public EU AI Act training-data transparency dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
+| GET | `/regional` | — | Public regional content-moderation transparency-law dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |

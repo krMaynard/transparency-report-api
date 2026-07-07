@@ -3451,6 +3451,63 @@ class TestAiTrainingTable:
         assert r.status_code == 200 and "ai_training_metrics" in r.text
 
 
+class TestRegionalTable:
+    def test_regional_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "regional_metrics" in names
+
+    def test_regional_fields_endpoint(self):
+        body = client.get("/api/fields?table=regional_metrics", headers=MOMO).json()
+        assert {"jurisdiction", "platform", "period", "section", "category",
+                "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_regional_texas_enforcement(self):
+        # Texas HB 20 videos removed for the 2025-H1 period (fixture).
+        job = _submit_and_wait({
+            "table": "regional_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "jurisdiction",
+                 "field_values": ["Texas (HB 20)"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["enforcement"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["videos_removed"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"][0][0] == 20025866
+
+    def test_regional_austria_complaints(self):
+        # Austria KoPl-G reported items — sparse (5 in the fixture period).
+        r = client.post("/api/explore", json={
+            "table": "regional_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "jurisdiction",
+                 "field_values": ["Austria (KoPl-G)"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["reported_items"]},
+            ]},
+            "fields": ["period", "value"],
+        })
+        assert r.status_code == 200
+        assert r.json()["rows"][0][1] == 5
+
+    def test_regional_unpinned_sum_warns(self):
+        # A SUM pinning none of jurisdiction / section / metric mixes two
+        # jurisdictions' incomparable metrics and a breakdown with its own total.
+        r = client.post("/api/explore", json={
+            "table": "regional_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "jurisdiction" in warnings and "section" in warnings and "metric" in warnings
+
+    def test_regional_page_served(self):
+        r = client.get("/regional")
+        assert r.status_code == 200 and "regional_metrics" in r.text
+
+
 class TestCserTable:
     def test_cser_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
