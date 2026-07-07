@@ -3337,6 +3337,24 @@ class TestTcoTable:
         assert r.status_code == 200
         assert not r.json().get("warnings")
 
+    def test_tco_google_platform_proactive(self):
+        # Google rides in the platform stream with exact (non-approx) counts;
+        # its proactive terrorist-content removals grow year on year.
+        job = _submit_and_wait({
+            "table": "tco_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "publisher", "field_values": ["Google"]},
+                {"operation": "EQ", "field_name": "metric",
+                 "field_values": ["content_removed_proactive"]},
+            ]},
+            "group_by": ["period"],
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2024", 55306499], ["2025", 181341358]]
+
     def test_tco_page_served(self):
         r = client.get("/tco")
         assert r.status_code == 200 and "tco_metrics" in r.text

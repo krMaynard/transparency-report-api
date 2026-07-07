@@ -240,6 +240,10 @@ _TCO_FIXTURE = {
          "Facebook", "content_removed_via_orders", "count", 10],
         ["Meta", "platform", "2023", "platform_enforcement",
          "Facebook", "content_removed_proactive", "approx_count", 6100000],
+        ["Google", "platform", "2024", "platform_enforcement",
+         "Google", "content_removed_proactive", "count", 55306499],
+        ["Google", "platform", "2025", "platform_enforcement",
+         "Google", "content_removed_proactive", "count", 181341358],
     ],
 }
 seed.build_tco_db(_TCO_FIXTURE, _DB)
