@@ -254,14 +254,19 @@ display: flex; align-items: center;
   table.mand tbody tr:hover td { background:var(--panel2); }
   /* Inactive obligations — enjoined, superseded or dead/proposed laws impose no
      currently-active reporting duty — are de-emphasised so the eye lands on the
-     in-force mandates. Hovering a row restores full contrast for reading. Browsers
-     without :has() simply show every row at full opacity (no loss of information). */
+     in-force mandates. Opacity .65 keeps #333-on-#fff text above the WCAG AA 4.5:1
+     ratio; hover OR keyboard focus within the row restores full contrast (so
+     keyboard/touch users aren't excluded). Browsers without :has() simply show
+     every row at full opacity (no loss of information). */
   table.mand tbody tr:has(.s-enjoined),
   table.mand tbody tr:has(.s-superseded),
-  table.mand tbody tr:has(.s-proposed) { opacity:.48; }
+  table.mand tbody tr:has(.s-proposed) { opacity:.65; }
   table.mand tbody tr:has(.s-enjoined):hover,
+  table.mand tbody tr:has(.s-enjoined):focus-within,
   table.mand tbody tr:has(.s-superseded):hover,
-  table.mand tbody tr:has(.s-proposed):hover { opacity:1; }
+  table.mand tbody tr:has(.s-superseded):focus-within,
+  table.mand tbody tr:has(.s-proposed):hover,
+  table.mand tbody tr:has(.s-proposed):focus-within { opacity:1; }
   @media (prefers-reduced-motion: no-preference) {
     table.mand tbody tr { transition:opacity .15s ease; }
   }
