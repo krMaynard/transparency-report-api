@@ -1276,7 +1276,7 @@ TABLES: dict[str, TableSpec] = {
         },
     ),
     "korea_network_act_metrics": TableSpec(
-        "Korea Network Act illegal-sexual-content transparency report — the annual report online service providers must publish under South Korea's Network Act (Art. 64-5) and Telecommunications Business Act (Art. 22-5) on the technical/managerial measures they take against the circulation of illegal sexual content (illegally-filmed content, deepfake / 'fake' images and videos, and child/youth sexual-abuse material). Google publishes one per calendar year covering Search and YouTube jointly; this is its 2025 report, one row per measured value identified by publisher × period × section × category × metric, with 'period' a month ('2025-01' … '2025-12'). Four sections, each a cross-cut of the SAME requests (so they are NOT additive across sections): 'requests_received' (removal requests by complainant — 'Victims etc. (User Requests)' + 'Agency and Org (Gov Requests)', metric 'requests'), 'request_reasons' (the same requests by reason — Illegal Photos and Videos / Fake Images and Videos / Child or Youth Sexual Abuse Content, metric 'requests'), 'processed_result' (the same requests by outcome — 'Removed Voluntarily by the Company' + four 'Not Removed - …' reasons + two 'KCSC Assessment - …' rows, metric 'urls') and 'removal_reasons' (the removed URLs by reason, metric 'urls_removed'). Within a section the categories are DISJOINT and sum to the section total (the report's 'Total' rows are dropped), so summing over 'category' within one section is a legitimate annual/grand total — but pin a 'section' (and 'metric') first, and never sum across sections (requests received ≠ processed outcomes ≠ removed URLs). Summing over 'period' gives the annual total.",
+        "Korea Network Act illegal-sexual-content transparency report — the annual report online service providers must publish under South Korea's Network Act (Art. 64-5) and Telecommunications Business Act (Art. 22-5) on the technical/managerial measures they take against the circulation of illegal sexual content (illegally-filmed content, deepfake / 'fake' images and videos, and child/youth sexual-abuse material). Google publishes one per calendar year covering Search and YouTube jointly; this holds all six reports so far (2020 → 2025). One row per measured value identified by publisher × period × section × category × metric. The 2024 and 2025 reports publish a full MONTHLY breakdown, in four sections each a cross-cut of the SAME requests (NOT additive across sections), with 'period' a month ('YYYY-MM'): 'requests_received' (removal requests by complainant — 'Victims etc. (User Requests)' + 'Agency and Org (Gov Requests)', metric 'requests'), 'request_reasons' (the same requests by reason — Illegal Photos and Videos / Fake Images and Videos / Child or Youth Sexual Abuse Content, metric 'requests'), 'processed_result' (the same requests by outcome — 'Removed Voluntarily by the Company' + four 'Not Removed - …' reasons + two 'KCSC Assessment - …' rows, metric 'urls') and 'removal_reasons' (the removed URLs by reason, metric 'urls_removed'). Within a monthly section the categories are DISJOINT and sum to the section total (the report's 'Total' rows are dropped), so summing over 'category' within one section is a legitimate grand total, and summing over 'period' within a year gives the annual total — but pin a 'section' (and 'metric') first, and never sum across sections (requests received ≠ processed outcomes ≠ removed URLs). The 2020–2023 reports are prose-only; their headline figures, plus a rollup of 2024/2025, live in section 'annual_summary' (category 'All', 'period' a YEAR 'YYYY', metric 'urls_received' / 'urls_removed') — a comparable 2020→2025 series that sits BESIDE the monthly sections (a rollup of them, so don't sum it together with them).",
         "FROM korea_network_act_metrics f",
         {
             "publisher": "f.publisher",
@@ -4106,19 +4106,20 @@ def _leg_warnings(
                 "vendor's own and aren't comparable across services; this "
                 "aggregate pins no 'service'. Filter or group by 'service'."
             )
-    # korea_network_act_metrics has four sections that are cross-cuts of the same
-    # requests (by complainant / reason / outcome, plus removed-by-reason), so
-    # summing across sections multiply-counts the same requests.
+    # korea_network_act_metrics has four monthly sections that are cross-cuts of
+    # the same requests (by complainant / reason / outcome, plus removed-by-reason)
+    # plus an 'annual_summary' rollup, so summing across sections multiply-counts.
     if table == "korea_network_act_metrics" and any(
         a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
     ):
         if "section" not in pinned:
             out.append(
-                "'korea_network_act_metrics' has four sections that are "
+                "'korea_network_act_metrics' has four monthly sections that are "
                 "cross-cuts of the SAME requests (requests_received by "
                 "complainant, request_reasons by reason, processed_result by "
-                "outcome, removal_reasons by reason); summing across them "
-                "multiply-counts the same requests. Filter or group by 'section'."
+                "outcome, removal_reasons by reason) plus an 'annual_summary' "
+                "rollup of them; summing across them multiply-counts the same "
+                "requests. Filter or group by 'section'."
             )
         if "metric" not in pinned:
             out.append(

@@ -619,21 +619,34 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Network Act Art. 64-5 · Google · 2025</span>
+    <span class="badge">Network Act Art. 64-5 · Google · 2020–2025</span>
     <h1>Korea — Network Act illegal-sexual-content report</h1>
-    <p>South Korea's <strong>Network Act</strong> (Art. 64-5) and <strong>Telecommunications Business Act</strong> (Art. 22-5), from the two bills passed on 20 May 2020, require online service providers to take technical and managerial measures against the circulation of <em>illegal sexual content</em> — illegally-filmed content, deepfake (&ldquo;fake&rdquo;) images and videos, and child/youth sexual-abuse material — and to publish an <strong>annual transparency report</strong> on them. <strong>Google</strong> publishes one per calendar year covering <strong>Search and YouTube jointly</strong>; this is its 2025 report. A tidy-long dataset: each row is one measured value identified by publisher × period (month) × section × category × metric. The four sections are cross-cuts of the <strong>same</strong> requests (by complainant, by reason, by outcome — plus the removed URLs by reason), so they aren't additive across sections. Pin a <code>section</code> (and <code>metric</code>) before aggregating; summing over <code>period</code> gives the annual total.</p>
+    <p>South Korea's <strong>Network Act</strong> (Art. 64-5) and <strong>Telecommunications Business Act</strong> (Art. 22-5), from the two bills passed on 20 May 2020, require online service providers to take technical and managerial measures against the circulation of <em>illegal sexual content</em> — illegally-filmed content, deepfake (&ldquo;fake&rdquo;) images and videos, and child/youth sexual-abuse material — and to publish an <strong>annual transparency report</strong> on them. <strong>Google</strong> publishes one per calendar year covering <strong>Search and YouTube jointly</strong>; this dataset holds all six reports so far (2020 → 2025). The 2024 and 2025 reports add a full <strong>monthly</strong> breakdown by complainant, reason and outcome; 2020–2023 give only the year's headline URL counts (2020 covers just 10–31 Dec, the law's implementation date). A tidy-long dataset: each row is one measured value identified by publisher × period × section × category × metric. The four monthly sections are cross-cuts of the <strong>same</strong> requests, so they aren't additive across sections; <code>annual_summary</code> is a rollup that sits beside them. Pin a <code>section</code> (and <code>metric</code>) before aggregating.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
 
-  <section class="data-section" aria-label="Charts">
-    <h2>Trends</h2>
-    <p class="sub">Interactive views of the reported figures. Each chart has a text alternative for screen readers.</p>
+  <section class="data-section" aria-label="Annual trend">
+    <h2>URLs received &amp; removed per year</h2>
+    <p class="sub">The headline series across all six reports (2020–2025). Reported URLs grew from 61 (a 22-day partial period in 2020) to a 2024 peak of 158,052, of which Google removed the large majority.</p>
+    <div class="chart-card wide">
+      <div class="chart-loading" id="ann-loading">Loading…</div>
+      <canvas id="chart-ann" height="130" aria-hidden="true" class="hidden"></canvas>
+      <div id="chart-ann-table" class="sr-only"></div>
+    </div>
+  </section>
+
+  <section class="data-section" aria-label="Monthly detail">
+    <h2>Monthly detail
+      <label class="sr-only" for="knaYear">Report year</label>
+      <select id="knaYear"><option value="2025">2025</option><option value="2024">2024</option></select>
+    </h2>
+    <p class="sub">The month-by-month breakdown for the selected year (2024 and 2025 publish it; earlier reports don't). Each chart has a text alternative for screen readers.</p>
     <div class="chart-grid">
 
       <div class="chart-card wide">
         <h3>Removal requests received per month, by complainant</h3>
-        <p class="chart-sub">URLs reported to Google for removal under this law each month of 2025, split by who reported them — victims and other users vs. government agencies and organisations. 115,280 URLs were reported in total.</p>
+        <p class="chart-sub">URLs reported to Google for removal each month, split by who reported them — victims and other users vs. government agencies and organisations.</p>
         <div class="chart-loading" id="req-loading">Loading…</div>
         <canvas id="chart-req" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -641,7 +654,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>URLs removed per month, by reason</h3>
-        <p class="chart-sub">URLs Google removed each month, by the category of illegal sexual content. 92,334 of the 115,280 reported URLs were removed.</p>
+        <p class="chart-sub">URLs Google removed each month, by the category of illegal sexual content.</p>
         <div class="chart-loading" id="rem-loading">Loading…</div>
         <canvas id="chart-rem" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
@@ -652,7 +665,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <section class="data-section">
     <h2>Requests received, by reason</h2>
-    <p class="sub">The 115,280 URLs reported for removal in 2025, by the category of alleged illegal sexual content the reporter selected.</p>
+    <p class="sub">The URLs reported for removal in the selected year, by the category of alleged illegal sexual content the reporter selected.</p>
     <div class="results" id="reasonsTable" aria-busy="true">
       <div class="results-loading">Loading…</div>
     </div>
@@ -660,7 +673,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <section class="data-section">
     <h2>How requests were processed</h2>
-    <p class="sub">The outcome of the 115,280 reported URLs. &ldquo;Removed Voluntarily by the Company&rdquo; is 92,334; the rest were not actioned (already gone, insufficient information, not found, or other). No URLs went to the KCSC for assessment in 2025.</p>
+    <p class="sub">The outcome of the reported URLs in the selected year — voluntarily removed by Google, or not actioned (already gone, insufficient information, not found, or other), plus any sent to the KCSC for assessment.</p>
     <div class="results" id="outcomeTable" aria-busy="true">
       <div class="results-loading">Loading…</div>
     </div>
@@ -668,7 +681,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <section class="data-section">
     <h2>Removed content, by reason</h2>
-    <p class="sub">The 92,334 removed URLs by category. Almost all were illegally-filmed photos and videos.</p>
+    <p class="sub">The removed URLs in the selected year by category. Almost all were illegally-filmed photos and videos.</p>
     <div class="results" id="removalTable" aria-busy="true">
       <div class="results-loading">Loading…</div>
     </div>
@@ -678,7 +691,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>Source: Google's <a href="https://transparencyreport.google.com/report-downloads" target="_blank" rel="noopener noreferrer">South Korea Network Act &amp; Telecommunications Business Act Transparency Report</a> (2025), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
+  <p>Source: Google's <a href="https://transparencyreport.google.com/report-downloads" target="_blank" rel="noopener noreferrer">South Korea Network Act &amp; Telecommunications Business Act Transparency Reports</a> (2020–2025), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Snapshot:</span> <span id="prov-snap"></span> · <span class="prov-label">Cite as:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -905,50 +918,58 @@ display: flex; align-items: center; justify-content: space-between;
       }));
   }
 
-  // Chart/table queries. Filter values are section/metric codes, so the
-  // localization generator's prose find/replace can never rewrite them.
-  function monthlyQ(section) { return {"table":"korea_network_act_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[section]}]},"group_by":["period","category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
-  function byCatQ(section) { return {"table":"korea_network_act_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[section]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  // Chart/table queries. Filter values are section/metric codes + numeric
+  // periods, so the localization generator's prose find/replace can't touch them.
+  function months(year) { var a = []; for (var m = 1; m <= 12; m++) a.push(year + '-' + (m < 10 ? '0' + m : m)); return a; }
+  function yearClause(section, year) {
+    return {"and":[
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"IN","field_name":"period","field_values":months(year)}
+    ]};
+  }
+  function monthlyQ(section, year) { return {"table":"korea_network_act_metrics","query":yearClause(section, year),"group_by":["period","category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
+  function byCatQ(section, year) { return {"table":"korea_network_act_metrics","query":yearClause(section, year),"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function annualQ() { return {"table":"korea_network_act_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["annual_summary"]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":40}; }
 
-  function renderTrend(canvasId, loadingId, tableId, head, d) {
+  var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
+
+  function renderTrend(canvasId, loadingId, tableId, head, d, seriesLabels) {
     if (!d.rows.length) { emptyChart(loadingId); return; }
-    var p = pivot(d.rows, null);
+    var p = pivot(d.rows, seriesLabels || null);
     seriesTable(tableId, head, p);
     linesChart(canvasId, loadingId, tableId, p.labels, p.dsets);
   }
 
-  // ── Load ──────────────────────────────────────────────────────────────────
-  async function load() {
-    try {
-      var d = await explore(byCatQ('request_reasons'));
-      renderTable('reasonsTable', d.rows || [], "Removal requests received in 2025, by reason.", "Reason", "Requests");
-      fillProvenance(d.generated, d.version);
-    } catch (err) {
-      showError('reasonsTable', "Failed to load request reasons: " + err.message);
-    }
-    try {
-      var d2 = await explore(byCatQ('processed_result'));
-      renderTable('outcomeTable', d2.rows || [], "How the reported URLs were processed in 2025.", "Outcome", "URLs");
-      if (d2.generated) fillProvenance(d2.generated, d2.version);
-    } catch (err) {
-      showError('outcomeTable', "Failed to load processing outcomes: " + err.message);
-    }
-    try {
-      var d3 = await explore(byCatQ('removal_reasons'));
-      renderTable('removalTable', d3.rows || [], "Removed URLs in 2025, by reason.", "Reason", "URLs removed");
-    } catch (err) {
-      showError('removalTable', "Failed to load removal reasons: " + err.message);
-    }
-  }
-  load();
+  // ── Annual trend (2020–2025) — year-independent ─────────────────────────────
+  soft(annualQ()).then(function (d) {
+    renderTrend('chart-ann', 'ann-loading', 'chart-ann-table', "Year", d,
+      {"urls_received": "URLs received", "urls_removed": "URLs removed"});
+    fillProvenance(d.generated, d.version);
+  });
 
-  var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  soft(monthlyQ('requests_received')).then(function (d) {
-    renderTrend('chart-req', 'req-loading', 'chart-req-table', "Month", d);
-  });
-  soft(monthlyQ('removal_reasons')).then(function (d) {
-    renderTrend('chart-rem', 'rem-loading', 'chart-rem-table', "Month", d);
-  });
+  // ── Monthly detail for the selected year ────────────────────────────────────
+  function renderYear(year) {
+    soft(monthlyQ('requests_received', year)).then(function (d) {
+      renderTrend('chart-req', 'req-loading', 'chart-req-table', "Month", d);
+    });
+    soft(monthlyQ('removal_reasons', year)).then(function (d) {
+      renderTrend('chart-rem', 'rem-loading', 'chart-rem-table', "Month", d);
+    });
+    soft(byCatQ('request_reasons', year)).then(function (d) {
+      renderTable('reasonsTable', d.rows, "Removal requests received by reason.", "Reason", "Requests");
+    });
+    soft(byCatQ('processed_result', year)).then(function (d) {
+      renderTable('outcomeTable', d.rows, "How the reported URLs were processed.", "Outcome", "URLs");
+    });
+    soft(byCatQ('removal_reasons', year)).then(function (d) {
+      renderTable('removalTable', d.rows, "Removed URLs by reason.", "Reason", "URLs removed");
+    });
+  }
+  var knaYear = document.getElementById('knaYear');
+  if (knaYear) {
+    knaYear.addEventListener('change', function () { renderYear(knaYear.value); });
+    renderYear(knaYear.value);
+  }
 })();
 </script>
 </body>

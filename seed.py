@@ -573,17 +573,18 @@ CREATE TABLE singapore_metrics (
 CREATE INDEX idx_singapore_section ON singapore_metrics(section);
 
 -- Korea Network Act (illegal-sexual-content) transparency report
--- (korea-network-act/build_korea_network_act.py). Tidy-long: the monthly
--- Jan–Dec breakdown from Google's annual report under Network Act Art. 64-5 /
--- Telecommunications Business Act Art. 22-5 (illegal sexual content on Search +
--- YouTube). Four sections are cross-cuts of the same requests — pin one before
--- aggregating. Dims inline.
+-- (korea-network-act/build_korea_network_act.py). Tidy-long: Google's annual
+-- reports (2020–2025) under Network Act Art. 64-5 / Telecommunications Business
+-- Act Art. 22-5 (illegal sexual content on Search + YouTube). 2024/2025 publish
+-- a monthly Jan–Dec breakdown in four cross-cut sections (period 'YYYY-MM');
+-- 2020–2023 (prose-only) + a rollup live in 'annual_summary' (period 'YYYY').
+-- Pin a section before aggregating. Dims inline.
 CREATE TABLE korea_network_act_metrics (
     publisher TEXT NOT NULL,    -- Google (Search + YouTube, jointly)
-    period    TEXT NOT NULL,    -- month 'YYYY-MM'
-    section   TEXT NOT NULL,    -- requests_received / request_reasons / processed_result / removal_reasons
-    category  TEXT NOT NULL,    -- complainant / reason / outcome label
-    metric    TEXT NOT NULL,    -- requests / urls / urls_removed
+    period    TEXT NOT NULL,    -- month 'YYYY-MM' (detailed) or year 'YYYY' (annual_summary)
+    section   TEXT NOT NULL,    -- requests_received / request_reasons / processed_result / removal_reasons / annual_summary
+    category  TEXT NOT NULL,    -- complainant / reason / outcome label; 'All' for annual_summary
+    metric    TEXT NOT NULL,    -- requests / urls / urls_removed / urls_received
     unit      TEXT NOT NULL,    -- count
     value     REAL
 );
