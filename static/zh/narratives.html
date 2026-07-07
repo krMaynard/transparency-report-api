@@ -636,15 +636,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">全文检索</span>
     <h1>检索透明度报告正文</h1>
-    <p>对平台透明度报告正文的全文检索——各平台用来描述其如何界定和执行内容审核政策的措辞。涵盖纽约和加利福尼亚州的《服务条款》报告、欧盟 DSA 报告的定性部分，以及 LY 集团日文《媒体透明度报告》（已译为英文）。</p>
+    <p>全文检索 across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings, Google's California AB 2013 AI-training summary, the EU DSA reports' qualitative sections, and LY Corporation's Japanese Media Transparency Report (translated to English).</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">对四个语料库<strong>正文</strong>的全文检索：纽约社交媒体《服务条款》报告和加利福尼亚州 AB 587 提交文件（各平台如何描述其对仇恨言论、极端主义、虚假信息、骚扰及外国政治干预的界定和执行）、欧盟 DSA 报告第 11 表的定性描述（各服务如何描述其内容审核方式），以及依据日本情プラ法发布的 LY 集团日文<strong>《媒体透明度报告》</strong>（以双语保存——英文译文加日文原文——因此可用任一语言检索）。每条结果是一页、一条描述或一节，按相关度排序；纽约的结果链接到已存档 PDF。由公开的只读 <code>GET /api/narratives</code>（SQLite FTS5）提供。</p>
+    <p class="sub">全文检索 across the <strong>prose</strong> of five corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference), Google's California AB 2013 AI Training Data Transparency Summary (how it describes the datasets used to train its generative-AI products), the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach), and LY Corporation's Japanese <strong>Media Transparency Report</strong> under Japan's 情プラ法 (stored bilingually — an English translation plus the Japanese original — so it's searchable in either language). Each result is one page, description or section, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>搜索 <input id="nq" type="search" placeholder="例如：仇恨言论、申诉、算法" autocomplete="off" /></label>
-      <label>来源 <select id="nsrc"><option value="">全部</option><option value="ny-tos">纽约 ToS 报告</option><option value="ca-ab587">加州 AB 587 报告</option><option value="dsa">DSA 报告</option><option value="japan">日本（LY 集团）</option></select></label>
+      <label>来源 <select id="nsrc"><option value="">全部</option><option value="ny-tos">纽约 ToS 报告</option><option value="ca-ab587">加州 AB 587 报告</option><option value="ca-ab2013">CA AB 2013 (AI training)</option><option value="dsa">DSA 报告</option><option value="japan">日本（LY 集团）</option></select></label>
       <label>公司 <select id="nco"><option value="">全部</option></select></label>
       <label>报告期 <select id="nper"><option value="">全部</option></select></label>
       <button id="nbtn" type="button">搜索</button>
@@ -693,7 +693,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "ca-ab2013": "CA AB 2013", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
 
 let nAbort = null;
 

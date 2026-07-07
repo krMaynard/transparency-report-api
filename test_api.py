@@ -1668,11 +1668,11 @@ class TestNarratives:
     def test_public_index_spans_all_sources(self):
         # No query: returns the facet lists + how much prose is searchable across
         # all corpora (3 NY ToS pages + 1 DSA description + 2 CA AB 587 pages +
-        # 2 Japan sections).
+        # 2 CA AB 2013 sections + 2 Japan sections).
         d = client.get("/api/narratives").json()  # no X-API-Key
         assert d["searched"] is False
-        assert d["page_total"] == 8
-        assert d["sources"] == ["ny-tos", "dsa", "ca-ab587", "japan"]
+        assert d["page_total"] == 10
+        assert d["sources"] == ["ny-tos", "dsa", "ca-ab587", "ca-ab2013", "japan"]
         assert {"Snap Inc", "TikTok Inc", "YouTube", "Reddit, Inc.",
                 "LY Corporation"} <= set(d["companies"])
         assert d["results"] == []
@@ -1699,6 +1699,17 @@ class TestNarratives:
         # "extremism" is unique to the CA corpus — not in the NY ToS pages.
         assert client.get("/api/narratives",
                           params={"q": "extremism", "source": "ny-tos"}).json()["total"] == 0
+
+    def test_ca_ab2013_source_indexed(self):
+        # Google's California AB 2013 AI-training summary prose (source='ca-ab2013')
+        # is searchable and scoped by source.
+        d = client.get("/api/narratives",
+                       params={"q": "synthetically generated", "source": "ca-ab2013"}).json()
+        assert d["total"] == 1
+        hit = d["results"][0]
+        assert hit["source"] == "ca-ab2013" and hit["company"] == "Google"
+        # "ca-ab2013" is one of the advertised corpora.
+        assert "ca-ab2013" in d["sources"]
 
     def test_japan_source_bilingual(self):
         # The LY Corporation report prose (source='japan') is stored bilingually,

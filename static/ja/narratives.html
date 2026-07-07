@@ -636,15 +636,15 @@ display: flex; align-items: center;
   <header>
     <span class="badge">全文検索</span>
     <h1>透明性レポートの本文を検索</h1>
-    <p>プラットフォームの透明性レポートの本文に対する全文検索です。各プラットフォームがコンテンツ・モデレーション方針をどのように定義し執行するかを説明する文章です。ニューヨークとカリフォルニアの利用規約報告書、EU DSA 報告書の定性的セクション、および LY コーポレーションの日本語のメディア透明性レポート（英訳）を対象とします。</p>
+    <p>全文検索 across the prose of platform transparency reports — the language platforms use to describe how they define and enforce their content-moderation policies. Spans New York's and California's Terms-of-Service filings, Google's California AB 2013 AI-training summary, the EU DSA reports' qualitative sections, and LY Corporation's Japanese Media Transparency Report (translated to English).</p>
   </header>
 
   <main id="main" tabindex="-1">
   <section class="card" id="narratives-card">
-    <p class="sub">4 つのコーパスの<strong>本文</strong>に対する全文検索です。ニューヨークのソーシャルメディア利用規約報告書とカリフォルニア州 AB 587 の提出書類（各プラットフォームがヘイトスピーチ・過激主義・偽情報・ハラスメント・外国からの政治的干渉の定義と執行をどのように説明するか）、EU DSA 報告書の第 11 表の定性的記述（各サービスがコンテンツ・モデレーションの方針をどのように説明するか）、および日本の情プラ法に基づく LY コーポレーションの<strong>メディア透明性レポート</strong>（英訳と日本語原文を併録して保存しており、いずれの言語でも検索できます）です。各結果は 1 ページ・1 件の記述・1 セクションで、関連度順に並びます。ニューヨークの結果はアーカイブ済み PDF にリンクします。公開・読み取り専用の <code>GET /api/narratives</code>（SQLite FTS5）が提供します。</p>
+    <p class="sub">全文検索 across the <strong>prose</strong> of five corpora: New York's Social Media Terms-of-Service filings and California's AB 587 filings (how platforms describe defining and enforcing hate speech, extremism, disinformation, harassment and foreign political interference), Google's California AB 2013 AI Training Data Transparency Summary (how it describes the datasets used to train its generative-AI products), the EU DSA reports' Table-11 qualitative descriptions (how each service describes its content-moderation approach), and LY Corporation's Japanese <strong>Media Transparency Report</strong> under Japan's 情プラ法 (stored bilingually — an English translation plus the Japanese original — so it's searchable in either language). Each result is one page, description or section, ranked by relevance; NY ToS results link into the archived PDF. Served by the public, read-only <code>GET /api/narratives</code> (SQLite FTS5).</p>
     <div class="controls">
       <label>検索 <input id="nq" type="search" placeholder="例：ヘイトスピーチ、異議申立、アルゴリズム" autocomplete="off" /></label>
-      <label>ソース <select id="nsrc"><option value="">すべて</option><option value="ny-tos">NY ToS 報告書</option><option value="ca-ab587">CA AB 587 報告書</option><option value="dsa">DSA 報告書</option><option value="japan">日本（LY コーポレーション）</option></select></label>
+      <label>ソース <select id="nsrc"><option value="">すべて</option><option value="ny-tos">NY ToS 報告書</option><option value="ca-ab587">CA AB 587 報告書</option><option value="ca-ab2013">CA AB 2013 (AI training)</option><option value="dsa">DSA 報告書</option><option value="japan">日本（LY コーポレーション）</option></select></label>
       <label>企業 <select id="nco"><option value="">すべて</option></select></label>
       <label>期間 <select id="nper"><option value="">すべて</option></select></label>
       <button id="nbtn" type="button">検索</button>
@@ -693,7 +693,7 @@ function nParams() {
 
 // Corpus badge shown on each result. Values are the API's source codes, so the
 // localization generator's prose find/replace can't rewrite them.
-const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
+const SOURCE_LABELS = { "ny-tos": "NY ToS", "ca-ab587": "CA AB 587", "ca-ab2013": "CA AB 2013", "dsa": "DSA report", "japan": "Japan (LY Corp)" };
 
 let nAbort = null;
 
