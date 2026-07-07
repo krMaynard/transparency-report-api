@@ -34,6 +34,7 @@ PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-t
                "ca-ab587.html",
                "apple.html", "github.html", "snap.html",
                "india.html", "korea.html", "taiwan.html", "turkey.html", "cser.html",
+               "tiktok-cger.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
                "disruptions.html", "android.html", "narratives.html",
                "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
@@ -53,6 +54,7 @@ SUFFIX = {
     "taiwan.html": "taiwan",
     "turkey.html": "turkey",
     "cser.html": "cser",
+    "tiktok-cger.html": "tiktok-cger",
     "user-data.html": "user-data",
     "microsoft.html": "microsoft",
     "linkedin.html": "linkedin",
@@ -121,7 +123,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/ca-ab587', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/tiktok-cger', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -7117,7 +7119,7 @@ PAGES["es"]["india.html"] = [
     ("Content actioned", "Contenido moderado"),
     ("Month", "Mes"),
     ("Accounts suspended", "Cuentas suspendidas"),
-    ("Platform", "Plataforma"),
+    ('"Platform"', '"Plataforma"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "Valores declarados en cada sección del conjunto de datos de las Reglas de TI de la India."),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7168,7 +7170,7 @@ PAGES["fr"]["india.html"] = [
     ("Content actioned", "Contenus traités"),
     ("Month", "Mois"),
     ("Accounts suspended", "Comptes suspendus"),
-    ("Platform", "Plateforme"),
+    ('"Platform"', '"Plateforme"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "Valeurs déclarées dans chaque section du jeu de données des Règles TI de l'Inde."),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7219,7 +7221,7 @@ PAGES["de"]["india.html"] = [
     ("Content actioned", "Moderierte Inhalte"),
     ("Month", "Monat"),
     ("Accounts suspended", "Gesperrte Konten"),
-    ("Platform", "Plattform"),
+    ('"Platform"', '"Plattform"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "Gemeldete Werte in jedem Abschnitt des Datensatzes zu Indiens IT-Regeln."),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7270,7 +7272,7 @@ PAGES["it"]["india.html"] = [
     ("Content actioned", "Contenuti moderati"),
     ("Month", "Mese"),
     ("Accounts suspended", "Account sospesi"),
-    ("Platform", "Piattaforma"),
+    ('"Platform"', '"Piattaforma"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "Valori dichiarati in ciascuna sezione del set di dati delle Regole IT dell'India."),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7321,7 +7323,7 @@ PAGES["ja"]["india.html"] = [
     ("Content actioned", "対処コンテンツ"),
     ("Month", "月"),
     ("Accounts suspended", "凍結アカウント"),
-    ("Platform", "プラットフォーム"),
+    ('"Platform"', '"プラットフォーム"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "インドIT規則データセットの各セクションにおける報告値。"),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7372,7 +7374,7 @@ PAGES["zh"]["india.html"] = [
     ("Content actioned", "处理的内容"),
     ("Month", "月份"),
     ("Accounts suspended", "封禁账号"),
-    ("Platform", "平台"),
+    ('"Platform"', '"平台"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "印度IT规则数据集中每个板块的报告值。"),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7423,7 +7425,7 @@ PAGES["ko"]["india.html"] = [
     ("Content actioned", "조치된 콘텐츠"),
     ("Month", "월"),
     ("Accounts suspended", "정지된 계정"),
-    ("Platform", "플랫폼"),
+    ('"Platform"', '"플랫폼"'),
     ("Reported values in each section of the India IT Rules dataset.",
      "인도 IT 규칙 데이터셋의 각 섹션에 보고된 값."),
     ("Reported values from each platform's India IT Rules filings.",
@@ -7468,7 +7470,7 @@ PAGES["es"]["korea.html"] = [
     ("Requests processed", "Solicitudes procesadas"),
     ("Half-year", "Semestre"),
     ("Request type", "Tipo de solicitud"),
-    ("Platform", "Plataforma"),
+    ('"Platform"', '"Plataforma"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "Solicitudes gubernamentales a Naver y Kakao, totalizadas por tipo de solicitud legal."),
     ("Reported values from each platform's transparency reports.",
@@ -7515,7 +7517,7 @@ PAGES["fr"]["korea.html"] = [
     ("Requests processed", "Demandes traitées"),
     ("Half-year", "Semestre"),
     ("Request type", "Type de demande"),
-    ("Platform", "Plateforme"),
+    ('"Platform"', '"Plateforme"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "Demandes gouvernementales à Naver et Kakao, totalisées par type de demande légale."),
     ("Reported values from each platform's transparency reports.",
@@ -7562,7 +7564,7 @@ PAGES["de"]["korea.html"] = [
     ("Requests processed", "Bearbeitete Anfragen"),
     ("Half-year", "Halbjahr"),
     ("Request type", "Anfragetyp"),
-    ("Platform", "Plattform"),
+    ('"Platform"', '"Plattform"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "Behördliche Anfragen an Naver und Kakao, summiert nach gesetzlichem Anfragetyp."),
     ("Reported values from each platform's transparency reports.",
@@ -7609,7 +7611,7 @@ PAGES["it"]["korea.html"] = [
     ("Requests processed", "Richieste evase"),
     ("Half-year", "Semestre"),
     ("Request type", "Tipo di richiesta"),
-    ("Platform", "Piattaforma"),
+    ('"Platform"', '"Piattaforma"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "Richieste governative a Naver e Kakao, totalizzate per tipo di richiesta legale."),
     ("Reported values from each platform's transparency reports.",
@@ -7656,7 +7658,7 @@ PAGES["ja"]["korea.html"] = [
     ("Requests processed", "処理済み要請"),
     ("Half-year", "半期"),
     ("Request type", "要請種別"),
-    ("Platform", "プラットフォーム"),
+    ('"Platform"', '"プラットフォーム"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "Naver と Kakao への政府要請。法的要請種別ごとの合計。"),
     ("Reported values from each platform's transparency reports.",
@@ -7703,7 +7705,7 @@ PAGES["zh"]["korea.html"] = [
     ("Requests processed", "已处理的请求"),
     ("Half-year", "半年"),
     ("Request type", "请求类型"),
-    ("Platform", "平台"),
+    ('"Platform"', '"平台"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "对 Naver 和 Kakao 的政府请求，按法定请求类型合计。"),
     ("Reported values from each platform's transparency reports.",
@@ -7750,7 +7752,7 @@ PAGES["ko"]["korea.html"] = [
     ("Requests processed", "처리된 요청"),
     ("Half-year", "반기"),
     ("Request type", "요청 유형"),
-    ("Platform", "플랫폼"),
+    ('"Platform"', '"플랫폼"'),
     ("Government requests to Naver and Kakao, totalled per legal request type.",
      "네이버와 카카오에 대한 정부 요청, 법적 요청 유형별 합계."),
     ("Reported values from each platform's transparency reports.",
@@ -11555,6 +11557,195 @@ for _loc in _NEW_PAGE_LOCALES:
             if _o in _cser_text and _o not in _cser_own:
                 PAGES[_loc]["cser.html"].append((_o, _n))
                 _cser_own.add(_o)
+
+# ── TikTok CGER (Community Guidelines Enforcement Report) ────────────────────
+_TTCGER_NAV = {
+    "es": "TikTok — Aplicación", "fr": "TikTok — Application", "de": "TikTok — Durchsetzung",
+    "it": "TikTok — Applicazione", "ja": "TikTok — 執行状況", "zh": "TikTok — 执行", "ko": "TikTok — 집행",
+}
+_TTCGER_CARD_DESC_EN = "TikTok's voluntary Community Guidelines Enforcement Report — videos, accounts and comments removed, proactive and removal-speed rates, by policy and moderation system, quarterly since 2020."
+_TTCGER_CARD_DESC = {
+    "es": "El Informe voluntario de aplicación de las Normas de la Comunidad de TikTok: videos, cuentas y comentarios eliminados, tasas proactivas y de rapidez de eliminación, por política y sistema de moderación, trimestral desde 2020.",
+    "fr": "Le rapport volontaire d'application des Règles communautaires de TikTok : vidéos, comptes et commentaires supprimés, taux proactif et de rapidité de suppression, par règle et système de modération, trimestriel depuis 2020.",
+    "de": "TikToks freiwilliger Bericht zur Durchsetzung der Community-Richtlinien — entfernte Videos, Konten und Kommentare, proaktive und Entfernungsgeschwindigkeits-Raten, nach Richtlinie und Moderationssystem, vierteljährlich seit 2020.",
+    "it": "Il report volontario di TikTok sull'applicazione delle Linee guida della community: video, account e commenti rimossi, tassi proattivi e di rapidità di rimozione, per policy e sistema di moderazione, trimestrale dal 2020.",
+    "ja": "TikTok の自主的なコミュニティガイドライン施行レポート。削除した動画・アカウント・コメント、事前対応率と削除の速さを、ポリシー・モデレーション方式別に、2020年以降四半期ごとに掲載。",
+    "zh": "TikTok 自愿发布的《社区自律公约执行报告》——已移除的视频、账号与评论，主动处理率与移除速度，按政策与审核方式列出，自2020年起按季度发布。",
+    "ko": "TikTok의 자발적 커뮤니티 가이드라인 시행 보고서 — 삭제한 동영상·계정·댓글, 선제적 조치율과 삭제 속도를 정책·모더레이션 방식별로 2020년부터 분기별 제공.",
+}
+_TTCGER_PAGE = {
+    "TikTok Community Guidelines Enforcement Report — Transparency Report API": {
+        "es": "Informe de aplicación de las Normas de la Comunidad de TikTok — Transparency Report API",
+        "fr": "Rapport d'application des Règles communautaires de TikTok — Transparency Report API",
+        "de": "TikTok-Bericht zur Durchsetzung der Community-Richtlinien — Transparency Report API",
+        "it": "Report di TikTok sull'applicazione delle Linee guida della community — Transparency Report API",
+        "ja": "TikTok コミュニティガイドライン施行レポート — Transparency Report API",
+        "zh": "TikTok 社区自律公约执行报告 — Transparency Report API",
+        "ko": "TikTok 커뮤니티 가이드라인 시행 보고서 — Transparency Report API",
+    },
+    "TikTok · Voluntary · Quarterly · 2020 – 2026": {
+        "es": "TikTok · Voluntario · Trimestral · 2020 – 2026", "fr": "TikTok · Volontaire · Trimestriel · 2020 – 2026",
+        "de": "TikTok · Freiwillig · Vierteljährlich · 2020 – 2026", "it": "TikTok · Volontario · Trimestrale · 2020 – 2026",
+        "ja": "TikTok · 自主的 · 四半期ごと · 2020 – 2026", "zh": "TikTok · 自愿 · 每季度 · 2020 – 2026", "ko": "TikTok · 자발적 · 분기별 · 2020 – 2026",
+    },
+    "TikTok — Community Guidelines Enforcement Report": {
+        "es": "TikTok — Informe de aplicación de las Normas de la Comunidad",
+        "fr": "TikTok — Rapport d'application des Règles communautaires",
+        "de": "TikTok — Bericht zur Durchsetzung der Community-Richtlinien",
+        "it": "TikTok — Report sull'applicazione delle Linee guida della community",
+        "ja": "TikTok — コミュニティガイドライン施行レポート",
+        "zh": "TikTok — 社区自律公约执行报告",
+        "ko": "TikTok — 커뮤니티 가이드라인 시행 보고서",
+    },
+    "TikTok's flagship <strong>voluntary</strong> transparency report — how much violating content it removed, how proactively, and how fast, quarterly since 2020 Q3. Distinct from TikTok's law-mandated <strong>DSA</strong> report and its <strong>government / legal-request</strong> disclosures (both carried separately here), the CGER is TikTok's analogue of Meta's Community Standards Enforcement Report. Headline metrics: <strong>total videos removed</strong> (plus accounts, comments, fake engagement, LIVE), the <strong>proactive removal rate</strong> (share removed before any user report), <strong>removal speed</strong> (before any views / within 24 hours), and <strong>videos restored</strong>. A tidy-long dataset: each row is one measured value identified by period × metric × policy × moderation task. Rates are fractions of 1 (never summed); the <code>policy</code> and <code>task</code> breakdowns each carry an <code>All</code> total, so this page shows one grain at a time. Global figures only.": {
+        "es": "El principal informe de transparencia <strong>voluntario</strong> de TikTok: cuánto contenido infractor eliminó, con qué proactividad y con qué rapidez, trimestralmente desde el 3.er trimestre de 2020. A diferencia del informe <strong>DSA</strong> obligatorio de TikTok y de sus divulgaciones de <strong>solicitudes gubernamentales / legales</strong> (ambas aquí por separado), el CGER es el análogo de TikTok del Informe de aplicación de las Normas Comunitarias de Meta. Métricas principales: <strong>total de videos eliminados</strong> (más cuentas, comentarios, interacciones falsas, LIVE), la <strong>tasa proactiva de eliminación</strong> (proporción eliminada antes de cualquier denuncia), la <strong>rapidez de eliminación</strong> (antes de cualquier visualización / en 24 horas) y los <strong>videos restaurados</strong>. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por periodo × métrica × política × tarea de moderación. Las tasas son fracciones de 1 (nunca se suman); los desgloses de <code>política</code> y <code>tarea</code> incluyen un total <code>All</code>, por lo que esta página muestra un grano a la vez. Solo cifras globales.",
+        "fr": "Le principal rapport de transparence <strong>volontaire</strong> de TikTok : la quantité de contenu enfreignant les règles qu'il a supprimée, avec quelle proactivité et quelle rapidité, chaque trimestre depuis le 3e trimestre 2020. Distinct du rapport <strong>DSA</strong> obligatoire de TikTok et de ses divulgations de <strong>demandes gouvernementales / légales</strong> (toutes deux séparées ici), le CGER est l'équivalent TikTok du rapport d'application des Standards de la communauté de Meta. Métriques phares : <strong>total de vidéos supprimées</strong> (plus comptes, commentaires, engagement factice, LIVE), le <strong>taux proactif de suppression</strong> (part supprimée avant tout signalement), la <strong>rapidité de suppression</strong> (avant toute vue / sous 24 heures) et les <strong>vidéos rétablies</strong>. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par période × métrique × règle × tâche de modération. Les taux sont des fractions de 1 (jamais additionnés) ; les ventilations <code>règle</code> et <code>tâche</code> incluent un total <code>All</code>, donc cette page affiche un grain à la fois. Chiffres mondiaux uniquement.",
+        "de": "TikToks wichtigster <strong>freiwilliger</strong> Transparenzbericht — wie viele verstoßende Inhalte es entfernt hat, wie proaktiv und wie schnell, vierteljährlich seit Q3 2020. Anders als TikToks gesetzlich vorgeschriebener <strong>DSA</strong>-Bericht und seine Offenlegungen zu <strong>behördlichen / rechtlichen Anfragen</strong> (beide hier separat) ist der CGER das TikTok-Pendant zu Metas Bericht zur Durchsetzung der Gemeinschaftsstandards. Kennzahlen: <strong>insgesamt entfernte Videos</strong> (plus Konten, Kommentare, gefälschtes Engagement, LIVE), die <strong>proaktive Entfernungsrate</strong> (Anteil, der vor einer Nutzermeldung entfernt wurde), die <strong>Entfernungsgeschwindigkeit</strong> (vor jeglichen Aufrufen / innerhalb von 24 Stunden) und die <strong>wiederhergestellten Videos</strong>. Ein Tidy-long-Datensatz: jede Zeile ist ein Messwert, identifiziert durch Zeitraum × Metrik × Richtlinie × Moderationsaufgabe. Raten sind Bruchteile von 1 (nie summieren); die Aufschlüsselungen <code>policy</code> und <code>task</code> enthalten jeweils einen <code>All</code>-Gesamtwert, daher zeigt diese Seite jeweils eine Granularität. Nur globale Zahlen.",
+        "it": "Il principale report di trasparenza <strong>volontario</strong> di TikTok: quanti contenuti che violano le regole ha rimosso, con quanta proattività e rapidità, ogni trimestre dal 3° trimestre 2020. Distinto dal report <strong>DSA</strong> obbligatorio di TikTok e dalle sue divulgazioni di <strong>richieste governative / legali</strong> (entrambe qui separate), il CGER è l'analogo TikTok del report di Meta sull'applicazione degli Standard della community. Metriche principali: <strong>totale video rimossi</strong> (più account, commenti, engagement falso, LIVE), il <strong>tasso proattivo di rimozione</strong> (quota rimossa prima di qualsiasi segnalazione), la <strong>rapidità di rimozione</strong> (prima di qualsiasi visualizzazione / entro 24 ore) e i <strong>video ripristinati</strong>. Un set di dati tidy-long: ogni riga è un valore misurato identificato da periodo × metrica × policy × attività di moderazione. I tassi sono frazioni di 1 (mai sommati); le suddivisioni <code>policy</code> e <code>task</code> includono un totale <code>All</code>, quindi questa pagina mostra un grano alla volta. Solo cifre globali.",
+        "ja": "TikTok を代表する<strong>自主的</strong>な透明性レポート。違反コンテンツをどれだけ削除したか、どれだけ事前対応で、どれだけ迅速にかを、2020年第3四半期以降四半期ごとに掲載します。TikTok の法定の <strong>DSA</strong> レポートや<strong>政府・法的要請</strong>の開示（いずれも本サイトでは別掲）とは異なり、CGER は Meta のコミュニティ規定施行レポートに相当します。主な指標：<strong>削除した動画の総数</strong>（およびアカウント、コメント、偽エンゲージメント、LIVE）、<strong>事前対応の削除率</strong>（ユーザー報告前に削除された割合）、<strong>削除の速さ</strong>（閲覧前／24時間以内）、<strong>復元された動画</strong>。tidy-long データセットで、各行は 期間 × 指標 × ポリシー × モデレーションタスク で識別される1つの測定値です。各種率は1の割合です（合計しないでください）。<code>policy</code> と <code>task</code> の内訳にはそれぞれ <code>All</code> の合計が含まれるため、本ページは1つの粒度ずつ表示します。グローバル数値のみ。",
+        "zh": "TikTok 最重要的<strong>自愿</strong>透明度报告——它移除了多少违规内容、有多主动、有多迅速，自2020年第三季度起按季度发布。与 TikTok 依法必报的 <strong>DSA</strong> 报告及其<strong>政府／法律请求</strong>披露（二者在本站均单独列出）不同，CGER 是 TikTok 对应于 Meta《社群守则执行报告》的报告。核心指标：<strong>移除视频总数</strong>（以及账号、评论、虚假互动、LIVE）、<strong>主动移除率</strong>（在任何用户举报前移除的比例）、<strong>移除速度</strong>（在任何观看前／24小时内）以及<strong>已恢复视频</strong>。这是一个 tidy-long 数据集：每行是由 时段 × 指标 × 政策 × 审核任务 标识的一个测量值。各类比率是1的分数（不要求和）；<code>policy</code> 与 <code>task</code> 的细分各自带有 <code>All</code> 汇总，因此本页一次只显示一种粒度。仅全球数据。",
+        "ko": "TikTok의 대표적인 <strong>자발적</strong> 투명성 보고서 — 위반 콘텐츠를 얼마나 삭제했는지, 얼마나 선제적으로, 얼마나 빠르게 처리했는지를 2020년 3분기부터 분기별로 공개합니다. TikTok의 법정 <strong>DSA</strong> 보고서 및 <strong>정부·법적 요청</strong> 공개(둘 다 본 사이트에서는 별도 게재)와 달리, CGER은 Meta의 커뮤니티 규정 시행 보고서에 해당합니다. 주요 지표: <strong>삭제한 동영상 총수</strong>(및 계정, 댓글, 허위 인게이지먼트, LIVE), <strong>선제적 삭제율</strong>(사용자 신고 전에 삭제된 비율), <strong>삭제 속도</strong>(조회 전 / 24시간 이내), <strong>복원된 동영상</strong>. tidy-long 데이터셋으로, 각 행은 기간 × 지표 × 정책 × 모더레이션 작업으로 식별되는 하나의 측정값입니다. 비율은 1의 분수입니다(합산 금지). <code>policy</code>와 <code>task</code> 세부 내역에는 각각 <code>All</code> 합계가 포함되어 있어, 이 페이지는 한 번에 한 가지 단위만 표시합니다. 글로벌 수치만 제공.",
+    },
+    "Total videos removed per quarter": {
+        "es": "Total de videos eliminados por trimestre", "fr": "Total de vidéos supprimées par trimestre",
+        "de": "Insgesamt entfernte Videos je Quartal", "it": "Totale video rimossi per trimestre",
+        "ja": "四半期ごとの削除動画総数", "zh": "各季度移除视频总数", "ko": "분기별 삭제 동영상 총수",
+    },
+    "Videos TikTok removed for Community Guidelines violations each quarter, globally.": {
+        "es": "Videos que TikTok eliminó por infringir las Normas de la Comunidad cada trimestre, a nivel mundial.",
+        "fr": "Vidéos que TikTok a supprimées pour non-respect des Règles communautaires chaque trimestre, au niveau mondial.",
+        "de": "Videos, die TikTok wegen Verstößen gegen die Community-Richtlinien je Quartal entfernt hat, weltweit.",
+        "it": "Video che TikTok ha rimosso per violazioni delle Linee guida della community ogni trimestre, a livello globale.",
+        "ja": "TikTok がコミュニティガイドライン違反で削除した動画数を四半期ごとに、グローバルで表示。",
+        "zh": "TikTok 每季度因违反社区自律公约而移除的视频（全球）。",
+        "ko": "TikTok이 커뮤니티 가이드라인 위반으로 삭제한 동영상을 분기별로, 전 세계 기준으로 표시.",
+    },
+    "Proactive removal rate per quarter": {
+        "es": "Tasa proactiva de eliminación por trimestre", "fr": "Taux proactif de suppression par trimestre",
+        "de": "Proaktive Entfernungsrate je Quartal", "it": "Tasso proattivo di rimozione per trimestre",
+        "ja": "四半期ごとの事前対応の削除率", "zh": "各季度主动移除率", "ko": "분기별 선제적 삭제율",
+    },
+    "The share of removed videos TikTok found itself before any user reported them. A percentage; higher is more proactive.": {
+        "es": "La proporción de videos eliminados que TikTok detectó antes de que ningún usuario los denunciara. Un porcentaje; cuanto más alto, más proactivo.",
+        "fr": "La part des vidéos supprimées que TikTok a détectées avant tout signalement d'un utilisateur. Un pourcentage ; plus il est élevé, plus c'est proactif.",
+        "de": "Der Anteil der entfernten Videos, den TikTok selbst fand, bevor ein Nutzer sie meldete. Ein Prozentsatz; höher ist proaktiver.",
+        "it": "La quota di video rimossi che TikTok ha individuato prima di qualsiasi segnalazione degli utenti. Una percentuale; più alta è più proattiva.",
+        "ja": "削除した動画のうち、ユーザーが報告する前に TikTok 自身が検出した割合。割合で、高いほど事前対応的です。",
+        "zh": "在任何用户举报之前 TikTok 自行发现的已移除视频占比。为百分比；越高越主动。",
+        "ko": "삭제한 동영상 중 사용자가 신고하기 전에 TikTok이 직접 발견한 비율. 백분율이며 높을수록 선제적입니다.",
+    },
+    "Videos removed by policy (latest quarter)": {
+        "es": "Videos eliminados por política (último trimestre)", "fr": "Vidéos supprimées par règle (dernier trimestre)",
+        "de": "Entfernte Videos nach Richtlinie (letztes Quartal)", "it": "Video rimossi per policy (ultimo trimestre)",
+        "ja": "ポリシー別の削除動画（直近の四半期）", "zh": "按政策列出的移除视频（最近季度）", "ko": "정책별 삭제 동영상(최근 분기)",
+    },
+    "Videos removed in the most recent quarter, by Community Guidelines policy. (The policy breakdown is reported from 2025 Q4 on.)": {
+        "es": "Videos eliminados en el trimestre más reciente, por política de las Normas de la Comunidad. (El desglose por política se reporta a partir del 4.º trimestre de 2025.)",
+        "fr": "Vidéos supprimées au trimestre le plus récent, par règle des Règles communautaires. (La ventilation par règle est indiquée à partir du 4e trimestre 2025.)",
+        "de": "Im jüngsten Quartal entfernte Videos, nach Community-Richtlinie. (Die Aufschlüsselung nach Richtlinie wird ab Q4 2025 berichtet.)",
+        "it": "Video rimossi nel trimestre più recente, per policy delle Linee guida della community. (La suddivisione per policy è riportata dal 4° trimestre 2025.)",
+        "ja": "直近の四半期に削除された動画を、コミュニティガイドラインのポリシー別に表示。（ポリシー別内訳は2025年第4四半期以降に報告されます。）",
+        "zh": "最近季度按社区自律公约政策移除的视频。（政策细分自2025年第四季度起报告。）",
+        "ko": "가장 최근 분기에 커뮤니티 가이드라인 정책별로 삭제된 동영상. (정책별 세부 내역은 2025년 4분기부터 보고됩니다.)",
+    },
+    "Removal speed &amp; proactivity (latest quarter)": {
+        "es": "Rapidez de eliminación y proactividad (último trimestre)",
+        "fr": "Rapidité de suppression et proactivité (dernier trimestre)",
+        "de": "Entfernungsgeschwindigkeit &amp; Proaktivität (letztes Quartal)",
+        "it": "Rapidità di rimozione e proattività (ultimo trimestre)",
+        "ja": "削除の速さと事前対応（直近の四半期）",
+        "zh": "移除速度与主动性（最近季度）",
+        "ko": "삭제 속도 및 선제성(최근 분기)",
+    },
+    "TikTok's global removal-quality rates in the most recent quarter. Fractions of 1, shown as percentages — don't sum them.": {
+        "es": "Las tasas globales de calidad de eliminación de TikTok en el trimestre más reciente. Fracciones de 1, mostradas como porcentajes — no las sumes.",
+        "fr": "Les taux mondiaux de qualité de suppression de TikTok au trimestre le plus récent. Des fractions de 1, affichées en pourcentages — ne les additionnez pas.",
+        "de": "TikToks globale Entfernungsqualitäts-Raten im jüngsten Quartal. Bruchteile von 1, als Prozentsätze angezeigt — nicht summieren.",
+        "it": "I tassi globali di qualità della rimozione di TikTok nel trimestre più recente. Frazioni di 1, mostrate come percentuali — non sommarle.",
+        "ja": "直近の四半期における TikTok のグローバルな削除品質率。1の割合で、パーセンテージとして表示します。合計しないでください。",
+        "zh": "TikTok 在最近季度的全球移除质量率。为1的分数，以百分比显示——不要求和。",
+        "ko": "가장 최근 분기의 TikTok 글로벌 삭제 품질 비율. 1의 분수이며 백분율로 표시 — 합산하지 마세요.",
+    },
+    'Source: <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">TikTok Community Guidelines Enforcement Report</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodology</a> · <a href="/api-key">API key</a> · <a href="/privacy">Privacy</a>': {
+        "es": 'Fuente: <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">Informe de aplicación de las Normas de la Comunidad de TikTok</a>. Datos vía <a href="/api">Transparency Report API</a> · <a href="/methodology">Metodología</a> · <a href="/api-key">Clave de API</a> · <a href="/privacy">Privacidad</a>',
+        "fr": 'Source : <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">Rapport d\'application des Règles communautaires de TikTok</a>. Données via <a href="/api">Transparency Report API</a> · <a href="/methodology">Méthodologie</a> · <a href="/api-key">Clé d\'API</a> · <a href="/privacy">Confidentialité</a>',
+        "de": 'Quelle: <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">TikToks Bericht zur Durchsetzung der Community-Richtlinien</a>. Daten über <a href="/api">Transparency Report API</a> · <a href="/methodology">Methodik</a> · <a href="/api-key">API-Schlüssel</a> · <a href="/privacy">Datenschutz</a>',
+        "it": 'Fonte: <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">Report di TikTok sull\'applicazione delle Linee guida della community</a>. Dati via <a href="/api">Transparency Report API</a> · <a href="/methodology">Metodologia</a> · <a href="/api-key">Chiave API</a> · <a href="/privacy">Privacy</a>',
+        "ja": 'ソース: <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">TikTok コミュニティガイドライン施行レポート</a>。データ提供: <a href="/api">Transparency Report API</a> · <a href="/methodology">方法論</a> · <a href="/api-key">API キー</a> · <a href="/privacy">プライバシー</a>',
+        "zh": '来源：<a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">TikTok 社区自律公约执行报告</a>。数据来自 <a href="/api">Transparency Report API</a> · <a href="/methodology">方法论</a> · <a href="/api-key">API 密钥</a> · <a href="/privacy">隐私</a>',
+        "ko": '출처: <a href="https://www.tiktok.com/transparency/en/community-guidelines-enforcement/" target="_blank" rel="noopener noreferrer">TikTok 커뮤니티 가이드라인 시행 보고서</a>. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/methodology">방법론</a> · <a href="/api-key">API 키</a> · <a href="/privacy">개인정보</a>',
+    },
+    "“TikTok Community Guidelines Enforcement Report, via the Transparency Report API (": {
+        "es": "“Informe de aplicación de las Normas de la Comunidad de TikTok, vía la Transparency Report API (",
+        "fr": "“Rapport d'application des Règles communautaires de TikTok, via la Transparency Report API (",
+        "de": "“TikToks Bericht zur Durchsetzung der Community-Richtlinien, über die Transparency Report API (",
+        "it": "“Report di TikTok sull'applicazione delle Linee guida della community, tramite la Transparency Report API (",
+        "ja": "“TikTok コミュニティガイドライン施行レポート、Transparency Report API 経由 (",
+        "zh": "“TikTok 社区自律公约执行报告，经由 Transparency Report API (",
+        "ko": "“TikTok 커뮤니티 가이드라인 시행 보고서, Transparency Report API 경유 (",
+    },
+    "Reported values per metric in the CGER dataset.": {
+        "es": "Valores declarados por métrica en el conjunto de datos del CGER.",
+        "fr": "Valeurs déclarées par métrique dans le jeu de données du CGER.",
+        "de": "Gemeldete Werte je Metrik im CGER-Datensatz.",
+        "it": "Valori dichiarati per metrica nel set di dati del CGER.",
+        "ja": "CGER データセットにおける指標ごとの報告値。",
+        "zh": "CGER 数据集中每个指标的报告值。",
+        "ko": "CGER 데이터셋의 지표별 보고된 값.",
+    },
+    '"TikTok removal-quality rates, "': {
+        "es": '"Tasas de calidad de eliminación de TikTok, "',
+        "fr": '"Taux de qualité de suppression de TikTok, "',
+        "de": '"TikToks Entfernungsqualitäts-Raten, "',
+        "it": '"Tassi di qualità della rimozione di TikTok, "',
+        "ja": '"TikTok の削除品質率、"',
+        "zh": '"TikTok 移除质量率，"',
+        "ko": '"TikTok 삭제 품질 비율, "',
+    },
+    "Videos removed": {
+        "es": "Videos eliminados", "fr": "Vidéos supprimées", "de": "Entfernte Videos",
+        "it": "Video rimossi", "ja": "削除動画数", "zh": "移除视频数", "ko": "삭제된 동영상",
+    },
+    "Proactive rate": {
+        "es": "Tasa proactiva", "fr": "Taux proactif", "de": "Proaktive Rate", "it": "Tasso proattivo",
+        "ja": "事前対応率", "zh": "主动处理率", "ko": "선제적 조치율",
+    },
+    "Removed before any views": {
+        "es": "Eliminados antes de cualquier visualización", "fr": "Supprimés avant toute vue",
+        "de": "Vor jeglichen Aufrufen entfernt", "it": "Rimossi prima di qualsiasi visualizzazione",
+        "ja": "閲覧前に削除", "zh": "在任何观看前移除", "ko": "조회 전 삭제",
+    },
+    "Removed within 24 hours": {
+        "es": "Eliminados en 24 horas", "fr": "Supprimés sous 24 heures",
+        "de": "Innerhalb von 24 Stunden entfernt", "it": "Rimossi entro 24 ore",
+        "ja": "24時間以内に削除", "zh": "在24小时内移除", "ko": "24시간 이내 삭제",
+    },
+    "Rate": {
+        "es": "Tasa", "fr": "Taux", "de": "Rate", "it": "Tasso",
+        "ja": "率", "zh": "比率", "ko": "비율",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    COMMON[_loc].append(("      TikTok — Enforcement\n    </a>", f"      {_TTCGER_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>TikTok — Enforcement</h3>", f"<h3>{_TTCGER_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_TTCGER_CARD_DESC_EN, _TTCGER_CARD_DESC[_loc]))
+    PAGES[_loc]["tiktok-cger.html"] = [(_en, _tr[_loc]) for _en, _tr in _TTCGER_PAGE.items()]
+    _tt_text = open(os.path.join(STATIC, "tiktok-cger.html"), encoding="utf-8").read()
+    _tt_own = {_o for _o, _ in PAGES[_loc]["tiktok-cger.html"]}
+    # The page embeds TikTok metric names verbatim as query filter values; a short
+    # inherited pair (e.g. bare "Total") would rewrite a substring of one and break
+    # the query. Never inherit a find-string that occurs inside a filter value.
+    _TT_FILTERS = ("Total videos removed", "Proactive removal rate",
+                   "Removal rate before any views", "Removal rate within 24 hours")
+    # Inherit shared chrome from sibling pages (Trends, "Interactive views…",
+    # Loading…, provenance, "What the report covers" + its sub, the query-builder
+    # hint, "No data available.", Quarter, Metric, Reported values).
+    for _src in ("cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _tt_text and _o not in _tt_own \
+                    and not any(_o in _f for _f in _TT_FILTERS):
+                PAGES[_loc]["tiktok-cger.html"].append((_o, _n))
+                _tt_own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

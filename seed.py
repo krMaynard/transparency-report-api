@@ -98,6 +98,11 @@ _DEFAULT_JAPAN_SOURCE = os.getenv(
     "SEED_JAPAN_SOURCE_JSON",
     os.path.join(HERE, "data", "japan-info-platform.json"),
 )
+# TikTok Community Guidelines Enforcement Report — vendored in-repo (from the
+# sibling data repo's tiktok-cger/build_cger.py).
+_DEFAULT_TIKTOK_CGER_SOURCE = os.getenv(
+    "SEED_TIKTOK_CGER_SOURCE_JSON", os.path.join(HERE, "data", "tiktok-cger.json")
+)
 # Google government requests for user information — vendored in-repo (from the
 # sibling data repo's google-user-data/build_userdata.py).
 _DEFAULT_GOOGLE_UD_SOURCE = os.getenv(
@@ -498,6 +503,23 @@ CREATE TABLE japan_metrics (
     value   REAL
 );
 CREATE INDEX idx_japan_service ON japan_metrics(service);
+
+-- TikTok Community Guidelines Enforcement Report (tiktok-cger/build_cger.py).
+-- TikTok's voluntary quarterly content-moderation report, 2020 Q3 onward, the
+-- Global cut. Tidy-long: one row per measured value. policy_type/issue and
+-- task_type/task each carry an 'All' total beside the breakdown; `unit` is
+-- count or rate (rates are fractions of 1 — never SUM).
+CREATE TABLE tiktok_cger_metrics (
+    period      TEXT NOT NULL,  -- reporting quarter, 'YYYY Qn'
+    metric      TEXT NOT NULL,  -- Total videos removed, Proactive removal rate, ...
+    policy_type TEXT NOT NULL,  -- All / Policy / Sub-policy / Ban reason...
+    issue       TEXT NOT NULL,  -- community-guideline value; 'All' = top-level
+    task_type   TEXT NOT NULL,  -- All / moderation-system / turnaround / view-band grouping
+    task        TEXT NOT NULL,  -- All / Automation / Human moderation / bucket
+    unit        TEXT NOT NULL,  -- count / rate
+    value       REAL
+);
+CREATE INDEX idx_tiktok_cger_metric ON tiktok_cger_metrics(metric);
 
 -- Google government requests for user information (google-user-data/
 -- build_userdata.py). Tidy-long: one row per measured value from the biannual
@@ -1299,6 +1321,36 @@ def build_cser_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_tiktok_cger_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the tiktok_cger_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long tiktok-cger.json (`columns` header + `rows` in column order), the
+    Global cut. Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("tiktok cger dataset is None")
+    expected_cols = ["period", "metric", "policy_type", "issue",
+                     "task_type", "task", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"tiktok cger dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("tiktok cger dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO tiktok_cger_metrics (period, metric, policy_type, "
+                "issue, task_type, task, unit, value) VALUES (?,?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_google_userdata_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the google_userdata_metrics table in an existing DB at db_path.
 
@@ -1728,6 +1780,8 @@ def main() -> None:
                         help="Path to singapore-online-safety.json")
     parser.add_argument("--japan-source", default=_DEFAULT_JAPAN_SOURCE,
                         help="Path to japan-info-platform.json")
+    parser.add_argument("--tiktok-cger-source", default=_DEFAULT_TIKTOK_CGER_SOURCE,
+                        help="Path to tiktok-cger.json")
     parser.add_argument("--google-ud-source", default=_DEFAULT_GOOGLE_UD_SOURCE,
                         help="Path to google-user-data.json")
     parser.add_argument("--microsoft-source", default=_DEFAULT_MICROSOFT_SOURCE,
@@ -1900,6 +1954,16 @@ def main() -> None:
               f"{len({r[0] for r in japan_data['rows']})} services")
     else:
         print(f"  (skipping Japan 情プラ法 — not found: {args.japan_source})")
+
+    if os.path.isfile(args.tiktok_cger_source):
+        with open(args.tiktok_cger_source, "r", encoding="utf-8") as f:
+            ttcger_data = json.load(f)
+        ttcger_rows = build_tiktok_cger_db(ttcger_data, args.db)
+        print(f"  tiktok CGER: {ttcger_rows} metric rows across "
+              f"{len({r[1] for r in ttcger_data['rows']})} metrics, "
+              f"{len({r[0] for r in ttcger_data['rows']})} quarters")
+    else:
+        print(f"  (skipping TikTok CGER — not found: {args.tiktok_cger_source})")
 
     if os.path.isfile(args.google_ud_source):
         with open(args.google_ud_source, "r", encoding="utf-8") as f:
