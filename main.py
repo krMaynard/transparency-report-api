@@ -1199,6 +1199,22 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "tco_metrics": TableSpec(
+        "EU Terrorist Content Online Regulation (Reg. 2021/784) transparency reports — the annual transparency duties around terrorist content. One row per measured value, identified by publisher × role × period × section × category × metric. Two reporting streams (role): 'authority' (the Art. 8 / European-Commission side — per-Member-State 'removal_orders_issued' aggregated in the Commission's implementation report, category = Member State e.g. Germany/Spain/France/Austria/Romania/Czechia plus an 'EU' summary; plus a national authority's activity, e.g. Ireland's Coimisiún na Meán) and 'platform' (the Art. 7 side — each hosting provider's enforcement figures, category = the report's own sub-service, e.g. Spotify / Spotify for Creators / Facebook: removal_order_requests_received, removal_orders_valid, content_removed_via_orders, content_removed_proactive, appeals_received, content_reinstated, complaints_art10, review_proceedings, decisions_reversed). Metric scope is each report's own and NOT comparable across publishers (Spotify's content_removed_proactive is terrorism-only; Meta's covers three broader policy areas). 'unit' is 'count' (exact) or 'approx_count' (Meta's rounded millions/thousands). Pin publisher (and metric) before aggregating; for the per-Member-State orders, category='EU' rows are summary totals — don't sum them with the per-country rows.",
+        "FROM tco_metrics f",
+        {
+            "publisher": "f.publisher",
+            "role":      "f.role",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "cser_metrics": TableSpec(
         "Meta Community Standards Enforcement Report (CSER) — Meta's flagship VOLUNTARY content-moderation transparency report (not filed under any single law), Facebook + Instagram, quarterly 2017 Q4 → 2025 Q4. One row per measured value, identified by app × policy_area × metric × period. 16 policy areas (Hateful Conduct, Bullying & Harassment, Fake Accounts, Adult Nudity & Sexual Activity, Dangerous Organizations, Spam, Violence and Incitement, …); note 'policy_area' = 'Cross-Policy Data' is an ACROSS-POLICY AGGREGATE, not a peer of the individual areas. 14 metrics: Content Actioned / Removed / Appealed / Restored with|without appeal (counts), Prevalence + Lowerbound/Upperbound Prevalence + UBP, Proactive rate, Enforcement Precision Lower/Upper Bound, False Positive Lower/Upper Bound. 'unit' is 'count' or 'percent' — prevalence, proactive rate and precision are rates (never SUM). Pin a metric before aggregating (metrics aren't comparable), exclude 'Cross-Policy Data' before summing over policy areas (it double-counts), and treat the Lower/Upper bounds as the ends of a range, not additive quantities.",
         "FROM cser_metrics f",
@@ -2459,6 +2475,12 @@ def taiwan_page() -> FileResponse:
 def turkey_page() -> FileResponse:
     """Serve the Türkiye Law 5651 dataset page (reads POST /api/explore)."""
     return _serve_page("turkey.html", "Turkey Law 5651 page")
+
+
+@app.get("/tco", response_class=HTMLResponse)
+def tco_page() -> FileResponse:
+    """Serve the EU Terrorist Content Online Regulation dataset page (reads POST /api/explore)."""
+    return _serve_page("tco.html", "EU TCO Regulation page")
 
 
 @app.get("/cser", response_class=HTMLResponse)
@@ -3906,6 +3928,33 @@ def _leg_warnings(
                 "_court_orders are parts of requests_total, and X's action_rate is "
                 "a percentage; this aggregate pins no 'metric'. Filter or group by "
                 "'metric'."
+            )
+    # tco_metrics spans the authority (per-Member-State orders + an 'EU' summary)
+    # and platform streams, with metric scope that differs per publisher.
+    if table == "tco_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "publisher" not in pinned:
+            out.append(
+                "'tco_metrics' metric scope is each report's own and not "
+                "comparable across publishers (Spotify's content_removed_proactive "
+                "is terrorism-only; Meta's covers broader policy areas); this "
+                "aggregate pins no 'publisher'. Filter or group by 'publisher'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'tco_metrics' reports distinct metrics (removal_orders_issued, "
+                "content_removed_via_orders, content_removed_proactive, appeals, "
+                "reinstatements) that aren't comparable, and some are approx_count "
+                "(rounded); this aggregate pins no 'metric'. Filter or group by "
+                "'metric'."
+            )
+        if "category" not in pinned:
+            out.append(
+                "'tco_metrics' per-Member-State removal_orders_issued rows sit "
+                "alongside category='EU' summary totals (double-counting if summed "
+                "together); this aggregate pins no 'category'. Filter or group by "
+                "'category'."
             )
     # cser_metrics mixes counts and rate-percentages across metrics, and carries
     # a 'Cross-Policy Data' aggregate alongside the per-policy-area rows.

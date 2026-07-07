@@ -68,7 +68,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), the Meta Community Standards Enforcement Report (`build_cser_db`, `--cser-source`), the TikTok Community Guidelines Enforcement Report (`build_tiktok_cger_db`, `--tiktok-cger-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), the Japan LY Corp report narratives (`build_japan_narratives`, `--japan-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), the EU Terrorist Content Online Regulation transparency reports (`build_tco_db`, `--tco-source`), the Meta Community Standards Enforcement Report (`build_cser_db`, `--cser-source`), the TikTok Community Guidelines Enforcement Report (`build_tiktok_cger_db`, `--tiktok-cger-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), the Japan LY Corp report narratives (`build_japan_narratives`, `--japan-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -82,6 +82,7 @@ Built to demonstrate two things:
 | `data/turkey-law5651.json` | Vendored snapshot of Türkiye's Law No. 5651 platform transparency reports (sibling `dsa-transparency-data/turkey-law5651/build_turkey.py`) — a tidy-long `columns`+`rows` list; seeded into the `turkey_metrics` table by `seed.build_turkey_db` |
 | `data/meta-cser.json` | Vendored snapshot of Meta's Community Standards Enforcement Report (sibling `dsa-transparency-data/meta-cser/build_cser.py`) — a tidy-long `columns`+`rows` list; seeded into the `cser_metrics` table by `seed.build_cser_db` |
 | `data/tiktok-cger.json` | Vendored snapshot of TikTok's Community Guidelines Enforcement Report (sibling `dsa-transparency-data/tiktok-cger/build_cger.py`) — a tidy-long `columns`+`rows` list (global `All`-location cut); seeded into the `tiktok_cger_metrics` table by `seed.build_tiktok_cger_db` |
+| `data/tco-regulation.json` | Vendored snapshot of the EU Terrorist Content Online Regulation transparency reports (sibling `dsa-transparency-data/tco-regulation/build_tco.py`) — a tidy-long `columns`+`rows` list across the authority (Art. 8 / Commission) and platform (Art. 7) streams; seeded into the `tco_metrics` table by `seed.build_tco_db` |
 | `data/google-user-data.json` | Vendored snapshot of Google's government requests for user information (sibling `dsa-transparency-data/google-user-data/build_userdata.py`) — a tidy-long `columns`+`rows` list; seeded into the `google_userdata_metrics` table by `seed.build_google_userdata_db` |
 | `data/microsoft-lerr.json` | Vendored snapshot of the Microsoft Law Enforcement Requests Report (sibling `dsa-transparency-data/microsoft-lerr/build_microsoft.py`) — a tidy-long `columns`+`rows` list; seeded into the `microsoft_metrics` table by `seed.build_microsoft_db` |
 | `data/linkedin-transparency.json` | Vendored snapshot of the LinkedIn Government Requests Report (sibling `dsa-transparency-data/linkedin-transparency/build_linkedin.py`) — a tidy-long `columns`+`rows` list; seeded into the `linkedin_metrics` table by `seed.build_linkedin_db` |
@@ -106,6 +107,7 @@ Built to demonstrate two things:
 | `static/turkey.html` | Public Türkiye Law No. 5651 transparency-reports dataset page (served at `/turkey`) — Trends charts + overview tables over `POST /api/explore` (`turkey_metrics`) |
 | `static/cser.html` | Public Meta Community Standards Enforcement Report dataset page (served at `/cser`) — Trends charts (prevalence trend, content actioned + proactive rate by policy area) + tables over `POST /api/explore` (`cser_metrics`) |
 | `static/tiktok-cger.html` | Public TikTok Community Guidelines Enforcement Report dataset page (served at `/tiktok-cger`) — Trends charts (videos removed, proactive rate, videos by policy) + removal-quality-rates table over `POST /api/explore` (`tiktok_cger_metrics`) |
+| `static/tco.html` | Public EU Terrorist Content Online Regulation dataset page (served at `/tco`) — charts (removal orders issued by Member State, content removed via orders by platform) + tables over `POST /api/explore` (`tco_metrics`); English-only, like `/mandates` |
 | `static/user-data.html` | Public Google user-data requests dataset page (served at `/user-data`) — Trends charts + overview tables over `POST /api/explore` (`google_userdata_metrics`) |
 | `static/microsoft.html` | Public Microsoft LERR dataset page (served at `/microsoft`) — Trends charts + overview tables over `POST /api/explore` (`microsoft_metrics`) |
 | `static/linkedin.html` | Public LinkedIn Government Requests dataset page (served at `/linkedin`) — Trends charts + overview tables over `POST /api/explore` (`linkedin_metrics`) |
@@ -285,7 +287,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Eighteen non-DSA datasets ride alongside, each exposed as an ordinary query table
+Nineteen non-DSA datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -366,6 +368,27 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   categories is a legitimate grand total. TikTok/YouTube publish no retrievable
   standalone Türkiye Law 5651 report (their Turkish figures live only in global
   tools).
+- **EU Terrorist Content Online Regulation (TCOR)** — a single **tidy-long**
+  `tco_metrics` table (one row per measured value: `publisher`/`role`/`period`/
+  `section`/`category`/`metric`/`unit` + a `value`; dims stored inline). The
+  annual transparency duties under Reg. (EU) 2021/784 around *terrorist content*.
+  Two streams (`role`): **`authority`** (the Art. 8 / European-Commission side —
+  per-Member-State `removal_orders_issued` from the Commission's implementation
+  report COM(2024) 64, `category` = Member State (Germany 249 / Spain 62 /
+  France 26 / Austria 8 / **Romania 2** / Czechia 2, 2022-06..2023-12) plus an
+  `EU` summary total; and a national authority's activity — Ireland's Coimisiún
+  na Meán) and **`platform`** (the Art. 7 side — each hosting provider's
+  enforcement figures, `category` = the report's own sub-service: Spotify (per
+  sub-service) + Meta/Facebook). Figures are **sparse** and **transcribed** from
+  the archived reports with fail-loud anchor checks (the build raises if a report
+  drifts). Metric scope is **each report's own** and not comparable across
+  publishers (Spotify's `content_removed_proactive` is terrorism-only; Meta's
+  covers broader policy areas and is `approx_count`). `unit` is `count` or
+  `approx_count`. Pin `publisher` **and** `metric` before aggregating, and note
+  the per-country rows sit beside the `category='EU'` summary total (summing both
+  double-counts); `_leg_warnings` warns on all three. Coverage is a starting set —
+  more Art. 7 platforms and national Art. 8 authorities slot in as archived. The
+  `/tco` dataset page is English-only (like `/mandates`).
 - **Meta Community Standards Enforcement Report (CSER)** — a single **tidy-long**
   `cser_metrics` table (one row per measured value: `app`/`policy_area`/`metric`/
   `period`/`unit` + a `value`; dims stored inline). Meta's flagship **voluntary**
@@ -837,6 +860,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/singapore` | — | Public Singapore IMDA Online Safety dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/japan` | — | Public Japan 情プラ法 (LY Corporation) dataset page (web UI over `POST /api/explore`) |
 | GET | `/tiktok-cger` | — | Public TikTok Community Guidelines Enforcement Report dataset page (web UI over `POST /api/explore`) |
+| GET | `/tco` | — | Public EU Terrorist Content Online Regulation dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |

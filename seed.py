@@ -81,6 +81,11 @@ _DEFAULT_TAIWAN_SOURCE = os.getenv(
 _DEFAULT_TURKEY_SOURCE = os.getenv(
     "SEED_TURKEY_SOURCE_JSON", os.path.join(HERE, "data", "turkey-law5651.json")
 )
+# EU Terrorist Content Online Regulation transparency reports (tco-regulation/
+# build_tco.py).
+_DEFAULT_TCO_SOURCE = os.getenv(
+    "SEED_TCO_SOURCE_JSON", os.path.join(HERE, "data", "tco-regulation.json")
+)
 # Meta Community Standards Enforcement Report — vendored in-repo (from the
 # sibling data repo's meta-cser/build_cser.py).
 _DEFAULT_CSER_SOURCE = os.getenv(
@@ -461,6 +466,24 @@ CREATE TABLE turkey_metrics (
     value    REAL               -- REAL: X action_rate is a percentage
 );
 CREATE INDEX idx_turkey_section ON turkey_metrics(section);
+
+-- EU Terrorist Content Online Regulation (2021/784) transparency reports
+-- (tco-regulation/build_tco.py). Tidy-long: one row per measured value across the
+-- two reporting streams (`role`): 'authority' (Art. 8 / Commission — per-Member-
+-- State removal orders issued + national authority activity) and 'platform'
+-- (Art. 7 — each hosting provider's enforcement figures). `category` is the row's
+-- sub-dimension: a Member State (authority) or a sub-service (platform). Dims inline.
+CREATE TABLE tco_metrics (
+    publisher TEXT NOT NULL,    -- reporting body: European Commission / a MS authority / a platform
+    role      TEXT NOT NULL,    -- authority / platform
+    period    TEXT NOT NULL,    -- reporting window ('YYYY' or 'YYYY-MM..YYYY-MM')
+    section   TEXT NOT NULL,    -- removal_orders_issued / authority_activity / platform_enforcement
+    category  TEXT NOT NULL,    -- Member State (authority) or sub-service (platform)
+    metric    TEXT NOT NULL,    -- removal_orders_issued, content_removed_via_orders, appeals_received, ...
+    unit      TEXT NOT NULL,    -- count / approx_count
+    value     REAL
+);
+CREATE INDEX idx_tco_role ON tco_metrics(role);
 
 -- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
 -- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
@@ -1239,6 +1262,36 @@ def build_turkey_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_tco_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the tco_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long tco-regulation.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("tco dataset is None")
+    expected_cols = ["publisher", "role", "period", "section",
+                     "category", "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"tco dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("tco dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO tco_metrics (publisher, role, period, section, "
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_singapore_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the singapore_metrics table in an existing DB at db_path.
 
@@ -1789,6 +1842,8 @@ def main() -> None:
                         help="Path to taiwan-anti-fraud.json")
     parser.add_argument("--turkey-source", default=_DEFAULT_TURKEY_SOURCE,
                         help="Path to turkey-law5651.json")
+    parser.add_argument("--tco-source", default=_DEFAULT_TCO_SOURCE,
+                        help="Path to tco-regulation.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
@@ -1938,6 +1993,15 @@ def main() -> None:
               f"{len({r[1] for r in turkey_data['rows']})} periods")
     else:
         print(f"  (skipping Türkiye Law 5651 — not found: {args.turkey_source})")
+
+    if os.path.isfile(args.tco_source):
+        with open(args.tco_source, "r", encoding="utf-8") as f:
+            tco_data = json.load(f)
+        tco_rows = build_tco_db(tco_data, args.db)
+        print(f"  tco regulation: {tco_rows} metric rows across "
+              f"{len({r[0] for r in tco_data['rows']})} publishers")
+    else:
+        print(f"  (skipping TCO Regulation — not found: {args.tco_source})")
 
     if os.path.isfile(args.cser_source):
         with open(args.cser_source, "r", encoding="utf-8") as f:
