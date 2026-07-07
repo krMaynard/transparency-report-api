@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Ley de Plataformas de Distribución de Información de Japón (情プラ法) — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) implementation statistics — LY Corporation's Media Transparency Report: posts, removals and removal rate per service." />
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, plus Google (YouTube)'s legal and policy actions by reason." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -251,6 +251,7 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .yt-h { font-size: 14px; margin: 4px 0 10px; color: var(--fg); }
 </style>
 </head>
 <body>
@@ -603,9 +604,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY Corporation · Anual · Ejercicio 2024</span>
+    <span class="badge">LY Corp + YouTube · art. 28</span>
     <h1>Japón — Ley de Plataformas de Distribución de Información (情プラ法)</h1>
-    <p>La Ley de Limitación de Responsabilidad de los Proveedores de Japón, reformada — la <strong>Ley de Plataformas de Distribución de Información</strong> (情プラ法, en vigor desde abril de 2025) — obliga a los grandes proveedores designados por el MIC a publicar estadísticas anuales de moderación de contenidos (art. 28). <strong>LY Corporation</strong> es el único proveedor designado que publica cifras hasta ahora (Google, Meta, TikTok y X solo publican páginas de criterios cualitativos), por lo que esto cubre los cinco servicios de LY Corp — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM y Yahoo! News comments — de su Informe de Transparencia de Medios del ejercicio 2024. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por servicio × período × métrica (<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>). Fija una métrica antes de agregar: las publicaciones, las retiradas y la tasa no son comparables, nunca sumes la tasa y no añadas los trimestres al total anual.</p>
+    <p>La Ley de Limitación de Responsabilidad de los Proveedores de Japón, reformada — la <strong>Ley de Plataformas de Distribución de Información</strong> (情プラ法, en vigor desde abril de 2025) — obliga a los grandes proveedores designados por el MIC a publicar estadísticas de moderación de contenidos (art. 28). Hasta ahora dos proveedores publican cifras (Meta, TikTok y X aún publican solo páginas de criterios cualitativos): <strong>LY Corporation</strong>, que abarca sus cinco servicios — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM y Yahoo! News comments — de su Informe de Transparencia de Medios del ejercicio 2024, y <strong>Google (YouTube)</strong>, de su informe del 26 jul 2025 al 31 mar 2026. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por servicio × período × sección × categoría × métrica. Las métricas y las secciones no son comparables — fija una <code>section</code>, una <code>category</code> y una <code>metric</code> antes de agregar, nunca sumes una tasa y no añadas el <code>Total</code> de una sección a su propio desglose.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -658,11 +659,30 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <p class="hint">Refina o amplía estas consultas en el <a href="/es/reports">generador de consultas</a> (fija una <code>metric</code> antes de agregar), consulta la lista completa de campos en la página de <a href="/es/schema">Esquema</a> o lee la <a href="/es/methodology">Metodología</a>.</p>
+  <section class="data-section">
+    <h2>YouTube (Google)</h2>
+    <p class="sub">El informe de YouTube (Google) conforme a la Ley de Plataformas de Distribución de Información abarca del <strong>26 jul 2025 al 31 mar 2026</strong> — cifras específicas de Japón con un calendario distinto al de las tablas del ejercicio 2024 de LY Corp, por lo que no son comparables. YouTube declaró <span id="ytMau">…</span> usuarios activos mensuales en Japón. Cada desglose siguiente excluye su propia fila <em>Total</em>.</p>
+    <h3 class="yt-h">Retiradas legales por motivo</h3>
+    <div class="results" id="ytLegal" aria-busy="true"><div class="results-loading">Cargando…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — vídeos retirados por política, por motivo</h2>
+    <p class="sub">Vídeos retirados conforme a las Normas de la Comunidad de YouTube en Japón, por motivo de política. La mayoría los detectaron primero sistemas automatizados (<span id="ytAuto">…</span> de las retiradas), no usuarios, organizaciones ni el gobierno.</p>
+    <div class="results" id="ytPolicy" aria-busy="true"><div class="results-loading">Cargando…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — denuncias de usuarios por motivo</h2>
+    <p class="sub">Denuncias de usuarios finales enviadas desde direcciones IP de Japón, según el motivo que seleccionó quien denunció.</p>
+    <div class="results" id="ytFlags" aria-busy="true"><div class="results-loading">Cargando…</div></div>
+  </section>
+
+  <p class="hint">Perfecciona o amplía esto en el <a href="/es/reports">generador de consultas</a> (fija una <code>section</code>, una <code>category</code> y una <code>metric</code> antes de agregar), consulta la lista completa de campos en la página de <a href="/es/schema">Esquema</a> o lee la <a href="/es/methodology">Metodología</a>.</p>
 </main>
 
 <footer>
-  <p>Fuente: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">Informe de Transparencia de Medios de LY Corporation</a>. Datos vía <a href="/api">Transparency Report API</a> · <a href="/es/methodology">Metodología</a> · <a href="/es/api-key">Clave API</a> · <a href="/es/privacy">Privacidad</a></p>
+  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a> and Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> (Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/es/methodology">Methodology</a> · <a href="/es/api-key">API key</a> · <a href="/es/privacy">Privacidad</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantánea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citar como:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -982,6 +1002,46 @@ display: flex; align-items: center; justify-content: space-between;
   var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
   Promise.all([soft(RATE_Q()), soft(REM_Q()), soft(OC_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
+  });
+
+  // ── YouTube (Google) — Information Platform Act report ──────────────────────
+  var YT_PERIOD = "2025-07-26..2026-03-31";
+  function ytQ(section, metric) {
+    return {"table":"japan_metrics","fields":["category","value"],"query":{"and":[
+      {"operation":"EQ","field_name":"service","field_values":["YouTube"]},
+      {"operation":"EQ","field_name":"period","field_values":[YT_PERIOD]},
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"EQ","field_name":"metric","field_values":[metric]}
+    ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
+  }
+  // 'Total' is the DB category name for a section's aggregate row (English in
+  // every locale). Build it by concatenation so the page localizer — which
+  // rewrites the bare display word "Total" into "Gesamt"/"合計"/… — can't rewrite
+  // this data-value literal and break the comparisons below.
+  var CAT_TOTAL = "To" + "tal";
+  function ytRender(elId, section, metric, caption, numHead) {
+    soft(ytQ(section, metric)).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
+      renderTable(elId, rows, caption, "Motivo", numHead);
+    });
+  }
+  ytRender('ytLegal', 'legal_removals', 'items_removed', "Retiradas legales de YouTube por motivo.", "Elementos retirados");
+  ytRender('ytPolicy', 'policy_removals', 'videos_removed', "Retiradas de vídeos por política de YouTube por motivo.", "Vídeos retirados");
+  ytRender('ytFlags', 'user_flags', 'flags', "Denuncias de usuarios de YouTube por motivo.", "Denuncias");
+  // Headline: MAU, and the automated share of policy removals.
+  soft(ytQ('platform', 'monthly_active_users')).then(function (d) {
+    var el = document.getElementById('ytMau');
+    if (el && d.rows.length) el.textContent = fmt(d.rows[0][1]);
+  });
+  soft(ytQ('policy_detection_source', 'videos_removed')).then(function (d) {
+    var el = document.getElementById('ytAuto');
+    if (!el) return;
+    var total = 0, auto = 0;
+    d.rows.forEach(function (r) {
+      if (r[0] === CAT_TOTAL) total = r[1];
+      else if (r[0] === 'Automated detection') auto = r[1];
+    });
+    if (total && auto) el.textContent = (100 * auto / total).toFixed(1) + '%';
   });
 })();
 </script>

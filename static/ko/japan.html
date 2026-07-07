@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>일본 정보유통플랫폼대처법(情プラ法) — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) implementation statistics — LY Corporation's Media Transparency Report: posts, removals and removal rate per service." />
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, plus Google (YouTube)'s legal and policy actions by reason." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -251,6 +251,7 @@ display: flex; align-items: center; justify-content: space-between;
     }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+  .yt-h { font-size: 14px; margin: 4px 0 10px; color: var(--fg); }
 </style>
 </head>
 <body>
@@ -603,9 +604,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY 코퍼레이션 · 연간 · 2024회계연도</span>
+    <span class="badge">LY 코퍼레이션 + YouTube · 제28조</span>
     <h1>일본 — 정보유통플랫폼대처법(情プラ法)</h1>
-    <p>일본의 개정된 제공자 책임제한법 — <strong>정보유통플랫폼대처법</strong>(情プラ法, 2025년 4월 시행) — 은 총무성이 지정한 대규모 제공자에게 연례 콘텐츠 관리 통계를 공개하도록 의무화합니다(제28조). 현재 수치를 공개하는 지정 제공자는 <strong>LY 코퍼레이션</strong>뿐이며(Google·Meta·TikTok·X는 정성적 기준 페이지만 공개), 본 데이터는 이 회사의 2024회계연도 미디어 투명성 보고서에서 다섯 개 서비스(Yahoo! 지혜주머니, Yahoo! 파이낸스 게시판, LINE 오픈챗, LINE VOOM, Yahoo! 뉴스 댓글)를 다룹니다. tidy-long 데이터셋으로, 각 행은 서비스 × 기간 × 지표(<code>posts</code>, <code>posts_removed</code>, <code>removal_rate</code>)로 식별되는 하나의 측정값입니다. 집계 전에 지표를 고정하세요 — 게시물·삭제·비율은 비교할 수 없고, 비율은 절대 합산하지 말며, 분기를 연간 합계에 더하지 마세요.</p>
+    <p>일본의 개정된 제공자 책임제한법 — <strong>정보유통플랫폼대처법</strong>(情プラ法, 2025년 4월 시행) — 은 총무성이 지정한 대규모 제공자에게 콘텐츠 관리 통계를 공개하도록 의무화합니다(제28조). 현재 수치를 공개하는 제공자는 두 곳입니다(Meta·TikTok·X는 여전히 정성적 기준 페이지만 공개). <strong>LY 코퍼레이션</strong>은 2024회계연도 미디어 투명성 보고서에서 다섯 개 서비스(Yahoo! 지혜주머니, Yahoo! 파이낸스 게시판, LINE 오픈챗, LINE VOOM, Yahoo! 뉴스 댓글)를, <strong>Google(YouTube)</strong>은 2025년 7월 26일~2026년 3월 31일 보고서를 다룹니다. tidy-long 데이터셋으로, 각 행은 서비스 × 기간 × 섹션 × 카테고리 × 지표로 식별되는 하나의 측정값입니다. 지표와 섹션은 비교할 수 없습니다 — 집계 전에 <code>section</code>·<code>category</code>·<code>metric</code>을 고정하고, 비율은 절대 합산하지 말며, 섹션의 <code>합계</code>을 그 자체 내역에 더하지 마세요.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -658,11 +659,30 @@ display: flex; align-items: center; justify-content: space-between;
     </div>
   </section>
 
-  <p class="hint">이 쿼리는 <a href="/ko/reports">쿼리 빌더</a>에서 다듬거나 확장할 수 있고(집계 전에 <code>metric</code>을 고정), 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서, 자세한 내용은 <a href="/ko/methodology">방법론</a>에서 확인하세요.</p>
+  <section class="data-section">
+    <h2>YouTube(Google)</h2>
+    <p class="sub">Google의 YouTube 정보유통플랫폼대처법 보고서는 <strong>2025년 7월 26일~2026년 3월 31일</strong>을 다루는 일본 고유 수치로, LY Corp의 2024회계연도 표와 기간이 달라 서로 비교할 수 없습니다. YouTube의 일본 월간 활성 사용자는 <span id="ytMau">…</span>였습니다. 아래 각 내역은 자체 <em>합계</em> 행을 제외합니다.</p>
+    <h3 class="yt-h">사유별 법적 삭제</h3>
+    <div class="results" id="ytLegal" aria-busy="true"><div class="results-loading">불러오는 중…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — 정책 위반으로 삭제된 동영상(사유별)</h2>
+    <p class="sub">일본에서 YouTube 커뮤니티 가이드에 따라 삭제된 동영상(정책 사유별). 대부분은 사용자·단체·정부가 아니라 자동화 시스템이 먼저 탐지했습니다(삭제의 <span id="ytAuto">…</span>).</p>
+    <div class="results" id="ytPolicy" aria-busy="true"><div class="results-loading">불러오는 중…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>YouTube — 사용자 신고(사유별)</h2>
+    <p class="sub">일본 IP 주소에서 제출된 최종 사용자 신고(신고자가 선택한 사유별).</p>
+    <div class="results" id="ytFlags" aria-busy="true"><div class="results-loading">불러오는 중…</div></div>
+  </section>
+
+  <p class="hint"><a href="/ko/reports">쿼리 빌더</a>에서 이 뷰를 다듬거나 확장하세요(집계 전에 <code>section</code>·<code>category</code>·<code>metric</code>을 고정하세요). 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서 확인하고 <a href="/ko/methodology">방법론</a>도 읽어 보세요.</p>
 </main>
 
 <footer>
-  <p>출처: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY 코퍼레이션 미디어 투명성 보고서</a>. 데이터 제공: <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">방법론</a> · <a href="/ko/api-key">API 키</a> · <a href="/ko/privacy">개인정보</a></p>
+  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a> and Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> (Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -982,6 +1002,46 @@ display: flex; align-items: center; justify-content: space-between;
   var soft = function (q) { return explore(q).then(function (d) { d.rows = d.rows || []; return d; }).catch(function (err) { console.error(err); return { rows: [] }; }); };
   Promise.all([soft(RATE_Q()), soft(REM_Q()), soft(OC_Q())]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2]);
+  });
+
+  // ── YouTube(Google) — Information Platform Act report ──────────────────────
+  var YT_PERIOD = "2025-07-26..2026-03-31";
+  function ytQ(section, metric) {
+    return {"table":"japan_metrics","fields":["category","value"],"query":{"and":[
+      {"operation":"EQ","field_name":"service","field_values":["YouTube"]},
+      {"operation":"EQ","field_name":"period","field_values":[YT_PERIOD]},
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"EQ","field_name":"metric","field_values":[metric]}
+    ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
+  }
+  // '합계' is the DB category name for a section's aggregate row (English in
+  // every locale). Build it by concatenation so the page localizer — which
+  // rewrites the bare display word "합계" into "Gesamt"/"合計"/… — can't rewrite
+  // this data-value literal and break the comparisons below.
+  var CAT_TOTAL = "To" + "tal";
+  function ytRender(elId, section, metric, caption, numHead) {
+    soft(ytQ(section, metric)).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
+      renderTable(elId, rows, caption, "사유", numHead);
+    });
+  }
+  ytRender('ytLegal', 'legal_removals', 'items_removed', "YouTube 사유별 법적 삭제.", "삭제된 항목");
+  ytRender('ytPolicy', 'policy_removals', 'videos_removed', "YouTube 정책 동영상 삭제(사유별).", "삭제된 동영상");
+  ytRender('ytFlags', 'user_flags', 'flags', "YouTube 사용자 신고(사유별).", "신고 수");
+  // Headline: MAU, and the automated share of policy removals.
+  soft(ytQ('platform', 'monthly_active_users')).then(function (d) {
+    var el = document.getElementById('ytMau');
+    if (el && d.rows.length) el.textContent = fmt(d.rows[0][1]);
+  });
+  soft(ytQ('policy_detection_source', 'videos_removed')).then(function (d) {
+    var el = document.getElementById('ytAuto');
+    if (!el) return;
+    var total = 0, auto = 0;
+    d.rows.forEach(function (r) {
+      if (r[0] === CAT_TOTAL) total = r[1];
+      else if (r[0] === 'Automated detection') auto = r[1];
+    });
+    if (total && auto) el.textContent = (100 * auto / total).toFixed(1) + '%';
   });
 })();
 </script>

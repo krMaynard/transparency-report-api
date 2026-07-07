@@ -1245,13 +1245,15 @@ TABLES: dict[str, TableSpec] = {
         },
     ),
     "japan_metrics": TableSpec(
-        "Japan Information Distribution Platform Act (情プラ法, in force Apr 2025) — the annual implementation-status statistics that MIC-designated large providers must publish under Art. 28. Currently only LY Corporation publishes figures (the other designated providers — Google, Meta, TikTok, X — publish only qualitative criteria so far), so this table holds LY Corp's five services: Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM and Yahoo! News comments. One row per measured value, identified by service × period × metric. `period` is a FY2024 quarter ('2024-04..2024-06' … '2025-01..2025-03') or the annual total ('2024-04..2025-03'). `metric` is `posts` (投稿件数) or `posts_removed` (投稿削除件数), both counts, or `removal_rate` (投稿削除割合), a percent. Pin `metric` before aggregating — posts, removals and the rate aren't comparable — never SUM `removal_rate` (a percent), and don't add the quarterly rows to the annual-total row.",
+        "Japan Information Distribution Platform Act (情プラ法, in force Apr 2025) — the annual implementation-status statistics MIC-designated large providers must publish under Art. 28. Two providers so far: LY Corporation (Media Transparency Report — its five services Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM, Yahoo! News comments) and Google (YouTube). One row per measured value, identified by service × period × section × category × metric. LY Corp's rows are in section 'posts_activity' (category 'All'): `metric` is `posts`/`posts_removed` (counts) or `removal_rate` (percent), per FY2024 quarter ('2024-04..2024-06' … '2025-01..2025-03') or the annual total ('2024-04..2025-03'). YouTube's rows cover 2025-07-26..2026-03-31 across sections legal_requests / legal_extended_review_notifications / legal_items / legal_removals (the legal stream) and user_flags / policy_removals / policy_detection_source / suspensions / appeals / platform (the policy stream); `category` is a reason (Defamation, Child Safety, Automated detection, …) with 'Total' the section aggregate, and `metric` names the measure (requests / items / items_removed / flags / videos_removed / accounts_terminated / appeals / reinstatements / monthly_active_users / …). Metrics and sections are NOT comparable (LY Corp posts vs YouTube flags/removals; percent vs count), and every YouTube section carries a 'Total' category beside its breakdown. Pin service, section AND category before aggregating; never SUM `removal_rate` (percent), and don't add YouTube's policy_removals and policy_detection_source together (two cross-cuts of the same removed videos).",
         "FROM japan_metrics f",
         {
-            "service": "f.service",
-            "period":  "f.period",
-            "metric":  "f.metric",
-            "unit":    "f.unit",
+            "service":  "f.service",
+            "period":   "f.period",
+            "section":  "f.section",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
         },
         {
             "value": "f.value",
@@ -4001,21 +4003,36 @@ def _leg_warnings(
                 "vendor's own and aren't comparable across services; this "
                 "aggregate pins no 'service'. Filter or group by 'service'."
             )
-    # japan_metrics mixes count metrics (posts, posts_removed) with a percent
-    # (removal_rate), and carries an annual-total period alongside the quarters.
+    # japan_metrics spans two providers (LY Corp posts activity vs YouTube's
+    # legal/policy actions by reason) across many incomparable sections, each of
+    # which carries a 'Total'/'All' category beside its breakdown, and LY Corp
+    # carries an annual-total period alongside the quarters.
     if table == "japan_metrics" and any(
         a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
     ):
+        if "section" not in pinned:
+            out.append(
+                "'japan_metrics' spans incomparable sections (LY Corp "
+                "'posts_activity' vs YouTube's legal/policy actions by reason) in "
+                "different units; this aggregate pins no 'section'. Filter or "
+                "group by 'section'."
+            )
         if "metric" not in pinned:
             out.append(
-                "'japan_metrics' reports posts and posts_removed (counts) and "
-                "removal_rate (a percent) as separate, non-comparable metrics; "
-                "this aggregate pins no 'metric'. Filter or group by 'metric' "
-                "(and never SUM removal_rate)."
+                "'japan_metrics' reports distinct, non-comparable metrics (posts, "
+                "posts_removed, videos_removed, flags, accounts_terminated, and "
+                "the percent removal_rate); this aggregate pins no 'metric'. "
+                "Filter or group by 'metric' (and never SUM removal_rate)."
+            )
+        if "category" not in pinned:
+            out.append(
+                "'japan_metrics' keeps a 'Total' (YouTube) / 'All' (LY Corp) "
+                "category beside each section's breakdown, so summing over "
+                "'category' double-counts. Filter or group by 'category'."
             )
         if "period" not in pinned:
             out.append(
-                "'japan_metrics' includes an annual-total period "
+                "'japan_metrics' includes LY Corp's annual-total period "
                 "('2024-04..2025-03') alongside the FY2024 quarters, so summing "
                 "over 'period' double-counts. Filter or group by 'period'."
             )

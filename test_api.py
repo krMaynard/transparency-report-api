@@ -3524,7 +3524,7 @@ class TestJapanTable:
 
     def test_japan_fields_endpoint(self):
         body = client.get("/api/fields?table=japan_metrics", headers=MOMO).json()
-        assert {"service", "period", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert {"service", "period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
         assert "value" in body["measures"]["fields"]
 
     def test_japan_annual_posts(self):
@@ -3553,16 +3553,32 @@ class TestJapanTable:
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"] == [["percent", 0.7]]
 
+    def test_japan_youtube_legal_removals_by_reason(self):
+        # YouTube's legal_removals breakdown (fixture: Defamation 155, Trademark 117),
+        # excluding the 'Total' category row.
+        job = _submit_and_wait({
+            "table": "japan_metrics", "fields": ["category", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["YouTube"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["legal_removals"]},
+                {"operation": "IN", "field_name": "category", "field_values": ["Defamation", "Trademark"]},
+            ]},
+            "sort": [{"field_name": "value", "order": "desc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["Defamation", 155], ["Trademark", 117]]
+
     def test_japan_unpinned_sum_warns(self):
-        # A SUM pinning neither metric nor period mixes counts/percent and adds
-        # the annual-total row to its own quarters.
+        # A SUM pinning none of section/metric/category/period mixes providers,
+        # units, and totals with their own breakdowns.
         r = client.post("/api/explore", json={
             "table": "japan_metrics",
             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
         })
         assert r.status_code == 200
         warnings = " ".join(r.json().get("warnings", []))
-        assert "metric" in warnings and "period" in warnings
+        assert "section" in warnings and "metric" in warnings and "category" in warnings
 
     def test_japan_page_served(self):
         r = client.get("/japan")
@@ -3574,10 +3590,17 @@ class TestJapanTable:
         import pathlib
         data = json.loads(pathlib.Path(__file__).with_name("data")
                           .joinpath("japan-info-platform.json").read_text(encoding="utf-8"))
-        assert data["columns"] == ["service", "period", "metric", "unit", "value"]
-        assert data["rows"] and all(len(r) == 5 for r in data["rows"])
-        assert {r[3] for r in data["rows"]} == {"count", "percent"}
-        assert {r[2] for r in data["rows"]} == {"posts", "posts_removed", "removal_rate"}
+        assert data["columns"] == ["service", "period", "section", "category", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 7 for r in data["rows"])
+        services = {r[0] for r in data["rows"]}
+        assert "YouTube" in services and "LINE OpenChat" in services
+        # LY Corp lives in posts_activity; YouTube brings the legal/policy sections.
+        yt_sections = {r[2] for r in data["rows"] if r[0] == "YouTube"}
+        assert {"legal_removals", "policy_removals", "user_flags", "suspensions"} <= yt_sections
+        # Each YouTube breakdown's category rows sum to its 'Total' row.
+        lr = [r for r in data["rows"] if r[0] == "YouTube" and r[2] == "legal_removals"]
+        total = next(r[6] for r in lr if r[3] == "Total")
+        assert sum(r[6] for r in lr if r[3] != "Total") == total == 289
 
 
 class TestTiktokCgerTable:
