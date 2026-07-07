@@ -153,7 +153,7 @@ translations are **generated**, not hand-written:
   `python scripts/localize_static.py` so all four languages stay in sync, and
   commit the regenerated files. Never edit `static/{es,fr,de}/*.html` by hand.
 - Routing: a loop in `main.py` registers `/<locale>`, `/<locale>/reports`,
-  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/ca-ab587`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/turkey`, `/<locale>/cser`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/narratives`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
+  `/<locale>/removals`, `/<locale>/catalog`, `/<locale>/ny-tos`, `/<locale>/ca-ab587`, `/<locale>/apple`, `/<locale>/github`, `/<locale>/snap`, `/<locale>/india`, `/<locale>/korea`, `/<locale>/taiwan`, `/<locale>/turkey`, `/<locale>/cser`, `/<locale>/japan`, `/<locale>/user-data`, `/<locale>/microsoft`, `/<locale>/linkedin`, `/<locale>/tiktok`, `/<locale>/discord`, `/<locale>/disruptions`, `/<locale>/android`, `/<locale>/narratives`, `/<locale>/mcp`, `/<locale>/methodology`, `/<locale>/schema`,
   `/<locale>/api-key`, `/<locale>/privacy` for each locale (plus a `/<locale>/portal` → `/<locale>/api-key`
   redirect), all through `_serve_page` (so each localized file gets its own recomputed
   per-page CSP hash). The JSON API (`/api/*`), Swagger (`/docs`) and operational
@@ -412,7 +412,8 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `posts`/`posts_removed` (count) or `removal_rate` (percent). Pin a `metric`
   before aggregating — never SUM `removal_rate`, and don't add the quarters to
   the annual-total row; `_leg_warnings` warns on both. The `/japan` dataset page
-  is English-only (like `/singapore`/`/mandates`).
+  is localized into all seven locales (the source report is Japanese-only, so a
+  localized page — especially the Japanese one — genuinely serves its audience).
 - **Google government requests for user information** — a single **tidy-long**
   `google_userdata_metrics` table (one row per measured value: `dataset`/
   `period`/`country`/`iso2`/`product`/`legal_process`/`assisting_country`/
@@ -800,7 +801,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/turkey` | — | Public Türkiye Law No. 5651 transparency-reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/cser` | — | Public Meta Community Standards Enforcement Report dataset page (web UI over `POST /api/explore`) |
 | GET | `/singapore` | — | Public Singapore IMDA Online Safety dataset page (web UI over `POST /api/explore`; English-only, like `/mandates`) |
-| GET | `/japan` | — | Public Japan 情プラ法 (LY Corporation) dataset page (web UI over `POST /api/explore`; English-only) |
+| GET | `/japan` | — | Public Japan 情プラ法 (LY Corporation) dataset page (web UI over `POST /api/explore`) |
 | GET | `/user-data` | — | Public Google user-data requests dataset page (web UI over `POST /api/explore`) |
 | GET | `/microsoft` | — | Public Microsoft LERR dataset page (web UI over `POST /api/explore`) |
 | GET | `/linkedin` | — | Public LinkedIn Government Requests dataset page (web UI over `POST /api/explore`) |
