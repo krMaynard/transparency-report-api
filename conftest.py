@@ -317,8 +317,10 @@ _SINGAPORE_FIXTURE = {
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
 # A small slice of the Japan 情プラ法 dataset (japan-info-platform.json shape):
-# LY Corp posts activity (section 'posts_activity', category 'All') plus a couple
-# of YouTube sections with their 'Total' beside a reason breakdown.
+# LY Corp posts activity (section 'posts_activity', category 'All'), a couple of
+# YouTube sections with their 'Total' beside a reason breakdown, and a slice of
+# Meta's per-service enforcement (Facebook/Instagram content_actions by violation
+# type + appeals), where the 'Total' is NOT the sum of the listed categories.
 # [service, period, section, category, metric, unit, value]
 _JAPAN_FIXTURE = {
     "columns": ["service", "period", "section", "category", "metric", "unit", "value"],
@@ -334,6 +336,14 @@ _JAPAN_FIXTURE = {
         ["YouTube", "2025-07-26..2026-03-31", "legal_removals", "Trademark", "items_removed", "count", 117],
         # and a headline platform figure.
         ["YouTube", "2025-07-26..2026-03-31", "platform", "All", "monthly_active_users", "count", 106400000],
+        # Meta: content_actions by violation type (Total is a superset, not the
+        # sum of the listed 'most prevalent' categories) + an appeals figure.
+        ["Facebook", "2025-07-30..2026-03-31", "content_actions", "Spam", "actions", "count", 420954],
+        ["Facebook", "2025-07-30..2026-03-31", "content_actions", "Fraud and Deception", "actions", "count", 112817],
+        ["Facebook", "2025-07-30..2026-03-31", "content_actions", "Total", "actions", "count", 891693],
+        ["Instagram", "2025-07-30..2026-03-31", "content_actions", "Spam", "actions", "count", 151519],
+        ["Instagram", "2025-07-30..2026-03-31", "appeals", "All", "content_appeals", "count", 70297],
+        ["Threads", "2025-07-30..2026-03-31", "platform", "All", "monthly_active_users", "approx_count", 20600000],
     ],
 }
 seed.build_japan_db(_JAPAN_FIXTURE, _DB)

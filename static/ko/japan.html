@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>일본 정보유통플랫폼대처법(情プラ法) — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, plus Google (YouTube)'s legal and policy actions by reason." />
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, Google (YouTube)'s legal and policy actions by reason, and Meta's Facebook/Instagram/Threads enforcement by violation type." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -612,9 +612,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY 코퍼레이션 + YouTube · 제28조</span>
+    <span class="badge">LY 코퍼레이션 · YouTube · Meta · 제28조</span>
     <h1>일본 — 정보유통플랫폼대처법(情プラ法)</h1>
-    <p>일본의 개정된 제공자 책임제한법 — <strong>정보유통플랫폼대처법</strong>(情プラ法, 2025년 4월 시행) — 은 총무성이 지정한 대규모 제공자에게 콘텐츠 관리 통계를 공개하도록 의무화합니다(제28조). 현재 수치를 공개하는 제공자는 두 곳입니다(Meta·TikTok·X는 여전히 정성적 기준 페이지만 공개). <strong>LY 코퍼레이션</strong>은 2024회계연도 미디어 투명성 보고서에서 다섯 개 서비스(Yahoo! 지혜주머니, Yahoo! 파이낸스 게시판, LINE 오픈챗, LINE VOOM, Yahoo! 뉴스 댓글)를, <strong>Google(YouTube)</strong>은 2025년 7월 26일~2026년 3월 31일 보고서를 다룹니다. tidy-long 데이터셋으로, 각 행은 서비스 × 기간 × 섹션 × 카테고리 × 지표로 식별되는 하나의 측정값입니다. 지표와 섹션은 비교할 수 없습니다 — 집계 전에 <code>section</code>·<code>category</code>·<code>metric</code>을 고정하고, 비율은 절대 합산하지 말며, 섹션의 <code>합계</code>을 그 자체 내역에 더하지 마세요.</p>
+    <p>일본의 개정된 제공자 책임제한법 — <strong>정보유통플랫폼대처법</strong>(情プラ法, 2025년 4월 시행) — 은 총무성이 지정한 대규모 제공자에게 콘텐츠 관리 통계를 공개하도록 의무화합니다(제28조). 현재 수치를 공개하는 제공자는 세 곳입니다(TikTok·X는 여전히 정성적 기준 페이지만 공개). <strong>LY 코퍼레이션</strong>은 2024회계연도 미디어 투명성 보고서에서 다섯 개 서비스(Yahoo! 지혜주머니, Yahoo! 파이낸스 게시판, LINE 오픈챗, LINE VOOM, Yahoo! 뉴스 댓글)를, <strong>Google(YouTube)</strong>은 2025년 7월 26일~2026년 3월 31일 보고서를, <strong>Meta</strong>는 지정 서비스인 Facebook·Instagram·Threads를 2025년 7월 30일~2026년 3월 31일에 대해 개별적으로 보고합니다. tidy-long 데이터셋으로, 각 행은 서비스 × 기간 × 섹션 × 카테고리 × 지표로 식별되는 하나의 측정값입니다. 지표와 섹션은 비교할 수 없습니다 — 집계 전에 <code>section</code>·<code>category</code>·<code>metric</code>을 고정하고, 비율은 절대 합산하지 말며, 섹션의 <code>합계</code>을 그 자체 내역에 더하지 마세요(Meta의 <code>합계</code>은 열거된 ‘가장 빈번한’ 카테고리의 상위집합이며 그 합이 아닙니다).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -686,11 +686,24 @@ display: flex; align-items: center; justify-content: space-between;
     <div class="results" id="ytFlags" aria-busy="true"><div class="results-loading">불러오는 중…</div></div>
   </section>
 
+  <section class="data-section">
+    <h2>Meta — Facebook·Instagram·Threads</h2>
+    <p class="sub">Meta의 첫 정보유통플랫폼대처법 보고서는 <strong>2025년 7월 30일~2026년 3월 31일</strong>을 다루며 지정 서비스마다 개별적으로 보고하므로, 수치는 LY Corp나 YouTube와 비교할 수 없습니다. 서비스를 선택하세요: <label class="sr-only" for="metaSvc">Meta 서비스</label><select id="metaSvc"><option value="Facebook">Facebook</option><option value="Instagram">Instagram</option><option value="Threads">Threads</option></select>. 일본의 월간 활성 계정은 <span id="metaMau">…</span>였습니다. 아래 위반 카테고리는 보고서의 <em>가장 빈번한</em> 예(부분집합)이므로 섹션 합계가 되지 않습니다(여기서는 합계 제외).</p>
+    <h3 class="yt-h">위반 유형별 콘텐츠 집행 조치</h3>
+    <div class="results" id="metaContent" aria-busy="true"><div class="results-loading">불러오는 중…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>Meta — 권리침해 신고 요청(사유별)</h2>
+    <p class="sub">선택한 서비스에 대해 Meta의 전용 제22조 신고 채널을 통해 접수된 요청을 신고자가 선택한 권리침해 사유별로 표시.</p>
+    <div class="results" id="meta요청 수" aria-busy="true"><div class="results-loading">불러오는 중…</div></div>
+  </section>
+
   <p class="hint"><a href="/ko/reports">쿼리 빌더</a>에서 이 뷰를 다듬거나 확장하세요(집계 전에 <code>section</code>·<code>category</code>·<code>metric</code>을 고정하세요). 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서 확인하고 <a href="/ko/methodology">방법론</a>도 읽어 보세요.</p>
 </main>
 
 <footer>
-  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a> and Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> (Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
+  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a>, Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> and Meta's <a href="https://transparency.meta.com/" target="_blank" rel="noopener noreferrer">Information Distribution Platform Act report</a> (all Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -1051,6 +1064,37 @@ display: flex; align-items: center; justify-content: space-between;
     });
     if (total && auto) el.textContent = (100 * auto / total).toFixed(1) + '%';
   });
+
+  // ── Meta (Facebook / Instagram / Threads) — IDPA report ─────────────────────
+  var META_PERIOD = "2025-07-30..2026-03-31";
+  function metaQ(service, section, metric) {
+    return {"table":"japan_metrics","fields":["category","value"],"query":{"and":[
+      {"operation":"EQ","field_name":"service","field_values":[service]},
+      {"operation":"EQ","field_name":"period","field_values":[META_PERIOD]},
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"EQ","field_name":"metric","field_values":[metric]}
+    ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
+  }
+  function metaRender(service) {
+    // Exclude each section's '합계' aggregate row (CAT_TOTAL, see note above).
+    soft(metaQ(service, 'content_actions', 'actions')).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
+      renderTable('metaContent', rows, "Meta 위반 유형별 콘텐츠 집행 조치.", "위반 유형", "조치 수");
+    });
+    soft(metaQ(service, 'requests_received', 'requests')).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
+      renderTable('meta요청 수', rows, "Meta가 접수한 권리침해 신고 요청(사유별).", "신고 사유", "요청 수");
+    });
+    soft(metaQ(service, 'platform', 'monthly_active_users')).then(function (d) {
+      var el = document.getElementById('metaMau');
+      if (el) el.textContent = d.rows.length ? fmt(d.rows[0][1]) : '—';
+    });
+  }
+  var metaSel = document.getElementById('metaSvc');
+  if (metaSel) {
+    metaSel.addEventListener('change', function () { metaRender(metaSel.value); });
+    metaRender(metaSel.value);
+  }
 })();
 </script>
 </body>

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Legge giapponese sulle piattaforme di distribuzione delle informazioni (情プラ法) — Transparency Report API</title>
-<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, plus Google (YouTube)'s legal and policy actions by reason." />
+<meta name="description" content="Japan's Information Distribution Platform Act (情プラ法) Art. 28 statistics — LY Corporation's posts/removals per service, Google (YouTube)'s legal and policy actions by reason, and Meta's Facebook/Instagram/Threads enforcement by violation type." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -612,9 +612,9 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">LY Corp + YouTube · art. 28</span>
+    <span class="badge">LY Corp · YouTube · Meta · art. 28</span>
     <h1>Giappone — Legge sulle piattaforme di distribuzione delle informazioni (情プラ法)</h1>
-    <p>La legge giapponese sulla limitazione della responsabilità dei provider, modificata — la <strong>legge sulle piattaforme di distribuzione delle informazioni</strong> (情プラ法, in vigore da aprile 2025) — impone ai grandi provider designati dal MIC di pubblicare statistiche sulla moderazione dei contenuti (art. 28). Finora due provider pubblicano cifre (Meta, TikTok e X pubblicano ancora solo pagine di criteri qualitativi): <strong>LY Corporation</strong>, che copre i suoi cinque servizi — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM e Yahoo! News comments — dal suo report sulla trasparenza dei media dell'esercizio 2024, e <strong>Google (YouTube)</strong>, dal suo report dal 26 lug 2025 al 31 mar 2026. Un set di dati tidy-long: ogni riga è un valore misurato identificato da servizio × periodo × sezione × categoria × metrica. Metricahe e sezioni non sono comparabili — fissa una <code>section</code>, una <code>category</code> e una <code>metric</code> prima di aggregare, non sommare mai un tasso e non aggiungere il <code>Totale</code> di una sezione al suo stesso dettaglio.</p>
+    <p>La legge giapponese sulla limitazione della responsabilità dei provider, modificata — la <strong>legge sulle piattaforme di distribuzione delle informazioni</strong> (情プラ法, in vigore da aprile 2025) — impone ai grandi provider designati dal MIC di pubblicare statistiche sulla moderazione dei contenuti (art. 28). Finora tre provider pubblicano cifre (TikTok e X pubblicano ancora solo pagine di criteri qualitativi): <strong>LY Corporation</strong>, che copre i suoi cinque servizi — Yahoo! Chiebukuro, Yahoo! Finance boards, LINE OpenChat, LINE VOOM e Yahoo! News comments — dal suo report sulla trasparenza dei media dell'esercizio 2024; <strong>Google (YouTube)</strong>, dal suo report dal 26 lug 2025 al 31 mar 2026; e <strong>Meta</strong>, che rendiconta separatamente i suoi servizi designati Facebook, Instagram e Threads per il 30 lug 2025 – 31 mar 2026. Un set di dati tidy-long: ogni riga è un valore misurato identificato da servizio × periodo × sezione × categoria × metrica. Metricahe e sezioni non sono comparabili — fissa una <code>section</code>, una <code>category</code> e una <code>metric</code> prima di aggregare, non sommare mai un tasso e non aggiungere il <code>Totale</code> di una sezione al suo stesso dettaglio (per Meta il <code>Totale</code> è un sovrainsieme delle categorie «più frequenti» elencate, non la loro somma).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -686,11 +686,24 @@ display: flex; align-items: center; justify-content: space-between;
     <div class="results" id="ytFlags" aria-busy="true"><div class="results-loading">Caricamento…</div></div>
   </section>
 
+  <section class="data-section">
+    <h2>Meta — Facebook, Instagram e Threads</h2>
+    <p class="sub">Il primo report di Meta ai sensi della legge sulle piattaforme di distribuzione delle informazioni copre il periodo <strong>30 lug 2025 – 31 mar 2026</strong> e rendiconta separatamente ciascun servizio designato — quindi le cifre non sono comparabili con quelle di LY Corp o YouTube. Scegli un servizio: <label class="sr-only" for="metaSvc">Servizio Meta</label><select id="metaSvc"><option value="Facebook">Facebook</option><option value="Instagram">Instagram</option><option value="Threads">Threads</option></select>. Ha dichiarato <span id="metaMau">…</span> account attivi mensili in Giappone. Le categorie di violazione qui sotto sono gli esempi <em>più frequenti</em> del report — un sottoinsieme, quindi non sommano al totale della sezione (escluso qui).</p>
+    <h3 class="yt-h">Azioni di applicazione sui contenuti per tipo di violazione</h3>
+    <div class="results" id="metaContent" aria-busy="true"><div class="results-loading">Caricamento…</div></div>
+  </section>
+
+  <section class="data-section">
+    <h2>Meta — richieste di segnalazione dei diritti per motivo</h2>
+    <p class="sub">Richieste ricevute tramite il canale di segnalazione dedicato all'articolo 22 di Meta per il servizio selezionato, in base al motivo di violazione dei diritti scelto da chi segnala.</p>
+    <div class="results" id="metaRichieste" aria-busy="true"><div class="results-loading">Caricamento…</div></div>
+  </section>
+
   <p class="hint">Perfeziona o estendi tutto questo nel <a href="/it/reports">generatore di query</a> (fissa una <code>section</code>, una <code>category</code> e una <code>metric</code> prima di aggregare), sfoglia l'elenco completo dei campi nella pagina <a href="/it/schema">Schema</a> o leggi la <a href="/it/methodology">Metodologia</a>.</p>
 </main>
 
 <footer>
-  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a> and Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> (Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Methodology</a> · <a href="/it/api-key">API key</a> · <a href="/it/privacy">Privacy</a></p>
+  <p>Sources: <a href="https://www.lycorp.co.jp/ja/company/transparency/media-transparency/" target="_blank" rel="noopener noreferrer">LY Corporation Media Transparency Report</a>, Google's <a href="https://transparencyreport.google.com/" target="_blank" rel="noopener noreferrer">YouTube Information Platform Act report</a> and Meta's <a href="https://transparency.meta.com/" target="_blank" rel="noopener noreferrer">Information Distribution Platform Act report</a> (all Japan), archived in <a href="https://github.com/krMaynard/dsa-transparency-data" target="_blank" rel="noopener noreferrer">dsa-transparency-data</a>. Data via <a href="/api">Transparency Report API</a> · <a href="/it/methodology">Methodology</a> · <a href="/it/api-key">API key</a> · <a href="/it/privacy">Privacy</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Istantanea:</span> <span id="prov-snap"></span> · <span class="prov-label">Citare come:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -1051,6 +1064,37 @@ display: flex; align-items: center; justify-content: space-between;
     });
     if (total && auto) el.textContent = (100 * auto / total).toFixed(1) + '%';
   });
+
+  // ── Meta (Facebook / Instagram / Threads) — IDPA report ─────────────────────
+  var META_PERIOD = "2025-07-30..2026-03-31";
+  function metaQ(service, section, metric) {
+    return {"table":"japan_metrics","fields":["category","value"],"query":{"and":[
+      {"operation":"EQ","field_name":"service","field_values":[service]},
+      {"operation":"EQ","field_name":"period","field_values":[META_PERIOD]},
+      {"operation":"EQ","field_name":"section","field_values":[section]},
+      {"operation":"EQ","field_name":"metric","field_values":[metric]}
+    ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
+  }
+  function metaRender(service) {
+    // Exclude each section's 'Totale' aggregate row (CAT_TOTAL, see note above).
+    soft(metaQ(service, 'content_actions', 'actions')).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
+      renderTable('metaContent', rows, "Azioni di applicazione di Meta sui contenuti per tipo di violazione.", "Tipo di violazione", "Azioni");
+    });
+    soft(metaQ(service, 'requests_received', 'requests')).then(function (d) {
+      var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
+      renderTable('metaRichieste', rows, "Richieste di segnalazione dei diritti ricevute da Meta, per motivo.", "Motivo della segnalazione", "Richieste");
+    });
+    soft(metaQ(service, 'platform', 'monthly_active_users')).then(function (d) {
+      var el = document.getElementById('metaMau');
+      if (el) el.textContent = d.rows.length ? fmt(d.rows[0][1]) : '—';
+    });
+  }
+  var metaSel = document.getElementById('metaSvc');
+  if (metaSel) {
+    metaSel.addEventListener('change', function () { metaRender(metaSel.value); });
+    metaRender(metaSel.value);
+  }
 })();
 </script>
 </body>
