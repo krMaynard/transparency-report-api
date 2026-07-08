@@ -118,6 +118,7 @@ SLUG_META = {
     "google-cloud-storage": ("Google Cloud Storage", "hosting"),
     "colab": ("Google Colab", "online-platform"),
     "fitbit": ("Fitbit", "online-platform"),
+    "reddit": ("Reddit", "online-platform"),
 }
 
 SECTIONS = [
