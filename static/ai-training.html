@@ -975,7 +975,7 @@ display: flex; align-items: center; justify-content: space-between;
     if (!text.rows.length) { emptyChart('text-loading'); } else {
       // rows: [provider, model, rank] — label each bar "Provider — Model".
       var tlabel = function (r) { return r[0] + ' — ' + r[1]; };
-      srTable('chart-text-table', ["Model", "Text size rank"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
+      srTable('chart-text-table', ["Provider — Model", "Text size rank"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
       hbarChart('chart-text', 'text-loading', 'chart-text-table',
         text.rows.map(tlabel), text.rows.map(function (r) { return r[2]; }));
     }

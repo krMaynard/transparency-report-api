@@ -973,9 +973,9 @@ display: flex; align-items: center; justify-content: space-between;
 
   function renderCharts(text, mod) {
     if (!text.rows.length) { emptyChart('text-loading'); } else {
-      // rows: [provider, model, rank] — label each bar "Fornitore — Modello".
+      // rows: [provider, model, rank] — label each bar "Fornitore — Modellolo".
       var tlabel = function (r) { return r[0] + ' — ' + r[1]; };
-      srTable('chart-text-table', ["Modello", "Rango di dimensione del testo"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
+      srTable('chart-text-table', ["Fornitore — Modellolo", "Rango di dimensione del testo"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
       hbarChart('chart-text', 'text-loading', 'chart-text-table',
         text.rows.map(tlabel), text.rows.map(function (r) { return r[2]; }));
     }

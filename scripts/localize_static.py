@@ -13403,6 +13403,15 @@ _AIT_PAGE = {
         "zh": "模型",
         "ko": "모델",
     },
+    "Provider — Model": {
+        "es": "Proveedor — Modelo",
+        "fr": "Fournisseur — Modèle",
+        "de": "Anbieter — Modell",
+        "it": "Fornitore — Modello",
+        "ja": "プロバイダー — モデル",
+        "zh": "提供商 — 模型",
+        "ko": "제공자 — 모델",
+    },
     "Modality": {
         "es": "Modalidad",
         "fr": "Modalité",
