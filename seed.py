@@ -96,6 +96,11 @@ _DEFAULT_AI_TRAINING_SOURCE = os.getenv(
 _DEFAULT_REGIONAL_SOURCE = os.getenv(
     "SEED_REGIONAL_SOURCE_JSON", os.path.join(HERE, "data", "regional-transparency.json")
 )
+# China CIIRC (12377) monthly online-report handling statistics (china-ciirc/
+# build_ciirc.py).
+_DEFAULT_CIIRC_SOURCE = os.getenv(
+    "SEED_CIIRC_SOURCE_JSON", os.path.join(HERE, "data", "china-ciirc.json")
+)
 # Meta Community Standards Enforcement Report — vendored in-repo (from the
 # sibling data repo's meta-cser/build_cser.py).
 _DEFAULT_CSER_SOURCE = os.getenv(
@@ -538,6 +543,21 @@ CREATE TABLE regional_metrics (
     value        REAL
 );
 CREATE INDEX idx_regional_jurisdiction ON regional_metrics(jurisdiction);
+
+-- China CIIRC / 12377 online-report handling statistics (china-ciirc/
+-- build_ciirc.py). The CAC reporting center's monthly bulletin on reports of
+-- illegal/harmful online information handled, by receiving body. Tidy-long: one
+-- row per measured value, by period × category (receiving body).
+CREATE TABLE ciirc_metrics (
+    publisher TEXT NOT NULL,     -- CAC-CIIRC
+    period    TEXT NOT NULL,     -- 'YYYY-MM'
+    section   TEXT NOT NULL,     -- reports_received
+    category  TEXT NOT NULL,     -- national_total / central_center / local_departments / platforms / commercial_platforms
+    metric    TEXT NOT NULL,     -- reports_received
+    unit      TEXT NOT NULL,     -- count (万 × 10,000)
+    value     REAL
+);
+CREATE INDEX idx_ciirc_period ON ciirc_metrics(period);
 
 -- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
 -- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
@@ -1370,6 +1390,36 @@ def build_tco_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_ciirc_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the ciirc_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long china-ciirc.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("ciirc dataset is None")
+    expected_cols = ["publisher", "period", "section", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"ciirc dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("ciirc dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ciirc_metrics (publisher, period, section, category, "
+                "metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_regional_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the regional_metrics table in an existing DB at db_path.
 
@@ -2025,6 +2075,8 @@ def main() -> None:
                         help="Path to ai-training-transparency.json")
     parser.add_argument("--regional-source", default=_DEFAULT_REGIONAL_SOURCE,
                         help="Path to regional-transparency.json")
+    parser.add_argument("--ciirc-source", default=_DEFAULT_CIIRC_SOURCE,
+                        help="Path to china-ciirc.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
@@ -2203,6 +2255,15 @@ def main() -> None:
               f"{len({r[0] for r in regional_data['rows']})} jurisdictions")
     else:
         print(f"  (skipping regional law reports — not found: {args.regional_source})")
+
+    if os.path.isfile(args.ciirc_source):
+        with open(args.ciirc_source, "r", encoding="utf-8") as f:
+            ciirc_data = json.load(f)
+        ciirc_rows = build_ciirc_db(ciirc_data, args.db)
+        print(f"  china ciirc: {ciirc_rows} rows across "
+              f"{len({r[1] for r in ciirc_data['rows']})} months")
+    else:
+        print(f"  (skipping China CIIRC — not found: {args.ciirc_source})")
 
     if os.path.isfile(args.cser_source):
         with open(args.cser_source, "r", encoding="utf-8") as f:

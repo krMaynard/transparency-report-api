@@ -1231,6 +1231,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "ciirc_metrics": TableSpec(
+        "China CIIRC (12377) online-report handling statistics — the Central Cyberspace Administration of China (CAC) Illegal and Harmful Information Reporting Center's monthly bulletin (全国网络举报受理情况) on how many public reports of illegal / harmful online information were handled that month. One row per measured value, identified by publisher × period × section × category. publisher is 'CAC-CIIRC'; period is 'YYYY-MM' (Oct 2019 →); section is 'reports_received'. category is the receiving body: 'central_center' (中央网信办举报中心), 'local_departments' (各地网信举报工作部门), 'platforms' (全国主要网站平台) — of which 'commercial_platforms' (主要商业网站平台) is a subset reported some months — and 'national_total' = central + local + platforms. unit is 'count' (figures published in 万 / ten-thousands, stored ×10,000). Coarse aggregate volumes only — China discloses no per-platform or per-category breakdown. Pin a category before aggregating: national_total already sums the three bodies, and commercial_platforms is a subset of platforms, so summing categories double-counts.",
+        "FROM ciirc_metrics f",
+        {
+            "publisher": "f.publisher",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "ai_training_metrics": TableSpec(
         "EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency summaries — the public summary of training content each general-purpose AI provider must publish on the AI Office's standardised template (in force Aug 2025). One row per disclosed field, identified by provider × model × section × field. `section` is 'modality' (field = Text/Image/Audio/Video/Other; value = the banded training-data size, e.g. 'More than 10 trillion tokens'; the numeric `size_rank` = 1/2/3 across the three bands, 0 = 'Not applicable', so coarse sizes are comparable across providers), 'general' (data_cutoff, ongoing_collection) or 'data_source' (publicly_available / commercially_licensed / third_party_private / personal_data / synthetic; value = Yes/No/Not applicable). `value` is text; `size_rank` is an ordinal rank (compare with MIN/MAX, don't SUM). Cross-provider, comparable; a starting set (Google + Microsoft) that expands as more providers' summaries are archived.",
         "FROM ai_training_metrics f",
@@ -2517,6 +2532,12 @@ def korea_page() -> FileResponse:
 def taiwan_page() -> FileResponse:
     """Serve the Taiwan Anti-Fraud Act dataset page (reads POST /api/explore)."""
     return _serve_page("taiwan.html", "Taiwan anti-fraud page")
+
+
+@app.get("/china", response_class=HTMLResponse)
+def china_page() -> FileResponse:
+    """Serve the China CIIRC (12377) dataset page (reads POST /api/explore)."""
+    return _serve_page("china.html", "China CIIRC page")
 
 
 @app.get("/turkey", response_class=HTMLResponse)
@@ -4060,6 +4081,20 @@ def _leg_warnings(
                 "demonetizations, appeals, flags, reported_items, …) that aren't "
                 "comparable; this aggregate pins no 'metric'. Filter or group by "
                 "'metric'."
+            )
+    # ciirc_metrics: national_total already sums central/local/platforms, and
+    # commercial_platforms is a subset of platforms, so summing categories (or
+    # across months, mixing the aggregate with its parts) double-counts.
+    if table == "ciirc_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "category" not in pinned:
+            out.append(
+                "'ciirc_metrics' category 'national_total' already sums "
+                "'central_center' + 'local_departments' + 'platforms', and "
+                "'commercial_platforms' is a subset of 'platforms'; summing "
+                "categories together double-counts. This aggregate pins no "
+                "'category'. Filter or group by 'category'."
             )
     # cser_metrics mixes counts and rate-percentages across metrics, and carries
     # a 'Cross-Policy Data' aggregate alongside the per-policy-area rows.
