@@ -1246,6 +1246,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "china12321_metrics": TableSpec(
+        "China 12321 telecom-spam report-handling statistics — the 12321 Internet Bad & Spam Information Reporting Center (Internet Society of China / MIIT), China's national hotline for telecom/internet nuisance & spam, published a monthly report-handling bulletin from 2016-09 to 2019-02 (discontinued after Feb 2019). The telecom-spam complement to the CAC/12377 content-reporting series (ciirc_metrics) — a different agency and remit. One row per measured value, identified by publisher × period × category. publisher is '12321-ISC'; period is 'YYYY-MM' (or 'YYYY-MM..YYYY-MM' for the few combined-month bulletins); section is 'reports_received'. category is the report type received: 'app' (手机应用软件/APP), 'sms' (短信 monthly total), 'sms_spam' (垃圾类短信) and 'sms_illegal' (涉嫌违法类短信) — the two disjoint parts of 'sms' — 'harassment_calls' (骚扰电话), 'bad_websites' (不良网站), and the 2016-era-only 'fraud_comms' (涉嫌通讯信息诈骗) and 'spam_email' (垃圾邮件). unit is 'count' (2016 bulletins, exact 件次) or 'approx_count' (2017+, rounded to 万/ten-thousands, stored ×10,000). Pin a category before aggregating: 'sms' already sums 'sms_spam' + 'sms_illegal', so summing categories double-counts. Also don't mix 'count' and 'approx_count' precision when comparing across years.",
+        "FROM china12321_metrics f",
+        {
+            "publisher": "f.publisher",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "ai_training_metrics": TableSpec(
         "EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency summaries — the public summary of training content each general-purpose AI provider must publish on the AI Office's standardised template (in force Aug 2025). One row per disclosed field, identified by provider × model × section × field. `section` is 'modality' (field = Text/Image/Audio/Video/Other; value = the banded training-data size, e.g. 'More than 10 trillion tokens'; the numeric `size_rank` = 1/2/3 across the three bands, 0 = 'Not applicable', so coarse sizes are comparable across providers), 'general' (data_cutoff, ongoing_collection) or 'data_source' (publicly_available / commercially_licensed / third_party_private / personal_data / synthetic; value = Yes/No/Not applicable). `value` is text; `size_rank` is an ordinal rank (compare with MIN/MAX, don't SUM). Cross-provider, comparable; a starting set (Google + Microsoft) that expands as more providers' summaries are archived.",
         "FROM ai_training_metrics f",
@@ -2538,6 +2553,12 @@ def taiwan_page() -> FileResponse:
 def china_page() -> FileResponse:
     """Serve the China CIIRC (12377) dataset page (reads POST /api/explore)."""
     return _serve_page("china.html", "China CIIRC page")
+
+
+@app.get("/china-12321", response_class=HTMLResponse)
+def china12321_page() -> FileResponse:
+    """Serve the China 12321 telecom-spam dataset page (reads POST /api/explore)."""
+    return _serve_page("china-12321.html", "China 12321 page")
 
 
 @app.get("/turkey", response_class=HTMLResponse)
@@ -4094,6 +4115,17 @@ def _leg_warnings(
                 "'commercial_platforms' is a subset of 'platforms'; summing "
                 "categories together double-counts. This aggregate pins no "
                 "'category'. Filter or group by 'category'."
+            )
+    # china12321_metrics: the 'sms' total already sums 'sms_spam' + 'sms_illegal',
+    # so summing categories double-counts.
+    if table == "china12321_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "category" not in pinned:
+            out.append(
+                "'china12321_metrics' category 'sms' already sums 'sms_spam' + "
+                "'sms_illegal'; summing categories together double-counts. This "
+                "aggregate pins no 'category'. Filter or group by 'category'."
             )
     # cser_metrics mixes counts and rate-percentages across metrics, and carries
     # a 'Cross-Policy Data' aggregate alongside the per-policy-area rows.

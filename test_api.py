@@ -3569,6 +3569,56 @@ class TestCiircTable:
         assert r.status_code == 200 and "ciirc_metrics" in r.text
 
 
+class TestChina12321Table:
+    def test_china12321_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "china12321_metrics" in names
+
+    def test_china12321_fields_endpoint(self):
+        body = client.get("/api/fields?table=china12321_metrics", headers=MOMO).json()
+        assert {"publisher", "period", "section", "category", "metric",
+                "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_china12321_app_value(self):
+        # 2016-10 app reports = 75,094 (exact 件次, unit=count).
+        r = client.post("/api/explore", json={
+            "table": "china12321_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "category", "field_values": ["app"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2016-10"]},
+            ]},
+            "fields": ["value", "unit"],
+        })
+        assert r.status_code == 200
+        assert r.json()["rows"][0] == [75094, "count"]
+
+    def test_china12321_sms_reconciles(self):
+        # sms == sms_spam + sms_illegal for a full month (2016-10, exact).
+        rows = client.post("/api/explore", json={
+            "table": "china12321_metrics",
+            "query": {"and": [{"operation": "EQ", "field_name": "period",
+                               "field_values": ["2016-10"]}]},
+            "fields": ["category", "value"],
+        }).json()["rows"]
+        v = {c: val for c, val in rows}
+        assert v["sms_spam"] + v["sms_illegal"] == v["sms"]
+
+    def test_china12321_unpinned_sum_warns(self):
+        # 'sms' already sums 'sms_spam' + 'sms_illegal' — summing categories
+        # double-counts, so an unpinned SUM warns to pin a category.
+        r = client.post("/api/explore", json={
+            "table": "china12321_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert "category" in " ".join(r.json().get("warnings", []))
+
+    def test_china12321_page_served(self):
+        r = client.get("/china-12321")
+        assert r.status_code == 200 and "china12321_metrics" in r.text
+
+
 class TestCserTable:
     def test_cser_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]

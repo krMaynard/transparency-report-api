@@ -101,6 +101,11 @@ _DEFAULT_REGIONAL_SOURCE = os.getenv(
 _DEFAULT_CIIRC_SOURCE = os.getenv(
     "SEED_CIIRC_SOURCE_JSON", os.path.join(HERE, "data", "china-ciirc.json")
 )
+# China 12321 telecom-spam report-handling statistics (china-12321/
+# build_12321.py).
+_DEFAULT_CHINA12321_SOURCE = os.getenv(
+    "SEED_CHINA12321_SOURCE_JSON", os.path.join(HERE, "data", "china-12321.json")
+)
 # Meta Community Standards Enforcement Report — vendored in-repo (from the
 # sibling data repo's meta-cser/build_cser.py).
 _DEFAULT_CSER_SOURCE = os.getenv(
@@ -558,6 +563,22 @@ CREATE TABLE ciirc_metrics (
     value     REAL
 );
 CREATE INDEX idx_ciirc_period ON ciirc_metrics(period);
+
+-- China 12321 telecom-spam report-handling statistics (china-12321/
+-- build_12321.py). The 12321 Internet Bad & Spam Information Reporting Center
+-- (Internet Society of China / MIIT) monthly bulletins on public reports of
+-- telecom/internet nuisance & spam received, by category. Tidy-long: one row per
+-- measured value, by period × category. Discontinued after Feb 2019.
+CREATE TABLE china12321_metrics (
+    publisher TEXT NOT NULL,     -- 12321-ISC
+    period    TEXT NOT NULL,     -- 'YYYY-MM' (or 'YYYY-MM..YYYY-MM' combined-month)
+    section   TEXT NOT NULL,     -- reports_received
+    category  TEXT NOT NULL,     -- app / sms / sms_spam / sms_illegal / harassment_calls / bad_websites / fraud_comms / spam_email
+    metric    TEXT NOT NULL,     -- reports_received
+    unit      TEXT NOT NULL,     -- count (2016 exact) / approx_count (万-rounded, 2017+)
+    value     REAL
+);
+CREATE INDEX idx_china12321_period ON china12321_metrics(period);
 
 -- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
 -- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
@@ -1570,6 +1591,36 @@ def build_japan_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_china12321_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the china12321_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long china-12321.json (`columns` header + `rows` in column order).
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("china-12321 dataset is None")
+    expected_cols = ["publisher", "period", "section", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"china-12321 dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("china-12321 dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO china12321_metrics (publisher, period, section, "
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_cser_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the cser_metrics table in an existing DB at db_path.
 
@@ -2077,6 +2128,8 @@ def main() -> None:
                         help="Path to regional-transparency.json")
     parser.add_argument("--ciirc-source", default=_DEFAULT_CIIRC_SOURCE,
                         help="Path to china-ciirc.json")
+    parser.add_argument("--china12321-source", default=_DEFAULT_CHINA12321_SOURCE,
+                        help="Path to china-12321.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
@@ -2264,6 +2317,15 @@ def main() -> None:
               f"{len({r[1] for r in ciirc_data['rows']})} months")
     else:
         print(f"  (skipping China CIIRC — not found: {args.ciirc_source})")
+
+    if os.path.isfile(args.china12321_source):
+        with open(args.china12321_source, "r", encoding="utf-8") as f:
+            china12321_data = json.load(f)
+        china12321_rows = build_china12321_db(china12321_data, args.db)
+        print(f"  china 12321: {china12321_rows} rows across "
+              f"{len({r[1] for r in china12321_data['rows']})} bulletins")
+    else:
+        print(f"  (skipping China 12321 — not found: {args.china12321_source})")
 
     if os.path.isfile(args.cser_source):
         with open(args.cser_source, "r", encoding="utf-8") as f:
