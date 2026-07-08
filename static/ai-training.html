@@ -917,7 +917,7 @@ display: flex; align-items: center; justify-content: space-between;
     // Group by provider+model, preserving first-seen order, pivoting field→value.
     var order = [], byKey = {};
     rows.forEach(function (r) {
-      var key = r[0] + ' ' + r[1];
+      var key = r[0] + '\u0000' + r[1];
       if (!byKey[key]) { byKey[key] = { provider: r[0], model: r[1], vals: {} }; order.push(key); }
       byKey[key].vals[r[2]] = r[3];
     });
