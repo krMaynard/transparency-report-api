@@ -119,6 +119,7 @@ SLUG_META = {
     "colab": ("Google Colab", "online-platform"),
     "fitbit": ("Fitbit", "online-platform"),
     "reddit": ("Reddit", "online-platform"),
+    "just-eat-takeaway": ("Just Eat Takeaway", "online-platform"),
 }
 
 SECTIONS = [
