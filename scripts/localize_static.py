@@ -13134,6 +13134,19 @@ _AI_TRAINING_NAV = {
 }
 for _loc in _AI_TRAINING_NAV:
     COMMON[_loc].append(("      EU AI Act\n    </a>", f"      {_AI_TRAINING_NAV[_loc]}\n    </a>"))
+# EU DSA nav label (the /reports item, relabelled from "DSA"), localized to match
+# the "EU DSA · transparency reports" subtitle forms already used per locale.
+_EU_DSA_NAV = {
+    "es": 'DSA de la UE',
+    "fr": "DSA de l'UE",
+    "de": 'EU-DSA',
+    "it": "DSA dell'UE",
+    "ja": 'EU DSA',
+    "zh": '欧盟 DSA',
+    "ko": 'EU DSA',
+}
+for _loc in _EU_DSA_NAV:
+    COMMON[_loc].append(("      EU DSA\n    </a>", f"      {_EU_DSA_NAV[_loc]}\n    </a>"))
 _AIT_PAGE = {
     # ── <title> ──────────────────────────────────────────────────────────────
     "EU AI Act — AI training-data transparency — Transparency Report API": {
