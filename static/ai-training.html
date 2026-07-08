@@ -645,7 +645,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Art. 53(1)(d) · GPAI · 2025 –</span>
     <h1>EU AI Act — AI training-data transparency</h1>
-    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI (GPAI) models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Meta + Microsoft).</p>
+    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI (GPAI) models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set that grows as providers publish their summaries.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -866,7 +866,10 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         indexAxis: 'y', responsive: true,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
-        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+        // autoSkip off so every bar keeps its model label (Chart.js otherwise
+        // drops every other y tick once there are many models).
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } },
+                  y: { ticks: { autoSkip: false } } },
       },
     });
   }
@@ -965,14 +968,16 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries. Filter values are section/field codes, so the localization
   // generator's prose find/replace can never rewrite them.
   var MODALITIES = ["Text", "Image", "Audio", "Video", "Other"];
-  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["provider","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
   function MOD_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]}]},"group_by":["field","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"max_count":200}; }
 
   function renderCharts(text, mod) {
     if (!text.rows.length) { emptyChart('text-loading'); } else {
-      srTable('chart-text-table', ["Model", "Text size rank"], text.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      // rows: [provider, model, rank] — label each bar "Provider — Model".
+      var tlabel = function (r) { return r[0] + ' — ' + r[1]; };
+      srTable('chart-text-table', ["Model", "Text size rank"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
       hbarChart('chart-text', 'text-loading', 'chart-text-table',
-        text.rows.map(function (r) { return r[0]; }), text.rows.map(function (r) { return r[1]; }));
+        text.rows.map(tlabel), text.rows.map(function (r) { return r[2]; }));
     }
     if (!mod.rows.length) { emptyChart('mod-loading'); } else {
       // Pivot [modality, model, rank]; order the x-axis by the template modality order.
