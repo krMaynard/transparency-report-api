@@ -83,7 +83,7 @@ Built to demonstrate two things:
 | `data/meta-cser.json` | Vendored snapshot of Meta's Community Standards Enforcement Report (sibling `dsa-transparency-data/meta-cser/build_cser.py`) — a tidy-long `columns`+`rows` list; seeded into the `cser_metrics` table by `seed.build_cser_db` |
 | `data/tiktok-cger.json` | Vendored snapshot of TikTok's Community Guidelines Enforcement Report (sibling `dsa-transparency-data/tiktok-cger/build_cger.py`) — a tidy-long `columns`+`rows` list (global `All`-location cut); seeded into the `tiktok_cger_metrics` table by `seed.build_tiktok_cger_db` |
 | `data/tco-regulation.json` | Vendored snapshot of the EU Terrorist Content Online Regulation transparency reports (sibling `dsa-transparency-data/tco-regulation/build_tco.py`) — a tidy-long `columns`+`rows` list across the authority (Art. 8 / Commission) and platform (Art. 7) streams; seeded into the `tco_metrics` table by `seed.build_tco_db` |
-| `data/ai-training-transparency.json` | Vendored snapshot of the EU AI Act Art. 53(1)(d) training-data transparency summaries (sibling `dsa-transparency-data/ai-training-transparency/build_ai_training.py`) — a tidy-long `columns`+`rows` list across providers' public summaries of training content (Google PDF + Microsoft Hugging Face cards); seeded into the `ai_training_metrics` table by `seed.build_ai_training_db` |
+| `data/ai-training-transparency.json` | Vendored snapshot of the EU AI Act Art. 53(1)(d) training-data transparency summaries (sibling `dsa-transparency-data/ai-training-transparency/build_ai_training.py`) — a tidy-long `columns`+`rows` list across providers' public summaries of training content (Google + Meta + OpenAI PDFs + Microsoft Hugging Face cards); seeded into the `ai_training_metrics` table by `seed.build_ai_training_db` |
 | `data/regional-transparency.json` | Vendored snapshot of the regional content-moderation transparency-law reports (sibling `dsa-transparency-data/regional-transparency/build_regional.py`) — a tidy-long `columns`+`rows` list of YouTube's Texas HB 20 (§120.053) + Austria KoPl-G (§4) reports; seeded into the `regional_metrics` table by `seed.build_regional_db` |
 | `data/china-ciirc.json` | Vendored snapshot of the China CIIRC (12377) online-report handling statistics (sibling `dsa-transparency-data/china-ciirc/build_ciirc.py`) — a tidy-long `columns`+`rows` list of the CAC reporting center's monthly 全国网络举报受理情况 figures by receiving body (2019→); seeded into the `ciirc_metrics` table by `seed.build_ciirc_db` |
 | `data/china-12321.json` | Vendored snapshot of the China 12321 telecom-spam report-handling statistics (sibling `dsa-transparency-data/china-12321/build_12321.py`) — a tidy-long `columns`+`rows` list of the 12321 center's (Internet Society of China / MIIT) monthly reports received by category (apps, spam/illegal SMS, harassment calls, bad websites, …), 2016-09 → 2019-02 (discontinued); seeded into the `china12321_metrics` table by `seed.build_china12321_db` |
@@ -423,10 +423,12 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `value` = Yes/No/…).
   `value` is text; `size_rank` is an **ordinal rank** — compare it with
   MIN/MAX/AVG, **never SUM** (`_leg_warnings` warns on a `size_rank` SUM).
-  Coverage is a starting, expandable set (Google + Meta + Microsoft; 5 model
-  entries) — Meta's is filed on the AI Office's full template (Image & Video
-  grouped as one "Perception" modality, recorded on both rows; `crawled` /
-  `user_data` data-source categories the others don't break out).
+  Coverage is a starting, expandable set (Google + Meta + Microsoft + OpenAI;
+  6 model entries) — Meta's and OpenAI's are filed on the AI Office's full
+  template (Meta groups Image & Video as one "Perception" modality, recorded on
+  both rows; both break out `crawled` / `user_data` data-source categories the
+  others don't — OpenAI's `user_data` is Yes via data from other products
+  (ChatGPT/Codex), though model-interaction data itself was not used).
   The `/ai-training` dataset page is English-only (like `/mandates`).
 - **Regional content-moderation transparency-law reports** — a single
   **tidy-long** `regional_metrics` table (one row per measured value:
