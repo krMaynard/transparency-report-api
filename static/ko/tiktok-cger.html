@@ -798,7 +798,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
@@ -941,12 +949,12 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // A latest-quarter horizontal-bar chart of one metric by a breakdown key.
-  function renderLatestHbar(rows, chartId, loadId, tableId, numHead, fmtVal) {
+  function renderLatestHbar(rows, chartId, loadId, tableId, numHead, fmtVal, rowHead) {
     var r = latestByArea(rows);
     if (!r.items.length) { emptyChart(loadId); return; }
     var labels = r.items.map(function (i) { return i.area; });
     var values = r.items.map(function (i) { return i.value; });
-    srTable(tableId, [numHead + " (" + r.latest + ")", numHead],
+    srTable(tableId, [(rowHead || "Category") + " (" + r.latest + ")", numHead],
       r.items.map(function (i) { return [i.area, fmtVal(i.value)]; }));
     hbarChart(chartId, loadId, tableId, labels, values);
   }
@@ -1011,7 +1019,7 @@ display: flex; align-items: center; justify-content: space-between;
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
   soft(VIDS_Q()).then(function (d) { renderLine(d.rows, 'chart-vids', 'vids-loading', 'chart-vids-table', '삭제된 동영상', false); });
   soft(PRO_Q()).then(function (d) { renderLine(d.rows, 'chart-pro', 'pro-loading', 'chart-pro-table', '선제적 조치율', true); });
-  soft(POL_Q()).then(function (d) { renderLatestHbar(d.rows, 'chart-pol', 'pol-loading', 'chart-pol-table', '삭제된 동영상', fmt); });
+  soft(POL_Q()).then(function (d) { renderLatestHbar(d.rows, 'chart-pol', 'pol-loading', 'chart-pol-table', '삭제된 동영상', fmt, 'Policy'); });
   soft(RATES_Q()).then(function (d) { render비율s(d.rows); });
 })();
 </script>

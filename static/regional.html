@@ -797,7 +797,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',

@@ -637,7 +637,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Art. 53(1)(d) · GPAI · 2025 –</span>
     <h1>EU AI Act — AI training-data transparency</h1>
-    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Meta + Microsoft).</p>
+    <p>Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI (GPAI) models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Meta + Microsoft).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -797,7 +797,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',

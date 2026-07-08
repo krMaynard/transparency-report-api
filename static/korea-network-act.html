@@ -648,6 +648,7 @@ display: flex; align-items: center; justify-content: space-between;
     <h2>Monthly detail
       <label class="sr-only" for="knaYear">Report year</label>
       <select id="knaYear"><option value="2025">2025</option><option value="2024">2024</option></select>
+      <span id="knaStatus" class="sr-only" role="status" aria-live="polite"></span>
     </h2>
     <p class="sub">The month-by-month breakdown for the selected year (2024 and 2025 publish it; earlier reports don't). Each chart has a text alternative for screen readers.</p>
     <div class="chart-grid">
@@ -681,7 +682,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <section class="data-section">
     <h2>How requests were processed</h2>
-    <p class="sub">The outcome of the reported URLs in the selected year — voluntarily removed by Google, or not actioned (already gone, insufficient information, not found, or other), plus any sent to the KCSC for assessment.</p>
+    <p class="sub">The outcome of the reported URLs in the selected year — voluntarily removed by Google, or not actioned (already gone, insufficient information, not found, or other), plus any sent to the Korea Communications Standards Commission (KCSC) for assessment.</p>
     <div class="results" id="outcomeTable" aria-busy="true">
       <div class="results-loading">Loading…</div>
     </div>
@@ -810,7 +811,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
@@ -957,6 +966,8 @@ display: flex; align-items: center; justify-content: space-between;
 
   // ── Monthly detail for the selected year ────────────────────────────────────
   function renderYear(year) {
+    var knaStatus = document.getElementById('knaStatus');
+    if (knaStatus) knaStatus.textContent = 'Showing monthly detail for ' + year + '.';
     soft(monthlyQ('requests_received', year)).then(function (d) {
       renderTrend('chart-req', 'req-loading', 'chart-req-table', "Month", d);
     });

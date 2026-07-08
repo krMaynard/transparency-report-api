@@ -637,7 +637,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">6 services · Annual · 2024 – 2025</span>
     <h1>Singapore — IMDA Online Safety reports</h1>
-    <p>The annual online safety reports the six <strong>Designated Social Media Services</strong> (Facebook, Instagram, TikTok, X, YouTube and HardwareZone) file under Singapore's <strong>Code of Practice for Online Safety</strong> (issued by IMDA under the Broadcasting Act), plus IMDA's own <strong>Online Safety Assessment Reports</strong> benchmarking them. Two streams: an <strong>assessment</strong> benchmark — IMDA's normalized, cross-service &ldquo;Mystery Shopper&rdquo; figures (action rate on legitimate user reports, and average time to action) for the 2024 and 2025 rounds — and each service's own <strong>Singapore-specific figures</strong> (2024 – 2025), which are each vendor's own metrics and aren't comparable across services. A tidy-long dataset: each row is one measured value identified by service × period × section × category × metric. Pin a section and metric before aggregating, and never mix the percent / days / count units.</p>
+    <p>The annual online safety reports the six <strong>Designated Social Media Services</strong> (Facebook, Instagram, TikTok, X, YouTube and HardwareZone) file under Singapore's <strong>Code of Practice for Online Safety</strong> (issued by Singapore's Infocomm Media Development Authority (IMDA) under the Broadcasting Act), plus IMDA's own <strong>Online Safety Assessment Reports</strong> benchmarking them. Two streams: an <strong>assessment</strong> benchmark — IMDA's normalized, cross-service &ldquo;Mystery Shopper&rdquo; figures (action rate on legitimate user reports, and average time to action) for the 2024 and 2025 rounds — and each service's own <strong>Singapore-specific figures</strong> (2024 – 2025), which are each vendor's own metrics and aren't comparable across services. A tidy-long dataset: each row is one measured value identified by service × period × section × category × metric. Pin a section and metric before aggregating, and never mix the percent / days / count units.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -821,7 +821,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
@@ -879,9 +887,10 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function vbarsChart(id, loadId, tableId, labels, dsets) {
+  function vbarsChart(id, loadId, tableId, labels, dsets, fmtY) {
     if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
+    var fv = fmtY || fmt;   // optional value formatter (e.g. percent / days)
     new Chart(document.getElementById(id), {
       type: 'bar',
       data: { labels: labels, datasets: dsets.map(function (ds, i) {
@@ -890,11 +899,13 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         responsive: true,
         plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
-                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
-        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fv(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fv(v); } } } },
       },
     });
   }
+  function fmtPctY(v) { return v == null ? '' : v + '%'; }
+  function fmtDaysY(v) { return v == null ? '' : v + ' d'; }
 
   function linesChart(id, loadId, tableId, labels, dsets) {
     if (!chartReady()) { fallbackTable(loadId, tableId); return; }
@@ -973,12 +984,12 @@ display: flex; align-items: center; justify-content: space-between;
     if (!ar.rows.length) { emptyChart('ar-loading'); } else {
       var p1 = pivot(ar.rows, ROUND);
       seriesTable('chart-ar-table', "Service", p1);
-      vbarsChart('chart-ar', 'ar-loading', 'chart-ar-table', p1.labels, p1.dsets);
+      vbarsChart('chart-ar', 'ar-loading', 'chart-ar-table', p1.labels, p1.dsets, fmtPctY);
     }
     if (!tta.rows.length) { emptyChart('tta-loading'); } else {
       var p2 = pivot(tta.rows, ROUND);
       seriesTable('chart-tta-table', "Service", p2);
-      vbarsChart('chart-tta', 'tta-loading', 'chart-tta-table', p2.labels, p2.dsets);
+      vbarsChart('chart-tta', 'tta-loading', 'chart-tta-table', p2.labels, p2.dsets, fmtDaysY);
     }
     if (!yt.rows.length) { emptyChart('yt-loading'); } else {
       srTable('chart-yt-table', ["Reason", "Flags"], yt.rows.map(function (r) { return [r[0], fmt(r[1])]; }));

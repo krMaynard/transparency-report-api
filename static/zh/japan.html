@@ -712,7 +712,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <section class="data-section">
     <h2>Meta — Facebook、Instagram 与 Threads</h2>
-    <p class="sub">Meta 首份《信息流通平台应对法》报告涵盖 <strong>2025年7月30日至2026年3月31日</strong>，对每个指定服务分别报告，因此数据与 LY 公司或 YouTube 不可比较。请选择一个服务：<label class="sr-only" for="metaSvc">Meta 服务</label><select id="metaSvc"><option value="Facebook">Facebook</option><option value="Instagram">Instagram</option><option value="Threads">Threads</option></select>。其在日本的月活跃账号为 <span id="metaMau">…</span>。下面的违规类别是报告中<em>最常见</em>的示例（子集），因此不构成板块总计（此处已排除）。</p>
+    <p class="sub">Meta's inaugural Information Distribution Platform Act report covers <strong>30 Jul 2025 – 31 Mar 2026</strong>, reporting each designated service separately — so the figures aren't comparable with LY Corp's or YouTube's. Pick a service: <label class="sr-only" for="metaSvc">Meta service</label><select id="metaSvc"><option value="Facebook">Facebook</option><option value="Instagram">Instagram</option><option value="Threads">Threads</option></select><span id="metaStatus" class="sr-only" role="status" aria-live="polite"></span>. It reported <span id="metaMau">…</span> monthly active accounts in Japan. The violation categories below are the report's <em>most prevalent</em> examples — a subset, so they don't sum to the section total (excluded here).</p>
     <h3 class="yt-h">按违规类型的内容执法行动</h3>
     <div class="results" id="metaContent" aria-busy="true"><div class="results-loading">加载中…</div></div>
   </section>
@@ -840,7 +840,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
@@ -915,9 +923,10 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function linesChart(id, loadId, tableId, labels, dsets) {
+  function linesChart(id, loadId, tableId, labels, dsets, fmtY) {
     if (!chartReady()) { fallbackTable(loadId, tableId); return; }
     showChart(id, loadId);
+    var fv = fmtY || fmt;   // optional value formatter (e.g. percent)
     new Chart(document.getElementById(id), {
       type: 'line',
       data: { labels: labels, datasets: dsets.map(function (ds, i) {
@@ -928,8 +937,8 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         responsive: true,
         plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
-                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
-        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fv(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return fv(v); } } } },
       },
     });
   }
@@ -974,7 +983,7 @@ display: flex; align-items: center; justify-content: space-between;
       var rr = rate.rows.map(function (r) { return [QLABEL[r[0]] || r[0], r[1], r[2]]; });
       var p1 = pivot(rr);
       seriesTable('chart-rate-table', "季度", p1);
-      linesChart('chart-rate', 'rate-loading', 'chart-rate-table', p1.labels, p1.dsets);
+      linesChart('chart-rate', 'rate-loading', 'chart-rate-table', p1.labels, p1.dsets, function (v) { return v == null ? '' : v + '%'; });
     }
     if (!rem.rows.length) { emptyChart('rem-loading'); } else {
       srTable('chart-rem-table', ["服务", "删除数"], rem.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
@@ -1100,6 +1109,8 @@ display: flex; align-items: center; justify-content: space-between;
     ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
   }
   function metaRender(service) {
+    var metaStatus = document.getElementById('metaStatus');
+    if (metaStatus) metaStatus.textContent = service;
     // Exclude each section's '合计' aggregate row (CAT_TOTAL, see note above).
     soft(metaQ(service, 'content_actions', 'actions')).then(function (d) {
       var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });

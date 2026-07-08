@@ -635,7 +635,7 @@ display: flex; align-items: center; justify-content: space-between;
 
 <main id="main" tabindex="-1">
   <header>
-    <span class="badge">Art. 7 &amp; 8 · Annual · 2022 – 2024</span>
+    <span class="badge">Art. 7 &amp; 8 · Annual · 2022 – 2025</span>
     <h1>EU Terrorist Content Online Regulation</h1>
     <p>Regulation <strong>(EU) 2021/784</strong> (&ldquo;TCOR&rdquo;, in application since June 2022) creates two annual transparency duties around <em>terrorist content</em>. Under <strong>Article 7</strong>, every hosting service provider that took action publishes an enforcement report (items removed, removal orders received &amp; actioned, complaints, reinstatements). Under <strong>Article 8</strong>, each Member State's competent authority reports its activity, and the <strong>European Commission</strong> aggregates the per-Member-State removal-order counts. A tidy-long dataset: each row is one measured value identified by publisher × role × period × section × category × metric. Metric scope is each report's own and isn't comparable across publishers — pin a <code>publisher</code> and <code>metric</code> before aggregating, and note the per-country rows sit beside an <code>EU</code> summary total.</p>
   </header>
@@ -667,8 +667,8 @@ display: flex; align-items: center; justify-content: space-between;
   </section>
 
   <section class="data-section">
-    <h2>Content removed proactively, by platform</h2>
-    <p class="sub">Terrorist / violent-extremist content each Art. 7 publisher removed under its own policies (not via removal orders). Scope differs per report — Spotify's is terrorism-only; Meta's covers a broader policy set and is a rounded estimate — so these aren't strictly comparable.</p>
+    <h2>Content removed proactively, by platform and year</h2>
+    <p class="sub">Terrorist / violent-extremist content each Art. 7 publisher removed under its own policies (not via removal orders), shown <strong>per reporting year</strong> (publishers report different years, so these are not a single comparable period). Scope also differs per report — Spotify's is terrorism-only; Meta's covers a broader policy set and is a rounded estimate — so the figures aren't strictly comparable across publishers.</p>
     <div class="results" id="proactiveTable" aria-busy="true">
       <div class="results-loading">Loading…</div>
     </div>
@@ -797,7 +797,15 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // ── Chart helpers ─────────────────────────────────────────────────────────
-  function chartReady() { return typeof Chart !== 'undefined'; }
+  function chartReady() {
+    var ok = typeof Chart !== 'undefined';
+    // Honour prefers-reduced-motion: disable Chart.js animations once, globally.
+    if (ok && !chartReady._init) {
+      chartReady._init = 1;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) Chart.defaults.animation = false;
+    }
+    return ok;
+  }
 
   var PALETTE = [
     '#2a9d8f','#e76f51','#264653','#e9c46a','#a8dadc','#f4a261','#457b9d','#1d3557',
@@ -935,9 +943,14 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     try {
-      var d = await explore({"table":"tco_metrics","query":{"and":[{"operation":"EQ","field_name":"role","field_values":["platform"]},{"operation":"EQ","field_name":"metric","field_values":["content_removed_proactive"]}]},"group_by":["publisher","category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40});
-      var rows = (d.rows || []).map(function (r) { return [r[0] === r[1] ? r[0] : (r[0] + ' — ' + r[1]), r[2]]; });
-      renderTable('proactiveTable', rows, "Content removed proactively for terrorism / violent extremism, by platform service.", "Platform service", "Content removed");
+      var d = await explore({"table":"tco_metrics","query":{"and":[{"operation":"EQ","field_name":"role","field_values":["platform"]},{"operation":"EQ","field_name":"metric","field_values":["content_removed_proactive"]}]},"group_by":["publisher","category","period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40});
+      // rows: [publisher, category, period, value]. Show the year per row so a
+      // publisher's multiple annual figures aren't read as one cumulative bar.
+      var rows = (d.rows || []).map(function (r) {
+        var svc = r[0] === r[1] ? r[0] : (r[0] + ' — ' + r[1]);
+        return [svc + ' (' + r[2] + ')', r[3]];
+      });
+      renderTable('proactiveTable', rows, "Content removed proactively for terrorism / violent extremism, by platform service and reporting year.", "Platform service (year)", "Content removed");
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('proactiveTable', "Failed to load proactive removals: " + err.message);
