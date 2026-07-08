@@ -1598,8 +1598,8 @@ def build_china12321_db(data: dict[str, Any], db_path: str) -> int:
     tidy-long china-12321.json (`columns` header + `rows` in column order).
     Returns the fact-row count.
     """
-    if data is None:
-        raise ValueError("china-12321 dataset is None")
+    if not isinstance(data, dict):
+        raise ValueError("china-12321 dataset must be a dictionary")
     expected_cols = ["publisher", "period", "section", "category", "metric",
                      "unit", "value"]
     if data.get("columns") != expected_cols:
