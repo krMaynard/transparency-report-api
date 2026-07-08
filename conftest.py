@@ -319,6 +319,27 @@ _CIIRC_FIXTURE = {
 }
 seed.build_ciirc_db(_CIIRC_FIXTURE, _DB)
 
+# A small slice of the China 12321 dataset (china-12321.json shape): one 2016
+# month (exact counts, incl. the 2016-era-only fraud_comms) and one 2019 month
+# (万-rounded approx_count), with the SMS total = spam + illegal.
+_CHINA12321_FIXTURE = {
+    "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["12321-ISC", "2016-10", "reports_received", "app", "reports_received", "count", 75094],
+        ["12321-ISC", "2016-10", "reports_received", "sms", "reports_received", "count", 15676],
+        ["12321-ISC", "2016-10", "reports_received", "sms_spam", "reports_received", "count", 7618],
+        ["12321-ISC", "2016-10", "reports_received", "sms_illegal", "reports_received", "count", 8058],
+        ["12321-ISC", "2016-10", "reports_received", "harassment_calls", "reports_received", "count", 18766],
+        ["12321-ISC", "2016-10", "reports_received", "bad_websites", "reports_received", "count", 22050],
+        ["12321-ISC", "2016-10", "reports_received", "fraud_comms", "reports_received", "count", 13211],
+        ["12321-ISC", "2019-02", "reports_received", "app", "reports_received", "approx_count", 27000],
+        ["12321-ISC", "2019-02", "reports_received", "sms", "reports_received", "approx_count", 19000],
+        ["12321-ISC", "2019-02", "reports_received", "sms_spam", "reports_received", "approx_count", 13000],
+        ["12321-ISC", "2019-02", "reports_received", "sms_illegal", "reports_received", "approx_count", 7000],
+    ],
+}
+seed.build_china12321_db(_CHINA12321_FIXTURE, _DB)
+
 # A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
 # Instagram, a couple of policy areas and quarters, mixing count metrics
 # (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),
