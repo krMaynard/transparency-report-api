@@ -645,7 +645,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Art. 53(1)(d) · GPAI · 2025 –</span>
     <h1>EU AI Act — Trasparenza dei dati di addestramento dell'IA</h1>
-    <p>L'articolo <strong>53(1)(d)</strong> dell'<strong>EU AI Act</strong> (Reg. (UE) 2024/1689) impone ai fornitori di <em>modelli di IA per finalità generali (GPAI)</em> di pubblicare un <strong>riepilogo pubblico dei contenuti utilizzati per addestrare il modello</strong>, sul modello standardizzato dell'AI Office (in vigore dal <strong>2 ago 2025</strong>). Ogni riepilogo indica, per modalità (Testo / Immagine / Audio / Video), una <strong>dimensione dei dati di addestramento a fasce</strong>, la data di chiusura dell'acquisizione dei dati e indicatori sì/no per categoria di fonte di dati. Non esiste un registro unico dei riepiloghi compilati — ogni fornitore li pubblica autonomamente nel proprio formato — quindi questo è un set di dati <strong>comparabile e tra fornitori</strong> costruito a partire dai riepiloghi archiviati: una riga per campo divulgato, identificata da fornitore × modello × sezione × campo. Le fasce di dimensione grossolane sono mappate su un <code>size_rank</code> numerico (1 / 2 / 3, 0 = &ldquo;non applicabile&rdquo;) affinché le dimensioni siano confrontabili tra fornitori — è un rango ordinale, quindi confrontalo con <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, mai <code>SUM</code>. La copertura è un insieme iniziale ed espandibile (Google + Meta + Microsoft).</p>
+    <p>L'articolo <strong>53(1)(d)</strong> dell'<strong>EU AI Act</strong> (Reg. (UE) 2024/1689) impone ai fornitori di <em>modelli di IA per finalità generali (GPAI)</em> di pubblicare un <strong>riepilogo pubblico dei contenuti utilizzati per addestrare il modello</strong>, sul modello standardizzato dell'AI Office (in vigore dal <strong>2 ago 2025</strong>). Ogni riepilogo indica, per modalità (Testo / Immagine / Audio / Video), una <strong>dimensione dei dati di addestramento a fasce</strong>, la data di chiusura dell'acquisizione dei dati e indicatori sì/no per categoria di fonte di dati. Non esiste un registro unico dei riepiloghi compilati — ogni fornitore li pubblica autonomamente nel proprio formato — quindi questo è un set di dati <strong>comparabile e tra fornitori</strong> costruito a partire dai riepiloghi archiviati: una riga per campo divulgato, identificata da fornitore × modello × sezione × campo. Le fasce di dimensione grossolane sono mappate su un <code>size_rank</code> numerico (1 / 2 / 3, 0 = &ldquo;non applicabile&rdquo;) affinché le dimensioni siano confrontabili tra fornitori — è un rango ordinale, quindi confrontalo con <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, mai <code>SUM</code>. La copertura è un insieme iniziale ed espandibile.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -866,7 +866,10 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         indexAxis: 'y', responsive: true,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
-        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+        // autoSkip off so every bar keeps its model label (Chart.js otherwise
+        // drops every other y tick once there are many models).
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } },
+                  y: { ticks: { autoSkip: false } } },
       },
     });
   }
@@ -965,14 +968,16 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries. Filter values are section/field codes, so the localization
   // generator's prose find/replace can never rewrite them.
   var MODALITIES = ["Text", "Image", "Audio", "Video", "Other"];
-  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["provider","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
   function MOD_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]}]},"group_by":["field","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"max_count":200}; }
 
   function renderCharts(text, mod) {
     if (!text.rows.length) { emptyChart('text-loading'); } else {
-      srTable('chart-text-table', ["Modello", "Rango di dimensione del testo"], text.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      // rows: [provider, model, rank] — label each bar "Fornitore — Modellolo".
+      var tlabel = function (r) { return r[0] + ' — ' + r[1]; };
+      srTable('chart-text-table', ["Fornitore — Modellolo", "Rango di dimensione del testo"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
       hbarChart('chart-text', 'text-loading', 'chart-text-table',
-        text.rows.map(function (r) { return r[0]; }), text.rows.map(function (r) { return r[1]; }));
+        text.rows.map(tlabel), text.rows.map(function (r) { return r[2]; }));
     }
     if (!mod.rows.length) { emptyChart('mod-loading'); } else {
       // Pivot [modality, model, rank]; order the x-axis by the template modality order.

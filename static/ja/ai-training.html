@@ -866,7 +866,10 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         indexAxis: 'y', responsive: true,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
-        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+        // autoSkip off so every bar keeps its model label (Chart.js otherwise
+        // drops every other y tick once there are many models).
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } },
+                  y: { ticks: { autoSkip: false } } },
       },
     });
   }
@@ -965,14 +968,16 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries. Filter values are section/field codes, so the localization
   // generator's prose find/replace can never rewrite them.
   var MODALITIES = ["Text", "Image", "Audio", "Video", "Other"];
-  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["provider","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
   function MOD_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]}]},"group_by":["field","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"max_count":200}; }
 
   function renderCharts(text, mod) {
     if (!text.rows.length) { emptyChart('text-loading'); } else {
-      srTable('chart-text-table', ["モデル", "テキスト規模ランク"], text.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      // rows: [provider, model, rank] — label each bar "プロバイダー — モデル".
+      var tlabel = function (r) { return r[0] + ' — ' + r[1]; };
+      srTable('chart-text-table', ["プロバイダー — モデル", "テキスト規模ランク"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
       hbarChart('chart-text', 'text-loading', 'chart-text-table',
-        text.rows.map(function (r) { return r[0]; }), text.rows.map(function (r) { return r[1]; }));
+        text.rows.map(tlabel), text.rows.map(function (r) { return r[2]; }));
     }
     if (!mod.rows.length) { emptyChart('mod-loading'); } else {
       // Pivot [modality, model, rank]; order the x-axis by the template modality order.

@@ -645,7 +645,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Art. 53(1)(d) · GPAI · 2025 –</span>
     <h1>EU AI Act — AI 학습 데이터 투명성</h1>
-    <p><strong>EU AI Act</strong>(규정 (EU) 2024/1689) 제<strong>53(1)(d)</strong>조는 <em>범용 AI(GPAI) 모델</em> 제공자에게 AI Office의 표준화된 템플릿에 <strong>모델 학습에 사용된 콘텐츠의 공개 요약</strong>을 게시하도록 요구합니다(<strong>2025년 8월 2일</strong> 시행). 각 요약은 모달리티별(텍스트 / 이미지 / 오디오 / 동영상)로 <strong>구간화된 학습 데이터 규모</strong>, 데이터 수집 마감 시점, 그리고 데이터 출처 범주별 예/아니오 플래그를 공개합니다. 작성된 요약을 모은 단일 등록부는 없으며 — 각 제공자가 자체 형식으로 직접 게시합니다 — 따라서 이는 보관된 요약으로 구축한 <strong>제공자 간 비교 가능한</strong> 데이터 세트입니다. 공개된 필드마다 한 행이며, 제공자 × 모델 × 섹션 × 필드로 식별됩니다. 대략적인 규모 구간은 숫자 <code>size_rank</code>(1 / 2 / 3, 0 = &ldquo;해당 없음&rdquo;)에 매핑되어 제공자 간에 규모를 비교할 수 있습니다 — 이는 순서 척도이므로 <code>MIN</code>/<code>MAX</code>/<code>AVG</code>로 비교하고 <code>SUM</code>은 절대 사용하지 마십시오. 적용 범위는 초기의 확장 가능한 집합입니다(Google + Meta + Microsoft).</p>
+    <p><strong>EU AI Act</strong>(규정 (EU) 2024/1689) 제<strong>53(1)(d)</strong>조는 <em>범용 AI(GPAI) 모델</em> 제공자에게 AI Office의 표준화된 템플릿에 <strong>모델 학습에 사용된 콘텐츠의 공개 요약</strong>을 게시하도록 요구합니다(<strong>2025년 8월 2일</strong> 시행). 각 요약은 모달리티별(텍스트 / 이미지 / 오디오 / 동영상)로 <strong>구간화된 학습 데이터 규모</strong>, 데이터 수집 마감 시점, 그리고 데이터 출처 범주별 예/아니오 플래그를 공개합니다. 작성된 요약을 모은 단일 등록부는 없으며 — 각 제공자가 자체 형식으로 직접 게시합니다 — 따라서 이는 보관된 요약으로 구축한 <strong>제공자 간 비교 가능한</strong> 데이터 세트입니다. 공개된 필드마다 한 행이며, 제공자 × 모델 × 섹션 × 필드로 식별됩니다. 대략적인 규모 구간은 숫자 <code>size_rank</code>(1 / 2 / 3, 0 = &ldquo;해당 없음&rdquo;)에 매핑되어 제공자 간에 규모를 비교할 수 있습니다 — 이는 순서 척도이므로 <code>MIN</code>/<code>MAX</code>/<code>AVG</code>로 비교하고 <code>SUM</code>은 절대 사용하지 마십시오. 적용 범위는 초기의 확장 가능한 집합입니다.</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -866,7 +866,10 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         indexAxis: 'y', responsive: true,
         plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
-        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+        // autoSkip off so every bar keeps its model label (Chart.js otherwise
+        // drops every other y tick once there are many models).
+        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } },
+                  y: { ticks: { autoSkip: false } } },
       },
     });
   }
@@ -965,14 +968,16 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries. Filter values are section/field codes, so the localization
   // generator's prose find/replace can never rewrite them.
   var MODALITIES = ["Text", "Image", "Audio", "Video", "Other"];
-  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function TEXT_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]},{"operation":"EQ","field_name":"field","field_values":["Text"]}]},"group_by":["provider","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
   function MOD_Q() { return {"table":"ai_training_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["modality"]}]},"group_by":["field","model"],"aggregates":[{"function":"MAX","field_name":"size_rank","alias":"n"}],"max_count":200}; }
 
   function renderCharts(text, mod) {
     if (!text.rows.length) { emptyChart('text-loading'); } else {
-      srTable('chart-text-table', ["모델", "텍스트 규모 등급"], text.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      // rows: [provider, model, rank] — label each bar "제공자 — 모델".
+      var tlabel = function (r) { return r[0] + ' — ' + r[1]; };
+      srTable('chart-text-table', ["제공자 — 모델", "텍스트 규모 등급"], text.rows.map(function (r) { return [tlabel(r), fmt(r[2])]; }));
       hbarChart('chart-text', 'text-loading', 'chart-text-table',
-        text.rows.map(function (r) { return r[0]; }), text.rows.map(function (r) { return r[1]; }));
+        text.rows.map(tlabel), text.rows.map(function (r) { return r[2]; }));
     }
     if (!mod.rows.length) { emptyChart('mod-loading'); } else {
       // Pivot [modality, model, rank]; order the x-axis by the template modality order.
