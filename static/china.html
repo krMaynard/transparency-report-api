@@ -920,7 +920,7 @@ display: flex; align-items: center; justify-content: space-between;
     var head = '<th scope="col">' + esc(rowLabel) + '</th>'
       + colLabels.map(function (h) { return '<th scope="col" class="num">' + esc(h) + '</th>'; }).join('');
     var body = order.map(function (k) {
-      return '<tr><th scope="row" data-label="' + esc(rowLabel) + '">' + esc(k) + '</th>'
+      return '<tr><td data-label="' + esc(rowLabel) + '">' + esc(k) + '</td>'
         + cols.map(function (c, i) {
             var v = byKey[k][c];
             return '<td class="num" data-label="' + esc(colLabels[i]) + '">' + (v == null ? '&mdash;' : fmt(v)) + '</td>';
@@ -935,7 +935,7 @@ display: flex; align-items: center; justify-content: space-between;
   // generator's prose find/replace can't rewrite them.
   var BODY_LABELS = { "central_center": "Central center", "local_departments": "Local departments", "platforms": "Website platforms" };
   function TOTAL_Q() { return {"table":"ciirc_metrics","query":{"and":[{"operation":"EQ","field_name":"category","field_values":["national_total"]}]},"fields":["period","value"],"sort":[{"field_name":"period","order":"asc"}],"max_count":400}; }
-  function BODY_Q() { return {"table":"ciirc_metrics","query":{"and":[{"operation":"IN","field_name":"category","field_values":["central_center","local_departments","platforms"]}]},"fields":["period","category","value"],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
+  function BODY_Q() { return {"table":"ciirc_metrics","query":{"and":[{"operation":"IN","field_name":"category","field_values":["central_center","local_departments","platforms"]}]},"fields":["period","category","value"],"sort":[{"field_name":"period","order":"asc"}],"max_count":2000}; }
 
   function renderCharts(total, body) {
     if (!total.rows.length) { emptyChart('total-loading'); } else {
@@ -954,7 +954,7 @@ display: flex; align-items: center; justify-content: space-between;
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
     try {
-      var d = await explore({"table":"ciirc_metrics","fields":["period","category","value"],"sort":[{"field_name":"period","order":"asc"}],"max_count":600});
+      var d = await explore({"table":"ciirc_metrics","fields":["period","category","value"],"sort":[{"field_name":"period","order":"asc"}],"max_count":2000});
       pivotTable('bodyTable', d.rows || [], "Month",
         ["national_total", "central_center", "local_departments", "platforms", "commercial_platforms"],
         ["National total", "Central center", "Local departments", "Website platforms", "Commercial platforms"],
