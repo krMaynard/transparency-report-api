@@ -2706,7 +2706,6 @@ _LOCALIZED_PAGES: dict[str, tuple[str, str, dict[str, list[str]]]] = {
     "taiwan": ("taiwan.html", "Taiwan anti-fraud page", {}),
     "turkey": ("turkey.html", "Turkey Law 5651 page", {}),
     "cser": ("cser.html", "Meta CSER page", {}),
-    "singapore": ("singapore.html", "Singapore online safety page", {}),
     "japan": ("japan.html", "Japan info-platform page", {}),
     "tiktok-cger": ("tiktok-cger.html", "TikTok CGER page", {}),
     "user-data": ("user-data.html", "Google user data page", {}),
