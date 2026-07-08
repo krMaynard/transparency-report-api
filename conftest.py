@@ -303,6 +303,22 @@ _REGIONAL_FIXTURE = {
 }
 seed.build_regional_db(_REGIONAL_FIXTURE, _DB)
 
+# A small slice of the China CIIRC dataset (china-ciirc.json shape): two months of
+# the receiving-body breakdown (national_total = central + local + platforms).
+_CIIRC_FIXTURE = {
+    "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["CAC-CIIRC", "2025-01", "reports_received", "national_total", "reports_received", "count", 16916000],
+        ["CAC-CIIRC", "2025-01", "reports_received", "central_center", "reports_received", "count", 361000],
+        ["CAC-CIIRC", "2025-01", "reports_received", "local_departments", "reports_received", "count", 784000],
+        ["CAC-CIIRC", "2025-01", "reports_received", "platforms", "reports_received", "count", 15771000],
+        ["CAC-CIIRC", "2025-01", "reports_received", "commercial_platforms", "reports_received", "count", 14647000],
+        ["CAC-CIIRC", "2026-05", "reports_received", "national_total", "reports_received", "count", 17994000],
+        ["CAC-CIIRC", "2026-05", "reports_received", "platforms", "reports_received", "count", 16901000],
+    ],
+}
+seed.build_ciirc_db(_CIIRC_FIXTURE, _DB)
+
 # A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
 # Instagram, a couple of policy areas and quarters, mixing count metrics
 # (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),

@@ -3519,6 +3519,56 @@ class TestRegionalTable:
         assert r.status_code == 200 and "regional_metrics" in r.text
 
 
+class TestCiircTable:
+    def test_ciirc_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "ciirc_metrics" in names
+
+    def test_ciirc_fields_endpoint(self):
+        body = client.get("/api/fields?table=ciirc_metrics", headers=MOMO).json()
+        assert {"publisher", "period", "section", "category", "metric",
+                "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_ciirc_national_total(self):
+        # The Jan-2025 national total = 16.916M reports (fixture).
+        r = client.post("/api/explore", json={
+            "table": "ciirc_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "category", "field_values": ["national_total"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2025-01"]},
+            ]},
+            "fields": ["value"],
+        })
+        assert r.status_code == 200
+        assert r.json()["rows"][0][0] == 16916000
+
+    def test_ciirc_total_reconciles(self):
+        # national_total == central + local + platforms for a full month.
+        rows = client.post("/api/explore", json={
+            "table": "ciirc_metrics",
+            "query": {"and": [{"operation": "EQ", "field_name": "period",
+                               "field_values": ["2025-01"]}]},
+            "fields": ["category", "value"],
+        }).json()["rows"]
+        v = {c: val for c, val in rows}
+        assert v["central_center"] + v["local_departments"] + v["platforms"] == v["national_total"]
+
+    def test_ciirc_unpinned_sum_warns(self):
+        # national_total sums the bodies and commercial ⊂ platforms — summing
+        # categories double-counts, so an unpinned SUM warns.
+        r = client.post("/api/explore", json={
+            "table": "ciirc_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert "category" in " ".join(r.json().get("warnings", []))
+
+    def test_ciirc_page_served(self):
+        r = client.get("/china")
+        assert r.status_code == 200 and "ciirc_metrics" in r.text
+
+
 class TestCserTable:
     def test_cser_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
