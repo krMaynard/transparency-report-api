@@ -37,7 +37,7 @@ PAGES_FILES = ["home.html", "index.html", "removals.html", "catalog.html", "ny-t
                "tiktok-cger.html", "singapore.html",
                "user-data.html", "microsoft.html", "linkedin.html", "tiktok.html", "discord.html",
                "disruptions.html", "android.html", "narratives.html",
-               "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html"]
+               "mcp.html", "methodology.html", "schema.html", "api-key.html", "privacy.html", "mandates.html", "korea-network-act.html", "regional.html", "ai-training.html", "tco.html", "china.html"]
 # page file -> path suffix (home is the locale root, "")
 SUFFIX = {
     "home.html": "",
@@ -70,6 +70,12 @@ SUFFIX = {
     "schema.html": "schema",
     "api-key.html": "api-key",
     "privacy.html": "privacy",
+    "mandates.html": "mandates",
+    "korea-network-act.html": "korea-network-act",
+    "regional.html": "regional",
+    "ai-training.html": "ai-training",
+    "tco.html": "tco",
+    "china.html": "china",
 }
 
 # Order of languages shown in every switcher; values are autonyms (each language
@@ -125,7 +131,7 @@ def build_switcher(active: str, suffix: str) -> str:
 # Internal links that gain the locale prefix on translated pages. The JSON API
 # (/api, /api/*), Swagger (/docs), anchors (#main) and external URLs stay as-is.
 INTERNAL_HREFS = ['/', '/reports', '/removals', '/catalog', '/ny-tos', '/ca-ab587', '/apple', '/github', '/snap',
-                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/japan', '/tiktok-cger', '/singapore', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy']
+                  '/india', '/korea', '/taiwan', '/turkey', '/cser', '/japan', '/tiktok-cger', '/singapore', '/user-data', '/microsoft', '/linkedin', '/tiktok', '/discord', '/disruptions', '/android', '/narratives', '/mcp', '/methodology', '/schema', '/api-key', '/privacy', '/mandates', '/korea-network-act', '/regional', '/ai-training', '/tco', '/china']
 
 
 def prefix_links(text: str, locale: str) -> str:
@@ -12504,6 +12510,1749 @@ for _loc in _NEW_PAGE_LOCALES:
                     and not any(_o in _f for _f in _SG_FILTERS):
                 PAGES[_loc]["singapore.html"].append((_o, _n))
                 _sg_own.add(_o)
+
+
+# -- china full page localization --
+
+_CHINA_NAV = {
+    "es": 'CIIRC de China',
+    "fr": 'CIIRC (Chine)',
+    "de": 'China CIIRC',
+    "it": 'CIIRC Cina',
+    "ja": '中国 CIIRC',
+    "zh": '中国 12377',
+    "ko": '중국 CIIRC',
+}
+for _loc in _CHINA_NAV:
+    COMMON[_loc].append(("      China CIIRC\n    </a>", f"      {_CHINA_NAV[_loc]}\n    </a>"))
+_CHINA_PAGE = {
+    # ── <title> (inner text; keep "Transparency Report API", CIIRC, 12377) ──
+    "China CIIRC (12377) online-report statistics — Transparency Report API": {
+        "es": "Estadísticas de denuncias en línea de CIIRC (12377) de China — Transparency Report API",
+        "fr": "Statistiques des signalements en ligne du CIIRC (12377) de Chine — Transparency Report API",
+        "de": "China CIIRC (12377) Online-Meldungsstatistik — Transparency Report API",
+        "it": "Statistiche delle segnalazioni online del CIIRC (12377) della Cina — Transparency Report API",
+        "ja": "中国 CIIRC(12377)オンライン通報統計 — Transparency Report API",
+        "zh": "中国 CIIRC(12377)网络举报统计 — Transparency Report API",
+        "ko": "중국 CIIRC(12377) 온라인 신고 통계 — Transparency Report API",
+    },
+
+    # ── <meta name="description"> value (keep CAC, CIIRC, 12377) ──
+    "China CAC / CIIRC (12377) monthly statistics on public reports of illegal and harmful online information handled, by receiving body (2019–).": {
+        "es": "Estadísticas mensuales de CAC / CIIRC (12377) de China sobre las denuncias públicas de información en línea ilegal y nociva tramitadas, por organismo receptor (2019–).",
+        "fr": "Statistiques mensuelles du CAC / CIIRC (12377) de Chine sur les signalements publics d'informations en ligne illégales et préjudiciables traités, par organisme récepteur (2019–).",
+        "de": "Monatliche Statistik des chinesischen CAC / CIIRC (12377) zu bearbeiteten öffentlichen Meldungen illegaler und schädlicher Online-Informationen, nach empfangender Stelle (2019–).",
+        "it": "Statistiche mensili del CAC / CIIRC (12377) della Cina sulle segnalazioni pubbliche di informazioni online illegali e dannose gestite, per organismo ricevente (2019–).",
+        "ja": "中国 CAC / CIIRC(12377)による、処理された違法・有害なオンライン情報に関する市民からの通報の月次統計。受理機関別(2019年〜)。",
+        "zh": "中国 CAC / CIIRC(12377)关于已处理的违法和不良网络信息公众举报的月度统计，按受理机构划分（2019年至今）。",
+        "ko": "처리된 불법·유해 온라인 정보에 대한 시민 신고의 중국 CAC / CIIRC(12377) 월별 통계, 접수 기관별(2019년~).",
+    },
+
+    # ── badge (only "Monthly" changes; keep CAC, 12377, 2019 –) ──
+    "CAC · 12377 · Monthly · 2019 –": {
+        "es": "CAC · 12377 · Mensual · 2019 –",
+        "fr": "CAC · 12377 · Mensuel · 2019 –",
+        "de": "CAC · 12377 · Monatlich · 2019 –",
+        "it": "CAC · 12377 · Mensile · 2019 –",
+        "ja": "CAC · 12377 · 月次 · 2019 –",
+        "zh": "CAC · 12377 · 月度 · 2019 –",
+        "ko": "CAC · 12377 · 월간 · 2019 –",
+    },
+
+    # ── <h1> (wrapped in tags to disambiguate from <title>) ──
+    "<h1>China — CIIRC online-report statistics</h1>": {
+        "es": "<h1>China — Estadísticas de denuncias en línea de CIIRC</h1>",
+        "fr": "<h1>Chine — Statistiques des signalements en ligne du CIIRC</h1>",
+        "de": "<h1>China — CIIRC Online-Meldungsstatistik</h1>",
+        "it": "<h1>Cina — Statistiche delle segnalazioni online del CIIRC</h1>",
+        "ja": "<h1>中国 — CIIRC オンライン通報統計</h1>",
+        "zh": "<h1>中国 — CIIRC 网络举报统计</h1>",
+        "ko": "<h1>중국 — CIIRC 온라인 신고 통계</h1>",
+    },
+
+    # ── intro <p> (keep <strong>/<em>/<code> tags, &hellip;/&mdash; entities,
+    #     the Chinese org name 中央网信办违法和不良信息举报中心, 万, CAC, 12377,
+    #     and the <code> filter tokens verbatim) ──
+    "The Central Cyberspace Administration of China (<strong>CAC</strong>) <strong>Illegal and Harmful Information Reporting Center</strong> (中央网信办违法和不良信息举报中心 — the national <strong>12377</strong> hotline) publishes a monthly bulletin on how many public reports of illegal / harmful online information (obscenity, gambling, infringement, rumors&hellip;) were handled that month, split by receiving body: the <strong>central</strong> reporting center, the <strong>local</strong> (provincial) cyberspace-office departments, and the major national <strong>website platforms</strong> (their sum is the national total). Coarse aggregate <em>volumes</em> only &mdash; China discloses no per-platform or per-category breakdown &mdash; but a genuine monthly series since Oct 2019. Figures are published in 万 (ten-thousands) and stored here as absolute counts. Pin a <code>category</code> before aggregating: <code>national_total</code> already sums the three bodies and <code>commercial_platforms</code> is a subset of <code>platforms</code>.": {
+        "es": "El <strong>Centro de Denuncias de Información Ilegal y Nociva</strong> de la Administración del Ciberespacio de China (<strong>CAC</strong>) (中央网信办违法和不良信息举报中心 — la línea directa nacional <strong>12377</strong>) publica un boletín mensual sobre cuántas denuncias públicas de información en línea ilegal / nociva (obscenidad, juego, infracciones, rumores&hellip;) se tramitaron ese mes, desglosadas por organismo receptor: el centro de denuncias <strong>central</strong>, los departamentos <strong>locales</strong> (provinciales) de las oficinas del ciberespacio y las principales <strong>plataformas web</strong> nacionales (su suma es el total nacional). Solo <em>volúmenes</em> agregados generales &mdash; China no divulga ningún desglose por plataforma o por categoría &mdash; pero una serie mensual genuina desde octubre de 2019. Las cifras se publican en 万 (decenas de miles) y aquí se almacenan como recuentos absolutos. Fija una <code>category</code> antes de agregar: <code>national_total</code> ya suma los tres organismos y <code>commercial_platforms</code> es un subconjunto de <code>platforms</code>.",
+        "fr": "Le <strong>Centre de signalement des informations illégales et préjudiciables</strong> de l'Administration du cyberespace de Chine (<strong>CAC</strong>) (中央网信办违法和不良信息举报中心 — la ligne d'assistance nationale <strong>12377</strong>) publie un bulletin mensuel indiquant combien de signalements publics d'informations en ligne illégales / préjudiciables (obscénité, jeux d'argent, contrefaçon, rumeurs&hellip;) ont été traités ce mois-là, ventilés par organisme récepteur : le centre de signalement <strong>central</strong>, les services <strong>locaux</strong> (provinciaux) des bureaux du cyberespace et les principales <strong>plateformes web</strong> nationales (leur somme constitue le total national). Uniquement des <em>volumes</em> agrégés grossiers &mdash; la Chine ne divulgue aucune ventilation par plateforme ou par catégorie &mdash; mais une véritable série mensuelle depuis octobre 2019. Les chiffres sont publiés en 万 (dizaines de milliers) et stockés ici en valeurs absolues. Fixez une <code>category</code> avant d'agréger : <code>national_total</code> additionne déjà les trois organismes et <code>commercial_platforms</code> est un sous-ensemble de <code>platforms</code>.",
+        "de": "Das <strong>Meldezentrum für illegale und schädliche Informationen</strong> der Cyberspace Administration of China (<strong>CAC</strong>) (中央网信办违法和不良信息举报中心 — die nationale <strong>12377</strong>-Hotline) veröffentlicht ein monatliches Bulletin darüber, wie viele öffentliche Meldungen illegaler / schädlicher Online-Informationen (Obszönität, Glücksspiel, Rechtsverletzungen, Gerüchte&hellip;) in diesem Monat bearbeitet wurden, aufgeschlüsselt nach empfangender Stelle: das <strong>zentrale</strong> Meldezentrum, die <strong>lokalen</strong> (provinziellen) Abteilungen der Cyberspace-Büros und die großen nationalen <strong>Website-Plattformen</strong> (ihre Summe ergibt den nationalen Gesamtwert). Nur grobe aggregierte <em>Mengen</em> &mdash; China veröffentlicht keine Aufschlüsselung nach Plattform oder Kategorie &mdash; aber eine echte monatliche Reihe seit Oktober 2019. Die Zahlen werden in 万 (Zehntausenden) veröffentlicht und hier als absolute Werte gespeichert. Fixieren Sie eine <code>category</code> vor dem Aggregieren: <code>national_total</code> summiert bereits die drei Stellen und <code>commercial_platforms</code> ist eine Teilmenge von <code>platforms</code>.",
+        "it": "Il <strong>Centro di segnalazione delle informazioni illegali e dannose</strong> dell'Amministrazione del cyberspazio della Cina (<strong>CAC</strong>) (中央网信办违法和不良信息举报中心 — la linea diretta nazionale <strong>12377</strong>) pubblica un bollettino mensile su quante segnalazioni pubbliche di informazioni online illegali / dannose (oscenità, gioco d'azzardo, violazioni, dicerie&hellip;) sono state gestite quel mese, suddivise per organismo ricevente: il centro di segnalazione <strong>centrale</strong>, i dipartimenti <strong>locali</strong> (provinciali) degli uffici del cyberspazio e le principali <strong>piattaforme web</strong> nazionali (la loro somma è il totale nazionale). Solo <em>volumi</em> aggregati approssimativi &mdash; la Cina non divulga alcuna suddivisione per piattaforma o per categoria &mdash; ma una vera serie mensile da ottobre 2019. Le cifre sono pubblicate in 万 (decine di migliaia) e qui memorizzate come conteggi assoluti. Fissa una <code>category</code> prima di aggregare: <code>national_total</code> somma già i tre organismi e <code>commercial_platforms</code> è un sottoinsieme di <code>platforms</code>.",
+        "ja": "中国サイバースペース管理局(<strong>CAC</strong>)の<strong>違法・不良情報通報センター</strong>（中央网信办违法和不良信息举报中心 — 全国共通の<strong>12377</strong>ホットライン）は、違法・有害なオンライン情報（わいせつ、賭博、権利侵害、デマ&hellip;）に関する市民からの通報がその月に何件処理されたかを、受理機関別に示す月次報告を公表しています。内訳は、<strong>中央</strong>の通報センター、<strong>地方</strong>（省）のサイバースペース管理部門、そして主要な全国の<strong>ウェブサイト・プラットフォーム</strong>（これらの合計が全国総数）です。粗い集計<em>件数</em>のみ &mdash; 中国はプラットフォーム別・カテゴリ別の内訳を一切公表していません &mdash; が、2019年10月以降の本物の月次系列です。数値は 万（万＝1万）単位で公表され、ここでは絶対数として格納されています。集計の前に <code>category</code> を固定してください。<code>national_total</code> はすでに3つの機関を合計しており、<code>commercial_platforms</code> は <code>platforms</code> の一部です。",
+        "zh": "中国国家互联网信息办公室（<strong>CAC</strong>）<strong>违法和不良信息举报中心</strong>（中央网信办违法和不良信息举报中心 — 全国统一的 <strong>12377</strong> 热线）发布月度通报，说明当月处理了多少件公众对违法/不良网络信息（淫秽、赌博、侵权、谣言&hellip;）的举报，按受理机构划分：<strong>中央</strong>举报中心、<strong>地方</strong>（省级）网信部门以及主要的全国性<strong>网站平台</strong>（三者之和即为全国总数）。仅为粗略的汇总<em>数量</em> &mdash; 中国不披露任何按平台或按类别的细分 &mdash; 但自 2019 年 10 月以来是真实的月度序列。数据以 万 为单位发布，此处存储为绝对计数。汇总前请固定 <code>category</code>：<code>national_total</code> 已经汇总了这三个机构，<code>commercial_platforms</code> 是 <code>platforms</code> 的子集。",
+        "ko": "중국 국가인터넷정보판공실(<strong>CAC</strong>)의 <strong>불법·유해 정보 신고 센터</strong>(中央网信办违法和不良信息举报中心 — 전국 공통 <strong>12377</strong> 핫라인)는 그달에 불법·유해 온라인 정보(음란물, 도박, 권리 침해, 유언비어&hellip;)에 대한 시민 신고가 몇 건 처리되었는지를 접수 기관별로 나눈 월간 보고를 발표합니다. 구분은 <strong>중앙</strong> 신고 센터, <strong>지방</strong>(성급) 사이버공간 관리 부서, 그리고 주요 전국 <strong>웹사이트 플랫폼</strong>(이 셋의 합이 전국 총계)입니다. 대략적인 집계 <em>건수</em>만 제공됩니다 &mdash; 중국은 플랫폼별·카테고리별 세부 내역을 전혀 공개하지 않습니다 &mdash; 그러나 2019년 10월 이후의 실제 월간 시계열입니다. 수치는 万(만) 단위로 발표되며 여기서는 절대 건수로 저장됩니다. 집계 전에 <code>category</code>를 고정하세요: <code>national_total</code>은 이미 세 기관을 합산하며 <code>commercial_platforms</code>는 <code>platforms</code>의 부분집합입니다.",
+    },
+
+    # ── Charts section <h2>Trends</h2> ──
+    "<h2>Trends</h2>": {
+        "es": "<h2>Tendencias</h2>",
+        "fr": "<h2>Tendances</h2>",
+        "de": "<h2>Trends</h2>",
+        "it": "<h2>Tendenze</h2>",
+        "ja": "<h2>トレンド</h2>",
+        "zh": "<h2>趋势</h2>",
+        "ko": "<h2>트렌드</h2>",
+    },
+
+    # ── Charts section <p class="sub"> ──
+    "Interactive views of the reported figures. Each chart has a text alternative for screen readers.": {
+        "es": "Vistas interactivas de las cifras notificadas. Cada gráfico tiene una alternativa de texto para lectores de pantalla.",
+        "fr": "Vues interactives des chiffres déclarés. Chaque graphique dispose d'une alternative textuelle pour les lecteurs d'écran.",
+        "de": "Interaktive Ansichten der gemeldeten Zahlen. Jedes Diagramm hat eine Textalternative für Screenreader.",
+        "it": "Viste interattive delle cifre dichiarate. Ogni grafico ha un'alternativa testuale per gli screen reader.",
+        "ja": "報告された数値のインタラクティブ表示。各グラフにはスクリーンリーダー向けのテキスト代替があります。",
+        "zh": "报告数据的交互式视图。每个图表都有面向屏幕阅读器的文字替代。",
+        "ko": "보고된 수치의 인터랙티브 보기입니다. 각 차트에는 스크린 리더용 텍스트 대체가 제공됩니다.",
+    },
+
+    # ── Chart card 1 <h3> (wrapped in tags) ──
+    "<h3>Reports handled nationally, by month</h3>": {
+        "es": "<h3>Denuncias tramitadas a nivel nacional, por mes</h3>",
+        "fr": "<h3>Signalements traités au niveau national, par mois</h3>",
+        "de": "<h3>Bundesweit bearbeitete Meldungen, nach Monat</h3>",
+        "it": "<h3>Segnalazioni gestite a livello nazionale, per mese</h3>",
+        "ja": "<h3>全国で処理された通報件数（月別）</h3>",
+        "zh": "<h3>全国处理的举报量（按月）</h3>",
+        "ko": "<h3>전국에서 처리된 신고, 월별</h3>",
+    },
+
+    # ── Chart card 1 <p class="chart-sub"> ──
+    "The national total of illegal / harmful-information reports the CAC reporting center, local departments and major platforms handled each month.": {
+        "es": "El total nacional de denuncias de información ilegal / nociva que el centro de denuncias de la CAC, los departamentos locales y las principales plataformas tramitaron cada mes.",
+        "fr": "Le total national des signalements d'informations illégales / préjudiciables que le centre de signalement du CAC, les services locaux et les principales plateformes ont traités chaque mois.",
+        "de": "Der nationale Gesamtwert der Meldungen illegaler / schädlicher Informationen, die das CAC-Meldezentrum, die lokalen Abteilungen und die großen Plattformen jeden Monat bearbeitet haben.",
+        "it": "Il totale nazionale delle segnalazioni di informazioni illegali / dannose che il centro di segnalazione del CAC, i dipartimenti locali e le principali piattaforme hanno gestito ogni mese.",
+        "ja": "CAC の通報センター、地方部門、主要プラットフォームが毎月処理した、違法・有害情報の通報の全国総数。",
+        "zh": "CAC 举报中心、地方部门和主要平台每月处理的违法/不良信息举报的全国总数。",
+        "ko": "CAC 신고 센터, 지방 부서, 주요 플랫폼이 매월 처리한 불법·유해 정보 신고의 전국 총계.",
+    },
+
+    # ── Chart card 2 <h3> (wrapped in tags — superset-string safety) ──
+    "<h3>Reports handled, by receiving body</h3>": {
+        "es": "<h3>Denuncias tramitadas, por organismo receptor</h3>",
+        "fr": "<h3>Signalements traités, par organisme récepteur</h3>",
+        "de": "<h3>Bearbeitete Meldungen, nach empfangender Stelle</h3>",
+        "it": "<h3>Segnalazioni gestite, per organismo ricevente</h3>",
+        "ja": "<h3>処理された通報件数（受理機関別）</h3>",
+        "zh": "<h3>处理的举报量（按受理机构）</h3>",
+        "ko": "<h3>처리된 신고, 접수 기관별</h3>",
+    },
+
+    # ── Chart card 2 <p class="chart-sub"> ──
+    "The central reporting center vs. local departments vs. major website platforms, per month. Platforms handle the overwhelming majority (the three sum to the national total).": {
+        "es": "El centro de denuncias central frente a los departamentos locales frente a las principales plataformas web, por mes. Las plataformas tramitan la inmensa mayoría (los tres suman el total nacional).",
+        "fr": "Le centre de signalement central par rapport aux services locaux et aux principales plateformes web, par mois. Les plateformes traitent l'écrasante majorité (les trois totalisent le total national).",
+        "de": "Das zentrale Meldezentrum vs. lokale Abteilungen vs. große Website-Plattformen, pro Monat. Die Plattformen bearbeiten die überwältigende Mehrheit (die drei ergeben zusammen den nationalen Gesamtwert).",
+        "it": "Il centro di segnalazione centrale rispetto ai dipartimenti locali e alle principali piattaforme web, per mese. Le piattaforme gestiscono la stragrande maggioranza (i tre insieme danno il totale nazionale).",
+        "ja": "中央の通報センター、地方部門、主要ウェブサイト・プラットフォームの月別比較。プラットフォームが圧倒的多数を処理します（3つの合計が全国総数）。",
+        "zh": "中央举报中心、地方部门与主要网站平台的逐月对比。平台处理了绝大多数（三者之和即为全国总数）。",
+        "ko": "중앙 신고 센터 대 지방 부서 대 주요 웹사이트 플랫폼의 월별 비교. 플랫폼이 압도적 다수를 처리합니다(셋의 합이 전국 총계).",
+    },
+
+    # ── Data section <h2> (wrapped in tags) ──
+    "<h2>Reports handled, by receiving body and month</h2>": {
+        "es": "<h2>Denuncias tramitadas, por organismo receptor y mes</h2>",
+        "fr": "<h2>Signalements traités, par organisme récepteur et par mois</h2>",
+        "de": "<h2>Bearbeitete Meldungen, nach empfangender Stelle und Monat</h2>",
+        "it": "<h2>Segnalazioni gestite, per organismo ricevente e mese</h2>",
+        "ja": "<h2>処理された通報件数（受理機関・月別）</h2>",
+        "zh": "<h2>处理的举报量（按受理机构和月份）</h2>",
+        "ko": "<h2>처리된 신고, 접수 기관 및 월별</h2>",
+    },
+
+    # ── Data section <p class="sub"> (keep 万) ──
+    "The monthly figures the CAC reporting center publishes: the national total and its split across the central center, local departments, and the major website platforms. Absolute report counts (the bulletins publish these in 万 / ten-thousands).": {
+        "es": "Las cifras mensuales que publica el centro de denuncias de la CAC: el total nacional y su desglose entre el centro central, los departamentos locales y las principales plataformas web. Recuentos absolutos de denuncias (los boletines los publican en 万 / decenas de miles).",
+        "fr": "Les chiffres mensuels publiés par le centre de signalement du CAC : le total national et sa répartition entre le centre central, les services locaux et les principales plateformes web. Nombres absolus de signalements (les bulletins les publient en 万 / dizaines de milliers).",
+        "de": "Die monatlichen Zahlen, die das CAC-Meldezentrum veröffentlicht: der nationale Gesamtwert und seine Aufteilung auf das zentrale Zentrum, die lokalen Abteilungen und die großen Website-Plattformen. Absolute Meldungszahlen (die Bulletins veröffentlichen diese in 万 / Zehntausenden).",
+        "it": "Le cifre mensili pubblicate dal centro di segnalazione del CAC: il totale nazionale e la sua ripartizione tra il centro centrale, i dipartimenti locali e le principali piattaforme web. Conteggi assoluti delle segnalazioni (i bollettini le pubblicano in 万 / decine di migliaia).",
+        "ja": "CAC の通報センターが公表する月次の数値：全国総数と、その中央センター・地方部門・主要ウェブサイト・プラットフォームへの内訳。通報の絶対数（各報告は 万 単位で公表）。",
+        "zh": "CAC 举报中心发布的月度数据：全国总数及其在中央中心、地方部门和主要网站平台之间的划分。举报的绝对计数（通报以 万 为单位发布）。",
+        "ko": "CAC 신고 센터가 발표하는 월간 수치: 전국 총계와 중앙 센터, 지방 부서, 주요 웹사이트 플랫폼으로의 분할. 신고의 절대 건수(통보는 万 / 만 단위로 발표).",
+    },
+
+    # ── static loading placeholders (>Loading…</div>, 3 occurrences) ──
+    "Loading…": {
+        "es": "Cargando…",
+        "fr": "Chargement…",
+        "de": "Wird geladen…",
+        "it": "Caricamento…",
+        "ja": "読み込み中…",
+        "zh": "加载中…",
+        "ko": "불러오는 중…",
+    },
+
+    # ── JS empty-state string (renderTable / pivotTable / emptyChart) ──
+    "No data available.": {
+        "es": "No hay datos disponibles.",
+        "fr": "Aucune donnée disponible.",
+        "de": "Keine Daten verfügbar.",
+        "it": "Nessun dato disponibile.",
+        "ja": "利用可能なデータがありません。",
+        "zh": "暂无可用数据。",
+        "ko": "사용 가능한 데이터가 없습니다.",
+    },
+
+    # ── JS series/column display labels (keys quoted so a bare-word replace
+    #     can't hit prose; these are double-quoted JS literals) ──
+    '"Central center"': {
+        "es": '"Centro central"',
+        "fr": '"Centre central"',
+        "de": '"Zentrales Zentrum"',
+        "it": '"Centro centrale"',
+        "ja": '"中央センター"',
+        "zh": '"中央中心"',
+        "ko": '"중앙 센터"',
+    },
+    '"Local departments"': {
+        "es": '"Departamentos locales"',
+        "fr": '"Services locaux"',
+        "de": '"Lokale Abteilungen"',
+        "it": '"Dipartimenti locali"',
+        "ja": '"地方部門"',
+        "zh": '"地方部门"',
+        "ko": '"지방 부서"',
+    },
+    '"Website platforms"': {
+        "es": '"Plataformas web"',
+        "fr": '"Plateformes web"',
+        "de": '"Website-Plattformen"',
+        "it": '"Piattaforme web"',
+        "ja": '"ウェブサイト・プラットフォーム"',
+        "zh": '"网站平台"',
+        "ko": '"웹사이트 플랫폼"',
+    },
+    '"National total"': {
+        "es": '"Total nacional"',
+        "fr": '"Total national"',
+        "de": '"Nationaler Gesamtwert"',
+        "it": '"Totale nazionale"',
+        "ja": '"全国総数"',
+        "zh": '"全国总数"',
+        "ko": '"전국 총계"',
+    },
+    '"Commercial platforms"': {
+        "es": '"Plataformas comerciales"',
+        "fr": '"Plateformes commerciales"',
+        "de": '"Kommerzielle Plattformen"',
+        "it": '"Piattaforme commerciali"',
+        "ja": '"商用プラットフォーム"',
+        "zh": '"商业平台"',
+        "ko": '"상업 플랫폼"',
+    },
+    '"Month"': {
+        "es": '"Mes"',
+        "fr": '"Mois"',
+        "de": '"Monat"',
+        "it": '"Mese"',
+        "ja": '"月"',
+        "zh": '"月份"',
+        "ko": '"월"',
+    },
+    '"Reports handled"': {
+        "es": '"Denuncias tramitadas"',
+        "fr": '"Signalements traités"',
+        "de": '"Bearbeitete Meldungen"',
+        "it": '"Segnalazioni gestite"',
+        "ja": '"処理された通報件数"',
+        "zh": '"处理的举报量"',
+        "ko": '"처리된 신고"',
+    },
+
+    # ── pivotTable caption arg (double-quoted JS literal) ──
+    "Reports of illegal / harmful online information handled, by receiving body and month.": {
+        "es": "Denuncias de información en línea ilegal / nociva tramitadas, por organismo receptor y mes.",
+        "fr": "Signalements d'informations en ligne illégales / préjudiciables traités, par organisme récepteur et par mois.",
+        "de": "Bearbeitete Meldungen illegaler / schädlicher Online-Informationen, nach empfangender Stelle und Monat.",
+        "it": "Segnalazioni di informazioni online illegali / dannose gestite, per organismo ricevente e mese.",
+        "ja": "処理された、違法・有害なオンライン情報の通報（受理機関・月別）。",
+        "zh": "已处理的违法/不良网络信息举报，按受理机构和月份。",
+        "ko": "처리된 불법·유해 온라인 정보 신고, 접수 기관 및 월별.",
+    },
+
+    # ── showError message prefix (trailing "err.message" concatenation) ──
+    "Failed to load the monthly figures: ": {
+        "es": "No se pudieron cargar las cifras mensuales: ",
+        "fr": "Échec du chargement des chiffres mensuels : ",
+        "de": "Die monatlichen Zahlen konnten nicht geladen werden: ",
+        "it": "Impossibile caricare le cifre mensili: ",
+        "ja": "月次の数値を読み込めませんでした: ",
+        "zh": "无法加载月度数据：",
+        "ko": "월간 수치를 불러오지 못했습니다: ",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    PAGES[_loc]["china.html"] = [(_en, _tr[_loc]) for _en, _tr in _CHINA_PAGE.items()]
+    _pt = open(os.path.join(STATIC, "china.html"), encoding="utf-8").read()
+    _own = {_o for _o, _ in PAGES[_loc]["china.html"]}
+    for _src in ("singapore.html", "cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _pt and _o not in _own:
+                PAGES[_loc]["china.html"].append((_o, _n))
+                _own.add(_o)
+
+
+# -- tco full page localization --
+
+_TCO_NAV = {
+    "es": 'TCO de la UE',
+    "fr": 'TCO (UE)',
+    "de": 'EU-TCO',
+    "it": 'TCO UE',
+    "ja": 'EU TCO規則',
+    "zh": '欧盟 TCO',
+    "ko": 'EU TCO',
+}
+for _loc in _TCO_NAV:
+    COMMON[_loc].append(("      EU TCO\n    </a>", f"      {_TCO_NAV[_loc]}\n    </a>"))
+_TCO_PAGE = {
+    # ── <title> ──────────────────────────────────────────────────────────────
+    "EU Terrorist Content Online Regulation — Transparency Report API": {
+        "es": "Reglamento de la UE sobre contenido terrorista en línea — Transparency Report API",
+        "fr": "Règlement de l'UE relatif aux contenus à caractère terroriste en ligne — Transparency Report API",
+        "de": "EU-Verordnung zu terroristischen Online-Inhalten — Transparency Report API",
+        "it": "Regolamento UE sui contenuti terroristici online — Transparency Report API",
+        "ja": "EUテロコンテンツオンライン規則 — Transparency Report API",
+        "zh": "欧盟在线恐怖主义内容条例 — Transparency Report API",
+        "ko": "EU 온라인 테러 콘텐츠 규정 — Transparency Report API",
+    },
+    # ── <meta name="description"> ────────────────────────────────────────────
+    "EU Terrorist Content Online Regulation (2021/784) transparency data — per-Member-State removal orders issued (Art. 8 / European Commission) and platforms' Art. 7 enforcement figures.": {
+        "es": "Datos de transparencia del Reglamento de la UE sobre contenido terrorista en línea (2021/784) — órdenes de retirada emitidas por Estado miembro (Art. 8 / Comisión Europea) y cifras de aplicación del Art. 7 de las plataformas.",
+        "fr": "Données de transparence du règlement de l'UE relatif aux contenus à caractère terroriste en ligne (2021/784) — injonctions de retrait émises par État membre (art. 8 / Commission européenne) et chiffres d'application au titre de l'art. 7 des plateformes.",
+        "de": "Transparenzdaten der EU-Verordnung zu terroristischen Online-Inhalten (2021/784) — pro Mitgliedstaat erlassene Entfernungsanordnungen (Art. 8 / Europäische Kommission) und Durchsetzungszahlen der Plattformen nach Art. 7.",
+        "it": "Dati di trasparenza del Regolamento UE sui contenuti terroristici online (2021/784) — ordini di rimozione emessi per Stato membro (art. 8 / Commissione europea) e cifre di applicazione ai sensi dell'art. 7 delle piattaforme.",
+        "ja": "EUテロコンテンツオンライン規則（2021/784）の透明性データ — 加盟国別に発出された削除命令（第8条／欧州委員会）とプラットフォームの第7条執行数値。",
+        "zh": "欧盟在线恐怖主义内容条例（2021/784）透明度数据 — 各成员国发出的移除令（第8条／欧盟委员会）以及各平台的第7条执行数据。",
+        "ko": "EU 온라인 테러 콘텐츠 규정(2021/784) 투명성 데이터 — 회원국별 발부된 삭제 명령(제8조 / 유럽연합 집행위원회)과 플랫폼의 제7조 집행 수치.",
+    },
+    # ── badge (translate "Annual"; keep Art./dates/entities) ─────────────────
+    "Art. 7 &amp; 8 · Annual · 2022 – 2025": {
+        "es": "Art. 7 &amp; 8 · Anual · 2022 – 2025",
+        "fr": "Art. 7 &amp; 8 · Annuel · 2022 – 2025",
+        "de": "Art. 7 &amp; 8 · Jährlich · 2022 – 2025",
+        "it": "Art. 7 &amp; 8 · Annuale · 2022 – 2025",
+        "ja": "第7・8条 · 年次 · 2022 – 2025",
+        "zh": "第7和8条 · 年度 · 2022 – 2025",
+        "ko": "제7·8조 · 연례 · 2022 – 2025",
+    },
+    # ── <h1> ─────────────────────────────────────────────────────────────────
+    "EU Terrorist Content Online Regulation": {
+        "es": "Reglamento de la UE sobre contenido terrorista en línea",
+        "fr": "Règlement de l'UE relatif aux contenus à caractère terroriste en ligne",
+        "de": "EU-Verordnung zu terroristischen Online-Inhalten",
+        "it": "Regolamento UE sui contenuti terroristici online",
+        "ja": "EUテロコンテンツオンライン規則",
+        "zh": "欧盟在线恐怖主义内容条例",
+        "ko": "EU 온라인 테러 콘텐츠 규정",
+    },
+    # ── intro <p> (keep inline tags + <code> tokens + entities) ──────────────
+    "Regulation <strong>(EU) 2021/784</strong> (&ldquo;TCOR&rdquo;, in application since June 2022) creates two annual transparency duties around <em>terrorist content</em>. Under <strong>Article 7</strong>, every hosting service provider that took action publishes an enforcement report (items removed, removal orders received &amp; actioned, complaints, reinstatements). Under <strong>Article 8</strong>, each Member State's competent authority reports its activity, and the <strong>European Commission</strong> aggregates the per-Member-State removal-order counts. A tidy-long dataset: each row is one measured value identified by publisher × role × period × section × category × metric. Metric scope is each report's own and isn't comparable across publishers — pin a <code>publisher</code> and <code>metric</code> before aggregating, and note the per-country rows sit beside an <code>EU</code> summary total.": {
+        "es": "El Reglamento <strong>(UE) 2021/784</strong> (&ldquo;TCOR&rdquo;, en aplicación desde junio de 2022) crea dos obligaciones anuales de transparencia en torno al <em>contenido terrorista</em>. En virtud del <strong>artículo 7</strong>, cada proveedor de servicios de alojamiento que haya adoptado medidas publica un informe de aplicación (elementos retirados, órdenes de retirada recibidas y ejecutadas, reclamaciones, restituciones). En virtud del <strong>artículo 8</strong>, la autoridad competente de cada Estado miembro informa de su actividad, y la <strong>Comisión Europea</strong> agrega los recuentos de órdenes de retirada por Estado miembro. Un conjunto de datos tidy-long: cada fila es un valor medido identificado por publisher × role × period × section × category × metric. El alcance de cada métrica es propio de cada informe y no es comparable entre editores — fija un <code>publisher</code> y una <code>metric</code> antes de agregar, y ten en cuenta que las filas por país aparecen junto a un total resumido de la <code>EU</code>.",
+        "fr": "Le règlement <strong>(UE) 2021/784</strong> (&ldquo;TCOR&rdquo;, applicable depuis juin 2022) crée deux obligations annuelles de transparence relatives aux <em>contenus à caractère terroriste</em>. Au titre de l'<strong>article 7</strong>, chaque fournisseur de services d'hébergement ayant pris des mesures publie un rapport d'application (éléments retirés, injonctions de retrait reçues et traitées, réclamations, rétablissements). Au titre de l'<strong>article 8</strong>, l'autorité compétente de chaque État membre rend compte de son activité, et la <strong>Commission européenne</strong> agrège les décomptes d'injonctions de retrait par État membre. Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par publisher × role × period × section × category × metric. La portée de chaque mesure est propre à chaque rapport et n'est pas comparable d'un éditeur à l'autre — fixez un <code>publisher</code> et une <code>metric</code> avant d'agréger, et notez que les lignes par pays côtoient un total récapitulatif <code>EU</code>.",
+        "de": "Die Verordnung <strong>(EU) 2021/784</strong> (&ldquo;TCOR&rdquo;, in Anwendung seit Juni 2022) schafft zwei jährliche Transparenzpflichten rund um <em>terroristische Inhalte</em>. Nach <strong>Artikel 7</strong> veröffentlicht jeder Hostingdiensteanbieter, der Maßnahmen ergriffen hat, einen Durchsetzungsbericht (entfernte Inhalte, erhaltene und bearbeitete Entfernungsanordnungen, Beschwerden, Wiederherstellungen). Nach <strong>Artikel 8</strong> berichtet die zuständige Behörde jedes Mitgliedstaats über ihre Tätigkeit, und die <strong>Europäische Kommission</strong> aggregiert die Zahlen der Entfernungsanordnungen je Mitgliedstaat. Ein Tidy-Long-Datensatz: Jede Zeile ist ein gemessener Wert, identifiziert durch publisher × role × period × section × category × metric. Der Umfang jeder Kennzahl ist berichtsspezifisch und nicht über Herausgeber hinweg vergleichbar — fixieren Sie einen <code>publisher</code> und eine <code>metric</code> vor dem Aggregieren, und beachten Sie, dass die Zeilen je Land neben einem zusammenfassenden <code>EU</code>-Gesamtwert stehen.",
+        "it": "Il Regolamento <strong>(UE) 2021/784</strong> (&ldquo;TCOR&rdquo;, in applicazione da giugno 2022) crea due obblighi annuali di trasparenza in materia di <em>contenuti terroristici</em>. Ai sensi dell'<strong>articolo 7</strong>, ogni fornitore di servizi di hosting che ha adottato misure pubblica un rapporto di applicazione (elementi rimossi, ordini di rimozione ricevuti ed eseguiti, reclami, ripristini). Ai sensi dell'<strong>articolo 8</strong>, l'autorità competente di ciascuno Stato membro riferisce sulla propria attività e la <strong>Commissione europea</strong> aggrega i conteggi degli ordini di rimozione per Stato membro. Un set di dati tidy-long: ogni riga è un valore misurato identificato da publisher × role × period × section × category × metric. L'ambito di ciascuna metrica è proprio di ogni rapporto e non è comparabile tra gli editori — fissa un <code>publisher</code> e una <code>metric</code> prima di aggregare, e nota che le righe per paese si trovano accanto a un totale riepilogativo <code>EU</code>.",
+        "ja": "規則 <strong>(EU) 2021/784</strong>（&ldquo;TCOR&rdquo;、2022年6月から適用）は、<em>テロコンテンツ</em>に関する2つの年次透明性義務を定めています。<strong>第7条</strong>により、措置を講じたすべてのホスティングサービス提供者は執行報告書（削除された項目、受領・処理された削除命令、苦情、復元）を公表します。<strong>第8条</strong>により、各加盟国の管轄当局はその活動を報告し、<strong>欧州委員会</strong>が加盟国別の削除命令件数を集計します。tidy-long 形式のデータセット：各行は publisher × role × period × section × category × metric で識別される1つの測定値です。各指標の範囲は報告書ごとに異なり、公表者間で比較できません — 集計の前に <code>publisher</code> と <code>metric</code> を固定し、国別の行が <code>EU</code> の要約合計の隣に並んでいる点に注意してください。",
+        "zh": "<strong>(EU) 2021/784</strong> 号条例（&ldquo;TCOR&rdquo;，自2022年6月起适用）设立了两项围绕<em>恐怖主义内容</em>的年度透明度义务。根据<strong>第7条</strong>，每家采取行动的托管服务提供商都要发布一份执行报告（已移除项目、收到并处理的移除令、投诉、恢复）。根据<strong>第8条</strong>，各成员国的主管机关报告其活动，<strong>欧盟委员会</strong>汇总各成员国的移除令数量。一个 tidy-long 数据集：每行是由 publisher × role × period × section × category × metric 标识的一个测量值。每个指标的范围各报告自成一体，不可在发布者之间比较 — 汇总前请固定 <code>publisher</code> 和 <code>metric</code>，并注意各国行与 <code>EU</code> 汇总总计并列。",
+        "ko": "규정 <strong>(EU) 2021/784</strong>(&ldquo;TCOR&rdquo;, 2022년 6월부터 적용)은 <em>테러 콘텐츠</em>와 관련한 두 가지 연례 투명성 의무를 규정합니다. <strong>제7조</strong>에 따라 조치를 취한 모든 호스팅 서비스 제공자는 집행 보고서(삭제된 항목, 접수·처리된 삭제 명령, 이의, 복원)를 공표합니다. <strong>제8조</strong>에 따라 각 회원국의 관할 당국은 활동을 보고하며, <strong>유럽연합 집행위원회</strong>가 회원국별 삭제 명령 건수를 집계합니다. tidy-long 데이터셋으로, 각 행은 publisher × role × period × section × category × metric으로 식별되는 하나의 측정값입니다. 각 지표의 범위는 보고서마다 고유하여 발행자 간 비교가 불가능합니다 — 집계 전에 <code>publisher</code>와 <code>metric</code>을 고정하고, 국가별 행이 <code>EU</code> 요약 합계 옆에 놓인다는 점에 유의하세요.",
+    },
+    # ── section heading "Trends" (shared UI; matches cser) ───────────────────
+    "<h2>Trends</h2>": {
+        "es": "<h2>Tendencias</h2>",
+        "fr": "<h2>Tendances</h2>",
+        "de": "<h2>Trends</h2>",
+        "it": "<h2>Tendenze</h2>",
+        "ja": "<h2>トレンド</h2>",
+        "zh": "<h2>趋势</h2>",
+        "ko": "<h2>트렌드</h2>",
+    },
+    "Interactive views of the reported figures. Each chart has a text alternative for screen readers.": {
+        "es": "Vistas interactivas de las cifras notificadas. Cada gráfico tiene una alternativa de texto para lectores de pantalla.",
+        "fr": "Vues interactives des chiffres déclarés. Chaque graphique dispose d'une alternative textuelle pour les lecteurs d'écran.",
+        "de": "Interaktive Ansichten der gemeldeten Zahlen. Jedes Diagramm hat eine Textalternative für Screenreader.",
+        "it": "Viste interattive delle cifre dichiarate. Ogni grafico ha un'alternativa testuale per gli screen reader.",
+        "ja": "報告された数値のインタラクティブ表示。各グラフにはスクリーンリーダー向けのテキスト代替があります。",
+        "zh": "报告数据的交互式视图。每个图表都有面向屏幕阅读器的文字替代。",
+        "ko": "보고된 수치의 인터랙티브 보기입니다. 각 차트에는 스크린 리더용 텍스트 대체가 제공됩니다.",
+    },
+    # ── chart 1 ──────────────────────────────────────────────────────────────
+    "Removal orders issued, by Member State": {
+        "es": "Órdenes de retirada emitidas, por Estado miembro",
+        "fr": "Injonctions de retrait émises, par État membre",
+        "de": "Erlassene Entfernungsanordnungen, nach Mitgliedstaat",
+        "it": "Ordini di rimozione emessi, per Stato membro",
+        "ja": "発出された削除命令（加盟国別）",
+        "zh": "已发出的移除令（按成员国）",
+        "ko": "발부된 삭제 명령(회원국별)",
+    },
+    "Art. 3 removal orders each national competent authority issued (7 Jun 2022 – 31 Dec 2023), as aggregated in the Commission's implementation report. Six of the 23 Member States with designated authorities issued orders.": {
+        "es": "Órdenes de retirada del art. 3 que emitió cada autoridad nacional competente (7 jun 2022 – 31 dic 2023), según la agregación del informe de aplicación de la Comisión. Seis de los 23 Estados miembros con autoridades designadas emitieron órdenes.",
+        "fr": "Injonctions de retrait au titre de l'art. 3 émises par chaque autorité nationale compétente (7 juin 2022 – 31 déc. 2023), telles qu'agrégées dans le rapport de mise en œuvre de la Commission. Six des 23 États membres dotés d'autorités désignées ont émis des injonctions.",
+        "de": "Entfernungsanordnungen nach Art. 3, die jede zuständige nationale Behörde erlassen hat (7. Juni 2022 – 31. Dez. 2023), aggregiert im Umsetzungsbericht der Kommission. Sechs der 23 Mitgliedstaaten mit benannten Behörden haben Anordnungen erlassen.",
+        "it": "Ordini di rimozione ai sensi dell'art. 3 emessi da ciascuna autorità nazionale competente (7 giu 2022 – 31 dic 2023), come aggregati nel rapporto di attuazione della Commissione. Sei dei 23 Stati membri con autorità designate hanno emesso ordini.",
+        "ja": "各国の管轄当局が発出した第3条の削除命令（2022年6月7日～2023年12月31日）で、欧州委員会の実施報告書で集計されたもの。指定当局を有する23加盟国のうち6か国が命令を発出しました。",
+        "zh": "各国主管机关发出的第3条移除令（2022年6月7日至2023年12月31日），依欧盟委员会实施报告的汇总。在设有指定机关的23个成员国中，有6个发出了命令。",
+        "ko": "각국 관할 당국이 발부한 제3조 삭제 명령(2022년 6월 7일 ~ 2023년 12월 31일)으로, 집행위원회 이행 보고서에서 집계된 수치입니다. 지정 당국을 둔 23개 회원국 중 6개국이 명령을 발부했습니다.",
+    },
+    # ── chart 2 ──────────────────────────────────────────────────────────────
+    "Content removed via EU removal orders, by platform": {
+        "es": "Contenido retirado mediante órdenes de retirada de la UE, por plataforma",
+        "fr": "Contenus retirés à la suite d'injonctions de retrait de l'UE, par plateforme",
+        "de": "Über EU-Entfernungsanordnungen entfernte Inhalte, nach Plattform",
+        "it": "Contenuti rimossi tramite ordini di rimozione dell'UE, per piattaforma",
+        "ja": "EUの削除命令により削除されたコンテンツ（プラットフォーム別）",
+        "zh": "通过欧盟移除令移除的内容（按平台）",
+        "ko": "EU 삭제 명령을 통해 삭제된 콘텐츠(플랫폼별)",
+    },
+    "Items each Art. 7 publisher removed as a result of removal orders from EU national competent authorities, by the report's own sub-service.": {
+        "es": "Elementos que cada editor del art. 7 retiró como resultado de órdenes de retirada de las autoridades nacionales competentes de la UE, por el propio subservicio del informe.",
+        "fr": "Éléments que chaque éditeur au titre de l'art. 7 a retirés à la suite d'injonctions de retrait des autorités nationales compétentes de l'UE, selon le sous-service propre au rapport.",
+        "de": "Inhalte, die jeder Herausgeber nach Art. 7 infolge von Entfernungsanordnungen der zuständigen nationalen Behörden der EU entfernt hat, nach dem berichtseigenen Teildienst.",
+        "it": "Elementi che ciascun editore ai sensi dell'art. 7 ha rimosso a seguito di ordini di rimozione delle autorità nazionali competenti dell'UE, per il sottoservizio proprio del rapporto.",
+        "ja": "各第7条公表者がEU各国の管轄当局からの削除命令の結果として削除した項目で、報告書独自のサブサービス別に示したもの。",
+        "zh": "各第7条发布者因欧盟各国主管机关的移除令而移除的项目，按报告自身的子服务划分。",
+        "ko": "각 제7조 발행자가 EU 각국 관할 당국의 삭제 명령에 따라 삭제한 항목으로, 보고서 자체의 하위 서비스별로 표시했습니다.",
+    },
+    # ── shared loading text ──────────────────────────────────────────────────
+    "Loading…": {
+        "es": "Cargando…",
+        "fr": "Chargement…",
+        "de": "Wird geladen…",
+        "it": "Caricamento…",
+        "ja": "読み込み中…",
+        "zh": "加载中…",
+        "ko": "불러오는 중…",
+    },
+    # ── proactive-removals section ───────────────────────────────────────────
+    "Content removed proactively, by platform and year": {
+        "es": "Contenido retirado de forma proactiva, por plataforma y año",
+        "fr": "Contenus retirés de manière proactive, par plateforme et par année",
+        "de": "Proaktiv entfernte Inhalte, nach Plattform und Jahr",
+        "it": "Contenuti rimossi in modo proattivo, per piattaforma e anno",
+        "ja": "プロアクティブに削除されたコンテンツ（プラットフォーム・年別）",
+        "zh": "主动移除的内容（按平台和年份）",
+        "ko": "선제적으로 삭제된 콘텐츠(플랫폼 및 연도별)",
+    },
+    "Terrorist / violent-extremist content each Art. 7 publisher removed under its own policies (not via removal orders), shown <strong>per reporting year</strong> (publishers report different years, so these are not a single comparable period). Scope also differs per report — Spotify's is terrorism-only; Meta's covers a broader policy set and is a rounded estimate — so the figures aren't strictly comparable across publishers.": {
+        "es": "Contenido terrorista o de extremismo violento que cada editor del art. 7 retiró conforme a sus propias políticas (no mediante órdenes de retirada), mostrado <strong>por año de referencia</strong> (los editores informan de años distintos, por lo que no constituyen un único período comparable). El alcance también varía según el informe — el de Spotify es solo de terrorismo; el de Meta abarca un conjunto de políticas más amplio y es una estimación redondeada — por lo que las cifras no son estrictamente comparables entre editores.",
+        "fr": "Contenus à caractère terroriste ou d'extrémisme violent que chaque éditeur au titre de l'art. 7 a retirés en vertu de ses propres règles (et non par des injonctions de retrait), présentés <strong>par année de déclaration</strong> (les éditeurs déclarent des années différentes, il ne s'agit donc pas d'une seule période comparable). La portée varie aussi selon le rapport — celle de Spotify porte uniquement sur le terrorisme ; celle de Meta couvre un ensemble de règles plus large et est une estimation arrondie — de sorte que les chiffres ne sont pas strictement comparables d'un éditeur à l'autre.",
+        "de": "Terroristische / gewaltextremistische Inhalte, die jeder Herausgeber nach Art. 7 gemäß seinen eigenen Richtlinien (nicht über Entfernungsanordnungen) entfernt hat, dargestellt <strong>pro Berichtsjahr</strong> (die Herausgeber berichten über unterschiedliche Jahre, daher handelt es sich nicht um einen einzigen vergleichbaren Zeitraum). Auch der Umfang unterscheidet sich je Bericht — der von Spotify betrifft nur Terrorismus; der von Meta deckt eine breitere Richtlinienpalette ab und ist eine gerundete Schätzung — sodass die Zahlen über Herausgeber hinweg nicht streng vergleichbar sind.",
+        "it": "Contenuti terroristici / di estremismo violento che ciascun editore ai sensi dell'art. 7 ha rimosso in base alle proprie policy (non tramite ordini di rimozione), mostrati <strong>per anno di riferimento</strong> (gli editori riferiscono anni diversi, quindi non costituiscono un unico periodo comparabile). Anche l'ambito varia in base al rapporto — quello di Spotify riguarda solo il terrorismo; quello di Meta copre un insieme di policy più ampio ed è una stima arrotondata — perciò le cifre non sono strettamente comparabili tra gli editori.",
+        "ja": "各第7条公表者が自社のポリシーに基づき（削除命令によらず）削除したテロ／暴力的過激主義コンテンツで、<strong>報告年ごと</strong>に示したもの（公表者ごとに報告年が異なるため、単一の比較可能な期間ではありません）。範囲も報告書ごとに異なり — Spotify はテロのみ、Meta はより広範なポリシーを対象とする概算値です — したがって公表者間で厳密には比較できません。",
+        "zh": "各第7条发布者依据自身政策（而非通过移除令）移除的恐怖主义／暴力极端主义内容，<strong>按报告年份</strong>显示（各发布者报告的年份不同，因此并非单一可比期间）。范围也因报告而异 — Spotify 仅限恐怖主义；Meta 涵盖更广泛的政策集且为四舍五入的估计值 — 因此这些数字在发布者之间并不严格可比。",
+        "ko": "각 제7조 발행자가 자체 정책에 따라(삭제 명령이 아니라) 삭제한 테러 / 폭력적 극단주의 콘텐츠로, <strong>보고 연도별</strong>로 표시했습니다(발행자마다 보고 연도가 달라 단일한 비교 가능 기간이 아닙니다). 범위도 보고서마다 다릅니다 — Spotify는 테러만, Meta는 더 넓은 정책 집합을 포함하며 반올림된 추정치입니다 — 따라서 발행자 간에 엄밀히 비교할 수 없습니다.",
+    },
+    # ── coverage section ─────────────────────────────────────────────────────
+    "What the reports cover": {
+        "es": "Qué cubren los informes",
+        "fr": "Ce que couvrent les rapports",
+        "de": "Was die Berichte abdecken",
+        "it": "Cosa coprono i rapporti",
+        "ja": "レポートが対象とする範囲",
+        "zh": "报告涵盖的内容",
+        "ko": "보고서가 다루는 범위",
+    },
+    "The number of reported values in each reporting stream. Counts of rows, not summed quantities.": {
+        "es": "El número de valores declarados en cada flujo. Recuentos de filas, no cantidades sumadas.",
+        "fr": "Le nombre de valeurs déclarées dans chaque flux de déclaration. Des décomptes de lignes, non des quantités additionnées.",
+        "de": "Die Anzahl der gemeldeten Werte in jedem Meldestrom. Zeilenzahlen, keine summierten Mengen.",
+        "it": "Il numero di valori dichiarati in ciascun flusso di rendicontazione. Conteggi di righe, non quantità sommate.",
+        "ja": "各報告ストリームで報告された値の数。合計した数量ではなく、行数のカウントです。",
+        "zh": "每个报告流中已报告值的数量。是行数统计，而非求和数量。",
+        "ko": "각 보고 스트림에서 보고된 값의 수입니다. 합산한 수량이 아니라 행의 개수입니다.",
+    },
+    # ── footer descriptive prose (page-specific) ─────────────────────────────
+    "platforms' Art. 7 reports + the Commission's implementation report (COM(2024) 64)": {
+        "es": "informes del art. 7 de las plataformas + el informe de aplicación de la Comisión (COM(2024) 64)",
+        "fr": "rapports au titre de l'art. 7 des plateformes + le rapport de mise en œuvre de la Commission (COM(2024) 64)",
+        "de": "Berichte der Plattformen nach Art. 7 + der Umsetzungsbericht der Kommission (COM(2024) 64)",
+        "it": "rapporti ai sensi dell'art. 7 delle piattaforme + il rapporto di attuazione della Commissione (COM(2024) 64)",
+        "ja": "プラットフォームの第7条報告書 + 欧州委員会の実施報告書（COM(2024) 64）",
+        "zh": "各平台的第7条报告 + 欧盟委员会的实施报告（COM(2024) 64）",
+        "ko": "플랫폼의 제7조 보고서 + 집행위원회 이행 보고서(COM(2024) 64)",
+    },
+    # ── JS: ROLE_LABELS display values (keys "authority"/"platform" NOT here) ─
+    "Authority (Art. 8 / Commission)": {
+        "es": "Autoridad (art. 8 / Comisión)",
+        "fr": "Autorité (art. 8 / Commission)",
+        "de": "Behörde (Art. 8 / Kommission)",
+        "it": "Autorità (art. 8 / Commissione)",
+        "ja": "当局（第8条／委員会）",
+        "zh": "机关（第8条／委员会）",
+        "ko": "당국(제8조 / 집행위원회)",
+    },
+    "Platform (Art. 7)": {
+        "es": "Plataforma (art. 7)",
+        "fr": "Plateforme (art. 7)",
+        "de": "Plattform (Art. 7)",
+        "it": "Piattaforma (art. 7)",
+        "ja": "プラットフォーム（第7条）",
+        "zh": "平台（第7条）",
+        "ko": "플랫폼(제7조)",
+    },
+    # ── JS: srTable / renderTable headers + captions ─────────────────────────
+    "Member State": {
+        "es": "Estado miembro", "fr": "État membre", "de": "Mitgliedstaat",
+        "it": "Stato membro", "ja": "加盟国", "zh": "成员国", "ko": "회원국",
+    },
+    "Removal orders issued": {
+        "es": "Órdenes de retirada emitidas",
+        "fr": "Injonctions de retrait émises",
+        "de": "Erlassene Entfernungsanordnungen",
+        "it": "Ordini di rimozione emessi",
+        "ja": "発出された削除命令",
+        "zh": "已发出的移除令",
+        "ko": "발부된 삭제 명령",
+    },
+    "Content removed via orders": {
+        "es": "Contenido retirado mediante órdenes",
+        "fr": "Contenus retirés à la suite d'injonctions",
+        "de": "Über Anordnungen entfernte Inhalte",
+        "it": "Contenuti rimossi tramite ordini",
+        "ja": "命令により削除されたコンテンツ",
+        "zh": "通过命令移除的内容",
+        "ko": "명령을 통해 삭제된 콘텐츠",
+    },
+    "Content removed proactively for terrorism / violent extremism, by platform service and reporting year.": {
+        "es": "Contenido retirado de forma proactiva por terrorismo / extremismo violento, por servicio de la plataforma y año de referencia.",
+        "fr": "Contenus retirés de manière proactive pour terrorisme / extrémisme violent, par service de la plateforme et année de déclaration.",
+        "de": "Proaktiv entfernte Inhalte wegen Terrorismus / gewaltbereitem Extremismus, nach Plattformdienst und Berichtsjahr.",
+        "it": "Contenuti rimossi in modo proattivo per terrorismo / estremismo violento, per servizio della piattaforma e anno di riferimento.",
+        "ja": "テロ／暴力的過激主義に対してプロアクティブに削除されたコンテンツ（プラットフォームサービス・報告年別）。",
+        "zh": "针对恐怖主义／暴力极端主义主动移除的内容，按平台服务和报告年份划分。",
+        "ko": "테러 / 폭력적 극단주의에 대해 선제적으로 삭제된 콘텐츠(플랫폼 서비스 및 보고 연도별).",
+    },
+    "Platform service (year)": {
+        "es": "Servicio de la plataforma (año)",
+        "fr": "Service de la plateforme (année)",
+        "de": "Plattformdienst (Jahr)",
+        "it": "Servizio della piattaforma (anno)",
+        "ja": "プラットフォームサービス（年）",
+        "zh": "平台服务（年份）",
+        "ko": "플랫폼 서비스(연도)",
+    },
+    "Content removed": {
+        "es": "Contenido retirado",
+        "fr": "Contenus retirés",
+        "de": "Entfernte Inhalte",
+        "it": "Contenuti rimossi",
+        "ja": "削除されたコンテンツ",
+        "zh": "已移除的内容",
+        "ko": "삭제된 콘텐츠",
+    },
+    "Reported values in each TCO reporting stream.": {
+        "es": "Valores declarados en cada flujo de información del TCO.",
+        "fr": "Valeurs déclarées dans chaque flux de déclaration du TCO.",
+        "de": "Gemeldete Werte in jedem TCO-Meldestrom.",
+        "it": "Valori dichiarati in ciascun flusso di rendicontazione del TCO.",
+        "ja": "各 TCO 報告ストリームで報告された値。",
+        "zh": "每个 TCO 报告流中已报告的值。",
+        "ko": "각 TCO 보고 스트림에서 보고된 값.",
+    },
+    "Platform service": {
+        "es": "Servicio de la plataforma",
+        "fr": "Service de la plateforme",
+        "de": "Plattformdienst",
+        "it": "Servizio della piattaforma",
+        "ja": "プラットフォームサービス",
+        "zh": "平台服务",
+        "ko": "플랫폼 서비스",
+    },
+    "Reported values": {
+        "es": "Valores declarados",
+        "fr": "Valeurs déclarées",
+        "de": "Gemeldete Werte",
+        "it": "Valori dichiarati",
+        "ja": "報告された値",
+        "zh": "已报告的值",
+        "ko": "보고된 값",
+    },
+    "Stream": {
+        "es": "Flujo", "fr": "Flux", "de": "Meldestrom",
+        "it": "Flusso", "ja": "ストリーム", "zh": "报告流", "ko": "스트림",
+    },
+    # ── JS: error / empty messages ───────────────────────────────────────────
+    "Failed to load proactive removals: ": {
+        "es": "No se pudieron cargar las retiradas proactivas: ",
+        "fr": "Échec du chargement des retraits proactifs : ",
+        "de": "Proaktive Entfernungen konnten nicht geladen werden: ",
+        "it": "Impossibile caricare le rimozioni proattive: ",
+        "ja": "プロアクティブな削除を読み込めませんでした: ",
+        "zh": "无法加载主动移除数据： ",
+        "ko": "선제적 삭제를 불러오지 못했습니다: ",
+    },
+    "Failed to load stream coverage: ": {
+        "es": "No se pudo cargar la cobertura de los flujos: ",
+        "fr": "Échec du chargement de la couverture des flux : ",
+        "de": "Die Abdeckung der Meldeströme konnte nicht geladen werden: ",
+        "it": "Impossibile caricare la copertura dei flussi: ",
+        "ja": "ストリームのカバレッジを読み込めませんでした: ",
+        "zh": "无法加载报告流覆盖情况： ",
+        "ko": "스트림 커버리지를 불러오지 못했습니다: ",
+    },
+    "No data available.": {
+        "es": "No hay datos disponibles.",
+        "fr": "Aucune donnée disponible.",
+        "de": "Keine Daten verfügbar.",
+        "it": "Nessun dato disponibile.",
+        "ja": "利用可能なデータがありません。",
+        "zh": "暂无可用数据。",
+        "ko": "사용 가능한 데이터가 없습니다.",
+    },
+    # ── JS: provenance "Cite as" prefix fragment (leading curly quote kept) ───
+    "“EU Terrorist Content Online Regulation transparency reports, via the Transparency Report API (": {
+        "es": "“Informes de transparencia del Reglamento de la UE sobre contenido terrorista en línea, vía la Transparency Report API (",
+        "fr": "“Rapports de transparence du règlement de l'UE relatif aux contenus à caractère terroriste en ligne, via la Transparency Report API (",
+        "de": "“Transparenzberichte der EU-Verordnung zu terroristischen Online-Inhalten, über die Transparency Report API (",
+        "it": "“Rapporti di trasparenza del Regolamento UE sui contenuti terroristici online, tramite la Transparency Report API (",
+        "ja": "“EUテロコンテンツオンライン規則の透明性レポート、Transparency Report API 経由 (",
+        "zh": "“欧盟在线恐怖主义内容条例透明度报告，经由 Transparency Report API (",
+        "ko": "“EU 온라인 테러 콘텐츠 규정 투명성 보고서, Transparency Report API 경유 (",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    PAGES[_loc]["tco.html"] = [(_en, _tr[_loc]) for _en, _tr in _TCO_PAGE.items()]
+    _pt = open(os.path.join(STATIC, "tco.html"), encoding="utf-8").read()
+    _own = {_o for _o, _ in PAGES[_loc]["tco.html"]}
+    for _src in ("singapore.html", "cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _pt and _o not in _own:
+                PAGES[_loc]["tco.html"].append((_o, _n))
+                _own.add(_o)
+
+
+# -- ai-training full page localization --
+
+_AI_TRAINING_NAV = {
+    "es": 'Ley de IA de la UE',
+    "fr": "Loi IA de l'UE",
+    "de": 'KI-Verordnung (EU)',
+    "it": "Legge UE sull'IA",
+    "ja": 'EU AI法',
+    "zh": '欧盟《AI法案》',
+    "ko": 'EU AI법',
+}
+for _loc in _AI_TRAINING_NAV:
+    COMMON[_loc].append(("      EU AI Act\n    </a>", f"      {_AI_TRAINING_NAV[_loc]}\n    </a>"))
+_AIT_PAGE = {
+    # ── <title> ──────────────────────────────────────────────────────────────
+    "EU AI Act — AI training-data transparency — Transparency Report API": {
+        "es": "EU AI Act — Transparencia de datos de entrenamiento de IA — Transparency Report API",
+        "fr": "EU AI Act — Transparence des données d'entraînement de l'IA — Transparency Report API",
+        "de": "EU AI Act — Transparenz von KI-Trainingsdaten — Transparency Report API",
+        "it": "EU AI Act — Trasparenza dei dati di addestramento dell'IA — Transparency Report API",
+        "ja": "EU AI Act — AIトレーニングデータの透明性 — Transparency Report API",
+        "zh": "EU AI Act — 人工智能训练数据透明度 — Transparency Report API",
+        "ko": "EU AI Act — AI 학습 데이터 투명성 — Transparency Report API",
+    },
+    # ── <meta name="description"> ────────────────────────────────────────────
+    "EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency — cross-provider public summaries of AI training content: per-modality data-size bands and data-source disclosures.": {
+        "es": "Transparencia de datos de entrenamiento del EU AI Act (Reg. 2024/1689) Art. 53(1)(d) — resúmenes públicos entre proveedores del contenido de entrenamiento de IA: bandas de tamaño de datos por modalidad y divulgaciones de fuentes de datos.",
+        "fr": "Transparence des données d'entraînement de l'EU AI Act (Rég. 2024/1689) Art. 53(1)(d) — résumés publics inter-fournisseurs du contenu d'entraînement de l'IA : tranches de taille de données par modalité et divulgations des sources de données.",
+        "de": "Transparenz der Trainingsdaten des EU AI Act (Verord. 2024/1689) Art. 53(1)(d) — anbieterübergreifende öffentliche Zusammenfassungen der KI-Trainingsinhalte: Datengrößenbänder je Modalität und Offenlegungen der Datenquellen.",
+        "it": "Trasparenza dei dati di addestramento dell'EU AI Act (Reg. 2024/1689) Art. 53(1)(d) — riepiloghi pubblici tra fornitori dei contenuti di addestramento dell'IA: fasce di dimensione dei dati per modalità e divulgazioni delle fonti di dati.",
+        "ja": "EU AI Act（規則2024/1689）第53条(1)(d)のトレーニングデータの透明性 — AIトレーニングコンテンツのプロバイダー横断的な公開概要：モダリティ別のデータサイズ帯とデータソースの開示。",
+        "zh": "EU AI Act（法规2024/1689）第53(1)(d)条训练数据透明度 — 跨提供商的人工智能训练内容公开摘要：按模态划分的数据规模区间和数据来源披露。",
+        "ko": "EU AI Act(규정 2024/1689) 제53조(1)(d) 학습 데이터 투명성 — 제공자 간 AI 학습 콘텐츠 공개 요약: 모달리티별 데이터 규모 구간 및 데이터 출처 공개.",
+    },
+    # ── <h1> ─────────────────────────────────────────────────────────────────
+    "EU AI Act — AI training-data transparency": {
+        "es": "EU AI Act — Transparencia de datos de entrenamiento de IA",
+        "fr": "EU AI Act — Transparence des données d'entraînement de l'IA",
+        "de": "EU AI Act — Transparenz von KI-Trainingsdaten",
+        "it": "EU AI Act — Trasparenza dei dati di addestramento dell'IA",
+        "ja": "EU AI Act — AIトレーニングデータの透明性",
+        "zh": "EU AI Act — 人工智能训练数据透明度",
+        "ko": "EU AI Act — AI 학습 데이터 투명성",
+    },
+    # ── intro <p> (inner HTML) ───────────────────────────────────────────────
+    "Article <strong>53(1)(d)</strong> of the <strong>EU AI Act</strong> (Reg. (EU) 2024/1689) requires providers of <em>general-purpose AI (GPAI) models</em> to publish a <strong>public summary of the content used to train the model</strong>, on the AI Office's standardised template (in force <strong>2 Aug 2025</strong>). Each summary discloses, per modality (Text / Image / Audio / Video), a <strong>banded training-data size</strong>, the data-acquisition cut-off, and yes/no flags per data-source category. There is no single registry of the filled summaries — each provider self-publishes in its own format — so this is a <strong>cross-provider, comparable</strong> dataset built from the archived summaries: one row per disclosed field, identified by provider × model × section × field. The coarse size bands are mapped to a numeric <code>size_rank</code> (1 / 2 / 3, 0 = &ldquo;not applicable&rdquo;) so sizes compare across providers — it is an ordinal rank, so compare it with <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, never <code>SUM</code>. Coverage is a starting, expandable set (Google + Meta + Microsoft).": {
+        "es": "Artículo <strong>53(1)(d)</strong> del <strong>EU AI Act</strong> (Reg. (UE) 2024/1689) exige a los proveedores de <em>modelos de IA de propósito general (GPAI)</em> que publiquen un <strong>resumen público del contenido utilizado para entrenar el modelo</strong>, sobre la plantilla estandarizada de la AI Office (en vigor el <strong>2 ago 2025</strong>). Cada resumen divulga, por modalidad (Texto / Imagen / Audio / Vídeo), un <strong>tamaño de datos de entrenamiento por bandas</strong>, la fecha de corte de adquisición de datos y marcas sí/no por categoría de fuente de datos. No existe un registro único de los resúmenes cumplimentados —cada proveedor los publica por su cuenta en su propio formato—, por lo que este es un conjunto de datos <strong>comparable y entre proveedores</strong> construido a partir de los resúmenes archivados: una fila por campo divulgado, identificada por proveedor × modelo × sección × campo. Las bandas de tamaño gruesas se asignan a un <code>size_rank</code> numérico (1 / 2 / 3, 0 = &ldquo;no aplicable&rdquo;) para que los tamaños se comparen entre proveedores — es un rango ordinal, así que compáralo con <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, nunca <code>SUM</code>. La cobertura es un conjunto inicial y ampliable (Google + Meta + Microsoft).",
+        "fr": "L'article <strong>53(1)(d)</strong> de l'<strong>EU AI Act</strong> (Rég. (UE) 2024/1689) impose aux fournisseurs de <em>modèles d'IA à usage général (GPAI)</em> de publier un <strong>résumé public du contenu utilisé pour entraîner le modèle</strong>, sur le modèle standardisé de l'AI Office (en vigueur le <strong>2 août 2025</strong>). Chaque résumé indique, par modalité (Texte / Image / Audio / Vidéo), une <strong>taille des données d'entraînement par tranches</strong>, la date limite d'acquisition des données et des indicateurs oui/non par catégorie de source de données. Il n'existe pas de registre unique des résumés remplis — chaque fournisseur les publie lui-même dans son propre format — il s'agit donc d'un jeu de données <strong>inter-fournisseurs et comparable</strong> constitué à partir des résumés archivés : une ligne par champ divulgué, identifiée par fournisseur × modèle × section × champ. Les tranches de taille grossières sont associées à un <code>size_rank</code> numérique (1 / 2 / 3, 0 = &ldquo;non applicable&rdquo;) afin que les tailles soient comparables entre fournisseurs — il s'agit d'un rang ordinal, comparez-le donc avec <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, jamais <code>SUM</code>. La couverture est un ensemble initial et extensible (Google + Meta + Microsoft).",
+        "de": "Artikel <strong>53(1)(d)</strong> des <strong>EU AI Act</strong> (Verord. (EU) 2024/1689) verpflichtet Anbieter von <em>KI-Modellen mit allgemeinem Verwendungszweck (GPAI)</em>, eine <strong>öffentliche Zusammenfassung der zum Training des Modells verwendeten Inhalte</strong> auf der standardisierten Vorlage des AI Office zu veröffentlichen (in Kraft seit <strong>2. Aug. 2025</strong>). Jede Zusammenfassung gibt je Modalität (Text / Bild / Audio / Video) eine <strong>gebänderte Trainingsdatengröße</strong>, den Datenerhebungs-Stichtag sowie Ja/Nein-Kennzeichnungen je Datenquellenkategorie an. Es gibt kein einheitliches Register der ausgefüllten Zusammenfassungen — jeder Anbieter veröffentlicht sie selbst in seinem eigenen Format —, sodass dies ein <strong>anbieterübergreifender, vergleichbarer</strong> Datensatz ist, der aus den archivierten Zusammenfassungen erstellt wurde: eine Zeile je offengelegtem Feld, identifiziert durch Anbieter × Modell × Abschnitt × Feld. Die groben Größenbänder werden einem numerischen <code>size_rank</code> zugeordnet (1 / 2 / 3, 0 = &ldquo;nicht zutreffend&rdquo;), damit Größen anbieterübergreifend vergleichbar sind — es ist ein ordinaler Rang, vergleichen Sie ihn daher mit <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, niemals <code>SUM</code>. Die Abdeckung ist ein anfänglicher, erweiterbarer Satz (Google + Meta + Microsoft).",
+        "it": "L'articolo <strong>53(1)(d)</strong> dell'<strong>EU AI Act</strong> (Reg. (UE) 2024/1689) impone ai fornitori di <em>modelli di IA per finalità generali (GPAI)</em> di pubblicare un <strong>riepilogo pubblico dei contenuti utilizzati per addestrare il modello</strong>, sul modello standardizzato dell'AI Office (in vigore dal <strong>2 ago 2025</strong>). Ogni riepilogo indica, per modalità (Testo / Immagine / Audio / Video), una <strong>dimensione dei dati di addestramento a fasce</strong>, la data di chiusura dell'acquisizione dei dati e indicatori sì/no per categoria di fonte di dati. Non esiste un registro unico dei riepiloghi compilati — ogni fornitore li pubblica autonomamente nel proprio formato — quindi questo è un set di dati <strong>comparabile e tra fornitori</strong> costruito a partire dai riepiloghi archiviati: una riga per campo divulgato, identificata da fornitore × modello × sezione × campo. Le fasce di dimensione grossolane sono mappate su un <code>size_rank</code> numerico (1 / 2 / 3, 0 = &ldquo;non applicabile&rdquo;) affinché le dimensioni siano confrontabili tra fornitori — è un rango ordinale, quindi confrontalo con <code>MIN</code>/<code>MAX</code>/<code>AVG</code>, mai <code>SUM</code>. La copertura è un insieme iniziale ed espandibile (Google + Meta + Microsoft).",
+        "ja": "<strong>EU AI Act</strong>（規則(EU) 2024/1689）の第<strong>53(1)(d)</strong>条は、<em>汎用AI（GPAI）モデル</em>のプロバイダーに対し、AI Officeの標準テンプレート上で<strong>モデルの学習に使用したコンテンツの公開概要</strong>を公表することを義務付けています（<strong>2025年8月2日</strong>施行）。各概要は、モダリティ別（テキスト / 画像 / 音声 / 動画）に<strong>帯域化された学習データ規模</strong>、データ取得のカットオフ、およびデータソースのカテゴリーごとの可否フラグを開示します。記入済みの概要をまとめた単一の登録簿は存在せず——各プロバイダーが独自の形式で自ら公表します——そのため、これはアーカイブされた概要から構築した<strong>プロバイダー横断的で比較可能な</strong>データセットです。開示された各フィールドにつき1行で、プロバイダー × モデル × セクション × フィールドで識別されます。粗い規模帯は数値の<code>size_rank</code>（1 / 2 / 3、0 = &ldquo;該当なし&rdquo;）にマッピングされ、規模をプロバイダー間で比較できます——これは順序尺度なので、<code>MIN</code>/<code>MAX</code>/<code>AVG</code>で比較し、<code>SUM</code>は使わないでください。対象範囲は初期段階で拡張可能なセットです（Google + Meta + Microsoft）。",
+        "zh": "<strong>EU AI Act</strong>（法规(EU) 2024/1689）第<strong>53(1)(d)</strong>条要求<em>通用人工智能（GPAI）模型</em>的提供商在 AI Office 的标准化模板上发布一份<strong>用于训练模型的内容的公开摘要</strong>（<strong>2025 年 8 月 2 日</strong>生效）。每份摘要按模态（文本 / 图像 / 音频 / 视频）披露<strong>分区间的训练数据规模</strong>、数据采集截止时间，以及每个数据来源类别的是/否标记。已填写摘要没有统一的登记册——每家提供商以各自的格式自行发布——因此这是一个根据已存档摘要构建的<strong>跨提供商、可比较的</strong>数据集：每个披露字段一行，由提供商 × 模型 × 章节 × 字段标识。粗略的规模区间被映射为数值型 <code>size_rank</code>（1 / 2 / 3，0 = &ldquo;不适用&rdquo;），以便在提供商之间比较规模——这是一个序数等级，因此请使用 <code>MIN</code>/<code>MAX</code>/<code>AVG</code> 进行比较，切勿使用 <code>SUM</code>。覆盖范围是一个初始的、可扩展的集合（Google + Meta + Microsoft）。",
+        "ko": "<strong>EU AI Act</strong>(규정 (EU) 2024/1689) 제<strong>53(1)(d)</strong>조는 <em>범용 AI(GPAI) 모델</em> 제공자에게 AI Office의 표준화된 템플릿에 <strong>모델 학습에 사용된 콘텐츠의 공개 요약</strong>을 게시하도록 요구합니다(<strong>2025년 8월 2일</strong> 시행). 각 요약은 모달리티별(텍스트 / 이미지 / 오디오 / 동영상)로 <strong>구간화된 학습 데이터 규모</strong>, 데이터 수집 마감 시점, 그리고 데이터 출처 범주별 예/아니오 플래그를 공개합니다. 작성된 요약을 모은 단일 등록부는 없으며 — 각 제공자가 자체 형식으로 직접 게시합니다 — 따라서 이는 보관된 요약으로 구축한 <strong>제공자 간 비교 가능한</strong> 데이터 세트입니다. 공개된 필드마다 한 행이며, 제공자 × 모델 × 섹션 × 필드로 식별됩니다. 대략적인 규모 구간은 숫자 <code>size_rank</code>(1 / 2 / 3, 0 = &ldquo;해당 없음&rdquo;)에 매핑되어 제공자 간에 규모를 비교할 수 있습니다 — 이는 순서 척도이므로 <code>MIN</code>/<code>MAX</code>/<code>AVG</code>로 비교하고 <code>SUM</code>은 절대 사용하지 마십시오. 적용 범위는 초기의 확장 가능한 집합입니다(Google + Meta + Microsoft).",
+    },
+    # ── <h2> Charts section ──────────────────────────────────────────────────
+    "Disclosed training-data size": {
+        "es": "Tamaño de datos de entrenamiento divulgado",
+        "fr": "Taille des données d'entraînement divulguée",
+        "de": "Offengelegte Trainingsdatengröße",
+        "it": "Dimensione dei dati di addestramento divulgata",
+        "ja": "開示された学習データ規模",
+        "zh": "披露的训练数据规模",
+        "ko": "공개된 학습 데이터 규모",
+    },
+    "Interactive views of the disclosed size bands. Each chart has a text alternative for screen readers. Size rank: <strong>1</strong> = smallest band (&ldquo;less than …&rdquo;), <strong>2</strong> = middle range, <strong>3</strong> = largest (&ldquo;more than …&rdquo;); <strong>0</strong> = the modality is not part of the training data.": {
+        "es": "Vistas interactivas de las bandas de tamaño divulgadas. Cada gráfico tiene una alternativa de texto para lectores de pantalla. Rango de tamaño: <strong>1</strong> = banda más pequeña (&ldquo;menos de …&rdquo;), <strong>2</strong> = rango intermedio, <strong>3</strong> = la mayor (&ldquo;más de …&rdquo;); <strong>0</strong> = la modalidad no forma parte de los datos de entrenamiento.",
+        "fr": "Vues interactives des tranches de taille divulguées. Chaque graphique dispose d'une alternative textuelle pour les lecteurs d'écran. Rang de taille : <strong>1</strong> = tranche la plus petite (&ldquo;moins de …&rdquo;), <strong>2</strong> = plage intermédiaire, <strong>3</strong> = la plus grande (&ldquo;plus de …&rdquo;) ; <strong>0</strong> = la modalité ne fait pas partie des données d'entraînement.",
+        "de": "Interaktive Ansichten der offengelegten Größenbänder. Jedes Diagramm hat eine Textalternative für Screenreader. Größenrang: <strong>1</strong> = kleinstes Band (&ldquo;weniger als …&rdquo;), <strong>2</strong> = mittlerer Bereich, <strong>3</strong> = größtes (&ldquo;mehr als …&rdquo;); <strong>0</strong> = die Modalität ist nicht Teil der Trainingsdaten.",
+        "it": "Viste interattive delle fasce di dimensione divulgate. Ogni grafico ha un'alternativa testuale per i lettori di schermo. Rango di dimensione: <strong>1</strong> = fascia più piccola (&ldquo;meno di …&rdquo;), <strong>2</strong> = fascia intermedia, <strong>3</strong> = la più grande (&ldquo;più di …&rdquo;); <strong>0</strong> = la modalità non fa parte dei dati di addestramento.",
+        "ja": "開示された規模帯のインタラクティブなビュー。各グラフにはスクリーンリーダー向けのテキスト代替があります。規模ランク：<strong>1</strong> = 最小の帯（&ldquo;…未満&rdquo;）、<strong>2</strong> = 中間の範囲、<strong>3</strong> = 最大（&ldquo;…超&rdquo;）、<strong>0</strong> = そのモダリティは学習データに含まれません。",
+        "zh": "已披露规模区间的交互式视图。每张图表都为屏幕阅读器提供文本替代。规模等级：<strong>1</strong> = 最小区间（&ldquo;少于 …&rdquo;），<strong>2</strong> = 中间范围，<strong>3</strong> = 最大（&ldquo;多于 …&rdquo;）；<strong>0</strong> = 该模态不属于训练数据。",
+        "ko": "공개된 규모 구간의 대화형 보기. 각 차트에는 스크린 리더용 텍스트 대체가 있습니다. 규모 등급: <strong>1</strong> = 가장 작은 구간(&ldquo;… 미만&rdquo;), <strong>2</strong> = 중간 범위, <strong>3</strong> = 가장 큼(&ldquo;… 초과&rdquo;); <strong>0</strong> = 해당 모달리티는 학습 데이터에 포함되지 않습니다.",
+    },
+    # ── chart cards <h3> + <p class="chart-sub"> ─────────────────────────────
+    "Text training-data size, by model": {
+        "es": "Tamaño de datos de entrenamiento de texto, por modelo",
+        "fr": "Taille des données d'entraînement de texte, par modèle",
+        "de": "Text-Trainingsdatengröße, nach Modell",
+        "it": "Dimensione dei dati di addestramento di testo, per modello",
+        "ja": "テキスト学習データ規模（モデル別）",
+        "zh": "文本训练数据规模（按模型）",
+        "ko": "텍스트 학습 데이터 규모(모델별)",
+    },
+    "The banded size of each model's text training data, as a comparable rank (1–3). Google's Gemini 3 Pro and Meta's Muse Spark disclose the largest band (&ldquo;more than 10 trillion tokens&rdquo;); Microsoft's Phi-4 models disclose the middle band.": {
+        "es": "El tamaño por bandas de los datos de entrenamiento de texto de cada modelo, como un rango comparable (1–3). Gemini 3 Pro de Google y Muse Spark de Meta divulgan la banda más grande (&ldquo;más de 10 billones de tokens&rdquo;); los modelos Phi-4 de Microsoft divulgan la banda intermedia.",
+        "fr": "La taille par tranches des données d'entraînement de texte de chaque modèle, sous forme de rang comparable (1–3). Gemini 3 Pro de Google et Muse Spark de Meta divulguent la tranche la plus grande (&ldquo;plus de 10 000 milliards de tokens&rdquo;) ; les modèles Phi-4 de Microsoft divulguent la tranche intermédiaire.",
+        "de": "Die gebänderte Größe der Text-Trainingsdaten jedes Modells als vergleichbarer Rang (1–3). Googles Gemini 3 Pro und Metas Muse Spark geben das größte Band an (&ldquo;mehr als 10 Billionen Tokens&rdquo;); Microsofts Phi-4-Modelle geben das mittlere Band an.",
+        "it": "La dimensione a fasce dei dati di addestramento di testo di ciascun modello, come rango comparabile (1–3). Gemini 3 Pro di Google e Muse Spark di Meta divulgano la fascia più grande (&ldquo;più di 10.000 miliardi di token&rdquo;); i modelli Phi-4 di Microsoft divulgano la fascia intermedia.",
+        "ja": "各モデルのテキスト学習データの帯域化された規模を、比較可能なランク（1–3）で示します。GoogleのGemini 3 ProとMetaのMuse Sparkは最大の帯（&ldquo;10兆トークン超&rdquo;）を開示し、MicrosoftのPhi-4モデルは中間の帯を開示しています。",
+        "zh": "每个模型文本训练数据的分区间规模，以可比较的等级（1–3）表示。Google 的 Gemini 3 Pro 和 Meta 的 Muse Spark 披露了最大区间（&ldquo;超过 10 万亿个 token&rdquo;）；Microsoft 的 Phi-4 模型披露了中间区间。",
+        "ko": "각 모델의 텍스트 학습 데이터의 구간화된 규모를 비교 가능한 등급(1–3)으로 표시합니다. Google의 Gemini 3 Pro와 Meta의 Muse Spark는 가장 큰 구간(&ldquo;10조 토큰 초과&rdquo;)을 공개하고, Microsoft의 Phi-4 모델은 중간 구간을 공개합니다.",
+    },
+    "Disclosed size rank, by modality": {
+        "es": "Rango de tamaño divulgado, por modalidad",
+        "fr": "Rang de taille divulgué, par modalité",
+        "de": "Offengelegter Größenrang, nach Modalität",
+        "it": "Rango di dimensione divulgato, per modalità",
+        "ja": "開示された規模ランク（モダリティ別）",
+        "zh": "披露的规模等级（按模态）",
+        "ko": "공개된 규모 등급(모달리티별)",
+    },
+    "The comparable size rank each model discloses for each modality. A rank of 0 means the model does not train on that modality (e.g. the text-only Phi-4).": {
+        "es": "El rango de tamaño comparable que cada modelo divulga para cada modalidad. Un rango de 0 significa que el modelo no se entrena con esa modalidad (p. ej., el Phi-4 solo de texto).",
+        "fr": "Le rang de taille comparable que chaque modèle divulgue pour chaque modalité. Un rang de 0 signifie que le modèle ne s'entraîne pas sur cette modalité (p. ex. le Phi-4 uniquement textuel).",
+        "de": "Der vergleichbare Größenrang, den jedes Modell für jede Modalität angibt. Ein Rang von 0 bedeutet, dass das Modell nicht auf dieser Modalität trainiert wird (z. B. das reine Text-Phi-4).",
+        "it": "Il rango di dimensione comparabile che ciascun modello divulga per ogni modalità. Un rango di 0 significa che il modello non si addestra su quella modalità (ad es. il Phi-4 solo testo).",
+        "ja": "各モデルが各モダリティについて開示する比較可能な規模ランク。ランク0は、そのモダリティで学習していないことを意味します（例：テキスト専用のPhi-4）。",
+        "zh": "每个模型为每种模态披露的可比较规模等级。等级为 0 表示该模型不在该模态上进行训练（例如仅文本的 Phi-4）。",
+        "ko": "각 모델이 각 모달리티에 대해 공개하는 비교 가능한 규모 등급. 등급 0은 해당 모달리티로 학습하지 않음을 의미합니다(예: 텍스트 전용 Phi-4).",
+    },
+    # ── data-section <h2> + <p class="sub"> ──────────────────────────────────
+    "Training-data size bands disclosed": {
+        "es": "Bandas de tamaño de datos de entrenamiento divulgadas",
+        "fr": "Tranches de taille des données d'entraînement divulguées",
+        "de": "Offengelegte Trainingsdaten-Größenbänder",
+        "it": "Fasce di dimensione dei dati di addestramento divulgate",
+        "ja": "開示された学習データの規模帯",
+        "zh": "已披露的训练数据规模区间",
+        "ko": "공개된 학습 데이터 규모 구간",
+    },
+    "The exact size band each summary discloses per modality, as filed. Bands are coarse by design (the template offers a fixed set) — &ldquo;Not applicable&rdquo; means the modality is not part of the training data.": {
+        "es": "La banda de tamaño exacta que cada resumen divulga por modalidad, tal como se presentó. Las bandas son gruesas por diseño (la plantilla ofrece un conjunto fijo) — &ldquo;No aplicable&rdquo; significa que la modalidad no forma parte de los datos de entrenamiento.",
+        "fr": "La tranche de taille exacte que chaque résumé divulgue par modalité, telle que déposée. Les tranches sont grossières par conception (le modèle propose un ensemble fixe) — &ldquo;Non applicable&rdquo; signifie que la modalité ne fait pas partie des données d'entraînement.",
+        "de": "Das genaue Größenband, das jede Zusammenfassung je Modalität angibt, wie eingereicht. Die Bänder sind bewusst grob (die Vorlage bietet einen festen Satz) — &ldquo;Nicht zutreffend&rdquo; bedeutet, dass die Modalität nicht Teil der Trainingsdaten ist.",
+        "it": "La fascia di dimensione esatta che ogni riepilogo divulga per modalità, così come presentata. Le fasce sono grossolane per progettazione (il modello offre un insieme fisso) — &ldquo;Non applicabile&rdquo; significa che la modalità non fa parte dei dati di addestramento.",
+        "ja": "各概要がモダリティごとに開示する正確な規模帯を、提出されたとおりに示します。帯は設計上粗くなっています（テンプレートは固定のセットを提供します）——&ldquo;該当なし&rdquo;は、そのモダリティが学習データに含まれないことを意味します。",
+        "zh": "每份摘要按模态披露的确切规模区间（按提交内容）。区间在设计上是粗略的（模板提供固定的一组）——&ldquo;不适用&rdquo;表示该模态不属于训练数据。",
+        "ko": "각 요약이 모달리티별로 공개하는 정확한 규모 구간(제출된 그대로). 구간은 설계상 대략적입니다(템플릿이 고정된 집합을 제공) — &ldquo;해당 없음&rdquo;은 해당 모달리티가 학습 데이터에 포함되지 않음을 의미합니다.",
+    },
+    "Data cut-off &amp; data-source categories": {
+        "es": "Fecha de corte de datos y categorías de fuentes de datos",
+        "fr": "Date limite des données et catégories de sources de données",
+        "de": "Datenstichtag und Datenquellenkategorien",
+        "it": "Data di chiusura dei dati e categorie di fonti di dati",
+        "ja": "データのカットオフとデータソースのカテゴリー",
+        "zh": "数据截止时间与数据来源类别",
+        "ko": "데이터 마감 시점 및 데이터 출처 범주",
+    },
+    "The data-acquisition cut-off and the yes/no data-source flags each summary discloses. Blank cells (&mdash;) are fields the summary does not report.": {
+        "es": "La fecha de corte de adquisición de datos y las marcas sí/no de fuentes de datos que divulga cada resumen. Las celdas en blanco (&mdash;) son campos que el resumen no informa.",
+        "fr": "La date limite d'acquisition des données et les indicateurs oui/non des sources de données que divulgue chaque résumé. Les cellules vides (&mdash;) sont des champs que le résumé ne rapporte pas.",
+        "de": "Der Datenerhebungs-Stichtag und die Ja/Nein-Kennzeichnungen der Datenquellen, die jede Zusammenfassung angibt. Leere Zellen (&mdash;) sind Felder, die die Zusammenfassung nicht meldet.",
+        "it": "La data di chiusura dell'acquisizione dei dati e gli indicatori sì/no delle fonti di dati che ogni riepilogo divulga. Le celle vuote (&mdash;) sono campi che il riepilogo non riporta.",
+        "ja": "各概要が開示するデータ取得のカットオフとデータソースの可否フラグ。空欄（&mdash;）は、概要が報告していないフィールドです。",
+        "zh": "每份摘要披露的数据采集截止时间和数据来源的是/否标记。空白单元格（&mdash;）是摘要未报告的字段。",
+        "ko": "각 요약이 공개하는 데이터 수집 마감 시점과 데이터 출처 예/아니오 플래그. 빈 셀(&mdash;)은 요약이 보고하지 않는 필드입니다.",
+    },
+    # ── shared "Loading…" (chart-loading + results-loading) ──────────────────
+    "Loading…": {
+        "es": "Cargando…",
+        "fr": "Chargement…",
+        "de": "Wird geladen…",
+        "it": "Caricamento…",
+        "ja": "読み込み中…",
+        "zh": "加载中…",
+        "ko": "불러오는 중…",
+    },
+    # ── footer prose (fragments around the <a> links) ────────────────────────
+    "Source: providers' ": {
+        "es": "Fuente: resúmenes públicos del contenido de entrenamiento de los proveedores según el ",
+        "fr": "Source : résumés publics du contenu d'entraînement des fournisseurs au titre de l'",
+        "de": "Quelle: öffentliche Zusammenfassungen der Trainingsinhalte der Anbieter gemäß ",
+        "it": "Fonte: riepiloghi pubblici dei contenuti di addestramento dei fornitori ai sensi dell'",
+        "ja": "出典：プロバイダーによる",
+        "zh": "来源：提供商根据 ",
+        "ko": "출처: 제공자의 ",
+    },
+    " public summaries of training content (Google's transparency-report PDF + Microsoft's Hugging Face data summary cards). Data via ": {
+        "es": " (PDF del informe de transparencia de Google + tarjetas de resumen de datos de Hugging Face de Microsoft). Datos vía ",
+        "fr": " (PDF du rapport de transparence de Google + fiches de résumé de données Hugging Face de Microsoft). Données via ",
+        "de": " (Transparenzbericht-PDF von Google + Hugging-Face-Datenzusammenfassungskarten von Microsoft). Daten über ",
+        "it": " (PDF del rapporto di trasparenza di Google + schede di riepilogo dati Hugging Face di Microsoft). Dati tramite ",
+        "ja": "の学習コンテンツの公開概要（GoogleのトランスペアレンシーレポートPDF + MicrosoftのHugging Faceデータ概要カード）。データ提供元： ",
+        "zh": " 发布的训练内容公开摘要（Google 的透明度报告 PDF + Microsoft 的 Hugging Face 数据摘要卡）。数据来自 ",
+        "ko": " 학습 콘텐츠 공개 요약(Google의 투명성 보고서 PDF + Microsoft의 Hugging Face 데이터 요약 카드). 데이터 제공: ",
+    },
+    "Snapshot:": {
+        "es": "Instantánea:",
+        "fr": "Instantané :",
+        "de": "Snapshot:",
+        "it": "Istantanea:",
+        "ja": "スナップショット：",
+        "zh": "快照：",
+        "ko": "스냅샷:",
+    },
+    "Cite as:": {
+        "es": "Citar como:",
+        "fr": "Citer comme :",
+        "de": "Zitieren als:",
+        "it": "Citare come:",
+        "ja": "引用：",
+        "zh": "引用为：",
+        "ko": "인용:",
+    },
+    # ── provenance cite (JS, double-quoted string fragments) ─────────────────
+    "“EU AI Act Art. 53(1)(d) training-data transparency summaries, via the Transparency Report API (": {
+        "es": "“Resúmenes de transparencia de datos de entrenamiento del EU AI Act Art. 53(1)(d), vía la Transparency Report API (",
+        "fr": "“Résumés de transparence des données d'entraînement de l'EU AI Act Art. 53(1)(d), via la Transparency Report API (",
+        "de": "“Transparenzzusammenfassungen der Trainingsdaten des EU AI Act Art. 53(1)(d), über die Transparency Report API (",
+        "it": "“Riepiloghi di trasparenza dei dati di addestramento dell'EU AI Act Art. 53(1)(d), tramite la Transparency Report API (",
+        "ja": "“EU AI Act Art. 53(1)(d) の学習データ透明性概要、Transparency Report API 経由 (",
+        "zh": "“EU AI Act Art. 53(1)(d) 训练数据透明度摘要，通过 Transparency Report API (",
+        "ko": "“EU AI Act Art. 53(1)(d) 학습 데이터 투명성 요약, Transparency Report API 경유 (",
+    },
+    " snapshot": {
+        "es": " instantánea",
+        "fr": " instantané",
+        "de": " Snapshot",
+        "it": " istantanea",
+        "ja": " スナップショット",
+        "zh": " 快照",
+        "ko": " 스냅샷",
+    },
+    ", dataset version ": {
+        "es": ", versión del conjunto de datos ",
+        "fr": ", version du jeu de données ",
+        "de": ", Datensatzversion ",
+        "it": ", versione del set di dati ",
+        "ja": "、データセットバージョン ",
+        "zh": "，数据集版本 ",
+        "ko": ", 데이터 세트 버전 ",
+    },
+    # ── JS display strings: empty/error states ───────────────────────────────
+    "No data available.": {
+        "es": "No hay datos disponibles.",
+        "fr": "Aucune donnée disponible.",
+        "de": "Keine Daten verfügbar.",
+        "it": "Nessun dato disponibile.",
+        "ja": "利用可能なデータがありません。",
+        "zh": "无可用数据。",
+        "ko": "사용할 수 있는 데이터가 없습니다.",
+    },
+    "Failed to load size bands: ": {
+        "es": "No se pudieron cargar las bandas de tamaño: ",
+        "fr": "Échec du chargement des tranches de taille : ",
+        "de": "Fehler beim Laden der Größenbänder: ",
+        "it": "Impossibile caricare le fasce di dimensione: ",
+        "ja": "規模帯を読み込めませんでした： ",
+        "zh": "无法加载规模区间： ",
+        "ko": "규모 구간을 불러오지 못했습니다: ",
+    },
+    "Failed to load data sources: ": {
+        "es": "No se pudieron cargar las fuentes de datos: ",
+        "fr": "Échec du chargement des sources de données : ",
+        "de": "Fehler beim Laden der Datenquellen: ",
+        "it": "Impossibile caricare le fonti di dati: ",
+        "ja": "データソースを読み込めませんでした： ",
+        "zh": "无法加载数据来源： ",
+        "ko": "데이터 출처를 불러오지 못했습니다: ",
+    },
+    # ── JS table headers / column labels ─────────────────────────────────────
+    "Provider": {
+        "es": "Proveedor",
+        "fr": "Fournisseur",
+        "de": "Anbieter",
+        "it": "Fornitore",
+        "ja": "プロバイダー",
+        "zh": "提供商",
+        "ko": "제공자",
+    },
+    "Model": {
+        "es": "Modelo",
+        "fr": "Modèle",
+        "de": "Modell",
+        "it": "Modello",
+        "ja": "モデル",
+        "zh": "模型",
+        "ko": "모델",
+    },
+    "Modality": {
+        "es": "Modalidad",
+        "fr": "Modalité",
+        "de": "Modalität",
+        "it": "Modalità",
+        "ja": "モダリティ",
+        "zh": "模态",
+        "ko": "모달리티",
+    },
+    "Text size rank": {
+        "es": "Rango de tamaño de texto",
+        "fr": "Rang de taille du texte",
+        "de": "Textgrößenrang",
+        "it": "Rango di dimensione del testo",
+        "ja": "テキスト規模ランク",
+        "zh": "文本规模等级",
+        "ko": "텍스트 규모 등급",
+    },
+    "Data cut-off": {
+        "es": "Fecha de corte de datos",
+        "fr": "Date limite des données",
+        "de": "Datenstichtag",
+        "it": "Data di chiusura",
+        "ja": "データのカットオフ",
+        "zh": "数据截止时间",
+        "ko": "데이터 마감 시점",
+    },
+    "Publicly available": {
+        "es": "Disponible públicamente",
+        "fr": "Accessible au public",
+        "de": "Öffentlich verfügbar",
+        "it": "Disponibile pubblicamente",
+        "ja": "一般に利用可能",
+        "zh": "公开可用",
+        "ko": "공개적으로 이용 가능",
+    },
+    "Commercially licensed": {
+        "es": "Con licencia comercial",
+        "fr": "Sous licence commerciale",
+        "de": "Kommerziell lizenziert",
+        "it": "Con licenza commerciale",
+        "ja": "商用ライセンス",
+        "zh": "商业授权",
+        "ko": "상업적 라이선스",
+    },
+    "Third-party private": {
+        "es": "Privado de terceros",
+        "fr": "Privé de tiers",
+        "de": "Privat von Dritten",
+        "it": "Privato di terzi",
+        "ja": "第三者の非公開",
+        "zh": "第三方私有",
+        "ko": "제3자 비공개",
+    },
+    "Personal data": {
+        "es": "Datos personales",
+        "fr": "Données personnelles",
+        "de": "Personenbezogene Daten",
+        "it": "Dati personali",
+        "ja": "個人データ",
+        "zh": "个人数据",
+        "ko": "개인정보",
+    },
+    "Crawled": {
+        "es": "Rastreado",
+        "fr": "Collecté par crawl",
+        "de": "Gecrawlt",
+        "it": "Sottoposto a crawling",
+        "ja": "クロール",
+        "zh": "爬取",
+        "ko": "크롤링",
+    },
+    "User data": {
+        "es": "Datos de usuario",
+        "fr": "Données utilisateur",
+        "de": "Nutzerdaten",
+        "it": "Dati utente",
+        "ja": "ユーザーデータ",
+        "zh": "用户数据",
+        "ko": "사용자 데이터",
+    },
+    "Synthetic": {
+        "es": "Sintético",
+        "fr": "Synthétique",
+        "de": "Synthetisch",
+        "it": "Sintetico",
+        "ja": "合成",
+        "zh": "合成",
+        "ko": "합성",
+    },
+    # ── JS renderMatrix captions (sr-only) ───────────────────────────────────
+    "Training-data size band disclosed by each model, per modality.": {
+        "es": "Banda de tamaño de datos de entrenamiento divulgada por cada modelo, por modalidad.",
+        "fr": "Tranche de taille des données d'entraînement divulguée par chaque modèle, par modalité.",
+        "de": "Trainingsdaten-Größenband, das jedes Modell je Modalität angibt.",
+        "it": "Fascia di dimensione dei dati di addestramento divulgata da ciascun modello, per modalità.",
+        "ja": "各モデルがモダリティごとに開示した学習データの規模帯。",
+        "zh": "每个模型按模态披露的训练数据规模区间。",
+        "ko": "각 모델이 모달리티별로 공개한 학습 데이터 규모 구간.",
+    },
+    "Data-acquisition cut-off and data-source categories disclosed by each model.": {
+        "es": "Fecha de corte de adquisición de datos y categorías de fuentes de datos divulgadas por cada modelo.",
+        "fr": "Date limite d'acquisition des données et catégories de sources de données divulguées par chaque modèle.",
+        "de": "Datenerhebungs-Stichtag und Datenquellenkategorien, die jedes Modell angibt.",
+        "it": "Data di chiusura dell'acquisizione dei dati e categorie di fonti di dati divulgate da ciascun modello.",
+        "ja": "各モデルが開示したデータ取得のカットオフとデータソースのカテゴリー。",
+        "zh": "每个模型披露的数据采集截止时间和数据来源类别。",
+        "ko": "각 모델이 공개한 데이터 수집 마감 시점 및 데이터 출처 범주.",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    PAGES[_loc]["ai-training.html"] = [(_en, _tr[_loc]) for _en, _tr in _AIT_PAGE.items()]
+    _pt = open(os.path.join(STATIC, "ai-training.html"), encoding="utf-8").read()
+    _own = {_o for _o, _ in PAGES[_loc]["ai-training.html"]}
+    for _src in ("singapore.html", "cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _pt and _o not in _own:
+                PAGES[_loc]["ai-training.html"].append((_o, _n))
+                _own.add(_o)
+
+
+# -- regional full page localization --
+
+_REGIONAL_NAV = {
+    "es": 'Leyes regionales',
+    "fr": 'Lois régionales',
+    "de": 'Regionale Gesetze',
+    "it": 'Leggi regionali',
+    "ja": '地域法',
+    "zh": '地区性法律',
+    "ko": '지역 법률',
+}
+for _loc in _REGIONAL_NAV:
+    COMMON[_loc].append(("      Regional laws\n    </a>", f"      {_REGIONAL_NAV[_loc]}\n    </a>"))
+_REG_PAGE = {
+    # ── <title> ────────────────────────────────────────────────────────────
+    "Regional content-moderation transparency laws — Transparency Report API": {
+        "es": "Leyes regionales de transparencia sobre moderación de contenidos — Transparency Report API",
+        "fr": "Lois régionales de transparence sur la modération de contenu — Transparency Report API",
+        "de": "Regionale Transparenzgesetze zur Inhaltsmoderation — Transparency Report API",
+        "it": "Leggi regionali sulla trasparenza della moderazione dei contenuti — Transparency Report API",
+        "ja": "地域のコンテンツモデレーション透明性法 — Transparency Report API",
+        "zh": "地区性内容审核透明度法律 — Transparency Report API",
+        "ko": "지역별 콘텐츠 모더레이션 투명성 법 — Transparency Report API",
+    },
+
+    # ── <meta name="description"> (literal § and — , not entities) ──────────
+    "YouTube transparency reports filed under Texas HB 20 (§120.053) and Austria's Kommunikationsplattformen-Gesetz (KoPl-G) — content moderation, enforcement and complaints figures.": {
+        "es": "Informes de transparencia de YouTube presentados bajo la Texas HB 20 (§120.053) y la Kommunikationsplattformen-Gesetz (KoPl-G) de Austria — cifras de moderación de contenidos, aplicación y reclamaciones.",
+        "fr": "Rapports de transparence de YouTube déposés au titre du Texas HB 20 (§120.053) et du Kommunikationsplattformen-Gesetz (KoPl-G) d'Austria — chiffres de modération de contenu, d'application et de plaintes.",
+        "de": "YouTube-Transparenzberichte nach dem Texas HB 20 (§120.053) und dem Kommunikationsplattformen-Gesetz (KoPl-G) von Austria — Zahlen zu Inhaltsmoderation, Durchsetzung und Beschwerden.",
+        "it": "Rapporti di trasparenza di YouTube presentati ai sensi del Texas HB 20 (§120.053) e del Kommunikationsplattformen-Gesetz (KoPl-G) di Austria — cifre su moderazione dei contenuti, applicazione e reclami.",
+        "ja": "Texas HB 20（§120.053）および Austria の Kommunikationsplattformen-Gesetz（KoPl-G）に基づいて提出された YouTube の透明性レポート — コンテンツモデレーション、執行、苦情の数値。",
+        "zh": "YouTube 根据 Texas HB 20（§120.053）和 Austria 的 Kommunikationsplattformen-Gesetz（KoPl-G）提交的透明度报告——内容审核、执行和投诉数据。",
+        "ko": "Texas HB 20(§120.053) 및 Austria의 Kommunikationsplattformen-Gesetz(KoPl-G)에 따라 제출된 YouTube 투명성 보고서 — 콘텐츠 모더레이션, 집행 및 신고 수치.",
+    },
+
+    # ── <h1> ───────────────────────────────────────────────────────────────
+    "Regional content-moderation transparency laws": {
+        "es": "Leyes regionales de transparencia sobre moderación de contenidos",
+        "fr": "Lois régionales de transparence sur la modération de contenu",
+        "de": "Regionale Transparenzgesetze zur Inhaltsmoderation",
+        "it": "Leggi regionali sulla trasparenza della moderazione dei contenuti",
+        "ja": "地域のコンテンツモデレーション透明性法",
+        "zh": "地区性内容审核透明度法律",
+        "ko": "지역별 콘텐츠 모더레이션 투명성 법",
+    },
+
+    # ── Intro <p> (keeps inline tags/entities + proper nouns YouTube/Google/
+    #    Texas/Austria/HB 20/KoPl-G/Business & Commerce Code/Kommunikations…) ─
+    "Two content-moderation laws require platforms to publish periodic transparency reports; Google files both for <strong>YouTube</strong>. <strong>Texas HB 20</strong> (Business &amp; Commerce Code &sect;120.053) mandates half-yearly reporting on monetization, Community-Guidelines enforcement (videos removed / appealed / reinstated), flags by flagger type, and removals by detection source, reason and country of upload. <strong>Austria's KoPl-G</strong> (Kommunikationsplattformen-Gesetz &sect;4) mandates biannual reporting on complaints about allegedly-illegal <em>textual</em> content (comments) &mdash; figures are sparse, as YouTube notes the webform is &ldquo;de facto not used.&rdquo; Each row is one measured value by jurisdiction × period × section × category × metric. Metric scope is each report's own &mdash; pin a <code>jurisdiction</code>, <code>section</code> and <code>metric</code> before aggregating, and note the reason/detection breakdowns each partition the <code>videos_removed</code> total.": {
+        "es": "Dos leyes de moderación de contenidos exigen a las plataformas publicar informes de transparencia periódicos; Google presenta ambos para <strong>YouTube</strong>. La <strong>Texas HB 20</strong> (Business &amp; Commerce Code &sect;120.053) obliga a informar semestralmente sobre monetización, aplicación de las Normas de la Comunidad (vídeos eliminados / apelados / restablecidos), denuncias por tipo de denunciante y retiradas por fuente de detección, motivo y país de subida. El <strong>KoPl-G de Austria</strong> (Kommunikationsplattformen-Gesetz &sect;4) obliga a informar dos veces al año sobre reclamaciones relativas a contenido <em>textual</em> presuntamente ilegal (comentarios) &mdash; las cifras son escasas, ya que YouTube señala que el formulario web &ldquo;de facto no se utiliza.&rdquo; Cada fila es un valor medido por jurisdicción × período × sección × categoría × métrica. El alcance de cada métrica es propio de cada informe &mdash; fija una <code>jurisdiction</code>, una <code>section</code> y una <code>metric</code> antes de agregar, y ten en cuenta que los desgloses por motivo/detección reparten cada uno el total de <code>videos_removed</code>.",
+        "fr": "Deux lois sur la modération de contenu imposent aux plateformes de publier des rapports de transparence périodiques ; Google les dépose tous deux pour <strong>YouTube</strong>. Le <strong>Texas HB 20</strong> (Business &amp; Commerce Code &sect;120.053) impose un rapport semestriel sur la monétisation, l'application des Règles de la communauté (vidéos supprimées / contestées / rétablies), les signalements par type de signaleur et les retraits par source de détection, motif et pays de mise en ligne. Le <strong>KoPl-G d'Austria</strong> (Kommunikationsplattformen-Gesetz &sect;4) impose un rapport semestriel sur les plaintes concernant des contenus <em>textuels</em> prétendument illégaux (commentaires) &mdash; les chiffres sont rares, car YouTube indique que le formulaire web est &ldquo;de facto inutilisé.&rdquo; Chaque ligne est une valeur mesurée par juridiction × période × section × catégorie × métrique. La portée de chaque métrique est propre à chaque rapport &mdash; fixez une <code>jurisdiction</code>, une <code>section</code> et une <code>metric</code> avant d'agréger, et notez que les ventilations par motif/détection partitionnent chacune le total <code>videos_removed</code>.",
+        "de": "Zwei Gesetze zur Inhaltsmoderation verpflichten Plattformen, regelmäßig Transparenzberichte zu veröffentlichen; Google reicht beide für <strong>YouTube</strong> ein. Das <strong>Texas HB 20</strong> (Business &amp; Commerce Code &sect;120.053) schreibt eine halbjährliche Berichterstattung über Monetarisierung, die Durchsetzung der Community-Richtlinien (entfernte / angefochtene / wiederhergestellte Videos), Meldungen nach Meldertyp sowie Entfernungen nach Erkennungsquelle, Grund und Upload-Land vor. Das <strong>KoPl-G von Austria</strong> (Kommunikationsplattformen-Gesetz &sect;4) schreibt eine halbjährliche Berichterstattung über Beschwerden zu angeblich rechtswidrigen <em>textuellen</em> Inhalten (Kommentaren) vor &mdash; die Zahlen sind spärlich, da YouTube anmerkt, dass das Webformular &ldquo;de facto nicht genutzt&rdquo; wird. Jede Zeile ist ein gemessener Wert nach Rechtsraum × Zeitraum × Abschnitt × Kategorie × Metrik. Der Umfang jeder Metrik ist berichtsspezifisch &mdash; fixieren Sie vor dem Aggregieren eine <code>jurisdiction</code>, <code>section</code> und <code>metric</code> und beachten Sie, dass die Aufschlüsselungen nach Grund/Erkennung jeweils den Gesamtwert <code>videos_removed</code> aufteilen.",
+        "it": "Due leggi sulla moderazione dei contenuti impongono alle piattaforme di pubblicare rapporti di trasparenza periodici; Google li presenta entrambi per <strong>YouTube</strong>. Il <strong>Texas HB 20</strong> (Business &amp; Commerce Code &sect;120.053) impone una rendicontazione semestrale su monetizzazione, applicazione delle Norme della community (video rimossi / contestati / ripristinati), segnalazioni per tipo di segnalatore e rimozioni per fonte di rilevamento, motivo e paese di caricamento. Il <strong>KoPl-G di Austria</strong> (Kommunikationsplattformen-Gesetz &sect;4) impone una rendicontazione semestrale sui reclami relativi a contenuti <em>testuali</em> presuntamente illegali (commenti) &mdash; le cifre sono scarse, poiché YouTube segnala che il modulo web è &ldquo;di fatto non utilizzato.&rdquo; Ogni riga è un valore misurato per giurisdizione × periodo × sezione × categoria × metrica. L'ambito di ogni metrica è proprio di ciascun rapporto &mdash; fissa una <code>jurisdiction</code>, una <code>section</code> e una <code>metric</code> prima di aggregare, e nota che le ripartizioni per motivo/rilevamento suddividono ciascuna il totale <code>videos_removed</code>.",
+        "ja": "2つのコンテンツモデレーション法が、プラットフォームに定期的な透明性レポートの公表を義務付けており、Google はいずれも <strong>YouTube</strong> について提出しています。<strong>Texas HB 20</strong>（Business &amp; Commerce Code &sect;120.053）は、収益化、コミュニティガイドラインの執行（削除／異議申し立て／復元された動画）、フラグ担当者の種類別のフラグ、検出元・理由・アップロード国別の削除について、半期ごとの報告を義務付けています。<strong>Austria の KoPl-G</strong>（Kommunikationsplattformen-Gesetz &sect;4）は、違法とされる<em>テキスト</em>コンテンツ（コメント）に関する苦情について年2回の報告を義務付けています &mdash; YouTube はウェブフォームが&ldquo;事実上使われていない&rdquo;と述べており、数値はわずかです。各行は、管轄区域 × 期間 × セクション × カテゴリ × メトリクスごとの1つの測定値です。各メトリクスの範囲はレポートごとに固有です &mdash; 集計する前に <code>jurisdiction</code>、<code>section</code>、<code>metric</code> を固定し、理由／検出の内訳がそれぞれ <code>videos_removed</code> の合計を分割している点に注意してください。",
+        "zh": "两部内容审核法律要求平台定期发布透明度报告；Google 均以 <strong>YouTube</strong> 名义提交。<strong>Texas HB 20</strong>（Business &amp; Commerce Code &sect;120.053）要求每半年报告变现、社区准则执行情况（已删除／已申诉／已恢复的视频）、按举报者类型的举报，以及按检测来源、原因和上传国家/地区的删除情况。<strong>Austria 的 KoPl-G</strong>（Kommunikationsplattformen-Gesetz &sect;4）要求每年两次报告有关涉嫌违法的<em>文本</em>内容（评论）的投诉 &mdash; 由于 YouTube 指出该网页表单&ldquo;实际上未被使用&rdquo;，相关数据很少。每一行都是按管辖区 × 期间 × 板块 × 类别 × 指标计量的一个测量值。每个指标的范围各报告自有 &mdash; 在聚合前请固定 <code>jurisdiction</code>、<code>section</code> 和 <code>metric</code>，并注意按原因／检测的细分各自都是对 <code>videos_removed</code> 总数的划分。",
+        "ko": "두 개의 콘텐츠 모더레이션 법이 플랫폼에 정기적인 투명성 보고서 발행을 의무화하며, Google은 두 가지 모두 <strong>YouTube</strong>에 대해 제출합니다. <strong>Texas HB 20</strong>(Business &amp; Commerce Code &sect;120.053)은 수익 창출, 커뮤니티 가이드 집행(삭제／이의 제기／복원된 동영상), 신고자 유형별 신고, 그리고 감지 출처·사유·업로드 국가별 삭제에 대해 반기별 보고를 의무화합니다. <strong>Austria의 KoPl-G</strong>(Kommunikationsplattformen-Gesetz &sect;4)는 위법으로 주장되는 <em>텍스트</em> 콘텐츠(댓글)에 관한 신고에 대해 연 2회 보고를 의무화합니다 &mdash; YouTube가 웹 양식이 &ldquo;사실상 사용되지 않는다&rdquo;고 언급하듯 수치는 희소합니다. 각 행은 관할권 × 기간 × 섹션 × 카테고리 × 지표별로 측정된 하나의 값입니다. 각 지표의 범위는 보고서마다 고유합니다 &mdash; 집계하기 전에 <code>jurisdiction</code>, <code>section</code>, <code>metric</code>을 고정하고, 사유／감지 세부 분류가 각각 <code>videos_removed</code> 총계를 분할한다는 점에 유의하세요.",
+    },
+
+    # ── Trends section ─────────────────────────────────────────────────────
+    "Trends": {
+        "es": "Tendencias", "fr": "Tendances", "de": "Trends", "it": "Tendenze",
+        "ja": "トレンド", "zh": "趋势", "ko": "트렌드",
+    },
+    "Interactive views of the reported figures. Each chart has a text alternative for screen readers.": {
+        "es": "Vistas interactivas de las cifras notificadas. Cada gráfico tiene una alternativa de texto para lectores de pantalla.",
+        "fr": "Vues interactives des chiffres déclarés. Chaque graphique dispose d'une alternative textuelle pour les lecteurs d'écran.",
+        "de": "Interaktive Ansichten der gemeldeten Zahlen. Jedes Diagramm hat eine Textalternative für Screenreader.",
+        "it": "Viste interattive delle cifre dichiarate. Ogni grafico ha un'alternativa testuale per gli screen reader.",
+        "ja": "報告された数値のインタラクティブ表示。各グラフにはスクリーンリーダー向けのテキスト代替があります。",
+        "zh": "报告数据的交互式视图。每个图表都有面向屏幕阅读器的文字替代。",
+        "ko": "보고된 수치의 인터랙티브 보기입니다. 각 차트에는 스크린 리더용 텍스트 대체가 제공됩니다.",
+    },
+
+    # ── Chart card 1 ───────────────────────────────────────────────────────
+    "YouTube videos removed, by reason (Texas HB 20)": {
+        "es": "Vídeos de YouTube eliminados, por motivo (Texas HB 20)",
+        "fr": "Vidéos YouTube supprimées, par motif (Texas HB 20)",
+        "de": "Entfernte YouTube-Videos, nach Grund (Texas HB 20)",
+        "it": "Video di YouTube rimossi, per motivo (Texas HB 20)",
+        "ja": "削除された YouTube 動画（理由別・Texas HB 20）",
+        "zh": "已删除的 YouTube 视频（按原因，Texas HB 20）",
+        "ko": "삭제된 YouTube 동영상, 사유별 (Texas HB 20)",
+    },
+    "Videos removed for Community-Guidelines violations, by policy category, in the latest full Texas &sect;120.053 report. The reason breakdown partitions the period's total videos-removed figure.": {
+        "es": "Vídeos eliminados por infracciones de las Normas de la Comunidad, por categoría de política, en el último informe completo de la Texas &sect;120.053. El desglose por motivo reparte la cifra total de vídeos eliminados del período.",
+        "fr": "Vidéos supprimées pour infraction aux Règles de la communauté, par catégorie de règle, dans le dernier rapport complet au titre du Texas &sect;120.053. La ventilation par motif partitionne le total de vidéos supprimées de la période.",
+        "de": "Videos, die wegen Verstößen gegen die Community-Richtlinien entfernt wurden, nach Richtlinienkategorie, im letzten vollständigen Bericht nach Texas &sect;120.053. Die Aufschlüsselung nach Grund teilt den Gesamtwert der im Zeitraum entfernten Videos auf.",
+        "it": "Video rimossi per violazioni delle Norme della community, per categoria di policy, nell'ultimo rapporto completo ai sensi del Texas &sect;120.053. La ripartizione per motivo suddivide la cifra totale dei video rimossi del periodo.",
+        "ja": "Texas &sect;120.053 に基づく直近の完全なレポートにおける、コミュニティガイドライン違反で削除された動画（ポリシーカテゴリ別）。理由別の内訳は、その期間の削除動画の合計を分割したものです。",
+        "zh": "在 Texas &sect;120.053 最新一份完整报告中，因违反社区准则而被删除的视频（按政策类别）。按原因的细分是对该期间已删除视频总数的划分。",
+        "ko": "Texas &sect;120.053에 따른 최신 전체 보고서에서 커뮤니티 가이드 위반으로 삭제된 동영상(정책 카테고리별). 사유별 세부 분류는 해당 기간의 총 삭제 동영상 수치를 분할한 것입니다.",
+    },
+
+    # ── Chart card 2 ───────────────────────────────────────────────────────
+    "YouTube videos removed, by country of upload (Texas HB 20)": {
+        "es": "Vídeos de YouTube eliminados, por país de subida (Texas HB 20)",
+        "fr": "Vidéos YouTube supprimées, par pays de mise en ligne (Texas HB 20)",
+        "de": "Entfernte YouTube-Videos, nach Upload-Land (Texas HB 20)",
+        "it": "Video di YouTube rimossi, per paese di caricamento (Texas HB 20)",
+        "ja": "削除された YouTube 動画（アップロード国別・Texas HB 20）",
+        "zh": "已删除的 YouTube 视频（按上传国家/地区，Texas HB 20）",
+        "ko": "삭제된 YouTube 동영상, 업로드 국가별 (Texas HB 20)",
+    },
+    "Videos removed by the uploader's country/region (based on IP at upload), in the latest full Texas report. Content removed for violating YouTube's guidelines is removed globally.": {
+        "es": "Vídeos eliminados según el país/región del autor de la subida (según la IP en el momento de subir), en el último informe completo de Texas. El contenido eliminado por infringir las normas de YouTube se elimina a nivel mundial.",
+        "fr": "Vidéos supprimées selon le pays/la région de l'auteur de la mise en ligne (d'après l'IP au moment de la mise en ligne), dans le dernier rapport complet du Texas. Le contenu supprimé pour infraction aux règles de YouTube est retiré au niveau mondial.",
+        "de": "Videos, entfernt nach Land/Region des Uploaders (basierend auf der IP beim Upload), im letzten vollständigen Texas-Bericht. Inhalte, die wegen Verstoßes gegen die YouTube-Richtlinien entfernt werden, werden weltweit entfernt.",
+        "it": "Video rimossi in base al paese/regione di chi ha caricato (in base all'IP al momento del caricamento), nell'ultimo rapporto completo del Texas. I contenuti rimossi per violazione delle norme di YouTube vengono rimossi a livello globale.",
+        "ja": "直近の完全な Texas レポートにおける、アップロード者の国/地域別（アップロード時の IP に基づく）に削除された動画。YouTube のガイドライン違反で削除されたコンテンツは全世界で削除されます。",
+        "zh": "在 Texas 最新一份完整报告中，按上传者所在国家/地区（基于上传时的 IP）删除的视频。因违反 YouTube 准则而删除的内容会在全球范围内删除。",
+        "ko": "최신 전체 Texas 보고서에서 업로더의 국가/지역별(업로드 시점의 IP 기준)로 삭제된 동영상. YouTube 가이드 위반으로 삭제된 콘텐츠는 전 세계적으로 삭제됩니다.",
+    },
+
+    # ── Data section 1 ─────────────────────────────────────────────────────
+    "Community-Guidelines enforcement, by period (Texas HB 20)": {
+        "es": "Aplicación de las Normas de la Comunidad, por período (Texas HB 20)",
+        "fr": "Application des Règles de la communauté, par période (Texas HB 20)",
+        "de": "Durchsetzung der Community-Richtlinien, nach Zeitraum (Texas HB 20)",
+        "it": "Applicazione delle Norme della community, per periodo (Texas HB 20)",
+        "ja": "コミュニティガイドラインの執行（期間別・Texas HB 20）",
+        "zh": "社区准则执行情况（按期间，Texas HB 20）",
+        "ko": "커뮤니티 가이드 집행, 기간별 (Texas HB 20)",
+    },
+    "The headline global Community-Guidelines figures YouTube files under Texas &sect;120.053 each half-year: videos removed, appeals received, and reinstatements. From 2025-H2 these point to the global enforcement report instead.": {
+        "es": "Las principales cifras globales de las Normas de la Comunidad que YouTube presenta bajo la Texas &sect;120.053 cada semestre: vídeos eliminados, apelaciones recibidas y restablecimientos. A partir de 2025-H2 estas remiten al informe global de aplicación.",
+        "fr": "Les principaux chiffres mondiaux des Règles de la communauté que YouTube dépose au titre du Texas &sect;120.053 chaque semestre : vidéos supprimées, appels reçus et rétablissements. À partir de 2025-H2, ils renvoient plutôt au rapport mondial d'application.",
+        "de": "Die wichtigsten globalen Community-Richtlinien-Zahlen, die YouTube halbjährlich nach Texas &sect;120.053 einreicht: entfernte Videos, eingegangene Einsprüche und Wiederherstellungen. Ab 2025-H2 verweisen diese stattdessen auf den globalen Durchsetzungsbericht.",
+        "it": "Le principali cifre globali delle Norme della community che YouTube presenta ai sensi del Texas &sect;120.053 ogni semestre: video rimossi, ricorsi ricevuti e ripristini. Dal 2025-H2 rimandano invece al rapporto globale sull'applicazione.",
+        "ja": "YouTube が Texas &sect;120.053 に基づいて半期ごとに提出する、コミュニティガイドラインの主要なグローバル数値：削除された動画、受け付けた異議申し立て、復元。2025-H2 以降、これらは代わりにグローバルの執行レポートを参照します。",
+        "zh": "YouTube 每半年根据 Texas &sect;120.053 提交的主要全球社区准则数据：已删除的视频、收到的申诉和恢复。自 2025-H2 起，这些数据转而指向全球执行报告。",
+        "ko": "YouTube가 Texas &sect;120.053에 따라 반기마다 제출하는 주요 글로벌 커뮤니티 가이드 수치: 삭제된 동영상, 접수된 이의 제기, 복원. 2025-H2부터는 대신 글로벌 집행 보고서를 가리킵니다.",
+    },
+
+    # ── Data section 2 ─────────────────────────────────────────────────────
+    "KoPl-G complaints, by period (Austria)": {
+        "es": "Reclamaciones KoPl-G, por período (Austria)",
+        "fr": "Plaintes KoPl-G, par période (Austria)",
+        "de": "KoPl-G-Beschwerden, nach Zeitraum (Austria)",
+        "it": "Reclami KoPl-G, per periodo (Austria)",
+        "ja": "KoPl-G の苦情（期間別・Austria）",
+        "zh": "KoPl-G 投诉（按期间，Austria）",
+        "ko": "KoPl-G 신고, 기간별 (Austria)",
+    },
+    "Complaints about allegedly-illegal comments reported and removed under Austria's KoPl-G. The counts are single-digit &mdash; YouTube's report notes the KoPl-G reporting webform is de facto unused.": {
+        "es": "Reclamaciones sobre comentarios presuntamente ilegales notificados y eliminados bajo la KoPl-G de Austria. Los recuentos son de un solo dígito &mdash; el informe de YouTube señala que el formulario web de notificación de la KoPl-G está de facto sin uso.",
+        "fr": "Plaintes concernant des commentaires prétendument illégaux signalés et supprimés au titre du KoPl-G d'Austria. Les nombres sont à un seul chiffre &mdash; le rapport de YouTube indique que le formulaire web de signalement du KoPl-G est de facto inutilisé.",
+        "de": "Beschwerden über angeblich rechtswidrige Kommentare, die nach dem KoPl-G von Austria gemeldet und entfernt wurden. Die Zahlen sind einstellig &mdash; der YouTube-Bericht merkt an, dass das KoPl-G-Meldeformular de facto ungenutzt ist.",
+        "it": "Reclami su commenti presuntamente illegali segnalati e rimossi ai sensi del KoPl-G di Austria. I conteggi sono a una sola cifra &mdash; il rapporto di YouTube segnala che il modulo web di segnalazione del KoPl-G è di fatto inutilizzato.",
+        "ja": "Austria の KoPl-G に基づいて報告・削除された、違法とされるコメントに関する苦情。件数は1桁です &mdash; YouTube のレポートは、KoPl-G の報告用ウェブフォームが事実上使われていないと述べています。",
+        "zh": "根据 Austria KoPl-G 举报并删除的涉嫌违法评论的投诉。计数为个位数 &mdash; YouTube 的报告指出 KoPl-G 举报网页表单实际上未被使用。",
+        "ko": "Austria KoPl-G에 따라 신고·삭제된, 위법으로 주장되는 댓글에 관한 신고. 건수는 한 자리 수입니다 &mdash; YouTube 보고서는 KoPl-G 신고 웹 양식이 사실상 사용되지 않는다고 언급합니다.",
+    },
+
+    # ── JS: loading / empty ────────────────────────────────────────────────
+    "Loading…": {
+        "es": "Cargando…", "fr": "Chargement…", "de": "Wird geladen…", "it": "Caricamento…",
+        "ja": "読み込み中…", "zh": "加载中…", "ko": "불러오는 중…",
+    },
+    # (appears in a SINGLE-QUOTED JS literal — all values apostrophe-free, safe)
+    "No data available.": {
+        "es": "Sin datos disponibles.", "fr": "Aucune donnée disponible.",
+        "de": "Keine Daten verfügbar.", "it": "Nessun dato disponibile.",
+        "ja": "データがありません。", "zh": "暂无数据。", "ko": "데이터가 없습니다.",
+    },
+
+    # ── JS: srTable / pivotTable column-head + row-label args (double-quoted) ─
+    "Period": {
+        "es": "Período", "fr": "Période", "de": "Zeitraum", "it": "Periodo",
+        "ja": "期間", "zh": "期间", "ko": "기간",
+    },
+    "Reason": {
+        "es": "Motivo", "fr": "Motif", "de": "Grund", "it": "Motivo",
+        "ja": "理由", "zh": "原因", "ko": "사유",
+    },
+    "Country": {
+        "es": "País", "fr": "Pays", "de": "Land", "it": "Paese",
+        "ja": "国", "zh": "国家/地区", "ko": "국가",
+    },
+    "Videos removed": {
+        "es": "Vídeos eliminados", "fr": "Vidéos supprimées", "de": "Entfernte Videos",
+        "it": "Video rimossi", "ja": "削除された動画", "zh": "已删除的视频", "ko": "삭제된 동영상",
+    },
+    "Appeals": {
+        "es": "Apelaciones", "fr": "Appels", "de": "Einsprüche", "it": "Ricorsi",
+        "ja": "異議申し立て", "zh": "申诉", "ko": "이의 제기",
+    },
+    "Reinstatements": {
+        "es": "Restablecimientos", "fr": "Rétablissements", "de": "Wiederherstellungen",
+        "it": "Ripristini", "ja": "復元", "zh": "恢复", "ko": "복원",
+    },
+    "Reported items": {
+        "es": "Elementos notificados", "fr": "Éléments signalés", "de": "Gemeldete Elemente",
+        "it": "Elementi segnalati", "ja": "報告された項目", "zh": "举报的项目", "ko": "신고된 항목",
+    },
+    "Removed items": {
+        "es": "Elementos eliminados", "fr": "Éléments supprimés", "de": "Entfernte Elemente",
+        "it": "Elementi rimossi", "ja": "削除された項目", "zh": "已删除的项目", "ko": "삭제된 항목",
+    },
+
+    # ── JS: pivotTable caption args (double-quoted) ─────────────────────────
+    "YouTube Community-Guidelines enforcement filed under Texas HB 20, by period.": {
+        "es": "Aplicación de las Normas de la Comunidad de YouTube presentada bajo la Texas HB 20, por período.",
+        "fr": "Application des Règles de la communauté de YouTube déposée au titre du Texas HB 20, par période.",
+        "de": "Durchsetzung der YouTube-Community-Richtlinien nach Texas HB 20, nach Zeitraum.",
+        "it": "Applicazione delle Norme della community di YouTube presentata ai sensi del Texas HB 20, per periodo.",
+        "ja": "Texas HB 20 に基づいて提出された YouTube コミュニティガイドラインの執行（期間別）。",
+        "zh": "根据 Texas HB 20 提交的 YouTube 社区准则执行情况（按期间）。",
+        "ko": "Texas HB 20에 따라 제출된 YouTube 커뮤니티 가이드 집행(기간별).",
+    },
+    "KoPl-G complaints reported and removed on YouTube in Austria, by period.": {
+        "es": "Reclamaciones KoPl-G notificadas y eliminadas en YouTube en Austria, por período.",
+        "fr": "Plaintes KoPl-G signalées et supprimées sur YouTube en Austria, par période.",
+        "de": "KoPl-G-Beschwerden, die auf YouTube in Austria gemeldet und entfernt wurden, nach Zeitraum.",
+        "it": "Reclami KoPl-G segnalati e rimossi su YouTube in Austria, per periodo.",
+        "ja": "Austria の YouTube で報告・削除された KoPl-G の苦情（期間別）。",
+        "zh": "在 Austria 的 YouTube 上举报并删除的 KoPl-G 投诉（按期间）。",
+        "ko": "Austria YouTube에서 신고·삭제된 KoPl-G 신고(기간별).",
+    },
+
+    # ── JS: error strings (double-quoted, trailing space kept) ──────────────
+    "Failed to load enforcement figures: ": {
+        "es": "No se pudieron cargar las cifras de aplicación: ",
+        "fr": "Échec du chargement des chiffres d'application : ",
+        "de": "Durchsetzungszahlen konnten nicht geladen werden: ",
+        "it": "Impossibile caricare le cifre di applicazione: ",
+        "ja": "執行の数値を読み込めませんでした: ",
+        "zh": "无法加载执行数据: ",
+        "ko": "집행 수치를 불러오지 못했습니다: ",
+    },
+    "Failed to load KoPl-G complaints: ": {
+        "es": "No se pudieron cargar las reclamaciones KoPl-G: ",
+        "fr": "Échec du chargement des plaintes KoPl-G : ",
+        "de": "KoPl-G-Beschwerden konnten nicht geladen werden: ",
+        "it": "Impossibile caricare i reclami KoPl-G: ",
+        "ja": "KoPl-G の苦情を読み込めませんでした: ",
+        "zh": "无法加载 KoPl-G 投诉: ",
+        "ko": "KoPl-G 신고를 불러오지 못했습니다: ",
+    },
+
+    # ── JS: provenance citation, fillProvenance() ──────────────────────────
+    # Part A — opening double-quoted literal (leading curly quote kept; ASCII
+    # "(" retained so " + generated" still reads correctly).
+    "“Regional content-moderation transparency-law reports (Texas HB 20 / Austria KoPl-G), via the Transparency Report API (": {
+        "es": "“Informes de las leyes regionales de transparencia sobre moderación de contenidos (Texas HB 20 / Austria KoPl-G), vía la Transparency Report API (",
+        "fr": "“Rapports des lois régionales de transparence sur la modération de contenu (Texas HB 20 / Austria KoPl-G), via la Transparency Report API (",
+        "de": "“Berichte nach regionalen Transparenzgesetzen zur Inhaltsmoderation (Texas HB 20 / Austria KoPl-G), über die Transparency Report API (",
+        "it": "“Rapporti delle leggi regionali sulla trasparenza della moderazione dei contenuti (Texas HB 20 / Austria KoPl-G), tramite la Transparency Report API (",
+        "ja": "“地域のコンテンツモデレーション透明性法レポート（Texas HB 20 / Austria KoPl-G）、Transparency Report API 経由 (",
+        "zh": "“地区性内容审核透明度法律报告（Texas HB 20 / Austria KoPl-G），通过 Transparency Report API (",
+        "ko": "“지역별 콘텐츠 모더레이션 투명성 법 보고서(Texas HB 20 / Austria KoPl-G), Transparency Report API 경유 (",
+    },
+    # Part B — single-quoted ' snapshot' (leading space kept; es/fr/de/it drop
+    # it entirely, matching the singapore precedent). No apostrophes → safe.
+    " snapshot": {
+        "es": "", "fr": "", "de": "", "it": "",
+        "ja": " のスナップショット", "zh": " 快照", "ko": " 스냅샷",
+    },
+    # Part C — single-quoted ', dataset version '
+    ", dataset version ": {
+        "es": ", versión del conjunto de datos ",
+        "fr": ", version du jeu de données ",
+        "de": ", Datensatzversion ",
+        "it": ", versione del set di dati ",
+        "ja": "、データセットバージョン ",
+        "zh": "，数据集版本 ",
+        "ko": ", 데이터셋 버전 ",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    PAGES[_loc]["regional.html"] = [(_en, _tr[_loc]) for _en, _tr in _REG_PAGE.items()]
+    _pt = open(os.path.join(STATIC, "regional.html"), encoding="utf-8").read()
+    _own = {_o for _o, _ in PAGES[_loc]["regional.html"]}
+    for _src in ("singapore.html", "cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _pt and _o not in _own:
+                PAGES[_loc]["regional.html"].append((_o, _n))
+                _own.add(_o)
+
+
+# -- korea-network-act full page localization --
+# Translation table for static/korea-network-act.html
+# Ordering: longest / most-specific keys first so a naive longest-first
+# text.replace resolves full sentences and multi-word heads before the short
+# column heads ("URLs", "Requests", "Reason", "Year", "Month") run last.
+# The badge "Network Act Art. 64-5 · Google · 2020–2025" is intentionally
+# omitted: every token is a proper noun / number, so it has no translatable text.
+_KNA_PAGE = {
+
+    # ── Intro paragraph (full <p> inner HTML; tags, entities & <code>/proper nouns kept verbatim) ──
+    "South Korea's <strong>Network Act</strong> (Art. 64-5) and <strong>Telecommunications Business Act</strong> (Art. 22-5), from the two bills passed on 20 May 2020, require online service providers to take technical and managerial measures against the circulation of <em>illegal sexual content</em> — illegally-filmed content, deepfake (&ldquo;fake&rdquo;) images and videos, and child/youth sexual-abuse material — and to publish an <strong>annual transparency report</strong> on them. <strong>Google</strong> publishes one per calendar year covering <strong>Search and YouTube jointly</strong>; this dataset holds all six reports so far (2020 → 2025). The 2024 and 2025 reports add a full <strong>monthly</strong> breakdown by complainant, reason and outcome; 2020–2023 give only the year's headline URL counts (2020 covers just 10–31 Dec, the law's implementation date). A tidy-long dataset: each row is one measured value identified by publisher × period × section × category × metric. The four monthly sections are cross-cuts of the <strong>same</strong> requests, so they aren't additive across sections; <code>annual_summary</code> is a rollup that sits beside them. Pin a <code>section</code> (and <code>metric</code>) before aggregating.": {
+        "es": "El <strong>Network Act</strong> (Art. 64-5) y la <strong>Telecommunications Business Act</strong> (Art. 22-5) de Corea del Sur, procedentes de los dos proyectos de ley aprobados el 20 de mayo de 2020, obligan a los proveedores de servicios en línea a adoptar medidas técnicas y de gestión contra la circulación de <em>contenido sexual ilegal</em> —contenido grabado ilegalmente, imágenes y vídeos deepfake (&ldquo;falsos&rdquo;) y material de abuso sexual de menores/jóvenes— y a publicar un <strong>informe anual de transparencia</strong> sobre ellas. <strong>Google</strong> publica uno por año natural que cubre <strong>Search y YouTube conjuntamente</strong>; este conjunto de datos contiene los seis informes publicados hasta ahora (2020 → 2025). Los informes de 2024 y 2025 añaden un desglose <strong>mensual</strong> completo por denunciante, motivo y resultado; los de 2020–2023 solo dan las cifras principales de URL del año (2020 cubre solo del 10 al 31 de dic., la fecha de entrada en vigor de la ley). Un conjunto de datos tidy-long: cada fila es un valor medido identificado por editor × período × sección × categoría × métrica. Las cuatro secciones mensuales son cortes transversales de las <strong>mismas</strong> solicitudes, por lo que no son aditivas entre secciones; <code>annual_summary</code> es un resumen agregado que se sitúa junto a ellas. Fija una <code>section</code> (y una <code>metric</code>) antes de agregar.",
+        "fr": "Le <strong>Network Act</strong> (Art. 64-5) et la <strong>Telecommunications Business Act</strong> (Art. 22-5) de la Corée du Sud, issus des deux textes adoptés le 20 mai 2020, imposent aux fournisseurs de services en ligne de prendre des mesures techniques et organisationnelles contre la circulation de <em>contenus sexuels illégaux</em> — contenus filmés illégalement, images et vidéos deepfake (&ldquo;fausses&rdquo;) et matériel d'abus sexuel sur mineurs/jeunes — et de publier un <strong>rapport de transparence annuel</strong> à ce sujet. <strong>Google</strong> en publie un par année civile couvrant <strong>Search et YouTube conjointement</strong> ; ce jeu de données contient les six rapports publiés à ce jour (2020 → 2025). Les rapports 2024 et 2025 ajoutent une ventilation <strong>mensuelle</strong> complète par auteur du signalement, motif et résultat ; ceux de 2020–2023 ne donnent que les principaux décomptes d'URL de l'année (2020 ne couvre que du 10 au 31 déc., date d'entrée en vigueur de la loi). Un jeu de données tidy-long : chaque ligne est une valeur mesurée identifiée par éditeur × période × section × catégorie × métrique. Les quatre sections mensuelles sont des coupes transversales des <strong>mêmes</strong> demandes ; elles ne s'additionnent donc pas d'une section à l'autre ; <code>annual_summary</code> est un récapitulatif qui les accompagne. Épinglez une <code>section</code> (et une <code>metric</code>) avant d'agréger.",
+        "de": "Der <strong>Network Act</strong> (Art. 64-5) und der <strong>Telecommunications Business Act</strong> (Art. 22-5) Südkoreas, hervorgegangen aus den beiden am 20. Mai 2020 verabschiedeten Gesetzen, verpflichten Online-Diensteanbieter, technische und organisatorische Maßnahmen gegen die Verbreitung <em>illegaler sexueller Inhalte</em> zu ergreifen — illegal gefilmte Inhalte, Deepfake-Bilder und -Videos (&ldquo;fake&rdquo;) sowie Material über sexuellen Missbrauch von Kindern/Jugendlichen — und darüber einen <strong>jährlichen Transparenzbericht</strong> zu veröffentlichen. <strong>Google</strong> veröffentlicht einen pro Kalenderjahr, der <strong>Search und YouTube gemeinsam</strong> abdeckt; dieser Datensatz enthält alle bisher sechs Berichte (2020 → 2025). Die Berichte 2024 und 2025 ergänzen eine vollständige <strong>monatliche</strong> Aufschlüsselung nach meldender Partei, Grund und Ergebnis; 2020–2023 nennen nur die wichtigsten URL-Zahlen des Jahres (2020 umfasst nur den 10.–31. Dez., das Inkrafttreten des Gesetzes). Ein tidy-long-Datensatz: Jede Zeile ist ein Messwert, identifiziert durch Herausgeber × Zeitraum × Abschnitt × Kategorie × Metrik. Die vier monatlichen Abschnitte sind Querschnitte <strong>derselben</strong> Anfragen, daher sind sie über Abschnitte hinweg nicht additiv; <code>annual_summary</code> ist eine Zusammenfassung, die daneben steht. Fixieren Sie einen <code>section</code> (und eine <code>metric</code>) vor dem Aggregieren.",
+        "it": "Il <strong>Network Act</strong> (Art. 64-5) e la <strong>Telecommunications Business Act</strong> (Art. 22-5) della Corea del Sud, nati dai due disegni di legge approvati il 20 maggio 2020, impongono ai fornitori di servizi online di adottare misure tecniche e gestionali contro la circolazione di <em>contenuti sessuali illegali</em> — contenuti ripresi illegalmente, immagini e video deepfake (&ldquo;falsi&rdquo;) e materiale di abuso sessuale su minori/giovani — e di pubblicare un <strong>rapporto di trasparenza annuale</strong> al riguardo. <strong>Google</strong> ne pubblica uno per anno solare che copre <strong>Search e YouTube congiuntamente</strong>; questo set di dati contiene tutti i sei rapporti finora pubblicati (2020 → 2025). I rapporti 2024 e 2025 aggiungono una ripartizione <strong>mensile</strong> completa per segnalante, motivo ed esito; quelli 2020–2023 forniscono solo i principali conteggi di URL dell'anno (il 2020 copre solo dal 10 al 31 dic., data di entrata in vigore della legge). Un set di dati tidy-long: ogni riga è un valore misurato identificato da editore × periodo × sezione × categoria × metrica. Le quattro sezioni mensili sono sezioni trasversali delle <strong>stesse</strong> richieste, quindi non sono sommabili tra sezioni; <code>annual_summary</code> è un riepilogo che le affianca. Fissa una <code>section</code> (e una <code>metric</code>) prima di aggregare.",
+        "ja": "韓国の <strong>Network Act</strong>（第64条の5）と <strong>Telecommunications Business Act</strong>（第22条の5）は、2020年5月20日に可決された2つの法案に由来し、オンラインサービス提供者に対し、<em>違法な性的コンテンツ</em>（違法に撮影されたコンテンツ、ディープフェイク（&ldquo;フェイク&rdquo;）の画像・動画、児童・青少年の性的虐待物）の流通を防ぐ技術的・管理的措置を講じ、それらに関する<strong>年次透明性報告書</strong>を公表するよう義務付けています。<strong>Google</strong> は暦年ごとに1件を公表し、<strong>Search と YouTube をまとめて</strong>対象としています。このデータセットには現時点までの6件すべての報告書（2020 → 2025）が含まれます。2024年と2025年の報告書は、申告者・理由・結果別の完全な<strong>月次</strong>内訳を追加しています。2020〜2023年はその年の主要な URL 件数のみを示します（2020年は法の施行日である12月10〜31日のみを対象）。tidy-long 形式のデータセットで、各行は 発行者 × 期間 × セクション × カテゴリ × 指標 で識別される1つの測定値です。4つの月次セクションは<strong>同じ</strong>リクエストの異なる断面であるため、セクションをまたいで合算できません。<code>annual_summary</code> はそれらに並ぶロールアップです。集計する前に <code>section</code>（および <code>metric</code>）を固定してください。",
+        "zh": "韩国的 <strong>Network Act</strong>（第64-5条）和 <strong>Telecommunications Business Act</strong>（第22-5条）源自2020年5月20日通过的两项法案，要求在线服务提供者采取技术和管理措施，防止<em>非法性内容</em>——非法拍摄的内容、深度伪造（&ldquo;fake&rdquo;）图片和视频，以及儿童/青少年性虐待材料——的传播，并就此发布<strong>年度透明度报告</strong>。<strong>Google</strong> 每个日历年发布一份，<strong>将 Search 和 YouTube 合并</strong>涵盖；此数据集包含迄今全部六份报告（2020 → 2025）。2024 年和 2025 年的报告增加了按举报者、原因和结果划分的完整<strong>月度</strong>细分；2020–2023 年仅给出当年的主要网址计数（2020 年仅涵盖 12 月 10–31 日，即法律的实施日期）。这是一个 tidy-long 数据集：每一行都是由 发布者 × 时段 × 分区 × 类别 × 指标 标识的一个测量值。四个月度分区是<strong>同一批</strong>请求的不同横切面，因此不能跨分区相加；<code>annual_summary</code> 是与它们并列的汇总。聚合前请先固定 <code>section</code>（和 <code>metric</code>）。",
+        "ko": "대한민국의 <strong>Network Act</strong>(제64조의5)와 <strong>Telecommunications Business Act</strong>(제22조의5)는 2020년 5월 20일 통과된 두 법안에서 비롯되었으며, 온라인 서비스 제공자에게 <em>불법 성적 콘텐츠</em>(불법 촬영물, 딥페이크(&ldquo;가짜&rdquo;) 이미지·영상, 아동·청소년 성착취물)의 유통을 막기 위한 기술적·관리적 조치를 취하고 이에 관한 <strong>연례 투명성 보고서</strong>를 발행하도록 요구합니다. <strong>Google</strong>은 매 역년 하나씩 발행하며 <strong>Search와 YouTube를 함께</strong> 다룹니다. 이 데이터셋에는 현재까지의 여섯 개 보고서 모두(2020 → 2025)가 담겨 있습니다. 2024년과 2025년 보고서는 신고자·사유·결과별 전체 <strong>월별</strong> 분류를 추가합니다. 2020–2023년은 해당 연도의 주요 URL 건수만 제공합니다(2020년은 법 시행일인 12월 10–31일만 포함). tidy-long 데이터셋으로, 각 행은 발행자 × 기간 × 섹션 × 카테고리 × 지표로 식별되는 하나의 측정값입니다. 네 개의 월별 섹션은 <strong>동일한</strong> 요청의 서로 다른 단면이므로 섹션 간에 합산할 수 없습니다. <code>annual_summary</code>는 그 옆에 있는 롤업입니다. 집계하기 전에 <code>section</code>(및 <code>metric</code>)을 고정하세요.",
+    },
+
+    # ── <meta name="description"> ──
+    "South Korea Network Act (Art. 64-5) / Telecommunications Business Act (Art. 22-5) transparency data — Google's 2025 report on removing illegal sexual content from Search and YouTube, by month, reason and outcome.": {
+        "es": "Datos de transparencia del Network Act (Art. 64-5) / Telecommunications Business Act (Art. 22-5) de Corea del Sur — el informe de 2025 de Google sobre la retirada de contenido sexual ilegal de Search y YouTube, por mes, motivo y resultado.",
+        "fr": "Données de transparence du Network Act (Art. 64-5) / Telecommunications Business Act (Art. 22-5) de la Corée du Sud — le rapport 2025 de Google sur le retrait des contenus sexuels illégaux de Search et YouTube, par mois, motif et résultat.",
+        "de": "Transparenzdaten des Network Act (Art. 64-5) / Telecommunications Business Act (Art. 22-5) Südkoreas — Googles Bericht 2025 über die Entfernung illegaler sexueller Inhalte aus Search und YouTube, nach Monat, Grund und Ergebnis.",
+        "it": "Dati di trasparenza del Network Act (Art. 64-5) / Telecommunications Business Act (Art. 22-5) della Corea del Sud — il rapporto 2025 di Google sulla rimozione di contenuti sessuali illegali da Search e YouTube, per mese, motivo ed esito.",
+        "ja": "韓国の Network Act（第64条の5）／ Telecommunications Business Act（第22条の5）の透明性データ — Search と YouTube から違法な性的コンテンツを削除した Google の2025年報告書を、月・理由・結果別に。",
+        "zh": "韩国《Network Act》（第64-5条）/《Telecommunications Business Act》（第22-5条）透明度数据——Google 2025 年关于从 Search 和 YouTube 删除非法性内容的报告，按月份、原因和结果划分。",
+        "ko": "대한민국 Network Act(제64조의5) / Telecommunications Business Act(제22조의5) 투명성 데이터 — Search와 YouTube에서 불법 성적 콘텐츠를 삭제한 Google의 2025년 보고서, 월·사유·결과별.",
+    },
+
+    # ── <h2> "How requests were processed" subtitle (long) ──
+    "The outcome of the reported URLs in the selected year — voluntarily removed by Google, or not actioned (already gone, insufficient information, not found, or other), plus any sent to the Korea Communications Standards Commission (KCSC) for assessment.": {
+        "es": "El resultado de las URL notificadas en el año seleccionado: eliminadas voluntariamente por Google o no accionadas (ya no existían, información insuficiente, no encontradas u otro), además de las enviadas a la Comisión de Estándares de Comunicaciones de Corea (KCSC) para su evaluación.",
+        "fr": "Le résultat des URL signalées au cours de l'année sélectionnée — supprimées volontairement par Google, ou sans suite (déjà disparues, informations insuffisantes, introuvables ou autre), plus celles envoyées à la Korea Communications Standards Commission (KCSC) pour évaluation.",
+        "de": "Das Ergebnis der im ausgewählten Jahr gemeldeten URLs — von Google freiwillig entfernt oder ohne Maßnahme (bereits verschwunden, unzureichende Informationen, nicht gefunden oder Sonstiges), zuzüglich der an die Korea Communications Standards Commission (KCSC) zur Bewertung übermittelten.",
+        "it": "L'esito degli URL segnalati nell'anno selezionato — rimossi volontariamente da Google, oppure senza intervento (già scomparsi, informazioni insufficienti, non trovati o altro), più quelli inviati alla Korea Communications Standards Commission (KCSC) per la valutazione.",
+        "ja": "選択した年に報告された URL の結果 — Google が自主的に削除、または未対応（すでに存在しない、情報不足、見つからない、その他）に加え、評価のため韓国放送通信審議委員会（KCSC）に送付されたもの。",
+        "zh": "所选年份中被举报网址的处理结果——由 Google 自愿删除，或未采取行动（已不存在、信息不足、未找到或其他），以及任何送交韩国通信标准委员会（KCSC）评估的网址。",
+        "ko": "선택한 연도에 신고된 URL의 결과 — Google이 자발적으로 삭제했거나 미조치(이미 삭제됨, 정보 부족, 찾을 수 없음 또는 기타), 그리고 심의를 위해 방송통신심의위원회(KCSC)에 회부된 건.",
+    },
+
+    # ── <h2> "Requests received, by reason" subtitle ──
+    "The URLs reported for removal in the selected year, by the category of alleged illegal sexual content the reporter selected.": {
+        "es": "Las URL notificadas para su retirada en el año seleccionado, según la categoría de presunto contenido sexual ilegal que seleccionó quien las reportó.",
+        "fr": "Les URL signalées pour retrait au cours de l'année sélectionnée, selon la catégorie de contenu sexuel illégal présumé choisie par l'auteur du signalement.",
+        "de": "Die im ausgewählten Jahr zur Entfernung gemeldeten URLs, nach der vom Meldenden gewählten Kategorie mutmaßlich illegaler sexueller Inhalte.",
+        "it": "Gli URL segnalati per la rimozione nell'anno selezionato, in base alla categoria di presunto contenuto sessuale illegale scelta da chi ha effettuato la segnalazione.",
+        "ja": "選択した年に削除のため報告された URL を、報告者が選択した違法な性的コンテンツの疑いのカテゴリ別に。",
+        "zh": "所选年份中举报要求删除的网址，按举报者所选的涉嫌非法性内容类别划分。",
+        "ko": "선택한 연도에 삭제를 위해 신고된 URL을, 신고자가 선택한 불법 성적 콘텐츠 의심 카테고리별로.",
+    },
+
+    # ── Annual-trend subtitle ──
+    "The headline series across all six reports (2020–2025). Reported URLs grew from 61 (a 22-day partial period in 2020) to a 2024 peak of 158,052, of which Google removed the large majority.": {
+        "es": "La serie principal en los seis informes (2020–2025). Las URL notificadas crecieron de 61 (un período parcial de 22 días en 2020) a un máximo de 158.052 en 2024, de las que Google eliminó la gran mayoría.",
+        "fr": "La série principale sur l'ensemble des six rapports (2020–2025). Les URL signalées sont passées de 61 (une période partielle de 22 jours en 2020) à un pic de 158 052 en 2024, dont Google a supprimé la grande majorité.",
+        "de": "Die Kennzahlen-Reihe über alle sechs Berichte (2020–2025). Gemeldete URLs stiegen von 61 (ein 22-tägiger Teilzeitraum 2020) auf einen Höchststand von 158.052 im Jahr 2024, von denen Google die große Mehrheit entfernte.",
+        "it": "La serie principale su tutti i sei rapporti (2020–2025). Gli URL segnalati sono cresciuti da 61 (un periodo parziale di 22 giorni nel 2020) a un picco di 158.052 nel 2024, di cui Google ha rimosso la grande maggioranza.",
+        "ja": "6件すべての報告書にわたる主要な系列（2020–2025）。報告された URL は61件（2020年の22日間の部分的期間）から2024年のピークである158,052件まで増加し、そのうち大多数を Google が削除しました。",
+        "zh": "贯穿全部六份报告的主要序列（2020–2025）。举报的网址从 61 个（2020 年为期 22 天的部分时段）增长到 2024 年的峰值 158,052 个，其中 Google 删除了绝大多数。",
+        "ko": "여섯 개 보고서 전체를 아우르는 핵심 시계열(2020–2025). 신고된 URL은 61건(2020년 22일간의 부분 기간)에서 2024년 최고치인 158,052건으로 증가했으며, 그중 대부분을 Google이 삭제했습니다.",
+    },
+
+    # ── Monthly-detail section subtitle ──
+    "The month-by-month breakdown for the selected year (2024 and 2025 publish it; earlier reports don't). Each chart has a text alternative for screen readers.": {
+        "es": "El desglose mes a mes del año seleccionado (2024 y 2025 lo publican; los informes anteriores no). Cada gráfico tiene una alternativa de texto para lectores de pantalla.",
+        "fr": "La ventilation mois par mois pour l'année sélectionnée (2024 et 2025 la publient ; les rapports antérieurs non). Chaque graphique dispose d'une alternative textuelle pour les lecteurs d'écran.",
+        "de": "Die monatliche Aufschlüsselung für das ausgewählte Jahr (2024 und 2025 veröffentlichen sie; frühere Berichte nicht). Jedes Diagramm hat eine Textalternative für Screenreader.",
+        "it": "La ripartizione mese per mese per l'anno selezionato (2024 e 2025 la pubblicano; i rapporti precedenti no). Ogni grafico ha un'alternativa testuale per gli screen reader.",
+        "ja": "選択した年の月ごとの内訳（2024年と2025年は公表、それ以前の報告書は非公表）。各グラフにはスクリーンリーダー向けのテキスト代替があります。",
+        "zh": "所选年份的逐月细分（2024 年和 2025 年公布；更早的报告没有）。每个图表都为屏幕阅读器提供了文本替代内容。",
+        "ko": "선택한 연도의 월별 분류(2024년과 2025년은 공개, 이전 보고서는 미공개). 각 차트에는 스크린 리더용 텍스트 대체가 있습니다.",
+    },
+
+    # ── Chart-sub (requests received) ──
+    "URLs reported to Google for removal each month, split by who reported them — victims and other users vs. government agencies and organisations.": {
+        "es": "URL notificadas a Google para su retirada cada mes, según quién las reportó: víctimas y otros usuarios frente a organismos y organizaciones gubernamentales.",
+        "fr": "URL signalées à Google pour retrait chaque mois, selon qui les a signalées : victimes et autres utilisateurs, ou organismes et organisations gouvernementaux.",
+        "de": "URLs, die Google monatlich zur Entfernung gemeldet wurden, aufgeteilt nach Meldenden — Opfer und andere Nutzer vs. Behörden und Organisationen.",
+        "it": "URL segnalati a Google per la rimozione ogni mese, suddivisi in base a chi li ha segnalati: vittime e altri utenti rispetto a enti e organizzazioni governativi.",
+        "ja": "毎月 Google に削除のため報告された URL を、報告者別（被害者・その他のユーザー対 政府機関・組織）に区分。",
+        "zh": "每月向 Google 举报要求删除的网址，按举报来源划分——受害者及其他用户与政府机构和组织。",
+        "ko": "매월 Google에 삭제를 위해 신고된 URL을 신고 주체별(피해자·기타 사용자 대 정부 기관·단체)로 구분.",
+    },
+
+    # ── Chart-sub (URLs removed) ──
+    "URLs Google removed each month, by the category of illegal sexual content.": {
+        "es": "URL que Google eliminó cada mes, por categoría de contenido sexual ilegal.",
+        "fr": "URL que Google a supprimées chaque mois, par catégorie de contenu sexuel illégal.",
+        "de": "URLs, die Google monatlich entfernt hat, nach Kategorie illegaler sexueller Inhalte.",
+        "it": "URL che Google ha rimosso ogni mese, per categoria di contenuto sessuale illegale.",
+        "ja": "Google が毎月削除した URL を、違法な性的コンテンツのカテゴリ別に。",
+        "zh": "Google 每月删除的网址，按非法性内容的类别划分。",
+        "ko": "Google이 매월 삭제한 URL을 불법 성적 콘텐츠 카테고리별로.",
+    },
+
+    # ── <h2> "Removed content, by reason" subtitle ──
+    "The removed URLs in the selected year by category. Almost all were illegally-filmed photos and videos.": {
+        "es": "Las URL eliminadas en el año seleccionado por categoría. Casi todas eran fotos y vídeos grabados ilegalmente.",
+        "fr": "Les URL supprimées au cours de l'année sélectionnée par catégorie. Presque toutes étaient des photos et vidéos filmées illégalement.",
+        "de": "Die im ausgewählten Jahr entfernten URLs nach Kategorie. Fast alle waren illegal aufgenommene Fotos und Videos.",
+        "it": "Gli URL rimossi nell'anno selezionato per categoria. Quasi tutti erano foto e video ripresi illegalmente.",
+        "ja": "選択した年に削除された URL をカテゴリ別に。ほぼすべてが違法に撮影された写真・動画でした。",
+        "zh": "所选年份中按类别删除的网址。几乎全部是非法拍摄的照片和视频。",
+        "ko": "선택한 연도에 카테고리별로 삭제된 URL. 거의 모두 불법 촬영된 사진과 영상이었습니다.",
+    },
+
+    # ── <title> (keeps "— Transparency Report API") ──
+    "Korea Network Act illegal-sexual-content report — Transparency Report API": {
+        "es": "Network Act de Corea: informe sobre contenido sexual ilegal — Transparency Report API",
+        "fr": "Network Act de Corée : rapport sur les contenus sexuels illégaux — Transparency Report API",
+        "de": "Koreas Network Act: Bericht über illegale sexuelle Inhalte — Transparency Report API",
+        "it": "Network Act della Corea: rapporto sui contenuti sessuali illegali — Transparency Report API",
+        "ja": "韓国 Network Act 違法な性的コンテンツ報告書 — Transparency Report API",
+        "zh": "韩国《Network Act》非法性内容报告 — Transparency Report API",
+        "ko": "대한민국 Network Act 불법 성적 콘텐츠 보고서 — Transparency Report API",
+    },
+
+    # ── <h1> ──
+    "Korea — Network Act illegal-sexual-content report": {
+        "es": "Corea — Informe del Network Act sobre contenido sexual ilegal",
+        "fr": "Corée — Rapport du Network Act sur les contenus sexuels illégaux",
+        "de": "Korea — Network-Act-Bericht über illegale sexuelle Inhalte",
+        "it": "Corea — Rapporto del Network Act sui contenuti sessuali illegali",
+        "ja": "韓国 — Network Act 違法な性的コンテンツ報告書",
+        "zh": "韩国 — 《Network Act》非法性内容报告",
+        "ko": "대한민국 — Network Act 불법 성적 콘텐츠 보고서",
+    },
+
+    # ── Chart <h3> titles ──
+    "Removal requests received per month, by complainant": {
+        "es": "Solicitudes de retirada recibidas por mes, por denunciante",
+        "fr": "Demandes de retrait reçues par mois, par auteur du signalement",
+        "de": "Pro Monat eingegangene Entfernungsanfragen, nach meldender Partei",
+        "it": "Richieste di rimozione ricevute al mese, per segnalante",
+        "ja": "月別の受理した削除リクエスト（申告者別）",
+        "zh": "每月收到的删除请求，按举报者划分",
+        "ko": "월별 접수된 삭제 요청, 신고자별",
+    },
+    "URLs removed per month, by reason": {
+        "es": "URL eliminadas por mes, por motivo",
+        "fr": "URL supprimées par mois, par motif",
+        "de": "Pro Monat entfernte URLs, nach Grund",
+        "it": "URL rimossi al mese, per motivo",
+        "ja": "月別の削除 URL 件数（理由別）",
+        "zh": "每月删除的网址，按原因划分",
+        "ko": "월별 삭제된 URL, 사유별",
+    },
+
+    # ── <h2> "URLs received & removed per year" (note the &amp; entity in the key) ──
+    "URLs received &amp; removed per year": {
+        "es": "URL recibidas y eliminadas por año",
+        "fr": "URL reçues et supprimées par an",
+        "de": "Eingegangene und entfernte URLs pro Jahr",
+        "it": "URL ricevuti e rimossi per anno",
+        "ja": "年別の受理・削除 URL 件数",
+        "zh": "每年收到与删除的网址数",
+        "ko": "연도별 접수 및 삭제된 URL",
+    },
+
+    # ── renderTable() captions (JS double-quoted args) ──
+    "Removal requests received by reason.": {
+        "es": "Solicitudes de retirada recibidas por motivo.",
+        "fr": "Demandes de retrait reçues par motif.",
+        "de": "Eingegangene Entfernungsanfragen nach Grund.",
+        "it": "Richieste di rimozione ricevute per motivo.",
+        "ja": "受理した削除リクエスト（理由別）。",
+        "zh": "按原因划分的收到删除请求。",
+        "ko": "사유별 접수된 삭제 요청.",
+    },
+    "How the reported URLs were processed.": {
+        "es": "Cómo se procesaron las URL notificadas.",
+        "fr": "Comment les URL signalées ont été traitées.",
+        "de": "Wie die gemeldeten URLs bearbeitet wurden.",
+        "it": "Come sono stati elaborati gli URL segnalati.",
+        "ja": "報告された URL の処理方法。",
+        "zh": "被举报网址的处理方式。",
+        "ko": "신고된 URL의 처리 방식.",
+    },
+    "Removed URLs by reason.": {
+        "es": "URL eliminadas por motivo.",
+        "fr": "URL supprimées par motif.",
+        "de": "Entfernte URLs nach Grund.",
+        "it": "URL rimossi per motivo.",
+        "ja": "削除された URL（理由別）。",
+        "zh": "按原因划分的已删除网址。",
+        "ko": "사유별 삭제된 URL.",
+    },
+
+    # ── <h2> headings ──
+    "How requests were processed": {
+        "es": "Cómo se procesaron las solicitudes",
+        "fr": "Comment les demandes ont été traitées",
+        "de": "Wie die Anfragen bearbeitet wurden",
+        "it": "Come sono state elaborate le richieste",
+        "ja": "リクエストの処理方法",
+        "zh": "请求的处理方式",
+        "ko": "요청 처리 방식",
+    },
+    "Requests received, by reason": {
+        "es": "Solicitudes recibidas, por motivo",
+        "fr": "Demandes reçues, par motif",
+        "de": "Eingegangene Anfragen, nach Grund",
+        "it": "Richieste ricevute, per motivo",
+        "ja": "受理したリクエスト（理由別）",
+        "zh": "收到的请求，按原因划分",
+        "ko": "접수된 요청, 사유별",
+    },
+    "Removed content, by reason": {
+        "es": "Contenido eliminado, por motivo",
+        "fr": "Contenus supprimés, par motif",
+        "de": "Entfernte Inhalte, nach Grund",
+        "it": "Contenuti rimossi, per motivo",
+        "ja": "削除されたコンテンツ（理由別）",
+        "zh": "已删除内容，按原因划分",
+        "ko": "삭제된 콘텐츠, 사유별",
+    },
+    "Monthly detail": {
+        "es": "Detalle mensual",
+        "fr": "Détail mensuel",
+        "de": "Monatliche Details",
+        "it": "Dettaglio mensile",
+        "ja": "月次詳細",
+        "zh": "月度明细",
+        "ko": "월별 상세",
+    },
+
+    # ── <label> "Report year" ──
+    "Report year": {
+        "es": "Año del informe",
+        "fr": "Année du rapport",
+        "de": "Berichtsjahr",
+        "it": "Anno del rapporto",
+        "ja": "レポート対象年",
+        "zh": "报告年份",
+        "ko": "보고 연도",
+    },
+
+    # ── aria-live status phrase (single-quoted JS; year appended at runtime; keep trailing space) ──
+    "Showing monthly detail for ": {
+        "es": "Mostrando el detalle mensual de ",
+        "fr": "Affichage du détail mensuel pour ",
+        "de": "Zeige Monatsdetails für ",
+        "it": "Visualizzazione del dettaglio mensile per ",
+        "ja": "月次詳細を表示中: ",
+        "zh": "正在显示月度明细：",
+        "ko": "월별 상세 표시: ",
+    },
+
+    # ── JS display strings: loading / empty ──
+    "Loading…": {
+        "es": "Cargando…",
+        "fr": "Chargement…",
+        "de": "Wird geladen…",
+        "it": "Caricamento…",
+        "ja": "読み込み中…",
+        "zh": "加载中…",
+        "ko": "불러오는 중…",
+    },
+    "No data available.": {
+        "es": "No hay datos disponibles.",
+        "fr": "Aucune donnée disponible.",
+        "de": "Keine Daten verfügbar.",
+        "it": "Nessun dato disponibile.",
+        "ja": "データがありません。",
+        "zh": "无可用数据。",
+        "ko": "사용할 수 있는 데이터가 없습니다.",
+    },
+
+    # ── Annual-chart series labels (display values in the seriesLabels map) ──
+    "URLs received": {
+        "es": "URL recibidas",
+        "fr": "URL reçues",
+        "de": "Eingegangene URLs",
+        "it": "URL ricevuti",
+        "ja": "受理したURL",
+        "zh": "收到的网址",
+        "ko": "접수된 URL",
+    },
+    "URLs removed": {  # also the numHead for the removalTable
+        "es": "URL eliminadas",
+        "fr": "URL supprimées",
+        "de": "Entfernte URLs",
+        "it": "URL rimossi",
+        "ja": "削除されたURL",
+        "zh": "已删除网址",
+        "ko": "삭제된 URL",
+    },
+
+    # ── Column heads (short JS args — must run AFTER all longer keys above) ──
+    "Requests": {
+        "es": "Solicitudes",
+        "fr": "Demandes",
+        "de": "Anfragen",
+        "it": "Richieste",
+        "ja": "リクエスト数",
+        "zh": "请求数",
+        "ko": "요청 수",
+    },
+    "Outcome": {
+        "es": "Resultado",
+        "fr": "Résultat",
+        "de": "Ergebnis",
+        "it": "Esito",
+        "ja": "結果",
+        "zh": "结果",
+        "ko": "결과",
+    },
+    "Reason": {
+        "es": "Motivo",
+        "fr": "Motif",
+        "de": "Grund",
+        "it": "Motivo",
+        "ja": "理由",
+        "zh": "原因",
+        "ko": "사유",
+    },
+    "URLs": {  # bare head (outcomeTable numHead); de maps to identical "URLs" (safe no-op)
+        "es": "URL",
+        "fr": "URL",
+        "de": "URLs",
+        "it": "URL",
+        "ja": "URL数",
+        "zh": "网址数",
+        "ko": "URL",
+    },
+    "Year": {
+        "es": "Año",
+        "fr": "Année",
+        "de": "Jahr",
+        "it": "Anno",
+        "ja": "年",
+        "zh": "年份",
+        "ko": "연도",
+    },
+    "Month": {
+        "es": "Mes",
+        "fr": "Mois",
+        "de": "Monat",
+        "it": "Mese",
+        "ja": "月",
+        "zh": "月份",
+        "ko": "월",
+    },
+}
+for _loc in _NEW_PAGE_LOCALES:
+    PAGES[_loc]["korea-network-act.html"] = [(_en, _tr[_loc]) for _en, _tr in _KNA_PAGE.items()]
+    _pt = open(os.path.join(STATIC, "korea-network-act.html"), encoding="utf-8").read()
+    _own = {_o for _o, _ in PAGES[_loc]["korea-network-act.html"]}
+    for _src in ("singapore.html", "cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _pt and _o not in _own:
+                PAGES[_loc]["korea-network-act.html"].append((_o, _n))
+                _own.add(_o)
+
+
+# -- mandates full page localization --
+_MND_PAGE = {
+    # ── <title> (keep "· Transparency Report") ──
+    "Reporting mandates · Transparency Report": {"es": "Obligaciones de información · Transparency Report", "fr": "Obligations de rapport · Transparency Report", "de": "Berichtspflichten · Transparency Report", "it": "Obblighi di rendicontazione · Transparency Report", "ja": "報告義務 · Transparency Report", "zh": "报告义务 · Transparency Report", "ko": "보고 의무 · Transparency Report"},
+
+    # ── <meta name="description"> ──
+    "A global reference table of the laws that require online platforms to publish transparency reports — scope, contents, frequency and in-force status by jurisdiction.": {"es": "Una tabla de referencia global de las leyes que obligan a las plataformas en línea a publicar informes de transparencia: alcance, contenido, frecuencia y estado de vigencia por jurisdicción.", "fr": "Un tableau de référence mondial des lois qui obligent les plateformes en ligne à publier des rapports de transparence : portée, contenu, fréquence et statut d'entrée en vigueur par juridiction.", "de": "Eine globale Referenztabelle der Gesetze, die Online-Plattformen zur Veröffentlichung von Transparenzberichten verpflichten – Umfang, Inhalt, Häufigkeit und Geltungsstatus nach Rechtsraum.", "it": "Una tabella di riferimento globale delle leggi che obbligano le piattaforme online a pubblicare rapporti di trasparenza: ambito, contenuti, frequenza e stato di vigore per giurisdizione.", "ja": "オンラインプラットフォームに透明性レポートの公開を義務付ける法律のグローバルなリファレンス表 — 適用範囲、内容、頻度、法域ごとの施行状況。", "zh": "要求在线平台发布透明度报告的法律的全球参考表——按司法辖区列出适用范围、内容、频率和生效状态。", "ko": "온라인 플랫폼에 투명성 보고서 발행을 의무화하는 법률의 글로벌 참조표 — 관할권별 적용 범위, 내용, 주기, 시행 상태."},
+
+    # ── badge ──
+    '<span class="badge">Reference</span>': {"es": '<span class="badge">Referencia</span>', "fr": '<span class="badge">Référence</span>', "de": '<span class="badge">Referenz</span>', "it": '<span class="badge">Riferimento</span>', "ja": '<span class="badge">リファレンス</span>', "zh": '<span class="badge">参考</span>', "ko": '<span class="badge">참고</span>'},
+
+    # ── <h1> ──
+    "Who has to publish a transparency report": {"es": "Quién debe publicar un informe de transparencia", "fr": "Qui doit publier un rapport de transparence", "de": "Wer einen Transparenzbericht veröffentlichen muss", "it": "Chi deve pubblicare un rapporto di trasparenza", "ja": "透明性レポートの公開が義務付けられるのは誰か", "zh": "谁必须发布透明度报告", "ko": "누가 투명성 보고서를 발행해야 하는가"},
+
+    # ── intro paragraph ──
+    "A global survey of the statutes that <strong>require</strong> platforms to publish transparency reports — what each mandates, who it binds, how often, and whether it is actually in force. Voluntary corporate reports are not included.": {"es": "Un análisis global de las normas que <strong>obligan</strong> a las plataformas a publicar informes de transparencia: qué exige cada una, a quién vincula, con qué frecuencia y si está realmente en vigor. No se incluyen los informes corporativos voluntarios.", "fr": "Un panorama mondial des textes qui <strong>obligent</strong> les plateformes à publier des rapports de transparence : ce que chacun impose, qui il lie, à quelle fréquence et s'il est réellement en vigueur. Les rapports d'entreprise volontaires ne sont pas inclus.", "de": "Ein globaler Überblick über die Gesetze, die Plattformen zur Veröffentlichung von Transparenzberichten <strong>verpflichten</strong> – was jedes vorschreibt, wen es bindet, wie oft und ob es tatsächlich in Kraft ist. Freiwillige Unternehmensberichte sind nicht enthalten.", "it": "Una rassegna globale delle normative che <strong>obbligano</strong> le piattaforme a pubblicare rapporti di trasparenza: cosa impone ciascuna, chi vincola, con quale frequenza e se è davvero in vigore. I rapporti aziendali volontari non sono inclusi.", "ja": "プラットフォームに透明性レポートの公開を<strong>義務付ける</strong>法令の世界的な概観 — 各法が何を求め、誰を拘束し、どの頻度で、実際に施行されているかを示す。企業の自主的なレポートは含まない。", "zh": "对<strong>要求</strong>平台发布透明度报告的法规的全球综述——各法规的要求内容、约束对象、频率，以及是否真正生效。不包括企业自愿发布的报告。", "ko": "플랫폼에 투명성 보고서 발행을 <strong>의무화하는</strong> 법령에 대한 글로벌 개관 — 각 법이 무엇을 요구하고, 누구를 구속하며, 얼마나 자주, 실제로 시행되고 있는지를 보여준다. 기업의 자발적 보고서는 포함하지 않는다."},
+
+    # ── count labels ──
+    "regions surveyed": {"es": "regiones analizadas", "fr": "régions étudiées", "de": "untersuchte Regionen", "it": "regioni esaminate", "ja": "調査対象地域", "zh": "调查地区", "ko": "조사 지역"},
+    "in-force reporting mandates": {"es": "mandatos de informes en vigor", "fr": "obligations de rapport en vigueur", "de": "geltende Berichtspflichten", "it": "obblighi di rendicontazione in vigore", "ja": "施行中の報告義務", "zh": "生效的报告义务", "ko": "시행 중인 보고 의무"},
+    "enjoined, superseded or dead": {"es": "suspendidos, reemplazados o desestimados", "fr": "suspendus, remplacés ou abandonnés", "de": "ausgesetzt, ersetzt oder gescheitert", "it": "sospesi, sostituiti o decaduti", "ja": "差止め・置換・廃案", "zh": "被禁止、取代或废弃", "ko": "집행정지·대체·폐기"},
+    "tracked in this dataset&nbsp;◆": {"es": "registrados en este conjunto de datos&nbsp;◆", "fr": "suivis dans ce jeu de données&nbsp;◆", "de": "in diesem Datensatz erfasst&nbsp;◆", "it": "tracciati in questo dataset&nbsp;◆", "ja": "本データセットに収録&nbsp;◆", "zh": "已收录于本数据集&nbsp;◆", "ko": "이 데이터셋에 수록&nbsp;◆"},
+
+    # ── legend ──
+    '<span class="lt">Status</span>': {"es": '<span class="lt">Estado</span>', "fr": '<span class="lt">Statut</span>', "de": '<span class="lt">Status</span>', "it": '<span class="lt">Stato</span>', "ja": '<span class="lt">状況</span>', "zh": '<span class="lt">状态</span>', "ko": '<span class="lt">상태</span>'},
+
+    # ── status chips (legend + table body; full-span keys) ──
+    '<span class="chip s-force">In force</span>': {"es": '<span class="chip s-force">En vigor</span>', "fr": '<span class="chip s-force">En vigueur</span>', "de": '<span class="chip s-force">In Kraft</span>', "it": '<span class="chip s-force">In vigore</span>', "ja": '<span class="chip s-force">施行中</span>', "zh": '<span class="chip s-force">生效中</span>', "ko": '<span class="chip s-force">시행 중</span>'},
+    '<span class="chip s-partial">Partly enjoined</span>': {"es": '<span class="chip s-partial">Parcialmente suspendida</span>', "fr": '<span class="chip s-partial">Partiellement suspendue</span>', "de": '<span class="chip s-partial">Teilweise ausgesetzt</span>', "it": '<span class="chip s-partial">Parzialmente sospesa</span>', "ja": '<span class="chip s-partial">一部差止め</span>', "zh": '<span class="chip s-partial">部分被禁止执行</span>', "ko": '<span class="chip s-partial">일부 집행정지</span>'},
+    '<span class="chip s-enjoined">Enjoined / not enforced</span>': {"es": '<span class="chip s-enjoined">Suspendida / sin aplicar</span>', "fr": '<span class="chip s-enjoined">Suspendue / non appliquée</span>', "de": '<span class="chip s-enjoined">Ausgesetzt / nicht durchgesetzt</span>', "it": '<span class="chip s-enjoined">Sospesa / non applicata</span>', "ja": '<span class="chip s-enjoined">差止め／不執行</span>', "zh": '<span class="chip s-enjoined">被禁止执行／未执行</span>', "ko": '<span class="chip s-enjoined">집행정지／미시행</span>'},
+    '<span class="chip s-superseded">Superseded</span>': {"es": '<span class="chip s-superseded">Reemplazada</span>', "fr": '<span class="chip s-superseded">Remplacée</span>', "de": '<span class="chip s-superseded">Ersetzt</span>', "it": '<span class="chip s-superseded">Sostituita</span>', "ja": '<span class="chip s-superseded">廃止・置換</span>', "zh": '<span class="chip s-superseded">已被取代</span>', "ko": '<span class="chip s-superseded">대체됨</span>'},
+    '<span class="chip s-proposed">Proposed / dead</span>': {"es": '<span class="chip s-proposed">Propuesta / desestimada</span>', "fr": '<span class="chip s-proposed">Proposée / abandonnée</span>', "de": '<span class="chip s-proposed">Vorgeschlagen / gescheitert</span>', "it": '<span class="chip s-proposed">Proposta / decaduta</span>', "ja": '<span class="chip s-proposed">提案・廃案</span>', "zh": '<span class="chip s-proposed">提案／已废弃</span>', "ko": '<span class="chip s-proposed">제안／폐기</span>'},
+    '<span class="chip s-partial">Contested</span>': {"es": '<span class="chip s-partial">Impugnada</span>', "fr": '<span class="chip s-partial">Contestée</span>', "de": '<span class="chip s-partial">Angefochten</span>', "it": '<span class="chip s-partial">Contestata</span>', "ja": '<span class="chip s-partial">係争中</span>', "zh": '<span class="chip s-partial">受质疑</span>', "ko": '<span class="chip s-partial">소송 중</span>'},
+    '<span class="chip s-enjoined">Contested</span>': {"es": '<span class="chip s-enjoined">Impugnada</span>', "fr": '<span class="chip s-enjoined">Contestée</span>', "de": '<span class="chip s-enjoined">Angefochten</span>', "it": '<span class="chip s-enjoined">Contestata</span>', "ja": '<span class="chip s-enjoined">係争中</span>', "zh": '<span class="chip s-enjoined">受质疑</span>', "ko": '<span class="chip s-enjoined">소송 중</span>'},
+    '<span class="chip s-enjoined">Enjoined</span>': {"es": '<span class="chip s-enjoined">Suspendida</span>', "fr": '<span class="chip s-enjoined">Suspendue</span>', "de": '<span class="chip s-enjoined">Ausgesetzt</span>', "it": '<span class="chip s-enjoined">Sospesa</span>', "ja": '<span class="chip s-enjoined">差止め</span>', "zh": '<span class="chip s-enjoined">被禁止执行</span>', "ko": '<span class="chip s-enjoined">집행정지</span>'},
+    '<span class="chip s-proposed">Dead / proposed</span>': {"es": '<span class="chip s-proposed">Desestimada / propuesta</span>', "fr": '<span class="chip s-proposed">Abandonnée / proposée</span>', "de": '<span class="chip s-proposed">Gescheitert / vorgeschlagen</span>', "it": '<span class="chip s-proposed">Decaduta / proposta</span>', "ja": '<span class="chip s-proposed">廃案・提案</span>', "zh": '<span class="chip s-proposed">已废弃／提案</span>', "ko": '<span class="chip s-proposed">폐기／제안</span>'},
+    '<span class="chip s-proposed">Abandoned</span>': {"es": '<span class="chip s-proposed">Abandonada</span>', "fr": '<span class="chip s-proposed">Abandonnée</span>', "de": '<span class="chip s-proposed">Aufgegeben</span>', "it": '<span class="chip s-proposed">Abbandonata</span>', "ja": '<span class="chip s-proposed">廃案</span>', "zh": '<span class="chip s-proposed">已放弃</span>', "ko": '<span class="chip s-proposed">폐기됨</span>'},
+    '<span class="chip s-proposed">Withdrawn</span>': {"es": '<span class="chip s-proposed">Retirada</span>', "fr": '<span class="chip s-proposed">Retirée</span>', "de": '<span class="chip s-proposed">Zurückgezogen</span>', "it": '<span class="chip s-proposed">Ritirata</span>', "ja": '<span class="chip s-proposed">撤回</span>', "zh": '<span class="chip s-proposed">已撤回</span>', "ko": '<span class="chip s-proposed">철회됨</span>'},
+
+    # ── section headings + subtitles ──
+    "<h2>Europe</h2>": {"es": "<h2>Europa</h2>", "fr": "<h2>Europe</h2>", "de": "<h2>Europa</h2>", "it": "<h2>Europa</h2>", "ja": "<h2>ヨーロッパ</h2>", "zh": "<h2>欧洲</h2>", "ko": "<h2>유럽</h2>"},
+    "The DSA is now the EU-wide instrument and pre-empts the older national laws.": {"es": "El DSA es ahora el instrumento de toda la UE y desplaza a las antiguas leyes nacionales.", "fr": "Le DSA est désormais l'instrument à l'échelle de l'UE et supplante les anciennes lois nationales.", "de": "Der DSA ist nun das EU-weite Instrument und verdrängt die älteren nationalen Gesetze.", "it": "Il DSA è ora lo strumento valido per tutta l'UE e prevale sulle vecchie leggi nazionali.", "ja": "現在、DSA が EU 全域の法的枠組みであり、旧来の各国法に優先する。", "zh": "DSA 现已成为覆盖全欧盟的法律工具，并优先于较早的各国法律。", "ko": "이제 DSA가 EU 전역의 법적 수단이며 기존 국가별 법률에 우선한다."},
+    "<h2>Americas</h2>": {"es": "<h2>América</h2>", "fr": "<h2>Amériques</h2>", "de": "<h2>Amerika</h2>", "it": "<h2>Americhe</h2>", "ja": "<h2>南北アメリカ</h2>", "zh": "<h2>美洲</h2>", "ko": "<h2>아메리카</h2>"},
+    "No US federal mandate; the binding rules are US-state ToS laws — most in First-Amendment litigation.": {"es": "No existe un mandato federal en EE. UU.; las normas vinculantes son las leyes estatales de ToS, la mayoría en litigios por la Primera Enmienda.", "fr": "Aucune obligation fédérale aux États-Unis ; les règles contraignantes sont les lois ToS des États, pour la plupart en litige au titre du Premier Amendement.", "de": "Kein US-Bundesmandat; die verbindlichen Regeln sind die ToS-Gesetze der US-Bundesstaaten – die meisten in Verfahren zum First Amendment.", "it": "Nessun obbligo federale negli USA; le regole vincolanti sono le leggi statali sui ToS, la maggior parte oggetto di contenziosi sul Primo Emendamento.", "ja": "米国に連邦レベルの義務はなく、拘束力を持つのは州単位の ToS 法である — その多くが憲法修正第1条をめぐって係争中。", "zh": "美国没有联邦层面的强制要求；具约束力的是各州的服务条款法律——其中大多数正因第一修正案而涉讼。", "ko": "미국에는 연방 차원의 의무가 없으며, 구속력 있는 규정은 주(州) 단위의 ToS 법이다 — 그 대부분이 수정헌법 제1조를 둘러싼 소송 중이다."},
+    "<h2>Asia-Pacific</h2>": {"es": "<h2>Asia-Pacífico</h2>", "fr": "<h2>Asie-Pacifique</h2>", "de": "<h2>Asien-Pazifik</h2>", "it": "<h2>Asia-Pacifico</h2>", "ja": "<h2>アジア太平洋</h2>", "zh": "<h2>亚太地区</h2>", "ko": "<h2>아시아·태평양</h2>"},
+    "The region with the most novel mandates — India's monthly cadence is the strictest anywhere.": {"es": "La región con los mandatos más novedosos: la periodicidad mensual de la India es la más estricta del mundo.", "fr": "La région aux obligations les plus inédites : la cadence mensuelle de l'Inde est la plus stricte au monde.", "de": "Die Region mit den neuartigsten Vorgaben – Indiens monatlicher Rhythmus ist der strengste weltweit.", "it": "La regione con gli obblighi più innovativi: la cadenza mensile dell'India è la più severa al mondo.", "ja": "最も新しい義務が集まる地域 — インドの月次という頻度は世界で最も厳格である。", "zh": "拥有最新颖义务的地区——印度的每月报告频率是全球最严格的。", "ko": "가장 새로운 의무가 모인 지역 — 인도의 월간 주기는 세계에서 가장 엄격하다."},
+
+    # ── table column headers ──
+    "<th>Law</th>": {"es": "<th>Ley</th>", "fr": "<th>Loi</th>", "de": "<th>Gesetz</th>", "it": "<th>Legge</th>", "ja": "<th>法律</th>", "zh": "<th>法律</th>", "ko": "<th>법률</th>"},
+    "<th>Applies to</th>": {"es": "<th>Se aplica a</th>", "fr": "<th>S'applique à</th>", "de": "<th>Gilt für</th>", "it": "<th>Si applica a</th>", "ja": "<th>対象</th>", "zh": "<th>适用对象</th>", "ko": "<th>적용 대상</th>"},
+    "<th>What's reported</th>": {"es": "<th>Qué se informa</th>", "fr": "<th>Contenu du rapport</th>", "de": "<th>Berichtsinhalt</th>", "it": "<th>Cosa si rendiconta</th>", "ja": "<th>報告内容</th>", "zh": "<th>报告内容</th>", "ko": "<th>보고 내용</th>"},
+    "<th>Frequency</th>": {"es": "<th>Frecuencia</th>", "fr": "<th>Fréquence</th>", "de": "<th>Häufigkeit</th>", "it": "<th>Frequenza</th>", "ja": "<th>頻度</th>", "zh": "<th>频率</th>", "ko": "<th>주기</th>"},
+    "<th>Since</th>": {"es": "<th>Desde</th>", "fr": "<th>Depuis</th>", "de": "<th>Seit</th>", "it": "<th>Dal</th>", "ja": "<th>開始</th>", "zh": "<th>起始</th>", "ko": "<th>시행 시작</th>"},
+    "<th>Status</th>": {"es": "<th>Estado</th>", "fr": "<th>Statut</th>", "de": "<th>Status</th>", "it": "<th>Stato</th>", "ja": "<th>状況</th>", "zh": "<th>状态</th>", "ko": "<th>상태</th>"},
+    "<th>Tracked</th>": {"es": "<th>Rastreado</th>", "fr": "<th>Suivi</th>", "de": "<th>Erfasst</th>", "it": "<th>Tracciato</th>", "ja": "<th>収録</th>", "zh": "<th>已收录</th>", "ko": "<th>수록</th>"},
+
+    # ── frequency values (table body; full-span keys avoid Annual↔Semiannual collisions) ──
+    '<span class="f">Annual</span>': {"es": '<span class="f">Anual</span>', "fr": '<span class="f">Annuel</span>', "de": '<span class="f">Jährlich</span>', "it": '<span class="f">Annuale</span>', "ja": '<span class="f">年次</span>', "zh": '<span class="f">每年</span>', "ko": '<span class="f">연 1회</span>'},
+    '<span class="f">Biannual</span>': {"es": '<span class="f">Semestral</span>', "fr": '<span class="f">Semestriel</span>', "de": '<span class="f">Halbjährlich</span>', "it": '<span class="f">Semestrale</span>', "ja": '<span class="f">半期ごと</span>', "zh": '<span class="f">每半年</span>', "ko": '<span class="f">반기별</span>'},
+    '<span class="f">Semiannual</span>': {"es": '<span class="f">Semestral</span>', "fr": '<span class="f">Semestriel</span>', "de": '<span class="f">Halbjährlich</span>', "it": '<span class="f">Semestrale</span>', "ja": '<span class="f">半期ごと</span>', "zh": '<span class="f">每半年</span>', "ko": '<span class="f">반기별</span>'},
+    '<span class="f">Monthly</span>': {"es": '<span class="f">Mensual</span>', "fr": '<span class="f">Mensuel</span>', "de": '<span class="f">Monatlich</span>', "it": '<span class="f">Mensile</span>', "ja": '<span class="f">毎月</span>', "zh": '<span class="f">每月</span>', "ko": '<span class="f">매월</span>'},
+    '<span class="f">Continuous</span>': {"es": '<span class="f">Continuo</span>', "fr": '<span class="f">Continu</span>', "de": '<span class="f">Laufend</span>', "it": '<span class="f">Continuo</span>', "ja": '<span class="f">継続的</span>', "zh": '<span class="f">持续</span>', "ko": '<span class="f">상시</span>'},
+    '<span class="f">Ongoing</span>': {"es": '<span class="f">En curso</span>', "fr": '<span class="f">En continu</span>', "de": '<span class="f">Fortlaufend</span>', "it": '<span class="f">In corso</span>', "ja": '<span class="f">継続中</span>', "zh": '<span class="f">持续进行</span>', "ko": '<span class="f">진행 중</span>'},
+    '<span class="f">Per model</span>': {"es": '<span class="f">Por modelo</span>', "fr": '<span class="f">Par modèle</span>', "de": '<span class="f">Pro Modell</span>', "it": '<span class="f">Per modello</span>', "ja": '<span class="f">モデルごと</span>', "zh": '<span class="f">每个模型</span>', "ko": '<span class="f">모델별</span>'},
+    '<span class="f">Per feature</span>': {"es": '<span class="f">Por función</span>', "fr": '<span class="f">Par fonctionnalité</span>', "de": '<span class="f">Pro Funktion</span>', "it": '<span class="f">Per funzionalità</span>', "ja": '<span class="f">機能ごと</span>', "zh": '<span class="f">每项功能</span>', "ko": '<span class="f">기능별</span>'},
+    '<span class="f">Reg.-set</span>': {"es": '<span class="f">Fija el regulador</span>', "fr": '<span class="f">Fixé par le régulateur</span>', "de": '<span class="f">Behörde legt fest</span>', "it": '<span class="f">Fissata dal regolatore</span>', "ja": '<span class="f">規制当局が設定</span>', "zh": '<span class="f">监管机构设定</span>', "ko": '<span class="f">규제기관 지정</span>'},
+    '<span class="f">On notice</span>': {"es": '<span class="f">Bajo requerimiento</span>', "fr": '<span class="f">Sur notification</span>', "de": '<span class="f">Auf Aufforderung</span>', "it": '<span class="f">Su richiesta</span>', "ja": '<span class="f">通知時</span>', "zh": '<span class="f">收到通知时</span>', "ko": '<span class="f">통지 시</span>'},
+    '<span class="f">n/a</span>': {"es": '<span class="f">N/D</span>', "fr": '<span class="f">s.o.</span>', "de": '<span class="f">k.A.</span>', "it": '<span class="f">n/d</span>', "ja": '<span class="f">該当なし</span>', "zh": '<span class="f">不适用</span>', "ko": '<span class="f">해당 없음</span>'},
+    '<span class="f">TBD</span>': {"es": '<span class="f">Por definir</span>', "fr": '<span class="f">À définir</span>', "de": '<span class="f">Offen</span>', "it": '<span class="f">Da definire</span>', "ja": '<span class="f">未定</span>', "zh": '<span class="f">待定</span>', "ko": '<span class="f">미정</span>'},
+
+    # ── secondary frequency notes (full-span keys) ──
+    '<span style="font-size:11px;color:var(--muted)">AMAR ≥ 6-monthly</span>': {"es": '<span style="font-size:11px;color:var(--muted)">AMAR ≥ semestral</span>', "fr": '<span style="font-size:11px;color:var(--muted)">AMAR ≥ semestriel</span>', "de": '<span style="font-size:11px;color:var(--muted)">AMAR ≥ halbjährlich</span>', "it": '<span style="font-size:11px;color:var(--muted)">AMAR ≥ semestrale</span>', "ja": '<span style="font-size:11px;color:var(--muted)">AMAR は半期以上</span>', "zh": '<span style="font-size:11px;color:var(--muted)">AMAR ≥ 每半年</span>', "ko": '<span style="font-size:11px;color:var(--muted)">AMAR ≥ 반기</span>'},
+    '<span style="font-size:11px;color:var(--muted)">audits annual</span>': {"es": '<span style="font-size:11px;color:var(--muted)">auditorías anuales</span>', "fr": '<span style="font-size:11px;color:var(--muted)">audits annuels</span>', "de": '<span style="font-size:11px;color:var(--muted)">Audits jährlich</span>', "it": '<span style="font-size:11px;color:var(--muted)">audit annuali</span>', "ja": '<span style="font-size:11px;color:var(--muted)">監査は年次</span>', "zh": '<span style="font-size:11px;color:var(--muted)">审计每年</span>', "ko": '<span style="font-size:11px;color:var(--muted)">감사는 연 1회</span>'},
+    '<span style="font-size:11px;color:var(--muted)">kept up to date</span>': {"es": '<span style="font-size:11px;color:var(--muted)">se mantiene actualizado</span>', "fr": '<span style="font-size:11px;color:var(--muted)">tenu à jour</span>', "de": '<span style="font-size:11px;color:var(--muted)">laufend aktualisiert</span>', "it": '<span style="font-size:11px;color:var(--muted)">tenuto aggiornato</span>', "ja": '<span style="font-size:11px;color:var(--muted)">随時更新</span>', "zh": '<span style="font-size:11px;color:var(--muted)">持续更新</span>', "ko": '<span style="font-size:11px;color:var(--muted)">수시 갱신</span>'},
+    '<span style="font-size:11px;color:var(--muted)">notice-triggered</span>': {"es": '<span style="font-size:11px;color:var(--muted)">activado por requerimiento</span>', "fr": '<span style="font-size:11px;color:var(--muted)">déclenché par notification</span>', "de": '<span style="font-size:11px;color:var(--muted)">durch Aufforderung ausgelöst</span>', "it": '<span style="font-size:11px;color:var(--muted)">attivato su richiesta</span>', "ja": '<span style="font-size:11px;color:var(--muted)">通知により発動</span>', "zh": '<span style="font-size:11px;color:var(--muted)">由通知触发</span>', "ko": '<span style="font-size:11px;color:var(--muted)">통지로 촉발</span>'},
+    '<span style="font-size:11px;color:var(--muted)">+ ad hoc</span>': {"es": '<span style="font-size:11px;color:var(--muted)">+ ad hoc</span>', "fr": '<span style="font-size:11px;color:var(--muted)">+ ad hoc</span>', "de": '<span style="font-size:11px;color:var(--muted)">+ ad hoc</span>', "it": '<span style="font-size:11px;color:var(--muted)">+ ad hoc</span>', "ja": '<span style="font-size:11px;color:var(--muted)">＋アドホック</span>', "zh": '<span style="font-size:11px;color:var(--muted)">+ 临时</span>', "ko": '<span style="font-size:11px;color:var(--muted)">+ 수시</span>'},
+
+    # ── "Tracked" / "Related" cell links (partial keys, unambiguous vs <th> and dashes) ──
+    ">Tracked</a>": {"es": ">Rastreado</a>", "fr": ">Suivi</a>", "de": ">Erfasst</a>", "it": ">Tracciato</a>", "ja": ">収録</a>", "zh": ">已收录</a>", "ko": ">수록</a>"},
+    ">Related</a>": {"es": ">Relacionado</a>", "fr": ">Connexe</a>", "de": ">Verwandt</a>", "it": ">Correlato</a>", "ja": ">関連</a>", "zh": ">相关</a>", "ko": ">관련</a>"},
+
+    # ── Notes & caveats (h2 + h4 + paragraphs) ──
+    "Notes &amp; caveats": {"es": "Notas y advertencias", "fr": "Notes et réserves", "de": "Hinweise und Vorbehalte", "it": "Note e avvertenze", "ja": "注記と留意点", "zh": "注释与说明", "ko": "참고 및 유의사항"},
+    "Reporting vs. removal duties": {"es": "Obligaciones de informar frente a obligaciones de retirar", "fr": "Obligations de rapport vs. obligations de retrait", "de": "Berichts- vs. Entfernungspflichten", "it": "Obblighi di rendicontazione vs. obblighi di rimozione", "ja": "報告義務と削除義務の違い", "zh": "报告义务与删除义务", "ko": "보고 의무 대 삭제 의무"},
+    "Many laws impose <b>registration, local-representative and takedown</b> duties without a standing transparency-report obligation, so they are excluded above: Indonesia's <b>MR5/2020</b>, Pakistan's <b>PECA Rules 2021</b>, Nepal's <b>2023 social-media directive</b>, and Singapore's <b>POFMA</b> and <b>OCHA</b>. The US <b>federal</b> government mandates none; §2258A NCMEC/CSAM reporting is incident reporting, not a public report.": {"es": "Muchas leyes imponen deberes de <b>registro, representante local y retirada</b> sin una obligación permanente de informe de transparencia, por lo que se excluyen aquí: la <b>MR5/2020</b> de Indonesia, las <b>PECA Rules 2021</b> de Pakistán, la <b>directiva de redes sociales de 2023</b> de Nepal y la <b>POFMA</b> y la <b>OCHA</b> de Singapur. El gobierno <b>federal</b> de EE. UU. no exige ninguno; la notificación §2258A NCMEC/CSAM es notificación de incidentes, no un informe público.", "fr": "De nombreuses lois imposent des obligations d'<b>enregistrement, de représentant local et de retrait</b> sans obligation permanente de rapport de transparence ; elles sont donc exclues ci-dessus : la <b>MR5/2020</b> de l'Indonésie, les <b>PECA Rules 2021</b> du Pakistan, la <b>directive sur les réseaux sociaux de 2023</b> du Népal, ainsi que la <b>POFMA</b> et l'<b>OCHA</b> de Singapour. Le gouvernement <b>fédéral</b> américain n'en impose aucun ; le signalement §2258A NCMEC/CSAM est un signalement d'incidents, pas un rapport public.", "de": "Viele Gesetze verlangen <b>Registrierungs-, Vertreter- und Entfernungspflichten</b> ohne eine dauerhafte Transparenzbericht-Pflicht und werden daher oben ausgeschlossen: Indonesiens <b>MR5/2020</b>, Pakistans <b>PECA Rules 2021</b>, Nepals <b>Social-Media-Richtlinie von 2023</b> sowie Singapurs <b>POFMA</b> und <b>OCHA</b>. Die <b>Bundesregierung</b> der USA schreibt keinen vor; die §2258A-NCMEC/CSAM-Meldung ist eine Vorfallmeldung, kein öffentlicher Bericht.", "it": "Molte leggi impongono obblighi di <b>registrazione, rappresentante locale e rimozione</b> senza un obbligo permanente di rapporto di trasparenza, e sono quindi escluse qui sopra: la <b>MR5/2020</b> dell'Indonesia, le <b>PECA Rules 2021</b> del Pakistan, la <b>direttiva sui social media del 2023</b> del Nepal e la <b>POFMA</b> e l'<b>OCHA</b> di Singapore. Il governo <b>federale</b> statunitense non ne impone alcuno; la segnalazione §2258A NCMEC/CSAM è una segnalazione di incidenti, non un rapporto pubblico.", "ja": "多くの法律は、常設の透明性レポート義務を伴わずに<b>登録・国内代理人・削除</b>の義務を課すため、上記から除外している。インドネシアの<b>MR5/2020</b>、パキスタンの<b>PECA Rules 2021</b>、ネパールの<b>2023年ソーシャルメディア指令</b>、シンガポールの<b>POFMA</b>および<b>OCHA</b>などである。米国<b>連邦</b>政府は義務を課しておらず、§2258A NCMEC/CSAM 報告はインシデント報告であって公開レポートではない。", "zh": "许多法律规定了<b>注册、本地代表和下架</b>义务，但没有长期的透明度报告义务，因此在上表中被排除：印度尼西亚的 <b>MR5/2020</b>、巴基斯坦的 <b>PECA Rules 2021</b>、尼泊尔的 <b>2023 年社交媒体指令</b>，以及新加坡的 <b>POFMA</b> 和 <b>OCHA</b>。美国<b>联邦</b>政府未作任何强制要求；§2258A NCMEC/CSAM 报告属于事件上报，而非公开报告。", "ko": "많은 법률은 상시적인 투명성 보고 의무 없이 <b>등록·현지 대리인·게시물 삭제</b> 의무를 부과하므로 위 표에서 제외했다: 인도네시아의 <b>MR5/2020</b>, 파키스탄의 <b>PECA Rules 2021</b>, 네팔의 <b>2023년 소셜미디어 지침</b>, 싱가포르의 <b>POFMA</b> 및 <b>OCHA</b> 등이다. 미국 <b>연방</b> 정부는 어떠한 의무도 부과하지 않으며, §2258A NCMEC/CSAM 신고는 사건 신고이지 공개 보고서가 아니다."},
+    "The DSA absorbed the national laws": {"es": "El DSA absorbió las leyes nacionales", "fr": "Le DSA a absorbé les lois nationales", "de": "Der DSA hat die nationalen Gesetze absorbiert", "it": "Il DSA ha assorbito le leggi nazionali", "ja": "DSA が各国法を吸収した", "zh": "DSA 吸收了各国法律", "ko": "DSA가 국가별 법률을 흡수했다"},
+    "The <b>EU Digital Services Act</b> now pre-empts the field it shares, winding down the NetzDG-style national regimes — Germany's <b>NetzDG</b>, Austria's <b>KoPl-G</b>, and most of France's ambitions after <b>loi Avia</b> was struck down. They are shown as <b>superseded</b> for the historical record.": {"es": "La <b>Ley de Servicios Digitales de la UE</b> desplaza ahora el ámbito que comparte, desmantelando los regímenes nacionales al estilo NetzDG: la <b>NetzDG</b> de Alemania, la <b>KoPl-G</b> de Austria y la mayor parte de las aspiraciones de Francia tras la anulación de la <b>loi Avia</b>. Se muestran como <b>reemplazadas</b> a efectos del registro histórico.", "fr": "La <b>loi sur les services numériques de l'UE</b> supplante désormais le domaine qu'elle partage, mettant fin aux régimes nationaux de type NetzDG : la <b>NetzDG</b> allemande, la <b>KoPl-G</b> autrichienne et la plupart des ambitions françaises après l'annulation de la <b>loi Avia</b>. Elles sont indiquées comme <b>remplacées</b> pour mémoire.", "de": "Der <b>Digital Services Act der EU</b> verdrängt nun das von ihm geteilte Feld und fährt die nationalen Regelungen im NetzDG-Stil zurück – Deutschlands <b>NetzDG</b>, Österreichs <b>KoPl-G</b> und die meisten Ambitionen Frankreichs, nachdem die <b>loi Avia</b> gekippt wurde. Sie werden für den historischen Überblick als <b>ersetzt</b> ausgewiesen.", "it": "La <b>legge sui servizi digitali dell'UE</b> prevale ora sul campo che condivide, smantellando i regimi nazionali in stile NetzDG: la <b>NetzDG</b> tedesca, la <b>KoPl-G</b> austriaca e gran parte delle ambizioni francesi dopo l'annullamento della <b>loi Avia</b>. Sono indicate come <b>sostituite</b> ai fini della memoria storica.", "ja": "<b>EUデジタルサービス法</b>は現在、重複する領域に優先し、NetzDG 型の各国制度を縮小させている — ドイツの<b>NetzDG</b>、オーストリアの<b>KoPl-G</b>、そして<b>loi Avia</b>が無効とされた後のフランスの構想の大半である。これらは歴史的記録として<b>置換済み</b>と表示している。", "zh": "<b>欧盟《数字服务法》</b>如今优先适用于其重叠的领域，逐步终止 NetzDG 式的各国制度——德国的 <b>NetzDG</b>、奥地利的 <b>KoPl-G</b>，以及在 <b>loi Avia</b> 被否决后法国的大部分设想。为保存历史记录，它们被标注为<b>已被取代</b>。", "ko": "<b>EU 디지털서비스법</b>은 이제 중복되는 영역에 우선 적용되어 NetzDG 방식의 국가별 제도를 단계적으로 폐지하고 있다 — 독일의 <b>NetzDG</b>, 오스트리아의 <b>KoPl-G</b>, 그리고 <b>loi Avia</b>가 무효화된 이후 프랑스의 구상 대부분이다. 이들은 역사적 기록을 위해 <b>대체됨</b>으로 표시한다."},
+    "The US state laws are in flux": {"es": "Las leyes estatales de EE. UU. están en constante cambio", "fr": "Les lois des États américains sont mouvantes", "de": "Die US-Bundesstaatengesetze sind im Fluss", "it": "Le leggi statali degli USA sono in evoluzione", "ja": "米国の州法は流動的である", "zh": "美国各州法律处于变动之中", "ko": "미국 주법은 유동적이다"},
+    "Every US-state mandate is being litigated on First-Amendment / compelled-speech grounds. <b>Moody v. NetChoice</b> (SCOTUS, 2024) vacated the Texas and Florida rulings; California's AB 587 lost its content-category provisions; New York's law is under the same challenge. Status here reflects mid-2026 — expect movement.": {"es": "Todos los mandatos estatales de EE. UU. están siendo litigados por motivos de la Primera Enmienda / expresión forzada. <b>Moody v. NetChoice</b> (Tribunal Supremo, 2024) anuló las sentencias de Texas y Florida; la AB 587 de California perdió sus disposiciones sobre categorías de contenido; la ley de Nueva York afronta la misma impugnación. El estado aquí refleja mediados de 2026: es de esperar que cambie.", "fr": "Chaque obligation d'un État américain fait l'objet de litiges au titre du Premier Amendement / de l'expression forcée. <b>Moody v. NetChoice</b> (Cour suprême, 2024) a annulé les décisions du Texas et de la Floride ; l'AB 587 de Californie a perdu ses dispositions sur les catégories de contenu ; la loi de New York fait l'objet du même recours. Le statut indiqué ici reflète la mi-2026 : attendez-vous à des évolutions.", "de": "Jedes Mandat eines US-Bundesstaats wird auf Grundlage des First Amendment / erzwungener Rede beklagt. <b>Moody v. NetChoice</b> (Supreme Court, 2024) hob die Urteile aus Texas und Florida auf; Kaliforniens AB 587 verlor seine Bestimmungen zu Inhaltskategorien; New Yorks Gesetz steht unter derselben Anfechtung. Der hier angegebene Status entspricht Mitte 2026 – mit Änderungen ist zu rechnen.", "it": "Ogni obbligo statale statunitense è oggetto di contenzioso in base al Primo Emendamento / all'espressione coartata. <b>Moody v. NetChoice</b> (Corte Suprema, 2024) ha annullato le sentenze del Texas e della Florida; l'AB 587 della California ha perso le disposizioni sulle categorie di contenuti; la legge di New York è soggetta alla stessa impugnazione. Lo stato qui indicato riflette metà 2026: sono attesi cambiamenti.", "ja": "米国の州単位の義務はすべて、憲法修正第1条／強制的表現を理由に係争中である。<b>Moody v. NetChoice</b>（連邦最高裁、2024年）はテキサス州とフロリダ州の判決を破棄し、カリフォルニア州の AB 587 は内容カテゴリーに関する規定を失い、ニューヨーク州の法律も同じ訴えの対象となっている。ここでの状況は2026年半ば時点のものであり、変動が見込まれる。", "zh": "美国每一项州级强制要求都在以第一修正案／强制言论为由涉讼。<b>Moody v. NetChoice</b>（美国最高法院，2024 年）撤销了得克萨斯州和佛罗里达州的裁决；加利福尼亚州的 AB 587 失去了其内容分类条款；纽约州的法律面临同样的挑战。此处状态反映的是 2026 年年中的情况——预计仍会变动。", "ko": "미국의 모든 주 단위 의무는 수정헌법 제1조／강제 표현을 근거로 소송 중이다. <b>Moody v. NetChoice</b>(연방대법원, 2024)는 텍사스주와 플로리다주 판결을 파기했고, 캘리포니아주의 AB 587은 콘텐츠 범주 조항을 잃었으며, 뉴욕주 법률도 동일한 소송에 직면해 있다. 여기의 상태는 2026년 중반 기준이며, 변동이 예상된다."},
+    '"Filed" is not always "published"': {"es": "«Presentado» no siempre es «publicado»", "fr": "« Déposé » n'est pas toujours « publié »", "de": "„Eingereicht“ heißt nicht immer „veröffentlicht“", "it": "«Depositato» non è sempre «pubblicato»", "ja": "「提出」は必ずしも「公開」ではない", "zh": "「已提交」不等于「已公开」", "ko": "‘제출’이 항상 ‘공개’는 아니다"},
+    "Some mandates require a report <b>to the regulator</b> rather than to the public — Vietnam (ABEI), Korea's statutory filing to the ministry, Australia's notices to eSafety (which then publishes summaries). Where a company's <em>public</em> report is voluntary even though a filing is compelled, that nuance is noted in the row.": {"es": "Algunos mandatos exigen un informe <b>al regulador</b> en lugar de al público: Vietnam (ABEI), la presentación legal de Corea al ministerio, las notificaciones de Australia a eSafety (que después publica resúmenes). Cuando el informe <em>público</em> de una empresa es voluntario aunque su presentación sea obligatoria, ese matiz se indica en la fila.", "fr": "Certaines obligations exigent un rapport <b>au régulateur</b> plutôt qu'au public : le Vietnam (ABEI), le dépôt légal de la Corée auprès du ministère, les notifications de l'Australie à eSafety (qui en publie ensuite des résumés). Lorsque le rapport <em>public</em> d'une entreprise est volontaire même si un dépôt est imposé, cette nuance est signalée dans la ligne.", "de": "Manche Vorgaben verlangen einen Bericht <b>an die Behörde</b> statt an die Öffentlichkeit – Vietnam (ABEI), Koreas gesetzliche Meldung an das Ministerium, Australiens Aufforderungen an eSafety (das anschließend Zusammenfassungen veröffentlicht). Wenn der <em>öffentliche</em> Bericht eines Unternehmens freiwillig ist, obwohl eine Meldung erzwungen wird, ist diese Nuance in der Zeile vermerkt.", "it": "Alcuni obblighi richiedono un rapporto <b>al regolatore</b> anziché al pubblico: Vietnam (ABEI), il deposito di legge della Corea presso il ministero, le notifiche dell'Australia a eSafety (che poi ne pubblica sintesi). Quando il rapporto <em>pubblico</em> di un'azienda è volontario anche se il deposito è obbligatorio, questa sfumatura è indicata nella riga.", "ja": "一部の義務は、公衆ではなく<b>規制当局への</b>報告を求める — ベトナム（ABEI）、韓国の省庁への法定提出、オーストラリアの eSafety への通知（同機関がその後に概要を公表する）などである。提出が義務であっても企業の<em>公開</em>レポートが自主的である場合、その差異は各行に注記している。", "zh": "有些义务要求向<b>监管机构</b>而非公众提交报告——越南（ABEI）、韩国向主管部门的法定提交、澳大利亚向 eSafety 的通知（该机构随后发布摘要）。当某公司的<em>公开</em>报告为自愿、尽管其提交是被强制的，此细微差别会在相应行中注明。", "ko": "일부 의무는 공중이 아니라 <b>규제기관에</b> 보고할 것을 요구한다 — 베트남(ABEI), 한국의 부처 대상 법정 제출, 호주의 eSafety 통지(이후 해당 기관이 요약본을 공개) 등이다. 제출은 강제되더라도 기업의 <em>공개</em> 보고서가 자발적인 경우, 그 뉘앙스는 해당 행에 주기했다."},
+
+    # ── footer paragraphs ──
+    '<span class="asof">Compiled July 2026.</span> Statuses and citations reflect sources current to that date and will drift as litigation and rollouts progress; verify the underlying statute before relying on any single figure. Primary sources include EUR-Lex, legislation.gov.uk, the California and New York Attorneys General, MeitY, Taiwan\'s MODA, Japan\'s MIC, Singapore\'s IMDA, and Brazil\'s STF.': {"es": '<span class="asof">Compilado en julio de 2026.</span> Los estados y las citas reflejan las fuentes vigentes a esa fecha y variarán a medida que avancen los litigios y las implementaciones; verifique la norma subyacente antes de basarse en cualquier dato concreto. Entre las fuentes primarias se incluyen EUR-Lex, legislation.gov.uk, los fiscales generales de California y Nueva York, MeitY, la MODA de Taiwán, el MIC de Japón, la IMDA de Singapur y el STF de Brasil.', "fr": '<span class="asof">Compilé en juillet 2026.</span> Les statuts et les citations reflètent les sources en vigueur à cette date et évolueront au fil des litiges et des déploiements ; vérifiez le texte sous-jacent avant de vous fier à un chiffre isolé. Les sources primaires comprennent EUR-Lex, legislation.gov.uk, les procureurs généraux de Californie et de New York, le MeitY, la MODA de Taïwan, le MIC du Japon, l\'IMDA de Singapour et le STF du Brésil.', "de": '<span class="asof">Zusammengestellt im Juli 2026.</span> Status und Fundstellen geben die zu diesem Zeitpunkt aktuellen Quellen wieder und ändern sich mit fortschreitenden Verfahren und Einführungen; prüfen Sie das zugrunde liegende Gesetz, bevor Sie sich auf eine einzelne Angabe verlassen. Zu den Primärquellen zählen EUR-Lex, legislation.gov.uk, die Attorneys General von Kalifornien und New York, MeitY, Taiwans MODA, Japans MIC, Singapurs IMDA und Brasiliens STF.', "it": '<span class="asof">Compilato a luglio 2026.</span> Gli stati e i riferimenti rispecchiano le fonti aggiornate a tale data e cambieranno con l\'avanzare dei contenziosi e delle attuazioni; verifica la norma di riferimento prima di basarti su un singolo dato. Tra le fonti primarie figurano EUR-Lex, legislation.gov.uk, i procuratori generali della California e di New York, il MeitY, la MODA di Taiwan, il MIC del Giappone, l\'IMDA di Singapore e l\'STF del Brasile.', "ja": '<span class="asof">2026年7月時点で編集。</span>状況と出典はその時点で有効な情報源に基づいており、訴訟や施行の進展に伴って変化する。個々の数値に依拠する前に、根拠となる法令を確認すること。主な出典には EUR-Lex、legislation.gov.uk、カリフォルニア州およびニューヨーク州の司法長官、MeitY、台湾の MODA、日本の MIC、シンガポールの IMDA、ブラジルの STF が含まれる。', "zh": '<span class="asof">编制于 2026 年 7 月。</span>状态与引用反映的是截至该日期的现行来源，并将随诉讼和实施的推进而变化；在依赖任何单一数据前，请核对相关法规原文。主要来源包括 EUR-Lex、legislation.gov.uk、加利福尼亚州和纽约州总检察长、MeitY、台湾的 MODA、日本的 MIC、新加坡的 IMDA 以及巴西的 STF。', "ko": '<span class="asof">2026년 7월 기준으로 정리.</span> 상태와 인용은 해당 시점에 유효한 자료를 반영하며, 소송과 시행이 진행됨에 따라 달라진다. 개별 수치에 의존하기 전에 근거 법령을 확인할 것. 주요 출처로는 EUR-Lex, legislation.gov.uk, 캘리포니아주 및 뉴욕주 법무장관, MeitY, 대만의 MODA, 일본의 MIC, 싱가포르의 IMDA, 브라질의 STF가 포함된다.'},
+    'The <span style="color:var(--accent)">◆ Tracked</span> regimes are archived and made queryable in the <a href="/">Transparency Report API</a> — the EU DSA, India\'s IT Rules, South Korea, Taiwan\'s Anti-Fraud Act, New York\'s Stop Hiding Hate Act and California\'s AB 587.': {"es": 'Los regímenes <span style="color:var(--accent)">◆ Rastreados</span> están archivados y se pueden consultar en la <a href="/">Transparency Report API</a>: el DSA de la UE, las IT Rules de la India, Corea del Sur, la Ley Anti-Fraude de Taiwán, la Ley Stop Hiding Hate de Nueva York y la AB 587 de California.', "fr": 'Les régimes <span style="color:var(--accent)">◆ suivis</span> sont archivés et interrogeables dans la <a href="/">Transparency Report API</a> — le DSA de l\'UE, les IT Rules de l\'Inde, la Corée du Sud, la loi anti-fraude de Taïwan, la loi Stop Hiding Hate de New York et l\'AB 587 de Californie.', "de": 'Die <span style="color:var(--accent)">◆ erfassten</span> Regime sind archiviert und in der <a href="/">Transparency Report API</a> abfragbar – der EU-DSA, Indiens IT Rules, Südkorea, Taiwans Anti-Betrugs-Gesetz, New Yorks Stop Hiding Hate Act und Kaliforniens AB 587.', "it": 'I regimi <span style="color:var(--accent)">◆ tracciati</span> sono archiviati e interrogabili nella <a href="/">Transparency Report API</a>: il DSA dell\'UE, le IT Rules dell\'India, la Corea del Sud, la legge anti-frode di Taiwan, lo Stop Hiding Hate Act di New York e l\'AB 587 della California.', "ja": '<span style="color:var(--accent)">◆ 収録</span>されている制度は、<a href="/">Transparency Report API</a> でアーカイブされ、クエリ可能になっている — EU の DSA、インドの IT Rules、韓国、台湾の反詐欺法、ニューヨークの Stop Hiding Hate Act、カリフォルニアの AB 587 である。', "zh": '<span style="color:var(--accent)">◆ 已收录</span>的制度已在 <a href="/">Transparency Report API</a> 中归档并可供查询——欧盟 DSA、印度 IT Rules、韩国、台湾反诈骗法、纽约 Stop Hiding Hate Act 以及加利福尼亚 AB 587。', "ko": '<span style="color:var(--accent)">◆ 수록</span>된 제도는 <a href="/">Transparency Report API</a>에서 아카이브되어 조회할 수 있다 — EU DSA, 인도 IT Rules, 대한민국, 대만 반사기법, 뉴욕 Stop Hiding Hate Act, 캘리포니아 AB 587이다.'},
+}
+for _loc in _NEW_PAGE_LOCALES:
+    PAGES[_loc]["mandates.html"] = [(_en, _tr[_loc]) for _en, _tr in _MND_PAGE.items()]
+    _pt = open(os.path.join(STATIC, "mandates.html"), encoding="utf-8").read()
+    _own = {_o for _o, _ in PAGES[_loc]["mandates.html"]}
+    for _src in ("singapore.html", "cser.html", "microsoft.html", "india.html", "snap.html"):
+        for _o, _n in PAGES[_loc][_src]:
+            if _o in _pt and _o not in _own:
+                PAGES[_loc]["mandates.html"].append((_o, _n))
+                _own.add(_o)
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
