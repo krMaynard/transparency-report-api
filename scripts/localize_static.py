@@ -11053,12 +11053,12 @@ for _loc in _KNA_NAV:
     COMMON[_loc].append(("      Korea Network Act\n    </a>", f"      {_KNA_NAV[_loc]}\n    </a>"))
     PAGES[_loc]["home.html"].append((_SG_CARD_DESC_EN, _SG_CARD_DESC[_loc]))
 
-# Japan 情プラ法 — English-only dataset page (Japanese-source, dense), like
+# Japan IDPA — English-only dataset page (Japanese-source, dense), like
 # Singapore/mandates: only the nav label + home card are localized (the law's
 # own abbreviation 情プラ法 is kept as its proper name).
 _JP_NAV = {
-    "es": "Japón 情プラ法", "fr": "Japon 情プラ法", "de": "Japan 情プラ法",
-    "it": "Giappone 情プラ法", "ja": "日本 情プラ法", "zh": "日本 情プラ法", "ko": "일본 情プラ法",
+    "es": "Japón IDPA", "fr": "Japon IDPA", "de": "Japan IDPA",
+    "it": "Giappone IDPA", "ja": "日本 情プラ法", "zh": "日本 信息平台法", "ko": "일본 정보플랫폼법",
 }
 _JP_CARD_DESC_EN = ("Japan’s Information Distribution Platform Act (情プラ法) implementation "
                     "statistics — LY Corporation’s Media Transparency Report: posts, removals "
@@ -11358,8 +11358,8 @@ _JP_PAGE = {
     '"Meta rights-report requests received by reason."': {"es": '"Solicitudes de denuncia de derechos recibidas por Meta, por motivo."', "fr": '"Demandes de signalement de droits reçues par Meta, par motif."', "de": '"Bei Meta eingegangene Rechtsverletzungsmeldungen nach Grund."', "it": '"Richieste di segnalazione dei diritti ricevute da Meta, per motivo."', "ja": '"Meta が受理した権利侵害報告の申請（理由別）。"', "zh": '"Meta 收到的权利举报请求（按理由）。"', "ko": '"Meta가 접수한 권리침해 신고 요청(사유별)."'},
 }
 for _loc in _JP_NAV:
-    COMMON[_loc].append(("      Japan 情プラ法\n    </a>", f"      {_JP_NAV[_loc]}\n    </a>"))
-    PAGES[_loc]["home.html"].append(("<h3>Japan 情プラ法</h3>", f"<h3>{_JP_NAV[_loc]}</h3>"))
+    COMMON[_loc].append(("      Japan IDPA\n    </a>", f"      {_JP_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Japan IDPA</h3>", f"<h3>{_JP_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_JP_CARD_DESC_EN, _JP_CARD_DESC[_loc]))
     PAGES[_loc]["japan.html"] = [(_en, _tr[_loc]) for _en, _tr in _JP_PAGE.items()]
     # Inherit the shared chrome (Trends, the chart intro, Loading…, No data
