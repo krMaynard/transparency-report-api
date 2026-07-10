@@ -13547,6 +13547,114 @@ _REGIONAL_NAV = {
 }
 for _loc in _REGIONAL_NAV:
     COMMON[_loc].append(("      Regional laws\n    </a>", f"      {_REGIONAL_NAV[_loc]}\n    </a>"))
+
+# ── China 12321 sidebar label (was rendering un-localized) ────────────────────
+_CHINA12321_NAV = {
+    "es": "12321 de China",
+    "fr": "12321 (Chine)",
+    "de": "China 12321",
+    "it": "12321 Cina",
+    "ja": "中国 12321",
+    "zh": "中国 12321",
+    "ko": "중국 12321",
+}
+for _loc in _CHINA12321_NAV:
+    COMMON[_loc].append(("      China 12321\n    </a>", f"      {_CHINA12321_NAV[_loc]}\n    </a>"))
+
+# ── Home feature cards for datasets that were sidebar-only (added) ─────────────
+# Seven datasets had a sidebar entry but no home "What's here" card; backfilled so
+# the landing page reflects the full breadth. Each card's h3 reuses that page's
+# localized sidebar label; the CTA ("Explore the data") is already translated.
+_HOME_NEW_CARD_TITLES = [
+    ("<h3>EU AI Act</h3>", _AI_TRAINING_NAV),
+    ("<h3>EU TCO</h3>", _TCO_NAV),
+    ("<h3>Korea — Network Act</h3>", _KNA_NAV),
+    ("<h3>China CIIRC</h3>", _CHINA_NAV),
+    ("<h3>China 12321</h3>", _CHINA12321_NAV),
+    ("<h3>Regional laws</h3>", _REGIONAL_NAV),
+    ("<h3>Reporting mandates</h3>", _MANDATES_NAV),
+]
+_HOME_NEW_CARD_DESC_EN = [
+    "The EU AI Act's training-data transparency summaries — the public summary of training content every provider of a general-purpose AI model must publish, with comparable size bands and data-source disclosures from Google, Meta, Microsoft and OpenAI.",
+    "The EU's Terrorist Content Online Regulation — the annual transparency duties around terrorist content: per-Member-State removal orders and hosting providers' enforcement figures.",
+    "South Korea's Network Act transparency reports — the annual measures Google takes against illegal sexual content across Search and YouTube, with a full monthly breakdown of requests, outcomes and removed URLs, 2020 onward.",
+    "China's CAC reporting centre — the national 12377 hotline's monthly statistics on how many reports of illegal and harmful online information were handled, by receiving body, 2019 onward.",
+    "China's 12321 hotline (Internet Society of China / MIIT) — the monthly telecom-spam and nuisance report-handling bulletins, by report category, 2016–2019.",
+    "Content-moderation reports filed under sub-national and national statutes — YouTube's Texas HB 20 enforcement figures and Austria's KoPl-G complaint statistics.",
+    "A tracker mapping the transparency-reporting laws themselves — which jurisdictions mandate what, from the EU DSA to US state terms-of-service statutes and Asia-Pacific online-safety codes.",
+]
+_HOME_NEW_CARD_DESC = {
+    "es": [
+        "Los resúmenes de transparencia sobre los datos de entrenamiento del Reglamento de IA de la UE — el resumen público del contenido de entrenamiento que todo proveedor de un modelo de IA de uso general debe publicar, con bandas de tamaño comparables y divulgaciones de fuentes de datos de Google, Meta, Microsoft y OpenAI.",
+        "El Reglamento de la UE sobre Contenido Terrorista en Línea — las obligaciones anuales de transparencia en torno al contenido terrorista: órdenes de retirada por Estado miembro y cifras de aplicación de los proveedores de alojamiento.",
+        "Los informes de transparencia de la Ley de Redes de Corea del Sur — las medidas anuales que Google adopta contra el contenido sexual ilegal en Search y YouTube, con un desglose mensual completo de solicitudes, resultados y URL retiradas, desde 2020.",
+        "El centro de denuncias de la CAC de China — las estadísticas mensuales de la línea directa nacional 12377 sobre cuántas denuncias de información en línea ilegal y dañina se tramitaron, por organismo receptor, desde 2019.",
+        "La línea directa 12321 de China (Sociedad de Internet de China / MIIT) — los boletines mensuales de tramitación de denuncias de spam y molestias en las telecomunicaciones, por categoría de denuncia, 2016–2019.",
+        "Informes de moderación de contenido presentados en virtud de leyes subnacionales y nacionales — las cifras de aplicación de YouTube bajo la Texas HB 20 y las estadísticas de reclamaciones de la KoPl-G de Austria.",
+        "Un rastreador que mapea las propias leyes de informes de transparencia — qué jurisdicciones exigen qué, desde la DSA de la UE hasta las leyes estatales de EE. UU. sobre condiciones de servicio y los códigos de seguridad en línea de Asia-Pacífico.",
+    ],
+    "fr": [
+        "Les résumés de transparence sur les données d'entraînement du règlement européen sur l'IA (AI Act) — le résumé public du contenu d'entraînement que tout fournisseur d'un modèle d'IA à usage général doit publier, avec des tranches de taille comparables et des déclarations de sources de données de Google, Meta, Microsoft et OpenAI.",
+        "Le règlement européen relatif aux contenus terroristes en ligne (Terrorist Content Online) — les obligations annuelles de transparence relatives aux contenus terroristes : les injonctions de retrait par État membre et les chiffres d'application des hébergeurs.",
+        "Les rapports de transparence au titre du Network Act sud-coréen — les mesures annuelles prises par Google contre les contenus sexuels illégaux sur Search et YouTube, avec une ventilation mensuelle complète des demandes, des décisions et des URL retirées, à partir de 2020.",
+        "Le centre de signalement de la CAC chinoise — les statistiques mensuelles de la ligne nationale 12377 sur le nombre de signalements d'informations en ligne illégales et nuisibles traités, par organisme récepteur, à partir de 2019.",
+        "La ligne chinoise 12321 (Internet Society of China / MIIT) — les bulletins mensuels de traitement des signalements de spam et de nuisances télécom, par catégorie de signalement, 2016–2019.",
+        "Les rapports de modération de contenu déposés au titre de lois infranationales et nationales — les chiffres d'application de YouTube au titre du Texas HB 20 et les statistiques de plaintes du KoPl-G autrichien.",
+        "Un outil de suivi cartographiant les lois sur les rapports de transparence elles-mêmes — quelles juridictions imposent quoi, du DSA européen aux lois d'État américaines sur les conditions d'utilisation et aux codes de sécurité en ligne d'Asie-Pacifique.",
+    ],
+    "de": [
+        "Die Transparenzzusammenfassungen zu Trainingsdaten des EU-KI-Gesetzes — die öffentliche Zusammenfassung der Trainingsinhalte, die jeder Anbieter eines KI-Modells mit allgemeinem Verwendungszweck veröffentlichen muss, mit vergleichbaren Größenbändern und Angaben zu Datenquellen von Google, Meta, Microsoft und OpenAI.",
+        "Die EU-Verordnung gegen terroristische Online-Inhalte — die jährlichen Transparenzpflichten rund um terroristische Inhalte: Entfernungsanordnungen je Mitgliedstaat und Durchsetzungszahlen der Hosting-Diensteanbieter.",
+        "Die Transparenzberichte nach Südkoreas Network Act — die jährlichen Maßnahmen, die Google gegen illegale sexuelle Inhalte in Search und YouTube ergreift, mit einer vollständigen monatlichen Aufschlüsselung von Anfragen, Ergebnissen und entfernten URLs, ab 2020.",
+        "Chinas CAC-Meldezentrum — die monatlichen Statistiken der nationalen Hotline 12377 dazu, wie viele Meldungen zu illegalen und schädlichen Online-Informationen bearbeitet wurden, nach empfangender Stelle, ab 2019.",
+        "Chinas Hotline 12321 (Internet Society of China / MIIT) — die monatlichen Bulletins zur Bearbeitung von Meldungen über Telekom-Spam und Belästigung, nach Meldungskategorie, 2016–2019.",
+        "Berichte zur Inhaltsmoderation, die nach subnationalen und nationalen Gesetzen eingereicht werden — YouTubes Durchsetzungszahlen nach Texas HB 20 und Österreichs Beschwerdestatistik nach dem KoPl-G.",
+        "Ein Tracker, der die Transparenzberichtspflichten selbst abbildet — welche Rechtsordnungen was vorschreiben, vom EU-DSA über die Terms-of-Service-Gesetze der US-Bundesstaaten bis zu den Online-Sicherheitskodizes im asiatisch-pazifischen Raum.",
+    ],
+    "it": [
+        "Le sintesi sulla trasparenza dei dati di addestramento previste dall'AI Act dell'UE — il riepilogo pubblico dei contenuti di addestramento che ogni fornitore di un modello di IA per finalità generali deve pubblicare, con fasce dimensionali comparabili e informazioni sulle fonti dei dati da Google, Meta, Microsoft e OpenAI.",
+        "Il Regolamento dell'UE sui contenuti terroristici online — gli obblighi annuali di trasparenza relativi ai contenuti terroristici: ordini di rimozione per ogni Stato membro e dati sull'applicazione da parte dei fornitori di servizi di hosting.",
+        "I rapporti di trasparenza previsti dal Network Act della Corea del Sud — le misure annuali adottate da Google contro i contenuti sessuali illegali su Search e YouTube, con una ripartizione mensile completa di richieste, esiti e URL rimossi, dal 2020 in poi.",
+        "Il centro di segnalazione della CAC cinese — le statistiche mensili della hotline nazionale 12377 su quante segnalazioni di informazioni online illegali e dannose sono state gestite, per organo ricevente, dal 2019 in poi.",
+        "La hotline cinese 12321 (Internet Society of China / MIIT) — i bollettini mensili sulla gestione delle segnalazioni di spam telecom e molestie, per categoria di segnalazione, 2016–2019.",
+        "Rapporti sulla moderazione dei contenuti presentati ai sensi di normative subnazionali e nazionali — i dati sull'applicazione della Texas HB 20 di YouTube e le statistiche sui reclami previste dalla KoPl-G austriaca.",
+        "Uno strumento che mappa le stesse leggi sulla rendicontazione di trasparenza — quali giurisdizioni impongono cosa, dal DSA dell'UE alle normative statali statunitensi sui termini di servizio fino ai codici sulla sicurezza online dell'Asia-Pacifico.",
+    ],
+    "ja": [
+        "EU AI Actの学習データ透明性サマリー — 汎用AIモデルのすべての提供者が公開しなければならない学習コンテンツの公開サマリー。Google、Meta、Microsoft、OpenAIによる比較可能なサイズ帯とデータソースの開示を掲載。",
+        "EUのテロリストコンテンツオンライン規則（TCO） — テロリストコンテンツに関する年次透明性義務。加盟国別の削除命令とホスティングプロバイダーの執行数値。",
+        "韓国の情報通信網法（Network Act）に基づく透明性報告 — GoogleがSearchとYouTube全体で違法な性的コンテンツに対して講じる年次措置。リクエスト、処理結果、削除URLの月次内訳を完全収録、2020年以降。",
+        "中国CACの通報センター — 全国12377ホットラインが違法・有害なオンライン情報の通報を毎月どれだけ処理したかを受理主体別に示す統計、2019年以降。",
+        "中国の12321ホットライン（中国インターネット協会 / MIIT） — 電気通信スパムと迷惑情報の通報処理に関する月次報告を、通報カテゴリー別に掲載、2016〜2019年。",
+        "地方および国内の法令に基づいて提出されたコンテンツモデレーション報告 — YouTubeのTexas HB 20執行数値とオーストリアのKoPl-G苦情統計。",
+        "透明性報告を義務付ける法律そのものをマッピングするトラッカー — EU DSAから米国州のサービス利用規約法、アジア太平洋のオンライン安全規範まで、どの法域が何を義務付けているか。",
+    ],
+    "zh": [
+        "欧盟《人工智能法案》的训练数据透明度摘要——每家通用人工智能模型的提供者都必须公开发布的训练内容公开摘要，包含来自 Google、Meta、Microsoft 和 OpenAI 的可比较的规模区间和数据来源披露。",
+        "欧盟《在线恐怖主义内容条例》——围绕恐怖主义内容的年度透明度义务：各成员国的删除令以及托管服务提供商的执法数据。",
+        "韩国《网络法》透明度报告——Google 在 Search 和 YouTube 上针对非法性内容所采取的年度措施，含请求、处理结果和被删除 URL 的完整逐月细分，自 2020 年起。",
+        "中国 CAC 举报中心——全国 12377 热线关于每月处理了多少起非法及有害网络信息举报的统计数据，按受理机构划分，自 2019 年起。",
+        "中国 12321 热线（中国互联网协会 / MIIT）——关于电信垃圾信息和骚扰举报处理的每月通报，按举报类别划分，2016–2019 年。",
+        "依据地方及国家法规提交的内容审核报告——YouTube 的 Texas HB 20 执法数据以及奥地利 KoPl-G 的投诉统计数据。",
+        "一个梳理透明度报告法律本身的追踪器——从欧盟 DSA 到美国各州的服务条款法规再到亚太地区的在线安全准则，哪些司法管辖区强制要求什么。",
+    ],
+    "ko": [
+        "EU AI Act의 학습 데이터 투명성 요약 — 범용 AI 모델을 제공하는 모든 사업자가 공개해야 하는 학습 콘텐츠 공개 요약으로, Google, Meta, Microsoft, OpenAI의 비교 가능한 규모 구간과 데이터 출처 공개를 담고 있습니다.",
+        "EU의 온라인 테러 콘텐츠 규정 — 테러 콘텐츠와 관련된 연간 투명성 의무: 회원국별 삭제 명령과 호스팅 제공업체의 집행 수치.",
+        "대한민국 정보통신망법 투명성 보고서 — Google이 Search와 YouTube 전반에서 불법 성적 콘텐츠에 대응해 취한 연간 조치로, 요청·처리 결과·삭제된 URL의 전체 월별 세부 내역을 2020년부터 담고 있습니다.",
+        "중국 CAC 신고센터 — 전국 12377 핫라인의 불법·유해 온라인 정보 신고 처리 건수에 관한 월별 통계로, 접수 기관별로 2019년부터 제공됩니다.",
+        "중국 12321 핫라인(중국인터넷협회 / MIIT) — 신고 유형별 월별 통신 스팸 및 유해 정보 신고 처리 소식지, 2016–2019년.",
+        "지방 및 국가 법령에 따라 제출된 콘텐츠 조정 보고서 — YouTube의 Texas HB 20 집행 수치와 오스트리아 KoPl-G 민원 통계.",
+        "투명성 보고 법률 자체를 정리한 트래커 — EU DSA부터 미국 주(州)의 서비스 약관 법령, 아시아·태평양의 온라인 안전 규정에 이르기까지 어느 관할권이 무엇을 의무화하는지 매핑합니다.",
+    ],
+}
+for _loc in _NEW_PAGE_LOCALES:
+    for _i, (_h3_en, _navd) in enumerate(_HOME_NEW_CARD_TITLES):
+        _navlbl = _navd[_loc]
+        if _h3_en != f"<h3>{_navlbl}</h3>":
+            PAGES[_loc]['home.html'].append((_h3_en, f"<h3>{_navlbl}</h3>"))
+        PAGES[_loc]['home.html'].append((_HOME_NEW_CARD_DESC_EN[_i], _HOME_NEW_CARD_DESC[_loc][_i]))
+
 _REG_PAGE = {
     # ── <title> ────────────────────────────────────────────────────────────
     "Regional content-moderation transparency laws — Transparency Report API": {
