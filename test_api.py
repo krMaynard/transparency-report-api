@@ -3569,6 +3569,46 @@ class TestCiircTable:
         assert r.status_code == 200 and "ciirc_metrics" in r.text
 
 
+class TestDsaTdbTable:
+    def test_dsatdb_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "dsa_tdb_metrics" in names
+
+    def test_dsatdb_fields_endpoint(self):
+        body = client.get("/api/fields?table=dsa_tdb_metrics", headers=MOMO).json()
+        assert {"section", "platform", "period", "category", "metric",
+                "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_dsatdb_category_partitions_total(self):
+        # The single-select by_category cut sums back to the platform's total.
+        rows = client.post("/api/explore", json={
+            "table": "dsa_tdb_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["by_category"]},
+                {"operation": "EQ", "field_name": "platform", "field_values": ["TikTok"]},
+            ]},
+            "group_by": ["platform"],
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        }).json()["rows"]
+        assert rows[0][1] == 100  # == the TikTok totals row
+
+    def test_dsatdb_unpinned_sum_warns(self):
+        # No section pinned: may sum a breakdown together with 'totals', and no
+        # platform pinned: a cross-platform sum is skewed. Both warn.
+        r = client.post("/api/explore", json={
+            "table": "dsa_tdb_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        w = " ".join(r.json().get("warnings", []))
+        assert "section" in w and "platform" in w
+
+    def test_dsatdb_page_served(self):
+        r = client.get("/dsa-db")
+        assert r.status_code == 200 and '"table": "dsa_tdb_metrics"' in r.text
+
+
 class TestChina12321Table:
     def test_china12321_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]

@@ -599,6 +599,27 @@ _ANDROID_FIXTURE = {
 }
 seed.build_android_db(_ANDROID_FIXTURE, _DB)
 
+# A small slice of the EU DSA Transparency Database — Statements of Reasons
+# (dsa-tdb.json shape). Two platforms × one month, with the totals cut plus the
+# single-select category / decision-ground cuts, so the suite exercises the
+# section-partitions-total reconciliation and the double-count/skew guardrails.
+# [section, platform, period, category, metric, unit, value]
+_DSATDB_FIXTURE = {
+    "columns": ["section", "platform", "period", "category", "metric", "unit", "value"],
+    "rows": [
+        ["totals", "TikTok", "2026-05", "All", "statements", "count", 100],
+        ["totals", "Amazon", "2026-05", "All", "statements", "count", 40],
+        ["by_category", "TikTok", "2026-05", "Scams and fraud", "statements", "count", 70],
+        ["by_category", "TikTok", "2026-05", "Violence", "statements", "count", 30],
+        ["by_category", "Amazon", "2026-05", "Unsafe and illegal products", "statements", "count", 40],
+        ["by_decision_ground", "TikTok", "2026-05", "Illegal content", "statements", "count", 25],
+        ["by_decision_ground", "TikTok", "2026-05", "Incompatible with terms", "statements", "count", 75],
+        ["by_decision_visibility", "TikTok", "2026-05", "Content removed", "statements", "count", 90],
+        ["by_decision_visibility", "TikTok", "2026-05", "Demoted", "statements", "count", 40],
+    ],
+}
+seed.build_dsa_tdb_db(_DSATDB_FIXTURE, _DB)
+
 # A small slice of the non-VLOP report-locations catalogue (report-locations.csv).
 _RL_FIXTURE = [
     # Reddit deliberately omits the optional columns (company / harmonised_template /

@@ -68,7 +68,7 @@ Built to demonstrate two things:
 | File | Purpose |
 |------|---------|
 | `main.py` | FastAPI app — all endpoints, job runner, in-memory job registry |
-| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), the EU Terrorist Content Online Regulation transparency reports (`build_tco_db`, `--tco-source`), the EU AI Act training-data transparency summaries (`build_ai_training_db`, `--ai-training-source`), the regional content-moderation transparency-law reports (`build_regional_db`, `--regional-source`), the China CIIRC (12377) online-report handling statistics (`build_ciirc_db`, `--ciirc-source`), the China 12321 telecom-spam report-handling statistics (`build_china12321_db`, `--china12321-source`), the Meta Community Standards Enforcement Report (`build_cser_db`, `--cser-source`), the TikTok Community Guidelines Enforcement Report (`build_tiktok_cger_db`, `--tiktok-cger-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), the Japan LY Corp report narratives (`build_japan_narratives`, `--japan-narratives`), the California AB 2013 AI-training summary narratives (`build_ca_ab2013_narratives`, `--ca-ab2013-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
+| `seed.py` | Build `demo.db` from a `vlop-dsa.json` (`--source`/`SEED_SOURCE_JSON`; default = sibling repo) — `build_db()` is reused by `conftest.py`. Also loads gr removals, `report_locations`, the Apple transparency dataset (`build_apple_db`, `--apple-source`), the GitHub transparency dataset (`build_github_db`, `--github-source`), the Snap transparency dataset (`build_snap_db`, `--snap-source`), India's IT Rules monthly compliance reports (`build_india_db`, `--india-source`), the Korea transparency dataset (`build_korea_db`, `--korea-source`), the Taiwan anti-fraud dataset (`build_taiwan_db`, `--taiwan-source`), the Türkiye Law 5651 platform reports (`build_turkey_db`, `--turkey-source`), the EU Terrorist Content Online Regulation transparency reports (`build_tco_db`, `--tco-source`), the EU AI Act training-data transparency summaries (`build_ai_training_db`, `--ai-training-source`), the regional content-moderation transparency-law reports (`build_regional_db`, `--regional-source`), the China CIIRC (12377) online-report handling statistics (`build_ciirc_db`, `--ciirc-source`), the China 12321 telecom-spam report-handling statistics (`build_china12321_db`, `--china12321-source`), the Meta Community Standards Enforcement Report (`build_cser_db`, `--cser-source`), the TikTok Community Guidelines Enforcement Report (`build_tiktok_cger_db`, `--tiktok-cger-source`), Google user-data requests (`build_google_userdata_db`, `--google-ud-source`), the Microsoft LERR (`build_microsoft_db`, `--microsoft-source`), the LinkedIn report (`build_linkedin_db`, `--linkedin-source`), TikTok's government & legal requests (`build_tiktok_db`, `--tiktok-source`), the Discord transparency reports (`build_discord_db`, `--discord-source`), the Google Traffic & Disruptions catalogue (`build_google_traffic_db`, `--traffic-source`), the Google Android ecosystem security dataset (`build_android_db`, `--android-source`), the EU DSA Transparency Database Statements of Reasons (`build_dsa_tdb_db`, `--dsa-tdb-source`), the NY ToS report narratives full text (`build_ny_tos_narratives`, `--narratives-source`), the California AB 587 ToS reports catalogue (`build_ca_ab587_reports`, `--ca-ab587`) + its narratives full text (`build_ca_ab587_narratives`, `--ca-ab587-narratives`), the Japan LY Corp report narratives (`build_japan_narratives`, `--japan-narratives`), the California AB 2013 AI-training summary narratives (`build_ca_ab2013_narratives`, `--ca-ab2013-narratives`), and the non-VLOP harmonised reports; after loading, `build_dsa_narratives` indexes the DSA Table-11 prose for search |
 | `seed_harmonised.py` | Append the **non-VLOP harmonised-template reports** into the same `t3`–`t11` star schema (`build_harmonised_facts()`): one new `reports` row (tier ≠ `vlop`) + `services` row per platform, dimensions interned/extended. Reads the vendored `data/harmonised-reports.json` snapshot (or the sibling repo's extracted CSVs in dev); `write_snapshot()` rebuilds the snapshot. For t6/t7/t8 the per-row surface comes from a trailing `Surface` cell (`Core`/`Ads`) when present — the sibling extractor folds Google's ads-surface split (Hotels/Workspace) into the base section — else defaults to `All` |
 | `data/vlop-dsa.json` | Vendored dataset snapshot — what the Docker image is seeded from (refresh via `scripts/refresh-dataset.sh`) |
 | `data/harmonised-reports.json` | Vendored snapshot of the 49 extracted non-VLOP harmonised-template reports (sibling `dsa-transparency-data/harmonised-reports/extracted/`) — seeded into `t3`–`t11` by `seed_harmonised.py` |
@@ -94,6 +94,7 @@ Built to demonstrate two things:
 | `data/discord-transparency.json` | Vendored snapshot of the Discord Transparency Reports (sibling `dsa-transparency-data/discord-transparency/build_discord.py`) — a tidy-long `columns`+`rows` list; seeded into the `discord_metrics` table by `seed.build_discord_db` |
 | `data/google-traffic.json` | Vendored snapshot of Google's Traffic & Disruptions catalogue (sibling `dsa-transparency-data/google-traffic/build_traffic.py`) — a flat-catalogue `columns`+`rows` list (one row per disruption event); seeded into the read-only `google_traffic` table by `seed.build_google_traffic_db` |
 | `data/android-security.json` | Vendored snapshot of Google's Android ecosystem security report (sibling `dsa-transparency-data/android-security/build_android.py`) — a tidy-long `columns`+`rows` list of PHA (malware) rates; seeded into the `android_metrics` table by `seed.build_android_db` |
+| `data/dsa-tdb.json` | Vendored snapshot of the EU DSA Transparency Database — Statements of Reasons, **re-aggregated** from the Commission's pre-made monthly aggregates (sibling `dsa-transparency-data/dsa-tdb/build_dsa_tdb.py`, via the `dsa-tdb` toolbox) — a tidy-long `columns`+`rows` list (SoR counts by platform × month × dimension, top 60 platforms, 2023-09→); seeded into the `dsa_tdb_metrics` table by `seed.build_dsa_tdb_db` |
 | `data/ny-tos-narratives.json` | Vendored snapshot of the **narrative text** of the NY ToS filings (sibling `dsa-transparency-data/ny-tos-reports/extract_narrative.py`) — one `columns`+`rows` entry per page of prose; seeded into the FTS5 `ny_tos_narratives` table by `seed.build_ny_tos_narratives` |
 | `data/template-crosswalk.json` | Vendored `{original-language label → canonical English}` map for the template's `sections`/`indicators`/`scopes`, applied by `seed.normalize_dimensions` to stamp each dim row's language-neutral `key`. Regenerate with `scripts/build_template_crosswalk.py` |
 | `scripts/build_template_crosswalk.py` | Learns `data/template-crosswalk.json` by aligning same-structure non-VLOP report sheets to an English reference (drops ambiguous labels) — reads the sibling repo's extracted CSVs |
@@ -123,6 +124,7 @@ Built to demonstrate two things:
 | `static/discord.html` | Public Discord Transparency Reports dataset page (served at `/discord`) — Trends charts + overview tables over `POST /api/explore` (`discord_metrics`) |
 | `static/disruptions.html` | Public Google Traffic & Disruptions catalogue page (served at `/disruptions`) — the "Government internet shutdowns" filterable table over `GET /api/traffic-disruptions` (a flat catalogue like `/catalog`, not `/api/explore`) |
 | `static/android.html` | Public Android ecosystem security dataset page (served at `/android`) — Trends charts + overview tables over `POST /api/explore` (`android_metrics`); PHA rates shown as percentages |
+| `static/dsa-db.html` | Public EU DSA Transparency Database (Statements of Reasons) dataset page (served at `/dsa-db`) — Trends charts (SoRs/month, top platforms, by category, decision ground) + a by-platform table over `POST /api/explore` (`dsa_tdb_metrics`); English-only, like `/china-12321` |
 | `static/narratives.html` | Public narrative full-text search page (served at `/narratives`) — a search box + highlighted result snippets over `GET /api/narratives` (SQLite FTS5) spanning the NY ToS filings (deep-linking into the archived PDFs), the California AB 587 filings, Google's California AB 2013 AI-training summary, the DSA reports' Table-11 prose, and LY Corporation's bilingual Japan 情プラ法 Media Transparency Report |
 | `data/ny-tos-reports.csv` | Vendored snapshot of New York's Social Media ToS-reports catalogue (sibling `dsa-transparency-data/ny_tos_reports.csv`) — seeded into the read-only `ny_tos_reports` table by `seed.py` |
 | `data/ca-ab587-reports.csv` | Vendored snapshot of California's AB 587 Terms-of-Service reports catalogue (sibling `dsa-transparency-data/ca-ab587/ca_ab587_reports.csv`) — seeded into the read-only `ca_ab587_reports` table by `seed.build_ca_ab587_reports` |
@@ -296,7 +298,7 @@ key/value table (`period`, `generated`). One **fact table per DSA report table**
 Fact-row leading values are indices into the lookup arrays (= the dimension row
 id), so seeding is positional. The DB is opened `mode=ro` as defence in depth.
 
-Twenty-three non-DSA datasets ride alongside, each exposed as an ordinary query table
+Two dozen further datasets ride alongside, each exposed as an ordinary query table
 via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
 - **Google government removals** (`gr_*` dims + `gr_removals` facts).
 - **Apple Transparency Report** — `ap_periods`/`ap_countries`/`ap_request_types`
@@ -685,6 +687,35 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   of 1** — never SUM) or `percent` (the category share, sums to ~100/quarter).
   These are **rates, not counts** — `_leg_warnings` warns on any SUM and when a
   SUM/AVG pins no `section`/`metric`; prefer AVG/MIN/MAX.
+- **EU DSA Transparency Database — Statements of Reasons** — a single
+  **tidy-long** `dsa_tdb_metrics` table (one row per SoR count: `section`/
+  `platform`/`period`/`category`/`metric`/`unit` + a `value`; dims inline). The
+  **decision-level** DSA data (distinct from the Art. 15/24 aggregated reports in
+  the `t3`–`t11` star schema): under the DSA every content-moderation decision an
+  in-scope platform takes is filed to the
+  [Transparency Database](https://transparency.dsa.ec.europa.eu/) as an
+  individual **Statement of Reasons**. The raw DB is billions of rows / ~4 TB, so
+  this is a compact **re-aggregation** of the Commission's own pre-made monthly
+  aggregates via its **`dsa-tdb`** toolbox (sibling
+  `dsa-transparency-data/dsa-tdb/build_dsa_tdb.py`, which runs `dsa-tdb-cli
+  download-aggs` then rolls day→month and collapses to one-dimension cuts). Kept
+  to the **top 60 platforms** by volume (~99.97% of all SoRs), 2023-09 onward.
+  `metric` is always `statements`, `unit` always `count`; `period` is the SoR's
+  `created_at` month `YYYY-MM`. Sections (`section`): `totals` (`category='All'`);
+  the **single-select** cuts `by_category` (14 DSA statement categories),
+  `by_decision_ground` (Illegal content / Incompatible with terms),
+  `by_automated_detection` (Yes/No), `by_automated_decision` (Fully/Partially/Not),
+  `by_source_type` (Article 16 notice / Trusted flagger / Own-initiative / Other);
+  and the **multi-select** `by_decision_visibility` (Content removed / Access
+  disabled / Demoted / …). Each single-select cut partitions the platform-month
+  total, so a cut's categories sum back to `totals` — never sum a cut *together
+  with* `totals` (double counts), and never sum `by_decision_visibility` to a
+  total. Volumes are dominated by a few marketplaces (Google Shopping product
+  delistings run to hundreds of millions/month), so pin a `section` **and usually
+  a `platform`** before aggregating; `_leg_warnings` warns on both. The `/dsa-db`
+  page is English-only (like `/china-12321`). `dsa-tdb` installs from the
+  Commission's package index and is a **build-time-only** dep of the sibling
+  builder — never in the API image.
 
 **Dimension normalization** (`seed.normalize_dimensions`, run post-load by both
 `build_db` and `build_harmonised_facts`, idempotent): the DSA template embeds an
@@ -1036,6 +1067,7 @@ root. The API endpoints are registered on an `APIRouter` included with
 | GET | `/discord` | — | Public Discord Transparency Reports dataset page (web UI over `POST /api/explore`) |
 | GET | `/disruptions` | — | Public Google Traffic & Disruptions catalogue page (web UI over `GET /api/traffic-disruptions`) |
 | GET | `/android` | — | Public Android ecosystem security dataset page (web UI over `POST /api/explore`) |
+| GET | `/dsa-db` | — | Public EU DSA Transparency Database (Statements of Reasons) dataset page (web UI over `POST /api/explore`; English-only, like `/china-12321`) |
 | GET | `/narratives` | — | Public narrative full-text search page (web UI over `GET /api/narratives`; NY ToS + CA AB 587 + DSA prose) |
 | GET | `/mcp` | — | Public MCP-server info page (web UI; documents `mcp_server.py`) |
 | GET | `/methodology` | — | Public methodology page (web UI; how the dataset is sourced/processed/cited) |
