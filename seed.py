@@ -1862,6 +1862,8 @@ def build_dsa_tdb_db(data: dict[str, Any], db_path: str) -> int:
     """
     if data is None:
         raise ValueError("dsa-tdb dataset is None")
+    if not isinstance(data, dict):
+        raise ValueError("dsa-tdb dataset must be a dict with 'columns'/'rows'")
     expected_cols = ["section", "platform", "period", "category", "metric",
                      "unit", "value"]
     if data.get("columns") != expected_cols:

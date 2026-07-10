@@ -949,7 +949,9 @@ display: flex; align-items: center; justify-content: space-between;
       if (!byKey[r[0]]) { byKey[r[0]] = {}; order.push(r[0]); }
       byKey[r[0]][r[1]] = r[2];
     });
-    order.sort();
+    // Keep first-seen order (the caller feeds the totals rows first, already
+    // sorted by descending volume) so the dominant platforms stay on top —
+    // don't re-sort alphabetically.
     var head = '<th scope="col">' + esc(rowLabel) + '</th>'
       + colLabels.map(function (h) { return '<th scope="col" class="num">' + esc(h) + '</th>'; }).join('');
     var body = order.map(function (k) {
