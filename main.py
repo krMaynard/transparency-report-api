@@ -1441,6 +1441,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "dsa_tdb_metrics": TableSpec(
+        "EU DSA Transparency Database — Statements of Reasons (aggregated). Every content-moderation decision an in-scope platform takes under the Digital Services Act is filed as an individual Statement of Reasons (SoR). The raw database is billions of rows / ~4 TB, so this is a compact RE-AGGREGATION (via the European Commission's own `dsa-tdb` toolbox) into one row per SoR count, identified by section × platform × period × category. `period` is the SoR's created_at month (YYYY-MM), 2023-09 onward. Sections (`section`): 'totals' (category='All'); the single-select cuts 'by_category' (14 DSA statement categories), 'by_decision_ground' (Illegal content / Incompatible with terms), 'by_automated_detection' (Yes/No), 'by_automated_decision' (Fully/Partially/Not automated), 'by_source_type' (Article 16 notice / Trusted flagger / Own-initiative / Other); and the MULTI-select 'by_decision_visibility' (Content removed / Access disabled / Demoted / …). `metric` is always 'statements', `unit` always 'count'. Each single-select cut partitions the platform-month total, so a cut's categories sum back to 'totals' — never sum a cut TOGETHER with 'totals' (double counts), and never sum by_decision_visibility to a total (a SoR can carry several). Volumes are dominated by a few marketplaces (Google Shopping product delistings): pin a `section` and usually a `platform` before aggregating. Top 60 platforms by volume (~99.97% of all SoRs).",
+        "FROM dsa_tdb_metrics f",
+        {
+            "section":  "f.section",
+            "platform": "f.platform",
+            "period":   "f.period",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
 }
 
 # operation → SQL comparator (numeric fields only)
@@ -2559,6 +2574,12 @@ def china_page() -> FileResponse:
 def china12321_page() -> FileResponse:
     """Serve the China 12321 telecom-spam dataset page (reads POST /api/explore)."""
     return _serve_page("china-12321.html", "China 12321 page")
+
+
+@app.get("/dsa-db", response_class=HTMLResponse)
+def dsa_db_page() -> FileResponse:
+    """Serve the EU DSA Transparency Database (Statements of Reasons) dataset page."""
+    return _serve_page("dsa-db.html", "DSA Transparency Database page")
 
 
 @app.get("/turkey", response_class=HTMLResponse)
@@ -4365,6 +4386,28 @@ def _leg_warnings(
                     "percent share as separate metrics in one 'value' column; this "
                     "aggregate pins no 'metric'. Filter or group by 'metric'."
                 )
+    # dsa_tdb_metrics: each single-select cut partitions the platform-month total,
+    # so summing across sections double-counts; by_decision_visibility is
+    # multi-select; and volumes are dominated by a few marketplaces, so a
+    # cross-platform SUM is heavily skewed.
+    if table == "dsa_tdb_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'dsa_tdb_metrics' spans one 'totals' cut plus several breakdown "
+                "cuts of the SAME statements (by_category / by_decision_ground / "
+                "by_source_type / …); this aggregate pins no 'section', so it may "
+                "sum a breakdown together with 'totals' (double counts) or across "
+                "non-comparable cuts. Filter or group by 'section'."
+            )
+        if "platform" not in pinned:
+            out.append(
+                "'dsa_tdb_metrics' volumes are dominated by a few marketplaces "
+                "(Google Shopping product delistings), so a cross-platform sum is "
+                "heavily skewed; this aggregate pins no 'platform'. Filter or "
+                "group by 'platform'."
+            )
     # ny_tos_stats normalizes only the *category* dimension: metric/submetric
     # stay in each company's own terms (flagged vs actioned vs warned…), counts
     # and percent rates share one `value` column, and Strava's per-format

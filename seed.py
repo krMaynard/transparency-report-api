@@ -169,6 +169,11 @@ _DEFAULT_TRAFFIC_SOURCE = os.getenv(
 _DEFAULT_ANDROID_SOURCE = os.getenv(
     "SEED_ANDROID_SOURCE_JSON", os.path.join(HERE, "data", "android-security.json")
 )
+# EU DSA Transparency Database — Statements of Reasons (aggregated) — vendored
+# in-repo (from the sibling data repo's dsa-tdb/build_dsa_tdb.py).
+_DEFAULT_DSA_TDB_SOURCE = os.getenv(
+    "SEED_DSA_TDB_SOURCE_JSON", os.path.join(HERE, "data", "dsa-tdb.json")
+)
 # NY ToS report narratives (full text) — vendored in-repo (from the sibling data
 # repo's ny-tos-reports/extract_narrative.py).
 _DEFAULT_NARRATIVES_SOURCE = os.getenv(
@@ -778,6 +783,24 @@ CREATE TABLE android_metrics (
     value     REAL
 );
 CREATE INDEX idx_android_section ON android_metrics(section);
+
+-- EU DSA Transparency Database — Statements of Reasons (dsa-tdb/build_dsa_tdb.py).
+-- Every content-moderation decision an in-scope platform takes under the DSA is
+-- filed as an individual Statement of Reasons (SoR). The raw DB is ~4 TB, so this
+-- is a compact RE-AGGREGATION of the Commission's own pre-made monthly aggregates
+-- (via the `dsa-tdb` toolbox). Tidy-long: one row per SoR count, platform × month
+-- × one dimension. `value` counts can reach ~1.5 billion/month (product delistings).
+CREATE TABLE dsa_tdb_metrics (
+    section  TEXT NOT NULL,     -- totals / by_category / by_decision_ground / by_automated_detection / by_automated_decision / by_source_type / by_decision_visibility
+    platform TEXT NOT NULL,     -- reporting platform (top 60 by volume)
+    period   TEXT NOT NULL,     -- SoR created_at month, 'YYYY-MM'
+    category TEXT NOT NULL,     -- the dimension value for the section ('All' for totals)
+    metric   TEXT NOT NULL,     -- always 'statements'
+    unit     TEXT NOT NULL,     -- always 'count'
+    value    INTEGER
+);
+CREATE INDEX idx_dsatdb_section  ON dsa_tdb_metrics(section);
+CREATE INDEX idx_dsatdb_platform ON dsa_tdb_metrics(platform);
 
 -- Non-VLOP DSA report-location catalogue: where other online platforms publish
 -- their Art. 15/24 transparency reports. One row per report URL.
@@ -1829,6 +1852,39 @@ def build_discord_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_dsa_tdb_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the dsa_tdb_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long dsa-tdb.json (`columns` header + `rows` in column order) — a compact
+    re-aggregation of the EU DSA Transparency Database's Statements of Reasons.
+    Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("dsa-tdb dataset is None")
+    if not isinstance(data, dict):
+        raise ValueError("dsa-tdb dataset must be a dict with 'columns'/'rows'")
+    expected_cols = ["section", "platform", "period", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"dsa-tdb dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("dsa-tdb dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO dsa_tdb_metrics (section, platform, period, category, "
+                "metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_android_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the android_metrics table in an existing DB at db_path.
 
@@ -2154,6 +2210,8 @@ def main() -> None:
                         help="Path to google-traffic.json")
     parser.add_argument("--android-source", default=_DEFAULT_ANDROID_SOURCE,
                         help="Path to android-security.json")
+    parser.add_argument("--dsa-tdb-source", default=_DEFAULT_DSA_TDB_SOURCE,
+                        help="Path to dsa-tdb.json")
     parser.add_argument("--narratives-source", default=_DEFAULT_NARRATIVES_SOURCE,
                         help="Path to ny-tos-narratives.json")
     args = parser.parse_args()
@@ -2447,6 +2505,16 @@ def main() -> None:
               f"{len({r[1] for r in an_data['rows']})} periods")
     else:
         print(f"  (skipping Android security — not found: {args.android_source})")
+
+    if os.path.isfile(args.dsa_tdb_source):
+        with open(args.dsa_tdb_source, "r", encoding="utf-8") as f:
+            dsatdb_data = json.load(f)
+        dsatdb_rows = build_dsa_tdb_db(dsatdb_data, args.db)
+        print(f"  DSA-TDB statements of reasons: {dsatdb_rows} metric rows across "
+              f"{len({r[1] for r in dsatdb_data['rows']})} platforms, "
+              f"{len({r[2] for r in dsatdb_data['rows']})} months")
+    else:
+        print(f"  (skipping DSA-TDB — not found: {args.dsa_tdb_source})")
 
     if os.path.isfile(args.narratives_source):
         with open(args.narratives_source, "r", encoding="utf-8") as f:

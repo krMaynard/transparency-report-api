@@ -13561,6 +13561,31 @@ _CHINA12321_NAV = {
 for _loc in _CHINA12321_NAV:
     COMMON[_loc].append(("      China 12321\n    </a>", f"      {_CHINA12321_NAV[_loc]}\n    </a>"))
 
+# ── EU DSA Transparency Database (Statements of Reasons) — English-only page ───
+# Only the sidebar nav label + home feature card are localized (the /dsa-db page
+# itself is English-only, like /china-12321). h3 reuses the nav label.
+_DSADB_NAV = {
+    "es": "Base de datos DSA", "fr": "Base de données DSA", "de": "DSA-Datenbank",
+    "it": "Database DSA", "ja": "DSA データベース", "zh": "DSA 数据库", "ko": "DSA 데이터베이스",
+}
+_DSADB_CARD_DESC_EN = ("The EU DSA Transparency Database — every content-moderation "
+                       "decision platforms file as a Statement of Reasons, aggregated "
+                       "by platform, category, decision ground and automation, monthly "
+                       "since 2023.")
+_DSADB_CARD_DESC = {
+    "es": "La base de datos de transparencia del DSA de la UE — cada decisión de moderación de contenidos que las plataformas registran como una Declaración de Motivos, agregada por plataforma, categoría, fundamento de la decisión y automatización, mensualmente desde 2023.",
+    "fr": "La base de données de transparence du DSA de l'UE — chaque décision de modération de contenu que les plateformes déposent sous forme de déclaration de motifs, agrégée par plateforme, catégorie, motif de la décision et automatisation, chaque mois depuis 2023.",
+    "de": "Die DSA-Transparenzdatenbank der EU — jede Inhaltsmoderationsentscheidung, die Plattformen als Begründung (Statement of Reasons) einreichen, aggregiert nach Plattform, Kategorie, Entscheidungsgrund und Automatisierung, monatlich seit 2023.",
+    "it": "Il database di trasparenza del DSA dell'UE — ogni decisione di moderazione dei contenuti che le piattaforme registrano come dichiarazione di motivazione, aggregata per piattaforma, categoria, motivo della decisione e automazione, mensilmente dal 2023.",
+    "ja": "EU DSA 透明性データベース — プラットフォームが理由説明（Statement of Reasons）として提出するすべてのコンテンツモデレーション判断を、プラットフォーム・カテゴリー・判断根拠・自動化の別に集計。2023年以降、月次。",
+    "zh": "欧盟 DSA 透明度数据库——平台以“理由说明”（Statement of Reasons）形式提交的每一项内容审核决定，按平台、类别、决定依据与自动化程度汇总，自 2023 年起按月统计。",
+    "ko": "EU DSA 투명성 데이터베이스 — 플랫폼이 이유 설명(Statement of Reasons)으로 제출하는 모든 콘텐츠 모더레이션 결정을 플랫폼·범주·결정 근거·자동화별로 집계. 2023년 이후 월별.",
+}
+for _loc in _DSADB_NAV:
+    COMMON[_loc].append(("      DSA database\n    </a>", f"      {_DSADB_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>DSA database</h3>", f"<h3>{_DSADB_NAV[_loc]}</h3>"))
+    PAGES[_loc]["home.html"].append((_DSADB_CARD_DESC_EN, _DSADB_CARD_DESC[_loc]))
+
 # ── Home feature cards for datasets that were sidebar-only (added) ─────────────
 # Seven datasets had a sidebar entry but no home "What's here" card; backfilled so
 # the landing page reflects the full breadth. Each card's h3 reuses that page's
