@@ -385,12 +385,12 @@ PAGES["es"]["home.html"] = [
     ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      '''Los informes sobre las condiciones del servicio de redes sociales de Nueva York: las presentaciones de políticas semestrales que las plataformas envían a la Fiscalía General de NY conforme a la Stop Hiding Hate Act. Un catálogo con copias archivadas.'''),
     ('''Browse the catalogue''', '''Explorar el catálogo'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''Datos de transparencia de las plataformas, hechos útiles. Paneles interactivos y una API de consultas estructuradas que abarca dos docenas de conjuntos de datos de transparencia: la Ley de Servicios Digitales de la UE, leyes de información nacionales y regionales de todo el mundo, y los informes voluntarios de aplicación y de solicitudes gubernamentales de las principales plataformas.'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''Datos de transparencia de las plataformas, hechos útiles. Paneles interactivos y una API de consultas estructuradas que abarca dos docenas de conjuntos de datos de transparencia: la Ley de Servicios Digitales de la UE, leyes de información nacionales y regionales de todo el mundo, y los informes voluntarios de moderación de contenidos y de solicitudes gubernamentales de las principales plataformas.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
      '''<span class="hero-eyebrow">Transparencia de plataformas</span>'''),
     ('''Platform transparency data,<br>made useful.''',
      '''Datos de transparencia de las plataformas,<br>hechos útiles.'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>Paneles interactivos y una API de consultas estructuradas que abarca dos docenas de conjuntos de datos de transparencia: la Ley de Servicios Digitales de la UE, leyes de información nacionales y regionales de todo el mundo, y los informes voluntarios de aplicación y de solicitudes gubernamentales de las principales plataformas.</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>Paneles interactivos y una API de consultas estructuradas que abarca dos docenas de conjuntos de datos de transparencia: la Ley de Servicios Digitales de la UE, leyes de información nacionales y regionales de todo el mundo, y los informes voluntarios de moderación de contenidos y de solicitudes gubernamentales de las principales plataformas.</p>'''),
     ('''Explore the data''', '''Explorar los datos'''),
     ('''>API reference</a>''', '''>Referencia de la API</a>'''),
     ('''>What's here</p>''', '''>Qué hay aquí</p>'''),
@@ -418,12 +418,12 @@ PAGES["fr"]["home.html"] = [
     ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      '''Les rapports sur les conditions d'utilisation des réseaux sociaux de l'État de New York : les dépôts semestriels de politiques que les plateformes soumettent au procureur général de NY au titre du Stop Hiding Hate Act. Un catalogue avec copies archivées.'''),
     ('''Browse the catalogue''', '''Parcourir le catalogue'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''Les données de transparence des plateformes, rendues utiles. Des tableaux de bord interactifs et une API de requêtes structurées couvrant deux douzaines de jeux de données de transparence : le règlement européen sur les services numériques, des lois de reporting nationales et régionales du monde entier, et les rapports volontaires d'application et de demandes gouvernementales des grandes plateformes.'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''Les données de transparence des plateformes, rendues utiles. Des tableaux de bord interactifs et une API de requêtes structurées couvrant deux douzaines de jeux de données de transparence : le règlement européen sur les services numériques, des lois de reporting nationales et régionales du monde entier, et les rapports volontaires de modération de contenu et de demandes gouvernementales des grandes plateformes.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
      '''<span class="hero-eyebrow">Transparence des plateformes</span>'''),
     ('''Platform transparency data,<br>made useful.''',
      '''Les données de transparence des plateformes,<br>rendues utiles.'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>Des tableaux de bord interactifs et une API de requêtes structurées couvrant deux douzaines de jeux de données de transparence : le règlement européen sur les services numériques, des lois de reporting nationales et régionales du monde entier, et les rapports volontaires d'application et de demandes gouvernementales des grandes plateformes.</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>Des tableaux de bord interactifs et une API de requêtes structurées couvrant deux douzaines de jeux de données de transparence : le règlement européen sur les services numériques, des lois de reporting nationales et régionales du monde entier, et les rapports volontaires de modération de contenu et de demandes gouvernementales des grandes plateformes.</p>'''),
     ('''Explore the data''', '''Explorer les données'''),
     ('''>API reference</a>''', '''>Référence de l’API</a>'''),
     ('''>What's here</p>''', '''>Au programme</p>'''),
@@ -451,12 +451,12 @@ PAGES["de"]["home.html"] = [
     ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      '''New Yorks Berichte zu den Nutzungsbedingungen sozialer Medien – die halbjährlichen Richtlinien-Einreichungen, die Plattformen dem Generalstaatsanwalt von NY nach dem Stop Hiding Hate Act vorlegen. Ein Katalog mit archivierten Kopien.'''),
     ('''Browse the catalogue''', '''Katalog durchsuchen'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''Transparenzdaten von Plattformen, nutzbar gemacht. Interaktive Dashboards und eine API für strukturierte Abfragen über zwei Dutzend Transparenz-Datensätze — das Gesetz über digitale Dienste der EU, nationale und regionale Berichtspflichten weltweit sowie die freiwilligen Durchsetzungs- und Behördenanfrage-Berichte der großen Plattformen.'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''Transparenzdaten von Plattformen, nutzbar gemacht. Interaktive Dashboards und eine API für strukturierte Abfragen über zwei Dutzend Transparenz-Datensätze — das Gesetz über digitale Dienste der EU, nationale und regionale Berichtspflichten weltweit sowie die freiwilligen Berichte der großen Plattformen zu Inhaltsmoderation und Behördenanfragen.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
      '''<span class="hero-eyebrow">Plattform-Transparenz</span>'''),
     ('''Platform transparency data,<br>made useful.''',
      '''Transparenzdaten von Plattformen,<br>nutzbar gemacht.'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>Interaktive Dashboards und eine API für strukturierte Abfragen über zwei Dutzend Transparenz-Datensätze — das Gesetz über digitale Dienste der EU, nationale und regionale Berichtspflichten weltweit sowie die freiwilligen Durchsetzungs- und Behördenanfrage-Berichte der großen Plattformen.</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>Interaktive Dashboards und eine API für strukturierte Abfragen über zwei Dutzend Transparenz-Datensätze — das Gesetz über digitale Dienste der EU, nationale und regionale Berichtspflichten weltweit sowie die freiwilligen Berichte der großen Plattformen zu Inhaltsmoderation und Behördenanfragen.</p>'''),
     ('''Explore the data''', '''Daten erkunden'''),
     ('''>API reference</a>''', '''>API-Referenz</a>'''),
     ('''>What's here</p>''', '''>Was es hier gibt</p>'''),
@@ -1926,12 +1926,12 @@ PAGES["ja"]["home.html"] = [
     (r'''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      r'''ニューヨーク州のソーシャルメディア利用規約報告 — Stop Hiding Hate Act に基づき、プラットフォームが年 2 回 NY 司法長官に提出するポリシー文書。アーカイブ付きのカタログ。'''),
     (r'''Browse the catalogue''', r'''カタログを見る'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''プラットフォームの透明性データが、一目瞭然。2ダースの透明性データセットを対象とする、インタラクティブなダッシュボードと構造化クエリ API — EU デジタルサービス法、世界各地の国内・地域の報告義務法、そして主要プラットフォームの自主的な執行レポートと政府リクエストの開示。'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''プラットフォームの透明性データが、一目瞭然。2ダースの透明性データセットを対象とする、インタラクティブなダッシュボードと構造化クエリ API — EU デジタルサービス法、世界各地の国内・地域の報告義務法、そして主要プラットフォームの自主的なコンテンツモデレーションレポートと政府リクエストの開示。'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
      r'''<span class="hero-eyebrow">プラットフォームの透明性</span>'''),
     (r'''Platform transparency data,<br>made useful.''',
      r'''プラットフォームの透明性データが、<br>一目瞭然。'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>2ダースの透明性データセットを対象とする、インタラクティブなダッシュボードと構造化クエリ API — EU デジタルサービス法、世界各地の国内・地域の報告義務法、そして主要プラットフォームの自主的な執行レポートと政府リクエストの開示。</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>2ダースの透明性データセットを対象とする、インタラクティブなダッシュボードと構造化クエリ API — EU デジタルサービス法、世界各地の国内・地域の報告義務法、そして主要プラットフォームの自主的なコンテンツモデレーションレポートと政府リクエストの開示。</p>'''),
     (r'''Explore the data''',
      r'''データを探索'''),
     (r'''>API reference</a>''',
@@ -2690,12 +2690,12 @@ PAGES["zh"]["home.html"] = [
     (r'''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      r'''纽约州社交媒体服务条款报告——依据《停止传播仇恨法》，平台每半年向纽约总检察长提交的政策文件。附有存档副本的目录。'''),
     (r'''Browse the catalogue''', r'''浏览目录'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''让平台透明度数据一目了然。覆盖二十多个透明度数据集的交互式仪表板与结构化查询 API——欧盟《数字服务法》、世界各地的国家和地区报告法律，以及各大平台的自愿执法报告与政府请求披露。'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''让平台透明度数据一目了然。覆盖二十多个透明度数据集的交互式仪表板与结构化查询 API——欧盟《数字服务法》、世界各地的国家和地区报告法律，以及各大平台的自愿内容审核报告与政府请求披露。'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
      r'''<span class="hero-eyebrow">平台透明度</span>'''),
     (r'''Platform transparency data,<br>made useful.''',
      r'''平台透明度数据，<br>一目了然。'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>覆盖二十多个透明度数据集的交互式仪表板与结构化查询 API——欧盟《数字服务法》、世界各地的国家和地区报告法律，以及各大平台的自愿执法报告与政府请求披露。</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>覆盖二十多个透明度数据集的交互式仪表板与结构化查询 API——欧盟《数字服务法》、世界各地的国家和地区报告法律，以及各大平台的自愿内容审核报告与政府请求披露。</p>'''),
     (r'''Explore the data''',
      r'''探索数据'''),
     (r'''>API reference</a>''',
@@ -3453,12 +3453,12 @@ PAGES["ko"]["home.html"] = [
     (r'''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      r'''뉴욕주 소셜미디어 약관 보고서 — Stop Hiding Hate Act에 따라 플랫폼이 연 2회 뉴욕 법무장관에게 제출하는 정책 문서. 아카이브 사본이 포함된 카탈로그.'''),
     (r'''Browse the catalogue''', r'''카탈로그 보기'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''플랫폼 투명성 데이터를 일목요연하게. 24개에 이르는 투명성 데이터셋을 아우르는 대화형 대시보드와 구조화된 쿼리 API — EU 디지털 서비스법, 전 세계 국가·지역 보고 법률, 그리고 주요 플랫폼의 자발적 집행 보고서와 정부 요청 공개.'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''플랫폼 투명성 데이터를 일목요연하게. 24개에 이르는 투명성 데이터셋을 아우르는 대화형 대시보드와 구조화된 쿼리 API — EU 디지털 서비스법, 전 세계 국가·지역 보고 법률, 그리고 주요 플랫폼의 자발적 콘텐츠 관리 보고서와 정부 요청 공개.'''),
     (r'''<span class="hero-eyebrow">Platform transparency</span>''',
      r'''<span class="hero-eyebrow">플랫폼 투명성</span>'''),
     (r'''Platform transparency data,<br>made useful.''',
      r'''플랫폼 투명성 데이터를,<br>일목요연하게.'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>24개에 이르는 투명성 데이터셋을 아우르는 대화형 대시보드와 구조화된 쿼리 API — EU 디지털 서비스법, 전 세계 국가·지역 보고 법률, 그리고 주요 플랫폼의 자발적 집행 보고서와 정부 요청 공개.</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>24개에 이르는 투명성 데이터셋을 아우르는 대화형 대시보드와 구조화된 쿼리 API — EU 디지털 서비스법, 전 세계 국가·지역 보고 법률, 그리고 주요 플랫폼의 자발적 콘텐츠 관리 보고서와 정부 요청 공개.</p>'''),
     (r'''Explore the data''',
      r'''데이터 탐색'''),
     (r'''>API reference</a>''',
@@ -4146,12 +4146,12 @@ PAGES["it"]["home.html"] = [
     ('''New York's Social Media Terms-of-Service reports — the twice-yearly policy filings platforms submit to the NY Attorney General under the Stop Hiding Hate Act. A catalogue with archived copies.''',
      '''I report sulle condizioni di servizio dei social media dello Stato di New York: i depositi semestrali sulle policy che le piattaforme inviano al procuratore generale di NY ai sensi dello Stop Hiding Hate Act. Un catalogo con copie archiviate.'''),
     ('''Browse the catalogue''', '''Sfoglia il catalogo'''),
-    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.''', r'''Dati sulla trasparenza delle piattaforme, resi utili. Dashboard interattive e un'API di query strutturate che abbraccia due dozzine di set di dati di trasparenza: il Digital Services Act dell'UE, leggi di rendicontazione nazionali e regionali di tutto il mondo e i report volontari di applicazione e di richieste governative delle principali piattaforme.'''),
+    ('''Platform transparency data, made useful. Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.''', r'''Dati sulla trasparenza delle piattaforme, resi utili. Dashboard interattive e un'API di query strutturate che abbraccia due dozzine di set di dati di trasparenza: il Digital Services Act dell'UE, leggi di rendicontazione nazionali e regionali di tutto il mondo e i report volontari di moderazione dei contenuti e di richieste governative delle principali piattaforme.'''),
     ('''<span class="hero-eyebrow">Platform transparency</span>''',
      '''<span class="hero-eyebrow">Trasparenza delle piattaforme</span>'''),
     ('''Platform transparency data,<br>made useful.''',
      '''Dati sulla trasparenza delle piattaforme,<br>resi utili.'''),
-    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary enforcement and government-request reports.</p>''', r'''<p>Dashboard interattive e un'API di query strutturate che abbraccia due dozzine di set di dati di trasparenza: il Digital Services Act dell'UE, leggi di rendicontazione nazionali e regionali di tutto il mondo e i report volontari di applicazione e di richieste governative delle principali piattaforme.</p>'''),
+    ('''<p>Interactive dashboards and a structured query API spanning two dozen transparency datasets — the EU Digital Services Act, national and regional reporting laws worldwide, and the major platforms' voluntary content-moderation and government-request reports.</p>''', r'''<p>Dashboard interattive e un'API di query strutturate che abbraccia due dozzine di set di dati di trasparenza: il Digital Services Act dell'UE, leggi di rendicontazione nazionali e regionali di tutto il mondo e i report volontari di moderazione dei contenuti e di richieste governative delle principali piattaforme.</p>'''),
     ('''Explore the data''', '''Esplora i dati'''),
     ('''>API reference</a>''', '''>Riferimento API</a>'''),
     ('''>What's here</p>''', '''>Cosa c'è qui</p>'''),
@@ -9453,13 +9453,13 @@ PAGES["ko"]["taiwan.html"] += [
 
 # ── tiktok.html localization (self-contained; authored, no inherit) ──
 _TT_NAV = {
-    "es": "Solicitudes a TikTok",
-    "fr": "Demandes à TikTok",
-    "de": "TikTok-Anfragen",
-    "it": "Richieste a TikTok",
-    "ja": "TikTok への要請",
-    "zh": "TikTok 请求",
-    "ko": "TikTok 요청",
+    "es": "TikTok — Solicitudes",
+    "fr": "TikTok — Demandes",
+    "de": "TikTok — Anfragen",
+    "it": "TikTok — Richieste",
+    "ja": "TikTok — リクエスト",
+    "zh": "TikTok — 请求",
+    "ko": "TikTok — 요청",
 }
 _TT_CARD_DESC_EN = "TikTok's government &amp; legal request reports — government content-removal requests and requests for user information per country, plus IP/copyright removal requests, half-yearly since 2019."
 _TT_CARD_DESC = {
@@ -9771,8 +9771,8 @@ _TT_PAGE = {
     },
 }
 for _loc in _TT_NAV:
-    COMMON[_loc].append(("      TikTok Requests\n    </a>", f"      {_TT_NAV[_loc]}\n    </a>"))
-    PAGES[_loc]["home.html"].append(("<h3>TikTok Requests</h3>", f"<h3>{_TT_NAV[_loc]}</h3>"))
+    COMMON[_loc].append(("      TikTok — Requests\n    </a>", f"      {_TT_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>TikTok — Requests</h3>", f"<h3>{_TT_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_TT_CARD_DESC_EN, _TT_CARD_DESC[_loc]))
     PAGES[_loc]["tiktok.html"] = [(_en, _tr[_loc]) for _en, _tr in _TT_PAGE.items()]
     # Inherit the shared chrome strings this page reuses verbatim from the
@@ -10848,20 +10848,20 @@ for _loc in _NAR_NAV:
 # stay in place — now dead for the nav, but still translating the home cards.
 _NAV_STD = {
     #        Google — Removals / — User Data / — Disruptions        Korea
-    "es": ("Retiradas", "Datos de usuario", "Interrupciones", "Corea"),
-    "fr": ("Retraits", "Données utilisateur", "Perturbations", "Corée"),
-    "de": ("Entfernungen", "Nutzerdaten", "Störungen", "Korea"),
-    "it": ("Rimozioni", "Dati utente", "Interruzioni", "Corea"),
-    "ja": ("削除", "ユーザーデータ", "障害", "韓国"),
-    "zh": ("删除", "用户数据", "中断", "韩国"),
-    "ko": ("삭제", "사용자 데이터", "중단", "한국"),
+    "es": ("Retiradas", "Datos de usuario", "Interrupciones", "Corea — Solicitudes de datos"),
+    "fr": ("Retraits", "Données utilisateur", "Perturbations", "Corée — Demandes de données"),
+    "de": ("Entfernungen", "Nutzerdaten", "Störungen", "Korea — Datenanfragen"),
+    "it": ("Rimozioni", "Dati utente", "Interruzioni", "Corea — Richieste dati"),
+    "ja": ("削除", "ユーザーデータ", "障害", "韓国 — データ要請"),
+    "zh": ("删除", "用户数据", "中断", "韩国 — 数据请求"),
+    "ko": ("삭제", "사용자 데이터", "중단", "한국 — 데이터 요청"),
 }
 for _loc, (_g_rem, _g_ud, _g_dis, _kor) in _NAV_STD.items():
     COMMON[_loc].extend([
         ("      Google — Removals\n    </a>", f"      Google — {_g_rem}\n    </a>"),
         ("      Google — User Data\n    </a>", f"      Google — {_g_ud}\n    </a>"),
         ("      Google — Disruptions\n    </a>", f"      Google — {_g_dis}\n    </a>"),
-        ("      Korea\n    </a>", f"      {_kor}\n    </a>"),
+        ("      Korea — Data Requests\n    </a>", f"      {_kor}\n    </a>"),
     ])
     # The home feature-card titles were standardized to match the sidebar, so the
     # descriptive ones (Google — X, Korea) get the same translation as the nav.
@@ -10871,7 +10871,7 @@ for _loc, (_g_rem, _g_ud, _g_dis, _kor) in _NAV_STD.items():
         ("<h3>Google — Removals</h3>", f"<h3>Google — {_g_rem}</h3>"),
         ("<h3>Google — User Data</h3>", f"<h3>Google — {_g_ud}</h3>"),
         ("<h3>Google — Disruptions</h3>", f"<h3>Google — {_g_dis}</h3>"),
-        ("<h3>Korea</h3>", f"<h3>{_kor}</h3>"),
+        ("<h3>Korea — Data Requests</h3>", f"<h3>{_kor}</h3>"),
     ])
 # ── California AB 587 Terms-of-Service reports catalogue page ─────────────────
 # Mirrors the NY ToS page (its California analogue): only the AB-587-specific
@@ -11045,12 +11045,12 @@ for _loc in _SG_NAV:
 # only the sidebar nav label is localized (no dedicated localized page, and, like
 # tco/ai-training, no home feature card).
 _KNA_NAV = {
-    "es": "Ley de Redes de Corea", "fr": "Loi coréenne sur les réseaux",
-    "de": "Korea-Netzwerkgesetz", "it": "Legge coreana sulle reti",
-    "ja": "韓国 ネットワーク法", "zh": "韩国网络法", "ko": "한국 정보통신망법",
+    "es": "Corea — Ley de Redes", "fr": "Corée — Loi sur les réseaux",
+    "de": "Korea — Netzwerkgesetz", "it": "Corea — Legge sulle reti",
+    "ja": "韓国 — ネットワーク法", "zh": "韩国 — 网络法", "ko": "한국 — 정보통신망법",
 }
 for _loc in _KNA_NAV:
-    COMMON[_loc].append(("      Korea Network Act\n    </a>", f"      {_KNA_NAV[_loc]}\n    </a>"))
+    COMMON[_loc].append(("      Korea — Network Act\n    </a>", f"      {_KNA_NAV[_loc]}\n    </a>"))
     PAGES[_loc]["home.html"].append((_SG_CARD_DESC_EN, _SG_CARD_DESC[_loc]))
 
 # Japan IDPA — English-only dataset page (Japanese-source, dense), like
@@ -11668,8 +11668,8 @@ for _loc in _NEW_PAGE_LOCALES:
 
 # ── Meta CSER (Community Standards Enforcement Report) ───────────────────────
 _CSER_NAV = {
-    "es": "Meta — Aplicación", "fr": "Meta — Application", "de": "Meta — Durchsetzung",
-    "it": "Meta — Applicazione", "ja": "Meta — 執行状況", "zh": "Meta — 执行", "ko": "Meta — 집행",
+    "es": "Meta — Moderación", "fr": "Meta — Modération", "de": "Meta — Moderation",
+    "it": "Meta — Moderazione", "ja": "Meta — モデレーション", "zh": "Meta — 内容审核", "ko": "Meta — 콘텐츠 관리",
 }
 _CSER_CARD_DESC_EN = "Meta's voluntary Community Standards Enforcement Report — prevalence, content actioned, proactive rate and appeals for Facebook &amp; Instagram, by policy area, quarterly since 2017."
 _CSER_CARD_DESC = {
@@ -11868,8 +11868,8 @@ _CSER_PAGE = {
     },
 }
 for _loc in _NEW_PAGE_LOCALES:
-    COMMON[_loc].append(("      Meta — Enforcement\n    </a>", f"      {_CSER_NAV[_loc]}\n    </a>"))
-    PAGES[_loc]["home.html"].append(("<h3>Meta — Enforcement</h3>", f"<h3>{_CSER_NAV[_loc]}</h3>"))
+    COMMON[_loc].append(("      Meta — Moderation\n    </a>", f"      {_CSER_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>Meta — Moderation</h3>", f"<h3>{_CSER_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_CSER_CARD_DESC_EN, _CSER_CARD_DESC[_loc]))
     PAGES[_loc]["cser.html"] = [(_en, _tr[_loc]) for _en, _tr in _CSER_PAGE.items()]
     _cser_text = open(os.path.join(STATIC, "cser.html"), encoding="utf-8").read()
@@ -11884,8 +11884,8 @@ for _loc in _NEW_PAGE_LOCALES:
 
 # ── TikTok CGER (Community Guidelines Enforcement Report) ────────────────────
 _TTCGER_NAV = {
-    "es": "TikTok — Aplicación", "fr": "TikTok — Application", "de": "TikTok — Durchsetzung",
-    "it": "TikTok — Applicazione", "ja": "TikTok — 執行状況", "zh": "TikTok — 执行", "ko": "TikTok — 집행",
+    "es": "TikTok — Moderación", "fr": "TikTok — Modération", "de": "TikTok — Moderation",
+    "it": "TikTok — Moderazione", "ja": "TikTok — モデレーション", "zh": "TikTok — 内容审核", "ko": "TikTok — 콘텐츠 관리",
 }
 _TTCGER_CARD_DESC_EN = "TikTok's voluntary Community Guidelines Enforcement Report — videos, accounts and comments removed, proactive and removal-speed rates, by policy and moderation system, quarterly since 2020."
 _TTCGER_CARD_DESC = {
@@ -12050,8 +12050,8 @@ _TTCGER_PAGE = {
     },
 }
 for _loc in _NEW_PAGE_LOCALES:
-    COMMON[_loc].append(("      TikTok — Enforcement\n    </a>", f"      {_TTCGER_NAV[_loc]}\n    </a>"))
-    PAGES[_loc]["home.html"].append(("<h3>TikTok — Enforcement</h3>", f"<h3>{_TTCGER_NAV[_loc]}</h3>"))
+    COMMON[_loc].append(("      TikTok — Moderation\n    </a>", f"      {_TTCGER_NAV[_loc]}\n    </a>"))
+    PAGES[_loc]["home.html"].append(("<h3>TikTok — Moderation</h3>", f"<h3>{_TTCGER_NAV[_loc]}</h3>"))
     PAGES[_loc]["home.html"].append((_TTCGER_CARD_DESC_EN, _TTCGER_CARD_DESC[_loc]))
     PAGES[_loc]["tiktok-cger.html"] = [(_en, _tr[_loc]) for _en, _tr in _TTCGER_PAGE.items()]
     _tt_text = open(os.path.join(STATIC, "tiktok-cger.html"), encoding="utf-8").read()
