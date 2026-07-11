@@ -5,7 +5,7 @@
 A FastAPI service that lets a researcher describe a query with **structured
 parameters** (no SQL), runs it asynchronously on a worker thread, and serves the
 results back as JSON or CSV. It's backed by a read-only SQLite database seeded
-from **two dozen-plus public transparency-reporting datasets** — EU-DSA
+from **two-dozen-plus public transparency-reporting datasets** — EU DSA
 content-moderation statistics, platforms' voluntary enforcement reports,
 national transparency-law filings, and government-request disclosures — each
 exposed as a queryable table *and* a public dashboard.
@@ -25,7 +25,7 @@ Highlights of the corpus:
   catalogue (232 non-VLOP platforms, 66 of which file the harmonised template).
 - **The EU DSA Transparency Database** — the *decision-level* Statements of
   Reasons (a compact re-aggregation of the Commission's monthly aggregates, top
-  60 platforms, 2023-09→), distinct from the Art. 15/24 aggregated reports above.
+  60 platforms, 2023-09 onward), distinct from the Art. 15/24 aggregated reports above.
 - **Platforms' voluntary content-moderation reports** — Meta's Community
   Standards Enforcement Report and TikTok's Community Guidelines Enforcement Report.
 - **Government-request & platform transparency reports** — Google (content
@@ -33,7 +33,7 @@ Highlights of the corpus:
   Discord, GitHub, Snap, and Korea's Naver + Kakao.
 - **National / regional transparency-law filings** — India's IT Rules 2021,
   Türkiye's Law 5651, Taiwan's Anti-Fraud Act, Singapore's Online Safety Code,
-  Korea's Network Act, Japan's 情プラ法 (IDPA), and Texas HB 20 + Austria KoPl-G.
+  Korea's Network Act, Japan's 情プラ法 (IDPA), and Texas HB 20 and Austria's KoPl-G.
 - **Other EU regulations & security data** — the Terrorist Content Online
   Regulation, the AI Act's training-data transparency summaries, Google's Android
   ecosystem-security (PHA / malware) report, and Google's Traffic & Disruptions
