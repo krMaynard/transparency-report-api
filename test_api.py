@@ -1383,6 +1383,22 @@ class TestDashboard:
         assert client.get("/static/vendor/secrets.js").status_code == 404
         assert client.get("/static/vendor/..%2fmain.py").status_code in (404, 400)
 
+    def test_vendored_chart_tools_served(self):
+        # The shared per-chart "Show data / Download CSV" enhancer.
+        r = client.get("/static/vendor/chart-tools.js")
+        assert r.status_code == 200
+        assert "javascript" in r.headers["content-type"]
+        assert "immutable" in r.headers.get("cache-control", "")
+
+    def test_dataset_pages_include_chart_tools(self):
+        # Every chart dashboard loads the shared chart-tools enhancer (same-origin,
+        # so it needs no CSP allowance beyond `script-src 'self'`).
+        for path in ("/india", "/cser", "/apple", "/dsa-db"):
+            page = client.get(path).text
+            assert "/static/vendor/chart-tools.js" in page, path
+            csp = client.get(path).headers["content-security-policy"]
+            assert "script-src 'self'" in csp, path
+
 
 # ── Public report-locations catalogue (GET /api/report-locations) ────────────
 

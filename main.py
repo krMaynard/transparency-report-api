@@ -2458,7 +2458,7 @@ def _serve_page(filename: str, label: str, **csp_hosts) -> FileResponse:
 # Self-hosting Chart.js (instead of a CDN) keeps the dashboard working
 # air-gapped and lets its CSP stay `script-src 'self'` with no third-party
 # origin. Allowlisted by exact name so user input never builds a filesystem path.
-_VENDOR_ASSETS = {"chart.umd.js": "text/javascript"}
+_VENDOR_ASSETS = {"chart.umd.js": "text/javascript", "chart-tools.js": "text/javascript"}
 
 
 @app.get("/static/vendor/{filename}")
