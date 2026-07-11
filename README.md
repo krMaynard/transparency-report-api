@@ -4,8 +4,13 @@
 
 A FastAPI service that lets a researcher describe a query with **structured
 parameters** (no SQL), runs it asynchronously on a worker thread, and serves the
-results back as JSON or CSV. Backed by a read-only SQLite database seeded from
-public transparency-reporting datasets:
+results back as JSON or CSV. It's backed by a read-only SQLite database seeded
+from **two dozen-plus public transparency-reporting datasets** — EU-DSA
+content-moderation statistics, platforms' voluntary enforcement reports,
+national transparency-law filings, and government-request disclosures — each
+exposed as a queryable table *and* a public dashboard.
+
+Highlights of the corpus:
 
 - **EU Digital Services Act (DSA) transparency reports** — content-moderation
   statistics for the 25 designated Very Large Online Platforms / Search Engines
@@ -18,11 +23,30 @@ public transparency-reporting datasets:
   headline `/api/overview` stays scoped to VLOP-tier reports. Sourced from the companion
   [dsa-transparency-data](https://github.com/krMaynard/dsa-transparency-data)
   catalogue (232 non-VLOP platforms, 66 of which file the harmonised template).
-- **Google Government content-removal requests** — 160 countries, 13 reporting
-  periods (2019–2025), 42 products, 22 stated reasons.
+- **The EU DSA Transparency Database** — the *decision-level* Statements of
+  Reasons (a compact re-aggregation of the Commission's monthly aggregates, top
+  60 platforms, 2023-09→), distinct from the Art. 15/24 aggregated reports above.
+- **Platforms' voluntary content-moderation reports** — Meta's Community
+  Standards Enforcement Report and TikTok's Community Guidelines Enforcement Report.
+- **Government-request & platform transparency reports** — Google (content
+  removals **and** user-data requests), Apple, Microsoft, LinkedIn, TikTok,
+  Discord, GitHub, Snap, and Korea's Naver + Kakao.
+- **National / regional transparency-law filings** — India's IT Rules 2021,
+  Türkiye's Law 5651, Taiwan's Anti-Fraud Act, Singapore's Online Safety Code,
+  Korea's Network Act, Japan's 情プラ法 (IDPA), and Texas HB 20 + Austria KoPl-G.
+- **Other EU regulations & security data** — the Terrorist Content Online
+  Regulation, the AI Act's training-data transparency summaries, Google's Android
+  ecosystem-security (PHA / malware) report, and Google's Traffic & Disruptions
+  catalogue.
+- **Terms-of-Service & narrative corpora** — New York's and California's ToS
+  reports, plus full-text search over the DSA Table-11 prose, Google's CA AB 2013
+  AI-training summary, and LY Corporation's bilingual Japan report.
 
 A query names one of the **report tables** (`GET /api/tables`) and then
-describes filters, group-bys, and aggregates over that table's fields.
+describes filters, group-bys, and aggregates over that table's fields. Every
+dataset also has a **public dashboard** (Chart.js trends + tables) with a
+per-chart **"Show data / Download CSV"** export, alongside the flagship
+interactive query builder and natural-language "Ask" box at `/reports`.
 
 ## Demo walkthrough
 
