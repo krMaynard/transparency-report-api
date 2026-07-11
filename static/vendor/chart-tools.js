@@ -17,6 +17,8 @@
 (function () {
   "use strict";
 
+  var chartCounter = 0;
+
   var I18N = {
     en: { show: "Show data", hide: "Hide data", csv: "Download CSV" },
     es: { show: "Ver datos", hide: "Ocultar datos", csv: "Descargar CSV" },
@@ -47,7 +49,7 @@
       var cells = [];
       tr.querySelectorAll("th,td").forEach(function (c) {
         var v = csvSafe(c.textContent.trim());
-        if (/[",\n]/.test(v)) v = '"' + v.replace(/"/g, '""') + '"';
+        if (/[",\r\n]/.test(v)) v = '"' + v.replace(/"/g, '""') + '"';
         cells.push(v);
       });
       if (cells.length) out.push(cells.join(","));
@@ -60,8 +62,9 @@
   }
 
   function downloadCsv(name, text) {
-    // Prepend a UTF-8 BOM so Excel reads non-ASCII labels correctly.
-    var blob = new Blob(["﻿" + text], { type: "text/csv;charset=utf-8" });
+    // Prepend a UTF-8 BOM (escape, not a literal char, so tooling can't strip it)
+    // so Excel reads non-ASCII labels correctly.
+    var blob = new Blob(["\ufeff" + text], { type: "text/csv;charset=utf-8" });
     var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
     a.href = url;
@@ -85,11 +88,15 @@
     var mirror = card.querySelector('[id$="-table"]');
     if (!mirror) return;
     card.setAttribute("data-ct", "1");
+    chartCounter++;
 
     var L = labels();
     var heading = card.querySelector("h3");
     var title = heading ? heading.textContent.trim() : "chart";
-    if (!mirror.id) mirror.id = "ct-mirror-" + slug(title);
+    // The mirror already carries its own id (the [id$="-table"] selector requires
+    // one), so reuse it for aria-controls. titleSlug backs the CSV filename; the
+    // counter is its fallback when a non-ASCII title slugs to empty.
+    var titleSlug = slug(title);
 
     var tools = document.createElement("div");
     tools.className = "ct-tools";
@@ -111,10 +118,10 @@
     styleButton(csv);
     csv.textContent = L.csv;
     csv.addEventListener("click", function () {
-      var table = mirror.querySelector("table");
+      var table = mirror.tagName === "TABLE" ? mirror : mirror.querySelector("table");
       if (!table) return;
       var page = (location.pathname.split("/").filter(Boolean).pop() || "dataset").replace(/\..*$/, "");
-      downloadCsv(page + "-" + slug(title) + ".csv", tableToCsv(table));
+      downloadCsv(page + "-" + (titleSlug || "chart-" + chartCounter) + ".csv", tableToCsv(table));
     });
 
     tools.appendChild(toggle);
