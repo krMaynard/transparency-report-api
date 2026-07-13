@@ -860,16 +860,17 @@ display: flex; align-items: center; justify-content: space-between;
       + '</tbody></table>';
   }
 
-  function hbarChart(id, loadId, tableId, labels, values) {
+  function hbarChart(id, loadId, tableId, labels, values, fmtVal) {
     if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    var f = fmtVal || fmt;
     showChart(id, loadId);
     new Chart(document.getElementById(id), {
       type: 'bar',
       data: { labels: labels, datasets: [{ label: '', data: values, backgroundColor: PALETTE[0], borderRadius: 4 }] },
       options: {
         indexAxis: 'y', responsive: true,
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return fmt(ctx.raw); } } } },
-        scales: { x: { ticks: { callback: function(v) { return fmt(v); } } } },
+        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return f(ctx.raw); } } } },
+        scales: { x: { ticks: { callback: function(v) { return f(v); } } } },
       },
     });
   }
@@ -891,8 +892,9 @@ display: flex; align-items: center; justify-content: space-between;
     });
   }
 
-  function linesChart(id, loadId, tableId, labels, dsets) {
+  function linesChart(id, loadId, tableId, labels, dsets, fmtY) {
     if (!chartReady()) { fallbackTable(loadId, tableId); return; }
+    var f = fmtY || fmt;
     showChart(id, loadId);
     new Chart(document.getElementById(id), {
       type: 'line',
@@ -904,8 +906,8 @@ display: flex; align-items: center; justify-content: space-between;
       options: {
         responsive: true,
         plugins: { legend: { display: dsets.length > 1, position: 'bottom' },
-                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + fmt(ctx.raw); } } } },
-        scales: { y: { ticks: { callback: function(v) { return fmt(v); } } } },
+                   tooltip: { callbacks: { label: function(ctx) { return (ctx.dataset.label ? ctx.dataset.label + ': ' : '') + f(ctx.raw); } } } },
+        scales: { y: { ticks: { callback: function(v) { return f(v); } } } },
       },
     });
   }
@@ -925,10 +927,11 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // Accessible mirror table for a pivoted line chart (one column per series).
-  function seriesTable(tableId, head, p) {
+  function seriesTable(tableId, head, p, fmtVal) {
+    var f = fmtVal || fmt;
     srTable(tableId, [head].concat(p.dsets.map(function (d) { return d.label; })),
       p.labels.map(function (x) {
-        return [x].concat(p.keys.map(function (k) { return fmt(p.bySeries[k][x]); }));
+        return [x].concat(p.keys.map(function (k) { return f(p.bySeries[k][x]); }));
       }));
   }
 
@@ -936,10 +939,10 @@ display: flex; align-items: center; justify-content: space-between;
   // the localization generator's prose find/replace can never rewrite them.
   // Each is scoped to Facebook and one metric; SUM over (period, policy_area) is
   // a no-op pass-through since each combination is a single reported value.
-  function PREV_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Upperbound Prevalence"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-  function ACT_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Content Actioned"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-  function PRO_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Tasa proactiva"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
-  function PREVRANGE_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"IN","field_name":"metric","field_values":["Lowerbound Prevalence","Upperbound Prevalence"]}]},"group_by":["period","policy_area","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
+  function PREV_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Upperbound Prevalence"]}],"not":[{"operation":"EQ","field_name":"policy_area","field_values":["Cross-Policy Data"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
+  function ACT_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Content Actioned"]}],"not":[{"operation":"EQ","field_name":"policy_area","field_values":["Cross-Policy Data"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
+  function PRO_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"EQ","field_name":"metric","field_values":["Tasa proactiva"]}],"not":[{"operation":"EQ","field_name":"policy_area","field_values":["Cross-Policy Data"]}]},"group_by":["period","policy_area"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
+  function PREVRANGE_Q() { return {"table":"cser_metrics","query":{"and":[{"operation":"EQ","field_name":"app","field_values":["Facebook"]},{"operation":"IN","field_name":"metric","field_values":["Lowerbound Prevalence","Upperbound Prevalence"]}],"not":[{"operation":"EQ","field_name":"policy_area","field_values":["Cross-Policy Data"]}]},"group_by":["period","policy_area","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
 
   // Given rows [period, policy_area, n], keep only the latest period and return
   // [{area, value}] sorted by value descending.
@@ -960,15 +963,17 @@ display: flex; align-items: center; justify-content: space-between;
     var values = r.items.map(function (i) { return i.value; });
     srTable(tableId, [numHead + " (" + r.latest + ")", numHead],
       r.items.map(function (i) { return [i.area, fmtVal(i.value)]; }));
-    hbarChart(chartId, loadId, tableId, labels, values);
+    hbarChart(chartId, loadId, tableId, labels, values, fmtVal);
   }
 
   // Prevalence trend: pivot [period, policy_area, n] into one line per area.
+  // Prevalence is a percent (share of views), so axis/tooltip/table carry '%'.
   function renderPrevTrend(rows) {
     if (!rows.length) { emptyChart('prev-loading'); return; }
     var p = pivot(rows);
-    seriesTable('chart-prev-table', "Trimestre", p);
-    linesChart('chart-prev', 'prev-loading', 'chart-prev-table', p.labels, p.dsets);
+    var pctf = function (v) { return v == null ? '—' : v + '%'; };
+    seriesTable('chart-prev-table', "Trimestre", p, pctf);
+    linesChart('chart-prev', 'prev-loading', 'chart-prev-table', p.labels, p.dsets, pctf);
   }
 
   // Prevalence lower–upper range per policy area, latest quarter (3-col table).

@@ -655,7 +655,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Google · 半期ごと · 2009 – 2025</span>
     <h1>Google ユーザーデータ要請</h1>
-    <p>Transparency Report の一括エクスポートによる、Google が報告した政府のユーザー情報要請。国 × 法的手続別の要請件数・アカウント数・開示率に加え、外交/MLAT 経由分、Enterprise Cloud（GCP・Google Workspace）への要請、そして<strong>レンジ値</strong>でのみ報告される米国国家安全保障関連（FISA・National Security Letter）を収録します。tidy-long 形式のデータセット：各行はデータセット × 半期 × 国 × 法的手続 × 指標で識別される1つの測定値です。レンジは合算できず、割合も合計してはいけません。また 2012 H2 – 2014 H1 は 'All' 集計値と手続別内訳を併記しているため、このページの各ビューは単一の粒度を固定しています。</p>
+    <p>Google's reported government requests for user information, from the Transparency Report bulk export: requests, accounts and the share of requests where some data was disclosed, per country × legal process, plus the diplomatic/MLAT slice, Enterprise Cloud (GCP and Google Workspace) requests, and the US national-security figures (FISA and National Security Letters), which are reportable only as <strong>banded ranges</strong>. A tidy-long dataset: each row is one measured value identified by dataset × half-year × country × legal process × metric. Ranges are not additive and percentages must never be summed — and 2012 H2 – 2014 H1 report an 'All' aggregate alongside the per-process split — 以下のグラフはビューごとに正しい粒度を選択しています（2 つの粒度は重複しないため、全体の合計は両方を合算します）。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>ユーザーデータ要請の全世界推移</h3>
-        <p class="chart-sub">半期ごとの受領要請件数：手続別数値の合計（2012 H2 以降）と、初期に Google が報告した 'All' 集計値を並べて表示。</p>
+        <p class="chart-sub">半期ごとの全世界での受領リクエスト数。Google は初期の期間を 'All'（全法的手続き）の集計として、以降の期間を法的手続き別の内訳として報告しています。同じ国・期間で 2 つの粒度が重なることはないため、その合計が正確な世界全体の総数になります。</p>
         <div class="chart-loading" id="req-loading">読み込み中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>要請件数の上位10か国</h3>
-        <p class="chart-sub">ユーザーデータ要請件数による国別ランキング。手続別数値の合計（2012 H2 以降。初期の 'All' のみの期間は二重計上を避けるため除外）。</p>
+        <p class="chart-sub">ユーザーデータ リクエスト数による国別ランキング（全期間合計）。初期の 'All' 粒度の報告とその後の法的手続き別内訳は重複しないため、両方を合計しても各リクエストは正確に 1 回だけ数えられます。</p>
         <div class="chart-loading" id="cty-loading">読み込み中…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>法的手続別の要請</h3>
-        <p class="chart-sub">法的手続種別ごとのユーザーデータ要請件数。全期間合算（'All' 集計値は除外）。</p>
+        <p class="chart-sub">法的手続きの種類別のユーザーデータ リクエスト数（全期間合計、'All' 集計は除外）。法的手続き別の内訳は 2014 年下半期より前は米国のみを対象としているため、初期の期間には米国分のみが含まれます。</p>
         <div class="chart-loading" id="prc-loading">読み込み中…</div>
         <canvas id="chart-prc" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-prc-table" class="sr-only"></div>
@@ -951,26 +951,25 @@ display: flex; align-items: center; justify-content: space-between;
 
   // Chart queries. Filter values are dataset codes, so the localization
   // generator's prose find/replace can never rewrite them.
-  function REQ_SPLIT_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function REQ_ALL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  // The 'All' legal-process grain and the per-process split are DISJOINT
+  // complements: no (country, period) carries both (during 2012 H2 – 2014 H1
+  // only the US is split; every other country files only 'All'). So the true
+  // global total is the unfiltered sum across both grains — filtering either
+  // grain out drops real volume.
+  function REQ_TOTAL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
+  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function PRC_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["legal_process"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":15}; }
   function NSL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["us_nsl"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"lo"},{"function":"SUM","field_name":"value_high","alias":"hi"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
 
-  function renderCharts(reqSplit, reqAll, cty, prc, nsl) {
-    if (!reqSplit.rows.length && !reqAll.rows.length) { emptyChart('req-loading'); } else {
-      var byPeriod = {};
-      reqSplit.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).split = r[1]; });
-      reqAll.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).all = r[1]; });
-      var periods = Object.keys(byPeriod).sort();
-      var splitLbl = "手続別数値の合計";
-      var allLbl = "報告どおりの 'All' 集計値";
-      srTable('chart-req-table', ["半期", splitLbl, allLbl],
-        periods.map(function (p) { return [p, fmt(byPeriod[p].split), fmt(byPeriod[p].all)]; }));
-      linesChart('chart-req', 'req-loading', 'chart-req-table', periods, [
-        { label: splitLbl, data: periods.map(function (p) { return byPeriod[p].split == null ? null : byPeriod[p].split; }) },
-        { label: allLbl, data: periods.map(function (p) { return byPeriod[p].all == null ? null : byPeriod[p].all; }) },
-      ]);
+  function renderCharts(req合計, cty, prc, nsl) {
+    if (!req合計.rows.length) { emptyChart('req-loading'); } else {
+      var lbl = "受領したリクエスト";
+      srTable('chart-req-table', ["半期", lbl],
+        req合計.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      linesChart('chart-req', 'req-loading', 'chart-req-table',
+        req合計.rows.map(function (r) { return r[0]; }), [
+          { label: lbl, data: req合計.rows.map(function (r) { return r[1]; }) },
+        ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
       srTable('chart-cty-table', ["国", "要請件数"],
@@ -1025,8 +1024,8 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(REQ_SPLIT_Q()), soft(REQ_ALL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4]);
+  Promise.all([soft(REQ_TOTAL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3]);
   });
 })();
 </script>

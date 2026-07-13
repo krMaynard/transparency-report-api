@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Solicitudes de retirada de autoridades por semestre</h3>
-        <p class="chart-sub">Total de solicitudes de retirada de autoridades judiciales y administrativas (Art. 8/8-A) por semestre, una línea por plataforma.</p>
+        <p class="chart-sub">Total de solicitudes de retirada de autoridades judiciales y administrativas (art. 8/8-A) por semestre, una línea por plataforma. Las cifras agrupadas de Facebook + Instagram de Meta hacen que las dos líneas se superpongan: son una única cifra compartida, no aditiva.</p>
         <div class="chart-loading" id="req-loading">Cargando…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Solicitudes por organismo solicitante (último semestre)</h3>
-        <p class="chart-sub">Las solicitudes de autoridades del semestre más reciente, desglosadas por fuente — la ICTA, el canal de Política de Consumo y órdenes judiciales — por plataforma.</p>
+        <p class="chart-sub">Las solicitudes de las autoridades del semestre más reciente, desglosadas por origen —la ICTA, el canal de política del consumidor y las órdenes judiciales— por plataforma. Meta presenta cifras agrupadas idénticas de Facebook + Instagram bajo cada plataforma, así que las dos barras repiten un mismo recuento compartido: no las sumes.</p>
         <div class="chart-loading" id="cty-loading">Cargando…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -1022,11 +1022,13 @@ display: flex; align-items: center; justify-content: space-between;
     var dsets = platforms.map(function (p) {
       return { label: p, data: sources.map(function (m) {
         var hit = cur.find(function (r) { return r[1] === p && r[2] === m; });
-        return hit ? hit[3] : 0;
+        // null (not 0) when a channel wasn't reported, so the chart shows a
+        // gap instead of a false zero.
+        return hit ? hit[3] : null;
       }) };
     });
     srTable('chart-cty-table', ["Organismo (" + latest + ")"].concat(platforms),
-      sources.map(function (m, i) { return [labels[i]].concat(dsets.map(function (d) { return fmt(d.data[i]); })); }));
+      sources.map(function (m, i) { return [labels[i]].concat(dsets.map(function (d) { return d.data[i] == null ? '\u2014' : fmt(d.data[i]); })); }));
     vbarsChart('chart-cty', 'cty-loading', 'chart-cty-table', labels, dsets);
   }
 
@@ -1049,7 +1051,7 @@ display: flex; align-items: center; justify-content: space-between;
     // Authority requests by source, summed over all half-years (Instagram only,
     // since authority counts can bundle Facebook + Instagram).
     try {
-      var d = await explore({"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Instagram"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
+      var d = await explore({"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Instagram"]},{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
       var rows = (d.rows || []).map(function (r) { return [AUTHORITY_LABELS[r[0]] || r[0], r[1]]; });
       renderTable('outcomeTotals', rows, "Solicitudes de autoridades a Instagram, totalizadas por organismo solicitante.", "Organismo solicitante", "Solicitudes totales");
       fillProvenance(d.generated, d.version);

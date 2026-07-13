@@ -655,7 +655,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Google · 半年度 · 2009 – 2025</span>
     <h1>Google 用户数据请求</h1>
-    <p>来自 Transparency Report 批量导出的 Google 报告的政府用户信息请求：按国家 × 法律程序划分的请求数、账号数和部分披露数据的请求比例，另有外交/MLAT 部分、Enterprise Cloud（GCP 和 Google Workspace）请求，以及仅以<strong>区间</strong>形式报告的美国国家安全数据（FISA 和 National Security Letter）。tidy-long 格式数据集：每行是一个测量值，由数据集 × 半年 × 国家 × 法律程序 × 指标标识。区间不可累加，百分比切勿求和——且 2012 H2 – 2014 H1 在按程序细分的同时还报告了 'All' 汇总值，因此本页面每个视图都固定单一粒度。</p>
+    <p>Google's reported government requests for user information, from the Transparency Report bulk export: requests, accounts and the share of requests where some data was disclosed, per country × legal process, plus the diplomatic/MLAT slice, Enterprise Cloud (GCP and Google Workspace) requests, and the US national-security figures (FISA and National Security Letters), which are reportable only as <strong>banded ranges</strong>. A tidy-long dataset: each row is one measured value identified by dataset × half-year × country × legal process × metric. Ranges are not additive and percentages must never be summed — and 2012 H2 – 2014 H1 report an 'All' aggregate alongside the per-process split——下方图表为每个视图选择正确的粒度（两种粒度互不重叠，因此全球总数将二者相加）。</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>全球用户数据请求</h3>
-        <p class="chart-sub">每半年收到的请求数：按程序数字之和（2012 H2 起）与 Google 早期报告的 'All' 汇总值并列显示。</p>
+        <p class="chart-sub">每半年全球收到的请求数。Google 早期以 'All' 法律程序聚合申报，后期按程序拆分——对同一国家和期间，两种粒度从不重叠，因此二者之和就是精确的全球总数。</p>
         <div class="chart-loading" id="req-loading">加载中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>请求数排名前 10 的国家</h3>
-        <p class="chart-sub">按用户数据请求数排名的国家，按程序数字求和（2012 H2 起；早期仅有 'All' 的时期已排除以避免重复计算）。</p>
+        <p class="chart-sub">按用户数据请求数排名的国家/地区（所有期间合计）。早期的 'All' 粒度申报与后期的按程序拆分互不重叠，因此将两种粒度相加时每个请求恰好计数一次。</p>
         <div class="chart-loading" id="cty-loading">加载中…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>按法律程序划分的请求</h3>
-        <p class="chart-sub">按法律程序类型划分的用户数据请求，所有时期合计（排除 'All' 汇总值）。</p>
+        <p class="chart-sub">按法律程序类型划分的用户数据请求（所有期间合计，不含 'All' 聚合）。2014 年下半年之前按程序的细分仅涵盖美国，因此早期期间只包含美国的数量。</p>
         <div class="chart-loading" id="prc-loading">加载中…</div>
         <canvas id="chart-prc" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-prc-table" class="sr-only"></div>
@@ -951,26 +951,25 @@ display: flex; align-items: center; justify-content: space-between;
 
   // Chart queries. Filter values are dataset codes, so the localization
   // generator's prose find/replace can never rewrite them.
-  function REQ_SPLIT_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function REQ_ALL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  // The 'All' legal-process grain and the per-process split are DISJOINT
+  // complements: no (country, period) carries both (during 2012 H2 – 2014 H1
+  // only the US is split; every other country files only 'All'). So the true
+  // global total is the unfiltered sum across both grains — filtering either
+  // grain out drops real volume.
+  function REQ_TOTAL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
+  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function PRC_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["legal_process"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":15}; }
   function NSL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["us_nsl"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"lo"},{"function":"SUM","field_name":"value_high","alias":"hi"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
 
-  function renderCharts(reqSplit, reqAll, cty, prc, nsl) {
-    if (!reqSplit.rows.length && !reqAll.rows.length) { emptyChart('req-loading'); } else {
-      var byPeriod = {};
-      reqSplit.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).split = r[1]; });
-      reqAll.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).all = r[1]; });
-      var periods = Object.keys(byPeriod).sort();
-      var splitLbl = "按程序数字之和";
-      var allLbl = "报告原样的 'All' 汇总值";
-      srTable('chart-req-table', ["半年", splitLbl, allLbl],
-        periods.map(function (p) { return [p, fmt(byPeriod[p].split), fmt(byPeriod[p].all)]; }));
-      linesChart('chart-req', 'req-loading', 'chart-req-table', periods, [
-        { label: splitLbl, data: periods.map(function (p) { return byPeriod[p].split == null ? null : byPeriod[p].split; }) },
-        { label: allLbl, data: periods.map(function (p) { return byPeriod[p].all == null ? null : byPeriod[p].all; }) },
-      ]);
+  function renderCharts(req合计, cty, prc, nsl) {
+    if (!req合计.rows.length) { emptyChart('req-loading'); } else {
+      var lbl = "收到的请求";
+      srTable('chart-req-table', ["半年", lbl],
+        req合计.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      linesChart('chart-req', 'req-loading', 'chart-req-table',
+        req合计.rows.map(function (r) { return r[0]; }), [
+          { label: lbl, data: req合计.rows.map(function (r) { return r[1]; }) },
+        ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
       srTable('chart-cty-table', ["国家/地区", "请求数"],
@@ -1025,8 +1024,8 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(REQ_SPLIT_Q()), soft(REQ_ALL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4]);
+  Promise.all([soft(REQ_TOTAL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3]);
   });
 })();
 </script>

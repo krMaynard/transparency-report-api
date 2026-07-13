@@ -654,7 +654,7 @@ display: flex; align-items: center; justify-content: space-between;
 <main id="main" tabindex="-1">
 
   <header>
-    <span class="badge">Snap · 2024 H2 – 2025 H1</span>
+    <span class="badge">Snap · 2024 H1 – 2024 H2</span>
     <h1>Snap 透明性レポート</h1>
     <p>Snap が報告するトラスト＆セーフティの執行措置、政府（米国の国家安全保障を含む）からのコンテンツ・アカウント削除要請および情報要請、ならびに DMCA／商標通知。tidy-long 形式のデータセットで、各行は期間 × セクション × カテゴリ × サブカテゴリ × 指標で識別される 1 つの測定値です。数値は<strong>セクション間で比較できず</strong>、一部の指標は<strong>中央値</strong>であるため合計できません。このページでは各テーブルについて単一のセクションと指標を固定しています。</p>
   </header>
@@ -713,7 +713,7 @@ display: flex; align-items: center; justify-content: space-between;
   <!-- ── 米国政府による情報要請 ─────────────────────── -->
   <section class="data-section">
     <h2>米国政府による情報要請</h2>
-    <p class="sub">United States Government Information Requests セクション内の指標ごとに報告された合計。</p>
+    <p class="sub">United States Government Information Requests セクション内の指標ごとの報告件数の合計。リクエスト種別ごとの開示率は除外しています（百分率は合計できません）。</p>
     <div class="results" id="usGov" aria-busy="true">
       <div class="results-loading">読み込み中…</div>
     </div>
@@ -919,7 +919,7 @@ display: flex; align-items: center; justify-content: space-between;
   var SEC_INTL = "International Government Information " + 'Requests';
   var SEC_ADS = "Ads " + 'Moderation';
   function VIO_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_GLOBAL]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}],"not":[{"operation":"EQ","field_name":"sub_category_1","field_values":["Reactive and Proactive"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20}; }
-  function CTY_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_COUNTRY]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  function CTY_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_COUNTRY]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]},{"operation":"EQ","field_name":"sub_category_2","field_values":["Reactive and Proactive"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function GOV_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_INTL]},{"operation":"EQ","field_name":"metric","field_values":["other_information_requests"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function ADS_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_ADS]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":20}; }
 
@@ -973,7 +973,7 @@ display: flex; align-items: center; justify-content: space-between;
 
     // 米国政府による情報要請: SUM per metric within that section.
     try {
-      var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
+      var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}],"not":[{"operation":"EQ","field_name":"metric","field_values":["percentage_of_requests_where_some_data_was_produced"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
       renderTable('usGov', d2.rows || [], "Snap への米国政府による情報要請、指標ごとに合計。", '指標', '合計');
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {

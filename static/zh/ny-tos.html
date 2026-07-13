@@ -854,7 +854,8 @@ async function runStats() {
   }
   $("#ns-out").setAttribute("aria-busy", "false");
   const rows = d.rows || [];
-  $("#ns-summary").textContent = `正在显示 ${fmt(rows.length)} 项数据。`;
+  $("#ns-summary").textContent = `正在显示 ${fmt(rows.length)} 项数据。`
+    + (d.truncated ? " 结果在行数上限处被截断——请收窄筛选条件以查看全部。" : "");
   const head = '<tr><th scope="col">公司</th><th scope="col">类别</th>' +
     '<th scope="col">提交的标签</th><th scope="col">指标</th>' +
     '<th scope="col">度量</th><th scope="col">值</th></tr>';

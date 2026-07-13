@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>停用账号随时间变化</h3>
-        <p class="chart-sub">因违反政策而停用的账号（按报告期）。</p>
+        <p class="chart-sub">因违反政策而被停用的账户数（按报告期间）。Discord 于 2024 年从季度报告改为半年报告，因此两个序列覆盖的时间窗长度不同，不能直接比较；2022 年第四季度未报告。</p>
         <div class="chart-loading" id="req-loading">加载中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>国际政府请求：主要国家/地区</h3>
-        <p class="chart-sub">按国际政府信息请求排名的国家/地区（所有报告期合计）。</p>
+        <p class="chart-sub">按国际政府信息请求数排名的国家/地区（自 2023 年第二季度起）——更早的报告仅细分美国法律程序，没有按国家的国际表格。</p>
         <div class="chart-loading" id="rem-loading">加载中…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
@@ -955,15 +955,22 @@ display: flex; align-items: center; justify-content: space-between;
   function REQ_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["accounts_disabled"]},{"operation":"EQ","field_name":"metric","field_values":["accounts_disabled"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
   function CTY_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["accounts_disabled"]},{"operation":"EQ","field_name":"metric","field_values":["accounts_disabled"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":12}; }
   function REM_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["international_government_information_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
-  function USA_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests","information_produced"]}]},"group_by":["category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"category","order":"asc"}],"max_count":100}; }
+  function USA_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]},{"operation":"IN","field_name":"metric","field_values":["requests","information_produced"]}]},"group_by":["category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"category","order":"asc"}],"max_count":100}; }
 
   function renderCharts(req, cty, rem, usa) {
     if (!req.rows.length) { emptyChart('req-loading'); } else {
-      srTable('chart-req-table', ["半年", "请求数"],
+      // Quarterly (2022–2023) and half-yearly (2024+) periods cover different
+      // spans — one continuous line would read the grain change as a trend
+      // (a half-year of volume looks like a jump vs a quarter). Split them
+      // into two labelled series instead.
+      var labels = req.rows.map(function (r) { return r[0]; });
+      var isH = function (pd) { return pd.indexOf('-H') >= 0; };
+      srTable('chart-req-table', ["期间", "被停用的账户"],
         req.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
-      linesChart('chart-req', 'req-loading', 'chart-req-table',
-        req.rows.map(function (r) { return r[0]; }),
-        [{ label: "请求数", data: req.rows.map(function (r) { return r[1]; }) }]);
+      linesChart('chart-req', 'req-loading', 'chart-req-table', labels, [
+        { label: "每季度（2022–2023）", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
+        { label: "每半年（2024 年起）", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
+      ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
       srTable('chart-cty-table', ["政策类别", "停用账号"],

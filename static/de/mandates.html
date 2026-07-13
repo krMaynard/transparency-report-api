@@ -682,9 +682,9 @@ display: flex; align-items: center;
   <section class="card">
     <div class="mand-counts">
       <div class="c"><div class="n">3</div><div class="l">untersuchte Regionen</div></div>
-      <div class="c"><div class="n">17</div><div class="l">geltende Berichtspflichten</div></div>
-      <div class="c"><div class="n">8</div><div class="l">ausgesetzt, ersetzt oder gescheitert</div></div>
-      <div class="c"><div class="n">10</div><div class="l">in diesem Datensatz erfasst&nbsp;◆</div></div>
+      <div class="c"><div class="n" id="cnt-force">—</div><div class="l">geltende Berichtspflichten</div></div>
+      <div class="c"><div class="n" id="cnt-dead">—</div><div class="l">ausgesetzt, ersetzt oder gescheitert</div></div>
+      <div class="c"><div class="n" id="cnt-tracked">—</div><div class="l">in diesem Datensatz erfasst&nbsp;◆</div></div>
     </div>
     <div class="legend">
       <span class="lt">Status</span>
@@ -1051,6 +1051,18 @@ display: flex; align-items: center;
 </div><!-- /.main-area -->
 </div><!-- /.app-body -->
 
+<script>
+  // Headline counters are derived from the table rows so they can never go
+  // stale as mandates are added. "In force" includes partly-enjoined regimes
+  // (they are in force outside the enjoined scope).
+  (function () {
+    var n = function (sel) { return document.querySelectorAll('tbody ' + sel).length; };
+    var put = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+    put('cnt-force', n('.chip.s-force') + n('.chip.s-partial'));
+    put('cnt-dead', n('.chip.s-enjoined') + n('.chip.s-superseded') + n('.chip.s-proposed'));
+    put('cnt-tracked', n('a.trk'));
+  })();
+</script>
 <script>
   // Hamburger — mobile sidebar toggle
   (function () {

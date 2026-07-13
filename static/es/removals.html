@@ -695,7 +695,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <!-- Headline stats -->
   <div class="stats" id="stats" aria-busy="true">
-    <div class="stat"><div class="num" id="stat-requests">—</div><div class="lbl">Solicitudes gubernamentales</div></div>
+    <div class="stat"><div class="num" id="stat-requests">—</div><div class="lbl">Entradas de solicitud (una solicitud que menciona varios productos o motivos cuenta una vez en cada uno)</div></div>
     <div class="stat"><div class="num" id="stat-items">—</div><div class="lbl">Elementos señalados para retirada</div></div>
     <div class="stat"><div class="num" id="stat-countries">—</div><div class="lbl">Países representados</div></div>
     <div class="stat"><div class="num" id="stat-periods">—</div><div class="lbl">Períodos de referencia</div></div>
@@ -1248,7 +1248,7 @@ display: flex; align-items: center; justify-content: space-between;
           { function: 'SUM', field_name: 'removed_legal',   alias: 'legal' },
           { function: 'SUM', field_name: 'removed_policy',  alias: 'policy' },
           { function: 'SUM', field_name: 'already_removed', alias: 'already' },
-        ], [{ field_name: 'period', order: 'asc' }], 20)),
+        ], null, 50)),
         explore(q('gr_removals', ['country_name'], [{ function: 'SUM', field_name: 'items_requested', alias: 'items' }], [{ field_name: 'items', order: 'desc' }], 10)),
         explore(q('gr_removals', ['reason'],       [{ function: 'SUM', field_name: 'items_requested', alias: 'items' }], [{ field_name: 'items', order: 'desc' }], 10)),
         explore(q('gr_removals', ['product'],      [{ function: 'SUM', field_name: 'items_requested', alias: 'items' }], [{ field_name: 'items', order: 'desc' }], 10)),
@@ -1263,6 +1263,12 @@ display: flex; align-items: center; justify-content: space-between;
         explore(recordsQuery()),
       ]);
 
+      // A truncated period series would render a misleading partial trend —
+      // surface it instead of charting it.
+      if (results[0].truncated || results[1].truncated) {
+        errEl.textContent = 'La serie de periodos alcanzó el límite de filas y quedaría incompleta; por favor, informa de esto.';
+        errEl.classList.remove('hidden');
+      }
       // Sort chronologically using allPeriods order (avoids lexicographic sorting bugs)
       results[0].rows.sort(function(a, b) { return allPeriods.indexOf(a[0]) - allPeriods.indexOf(b[0]); });
       results[1].rows.sort(function(a, b) { return allPeriods.indexOf(a[0]) - allPeriods.indexOf(b[0]); });

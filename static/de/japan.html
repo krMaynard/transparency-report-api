@@ -976,10 +976,11 @@ display: flex; align-items: center; justify-content: space-between;
   }
 
   // Accessible mirror table for a pivoted line chart (one column per series).
-  function seriesTable(tableId, head, p) {
+  function seriesTable(tableId, head, p, fmtVal) {
+    var f = fmtVal || fmt;
     srTable(tableId, [head].concat(p.dsets.map(function (d) { return d.label; })),
       p.labels.map(function (x) {
-        return [x].concat(p.keys.map(function (k) { return fmt(p.bySeries[k][x]); }));
+        return [x].concat(p.keys.map(function (k) { return f(p.bySeries[k][x]); }));
       }));
   }
 
@@ -1000,7 +1001,7 @@ display: flex; align-items: center; justify-content: space-between;
     if (!rate.rows.length) { emptyChart('rate-loading'); } else {
       var rr = rate.rows.map(function (r) { return [QLABEL[r[0]] || r[0], r[1], r[2]]; });
       var p1 = pivot(rr);
-      seriesTable('chart-rate-table', "Quartal", p1);
+      seriesTable('chart-rate-table', "Quarter", p1, function (v) { return v == null ? '\u2014' : v + '%'; });
       linesChart('chart-rate', 'rate-loading', 'chart-rate-table', p1.labels, p1.dsets, function (v) { return v == null ? '' : v + '%'; });
     }
     if (!rem.rows.length) { emptyChart('rem-loading'); } else {
@@ -1020,7 +1021,7 @@ display: flex; align-items: center; justify-content: space-between;
   async function load() {
     // FY2024 summary per service: posts, posts_removed, removal_rate.
     try {
-      var d = await explore({"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"period","field_values":["2024-04..2025-03"]}]},"group_by":["service","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"max_count":100});
+      var d = await explore({"table":"japan_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["posts_activity"]},{"operation":"EQ","field_name":"period","field_values":["2024-04..2025-03"]}]},"group_by":["service","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"max_count":100});
       var by = {};
       (d.rows || []).forEach(function (r) { (by[r[0]] = by[r[0]] || {})[r[1]] = r[2]; });
       var svcs = Object.keys(by).sort(function (a, b) { return (by[b].posts || 0) - (by[a].posts || 0); });
@@ -1126,19 +1127,26 @@ display: flex; align-items: center; justify-content: space-between;
       {"operation":"EQ","field_name":"metric","field_values":[metric]}
     ]},"sort":[{"field_name":"value","order":"desc"}],"max_count":50};
   }
+  // Generation counter: switching services fires three async fetches, and a
+  // slow response for the previous service must not overwrite the new one.
+  var metaGen = 0;
   function metaRender(service) {
+    var gen = ++metaGen;
     var metaStatus = document.getElementById('metaStatus');
     if (metaStatus) metaStatus.textContent = service;
     // Exclude each section's 'Gesamt' aggregate row (CAT_TOTAL, see note above).
     soft(metaQ(service, 'content_actions', 'actions')).then(function (d) {
+      if (gen !== metaGen) return;
       var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
       renderTable('metaContent', rows, "Durchsetzungsmaßnahmen von Meta bei Inhalten nach Verstoßtyp.", "Verstoßtyp", "Maßnahmen");
     });
     soft(metaQ(service, 'requests_received', 'requests')).then(function (d) {
+      if (gen !== metaGen) return;
       var rows = d.rows.filter(function (r) { return r[0] !== CAT_TOTAL; });
       renderTable('metaAnfragen', rows, "Bei Meta eingegangene Rechtsverletzungsmeldungen nach Grund.", "Meldegrund", "Anfragen");
     });
     soft(metaQ(service, 'platform', 'monthly_active_users')).then(function (d) {
+      if (gen !== metaGen) return;
       var el = document.getElementById('metaMau');
       if (el) el.textContent = d.rows.length ? fmt(d.rows[0][1]) : '—';
     });

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Rapport de transparence de GitHub — Transparency Report API</title>
-<meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
+<meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014 onward." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -627,7 +627,7 @@ display: flex; align-items: center; justify-content: space-between;
 <main id="main" tabindex="-1">
 
   <header>
-    <span class="badge">GitHub · 2014 – 2024</span>
+    <span class="badge">GitHub · 2014 – 2026</span>
     <h1>Rapport de transparence de GitHub</h1>
     <p>Les demandes gouvernementales de retrait déclarées par GitHub, les demandes de divulgation d’informations sur les utilisateurs (y compris les lettres de sécurité nationale), les retraits DMCA et réclamations pour contournement, la détection automatisée, les recours et rétablissements, ainsi que les utilisateurs actifs mensuels au titre du DSA de l’UE. Un jeu de données au format tidy-long : chaque ligne est une valeur mesurée, identifiée par dataset × année × période × gouvernement × catégorie × métrique. Les comptages exacts ont des bornes inférieure/supérieure égales ; les lettres/ordonnances de sécurité nationale et les MAU au titre du DSA de l’UE sont publiés sous forme de plages par tranches (inférieur ≠ supérieur) — additionner la borne supérieure donne donc une estimation maximale.</p>
   </header>
@@ -639,7 +639,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Demandes d'informations sur les utilisateurs par an</h3>
-        <p class="chart-sub">Demandes reçues vs comptes divulgués dans le cadre d'une procédure légale (comptes exacts, déclaré depuis 2021).</p>
+        <p class="chart-sub">Demandes reçues vs cas où des informations ont été divulguées dans le cadre d'une procédure légale (comptes exacts, déclaré depuis 2021 ; le nombre de comptes concernés constitue un jeu de données distinct).</p>
         <div class="chart-loading" id="ui-loading">Chargement…</div>
         <canvas id="chart-ui" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-ui-table" class="sr-only"></div>
@@ -663,7 +663,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Avis de retrait DMCA par an</h3>
-        <p class="chart-sub">Avis de retrait pour droit d'auteur traités par GitHub au titre du DMCA.</p>
+        <p class="chart-sub">Avis de retrait pour droit d'auteur traités par GitHub au titre du DMCA (avis de retrait uniquement — les contre-avis et les avis d'action en justice sont exclus).</p>
         <div class="chart-loading" id="dmca-loading">Chargement…</div>
         <canvas id="chart-dmca" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-dmca-table" class="sr-only"></div>
@@ -673,19 +673,19 @@ display: flex; align-items: center; justify-content: space-between;
   </section>
 
   <div class="data-section">
-    <h2>Valeurs déclarées par domaine du rapport</h2>
+    <h2>Couverture du jeu de données par domaine de rapport</h2>
     <div class="results" id="byDataset" aria-busy="true">
       <p class="loading">Chargement…</p>
     </div>
-    <p class="sub">Pour chaque domaine du rapport (<code>dataset</code>), le comptage de la borne supérieure cumulé sur toutes les années, périodes, gouvernements et catégories.</p>
+    <p class="sub">Pour chaque domaine de rapport (<code>dataset</code>), le nombre de valeurs déclarées que contient le jeu de données. Des comptes de lignes, pas des quantités additionnées — les domaines mêlent des stocks (niveaux de MAU), des flux (demandes) et des fourchettes, qui ne peuvent pas être additionnés de manière significative.</p>
   </div>
 
   <div class="data-section">
-    <h2>Principales catégories par volume déclaré</h2>
+    <h2>Catégories les plus déclarées</h2>
     <div class="results" id="byCategory" aria-busy="true">
       <p class="loading">Chargement…</p>
     </div>
-    <p class="sub">Les catégories ayant les plus grands comptages de borne supérieure cumulés. Les plages par tranches contribuent par leur borne supérieure, de sorte que les totaux sont des estimations maximales.</p>
+    <p class="sub">Les catégories comptant le plus de valeurs déclarées. Des comptes de lignes, pas des quantités additionnées — les catégories couvrent des domaines de rapport sans lien dont les mesures ne sont pas additives.</p>
   </div>
 
   <p class="hint">Affinez ou étendez ces résultats dans le <a href="/fr/reports">générateur de requêtes</a>, parcourez la liste complète des champs sur la page <a href="/fr/schema">Schéma</a>, ou lisez la <a href="/fr/methodology">Méthodologie</a>.</p>
@@ -693,7 +693,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>Source : <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">Rapport de transparence de GitHub</a> — retraits gouvernementaux, demandes d’informations sur les utilisateurs, DMCA, détection automatisée, recours et MAU au titre du DSA de l’UE (2014–2024). Données via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Methodology</a> · <a href="/fr/api-key">API key</a> · <a href="/fr/privacy">Confidentialité</a></p>
+  <p>Source : <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014 onward). Data via <a href="/api">Transparency Report API</a> · <a href="/fr/methodology">Methodology</a> · <a href="/fr/api-key">API key</a> · <a href="/fr/privacy">Confidentialité</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">Instantané :</span> <span id="prov-snap"></span> · <span class="prov-label">Citer comme :</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -894,15 +894,15 @@ display: flex; align-items: center; justify-content: space-between;
 
   // ── Init ──────────────────────────────────────────────────────────────────
   async function init() {
-    var byDataset = {"table":"github_metrics","group_by":["dataset"],"aggregates":[{"function":"SUM","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":30};
-    var byCategory = {"table":"github_metrics","group_by":["category"],"aggregates":[{"function":"SUM","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":15};
+    var byDataset = {"table":"github_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":30};
+    var byCategory = {"table":"github_metrics","group_by":["category"],"aggregates":[{"function":"COUNT","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":15};
 
     // Chart queries — each pins one dataset (metrics are not comparable across
     // report areas). These datasets carry exact counts, so count_low == count_high.
     var UI_Q   = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["user_info_requests"]}]},"group_by":["year","metric"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
     var GT_Q   = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["government_takedowns_received"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
     var GOV_Q  = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["government_takedowns_received"]}]},"group_by":["government"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10};
-    var DMCA_Q = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["dmca_takedowns"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
+    var DMCA_Q = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["dmca_takedowns"]},{"operation":"EQ","field_name":"category","field_values":["Takedown notices or counter notice reversal"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
 
     // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
     // single failure can't block the rest of the page.
@@ -918,10 +918,11 @@ display: flex; align-items: center; justify-content: space-between;
           (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
         });
         var metrics = Object.keys(byMetric).sort().reverse(); // received before disclosed
-        srTable('chart-ui-table', ["Année"].concat(metrics),
+        var UI_LABELS = { received: "Demandes reçues", disclosed: "Divulgations effectuées" };
+        srTable('chart-ui-table', ["Année"].concat(metrics.map(function (m) { return UI_LABELS[m] || m; })),
           years.map(function (y) { return [y].concat(metrics.map(function (m) { return fmt(byMetric[m][y]); })); }));
         linesChart('chart-ui', 'ui-loading', 'chart-ui-table', years,
-          metrics.map(function (m) { return { label: m, data: years.map(function (y) { return byMetric[m][y] == null ? null : byMetric[m][y]; }) }; }));
+          metrics.map(function (m) { return { label: UI_LABELS[m] || m, data: years.map(function (y) { return byMetric[m][y] == null ? null : byMetric[m][y]; }) }; }));
       }
 
       if (!gt.rows.length) { emptyChart('gt-loading'); } else {

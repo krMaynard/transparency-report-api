@@ -650,7 +650,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>提供数据的请求占比</h3>
-        <p class="chart-sub">Apple 提供了部分数据的请求,占该时期收到请求的比例(仅适用于涉及数据披露的请求类型)。</p>
+        <p class="chart-sub">Apple 提供了部分数据的请求，占该时期收到请求的比例——仅限于报告了数据提供数字的请求类型（设备、金融标识符、推送令牌、紧急情况、数字内容提供方），因此账户、保全和应用下架请求绝不会夸大分母。</p>
         <div class="chart-loading" id="rate-loading">加载中…</div>
         <canvas id="chart-rate" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rate-table" class="sr-only"></div>
@@ -785,7 +785,7 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries. Rate: SUM(provided)/SUM(received) is derived client-side per
   // period (measures not reported for a request type are NULL, so SUM skips them).
   var TS_ASC = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
-  var RATE_ASC = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_data_provided","alias":"provided"},{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
+  var RATE_ASC = {"table":"apple_requests","query":{"and":[{"operation":"IN","field_name":"request_type","field_values":["device","financial_identifier","push_token","emergency","digital_content_provider"]}]},"group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"requests_data_provided","alias":"provided"},{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
   var TOP_CTY = {"table":"apple_requests","group_by":["country_name"],"aggregates":[{"function":"SUM","field_name":"requests_received","alias":"requests"}],"sort":[{"field_name":"requests","order":"desc"}],"max_count":10};
   var APPS_ASC = {"table":"apple_requests","group_by":["period","period_ord"],"aggregates":[{"function":"SUM","field_name":"apps_removed","alias":"apps"}],"sort":[{"field_name":"period_ord","order":"asc"}],"max_count":100};
 

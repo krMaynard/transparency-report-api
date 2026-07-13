@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>当局による削除要請（半期ごと）</h3>
-        <p class="chart-sub">司法・行政当局（第8条/8-A条）からの削除要請の合計を半期ごとに、プラットフォームごとに1本の線で表示。</p>
+        <p class="chart-sub">司法・行政当局からの削除要請の総数（第8/8-A条）、半期ごと・プラットフォーム別の折れ線。Meta は Facebook + Instagram を一括計上しているため 2 本の線は重なります。共有された 1 つの数値であり、加算はできません。</p>
         <div class="chart-loading" id="req-loading">読み込み中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>要請元別の要請（直近の半期）</h3>
-        <p class="chart-sub">直近の半期における当局の要請を要請元別（ICTA、消費者政策チャネル、裁判所命令）に、プラットフォームごとに表示。</p>
+        <p class="chart-sub">直近の半期における当局からの要請を、発信元別（ICTA、消費者政策チャネル、裁判所命令）にプラットフォームごとに表示。Meta は各プラットフォームに同一の Facebook + Instagram 一括値を計上しているため、2 本の棒は同じ数値の繰り返しです。加算しないでください。</p>
         <div class="chart-loading" id="cty-loading">読み込み中…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -1022,11 +1022,13 @@ display: flex; align-items: center; justify-content: space-between;
     var dsets = platforms.map(function (p) {
       return { label: p, data: sources.map(function (m) {
         var hit = cur.find(function (r) { return r[1] === p && r[2] === m; });
-        return hit ? hit[3] : 0;
+        // null (not 0) when a channel wasn't reported, so the chart shows a
+        // gap instead of a false zero.
+        return hit ? hit[3] : null;
       }) };
     });
     srTable('chart-cty-table', ["当局 (" + latest + ")"].concat(platforms),
-      sources.map(function (m, i) { return [labels[i]].concat(dsets.map(function (d) { return fmt(d.data[i]); })); }));
+      sources.map(function (m, i) { return [labels[i]].concat(dsets.map(function (d) { return d.data[i] == null ? '\u2014' : fmt(d.data[i]); })); }));
     vbarsChart('chart-cty', 'cty-loading', 'chart-cty-table', labels, dsets);
   }
 
@@ -1049,7 +1051,7 @@ display: flex; align-items: center; justify-content: space-between;
     // Authority requests by source, summed over all half-years (Instagram only,
     // since authority counts can bundle Facebook + Instagram).
     try {
-      var d = await explore({"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Instagram"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
+      var d = await explore({"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Instagram"]},{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
       var rows = (d.rows || []).map(function (r) { return [AUTHORITY_LABELS[r[0]] || r[0], r[1]]; });
       renderTable('outcome合計s', rows, "Instagram に対する当局の要請を要請元別に合計。", "要請元", "要請の合計");
       fillProvenance(d.generated, d.version);

@@ -764,13 +764,13 @@ async function runSearch() {
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
+      `${fmt(d.companies.length)} 社の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `「${esc(q)}」に一致する ${fmt(d.total)} 箇所中 ${fmt(d.count)} 箇所を関連度順に表示しています。`
-    : `「${esc(q)}」に一致する箇所はありません。`;
+    ? `「${q}」に一致する ${fmt(d.total)} 箇所中 ${fmt(d.count)} 箇所を関連度順に表示しています。`
+    : `「${q}」に一致する箇所はありません。`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
@@ -797,9 +797,13 @@ function fillFacets(d) {
 }
 
 async function setupNarratives() {
+  // Honour deep links like /narratives?source=ca-ab587 (advertised elsewhere).
+  const want = new URLSearchParams(location.search).get("source");
+  if (want && $("#nsrc").querySelector(`option[value="${CSS.escape(want)}"]`)) $("#nsrc").value = want;
+  const src0 = $("#nsrc").value;
   let d;
   try {
-    const res = await fetch("/api/narratives");
+    const res = await fetch("/api/narratives" + (src0 ? "?source=" + encodeURIComponent(src0) : ""));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     d = await res.json();
   } catch (err) {
@@ -810,7 +814,7 @@ async function setupNarratives() {
   if (d.mark_close) MARK_CLOSE = d.mark_close;
   fillFacets(d);
   $("#nsummary").textContent =
-    `${fmt(d.companies.length)} 件の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
+    `${fmt(d.companies.length)} 社の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
   fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });

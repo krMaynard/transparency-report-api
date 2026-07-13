@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>EU 삭제 명령을 통해 삭제된 콘텐츠(플랫폼별)</h3>
-        <p class="chart-sub">각 제7조 발행자가 EU 각국 관할 당국의 삭제 명령에 따라 삭제한 항목으로, 보고서 자체의 하위 서비스별로 표시했습니다.</p>
+        <p class="chart-sub">Items each Art. 7 publisher removed as a result of removal orders from EU national competent authorities, by the report's own sub-service and reporting period — one bar per annual report, since coverage windows differ per publisher.</p>
         <div class="chart-loading" id="plat-loading">불러오는 중…</div>
         <canvas id="chart-plat" height="160" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-plat-table" class="sr-only"></div>
@@ -943,7 +943,7 @@ display: flex; align-items: center; justify-content: space-between;
   // generator's prose find/replace can never rewrite them.
   var ROLE_LABELS = { "authority": "당국(제8조 / 집행위원회)", "platform": "플랫폼(제7조)" };
   function ORDERS_Q() { return {"table":"tco_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["removal_orders_issued"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
-  function PLAT_Q() { return {"table":"tco_metrics","query":{"and":[{"operation":"EQ","field_name":"role","field_values":["platform"]},{"operation":"EQ","field_name":"metric","field_values":["content_removed_via_orders"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
+  function PLAT_Q() { return {"table":"tco_metrics","query":{"and":[{"operation":"EQ","field_name":"role","field_values":["platform"]},{"operation":"EQ","field_name":"metric","field_values":["content_removed_via_orders"]}]},"group_by":["category","period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":40}; }
 
   function renderCharts(orders, plat) {
     if (!orders.rows.length) { emptyChart('orders-loading'); } else {
@@ -952,9 +952,12 @@ display: flex; align-items: center; justify-content: space-between;
         orders.rows.map(function (r) { return r[0]; }), orders.rows.map(function (r) { return r[1]; }));
     }
     if (!plat.rows.length) { emptyChart('plat-loading'); } else {
-      srTable('chart-plat-table', ["플랫폼 서비스", "명령을 통해 삭제된 콘텐츠"], plat.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      // rows: [category, period, n]. One bar per report year, so a publisher's
+      // multiple annual figures aren't read as one cumulative bar.
+      var pr = plat.rows.map(function (r) { return [r[0] + ' (' + r[1] + ')', r[2]]; });
+      srTable('chart-plat-table', ["플랫폼 서비스 (report period)", "명령을 통해 삭제된 콘텐츠"], pr.map(function (r) { return [r[0], fmt(r[1])]; }));
       hbarChart('chart-plat', 'plat-loading', 'chart-plat-table',
-        plat.rows.map(function (r) { return r[0]; }), plat.rows.map(function (r) { return r[1]; }));
+        pr.map(function (r) { return r[0]; }), pr.map(function (r) { return r[1]; }));
     }
   }
 

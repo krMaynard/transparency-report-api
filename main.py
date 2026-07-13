@@ -382,6 +382,8 @@ class Job:
     row_count: int | None = None
     callback_url: str | None = None  # optional webhook notified on terminal state
     warnings: list[str] = field(default_factory=list)  # non-fatal query caveats
+    row_cap: int = ROW_LIMIT  # effective row cap (min(max_count, ROW_LIMIT))
+    truncated: bool = False  # True when the result was cut at row_cap
     # columns/rows live in the result store, not on the job object.
     columns: list[str] | None = field(default=None, repr=False)
     rows: list[list[Any]] | None = field(default=None, repr=False)
@@ -397,6 +399,7 @@ class Job:
             "finished_at": self.finished_at,
             "error": self.error,
             "row_count": rc,
+            "truncated": self.truncated,
             "compiled_sql": self.sql,
             "warnings": self.warnings,
             "status_url": f"{API_PREFIX}/jobs/{self.id}",
@@ -510,6 +513,8 @@ class RedisJobStore:
             "row_count": "" if job.row_count is None else str(job.row_count),
             "callback_url": job.callback_url or "",
             "warnings": json.dumps(job.warnings),
+            "row_cap": str(job.row_cap),
+            "truncated": "1" if job.truncated else "",
         }
 
     def _from_hash(self, h: dict[str, str]) -> Job:
@@ -527,6 +532,8 @@ class RedisJobStore:
             row_count=int(h["row_count"]) if h.get("row_count") else None,
             callback_url=h.get("callback_url") or None,
             warnings=json.loads(h.get("warnings") or "[]"),
+            row_cap=int(h["row_cap"]) if h.get("row_cap") else ROW_LIMIT,
+            truncated=h.get("truncated") in ("1", "True"),
         )
 
     def put(self, job: Job) -> None:
@@ -1772,11 +1779,16 @@ def _compile_expr(expr: str, refs: dict[str, str]) -> str:
         return tok
 
     def parse_sum(depth: int) -> str:
+        # Additive terms COALESCE to 0: with full-outer spine semantics a service
+        # missing from one leg arrives as NULL, and NULL + x would silently drop
+        # it from sums/rankings (e.g. a t5+t6 total losing every service that
+        # filed only t6). Division deliberately keeps NULL propagation — a rate
+        # with a missing operand is undefined, not 0.
         left = parse_product(depth)
         while (tok := peek()) and tok[1] in ("+", "-"):
             take()
             right = parse_product(depth)
-            left = f"({left} {tok[1]} {right})"
+            left = f"(COALESCE({left}, 0) {tok[1]} COALESCE({right}, 0))"
         return left
 
     def parse_product(depth: int) -> str:
@@ -2013,7 +2025,7 @@ def _compile_composite(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
                 order_parts.append(f"{_quote_ident(c)} ASC")
     if order_parts:
         sql += " ORDER BY " + ", ".join(order_parts)
-    sql += f" LIMIT {min(req.max_count, ROW_LIMIT)}"
+    sql += f" LIMIT {min(req.max_count, ROW_LIMIT + 1)}"
     if req.offset:
         sql += f" OFFSET {int(req.offset)}"
 
@@ -2105,7 +2117,9 @@ def compile_query(req: QueryRequest) -> tuple[str, list[Any], list[str]]:
             if c not in sorted_cols:
                 order_parts.append(f"{col_expr[c]} ASC")
 
-    limit = min(req.max_count, ROW_LIMIT)
+    # ROW_LIMIT + 1 (not ROW_LIMIT) so a caller may fetch one sentinel row past
+    # the cap to detect truncation (the job runner and /api/explore both do).
+    limit = min(req.max_count, ROW_LIMIT + 1)
 
     sql = f"SELECT {', '.join(select_parts)} {spec.from_sql}"
     if where:
@@ -2234,11 +2248,15 @@ def _execute_job(job_id: str) -> None:
         if refreshed is None or refreshed.status == "cancelled":
             return
 
-        if len(rows) > ROW_LIMIT:
-            raise ValueError(f"Result exceeds {ROW_LIMIT} rows; add a LIMIT clause.")
+        # The SQL fetches one sentinel row past the job's cap: seeing it means
+        # results were cut. Surface that as `truncated` on the job/result rather
+        # than returning a silently short row set.
+        truncated = len(rows) > job.row_cap
+        if truncated:
+            rows = rows[: job.row_cap]
 
         _store.save_result(job_id, cols, [list(r) for r in rows])
-        _store.update_fields(job_id, status="done", finished_at=_now())
+        _store.update_fields(job_id, status="done", truncated=truncated, finished_at=_now())
         JOBS_TOTAL.labels("done").inc()
         logger.info(
             "job_done",
@@ -3857,14 +3875,46 @@ def _askquery_to_request(aq: dict[str, Any]) -> QueryRequest:
     return QueryRequest.model_validate(payload)
 
 
-# Measures that are medians, not additive — SUM/AVG across rows is meaningless
-# (a median of medians isn't a median).
-NON_ADDITIVE_MEASURES = {"median_time", "tf_median_time"}
+# Measures that are medians or percentages, not additive — SUM across rows is
+# meaningless (a median of medians isn't a median; summed percentages aren't a
+# percentage).
+NON_ADDITIVE_MEASURES = {"median_time", "tf_median_time", "pct_data_provided"}
 
 
 def _filter_fields(q: "BooleanQuery") -> set[str]:
+    """Fields the query actually RESTRICTS to a single grain. Every AND
+    condition restricts its field. An OR restricts a field only when every
+    branch names it (otherwise a row can match via a branch that doesn't touch
+    the field). A NOT never restricts a field — excluding one value still spans
+    all the rest — so counting it as a "pin" would silently suppress the
+    double-count/unit advisories."""
     # The clause lists default to [] (never None) per the model, but guard anyway.
-    return {c.field_name for c in (*(q.and_ or ()), *(q.or_ or ()), *(q.not_ or ()))}
+    fields = {c.field_name for c in (q.and_ or ())}
+    if q.or_:
+        common = set.intersection(*({c.field_name} for c in q.or_))
+        fields |= common
+    return fields
+
+
+def _ascii_header(value: str) -> str:
+    """HTTP header values must be latin-1; the advisory texts use em dashes and
+    curly quotes, so transliterate to plain ASCII for header transport (the JSON
+    body keeps the original text)."""
+    return (
+        value.replace("\u2014", "-").replace("\u2013", "-")
+        .replace("\u2018", "'").replace("\u2019", "'")
+        .replace("\u201c", '"').replace("\u201d", '"')
+        .encode("ascii", "replace").decode("ascii")
+    )
+
+
+def _pinned_values(q: "BooleanQuery", field: str) -> set[Any]:
+    """Values a query positively targets for `field` (AND/OR conditions only —
+    a NOT excludes values, so its values are never "targeted")."""
+    return {
+        v for c in (*(q.and_ or ()), *(q.or_ or ()))
+        if c.field_name == field for v in c.field_values
+    }
 
 
 def _leg_warnings(
@@ -3886,6 +3936,20 @@ def _leg_warnings(
                 f"{flag}; this aggregate pins neither, so it may double-count. Filter "
                 f"{flag}=1 for the headline total or {flag}=0 for the breakdown."
             )
+    # t7/t8/t9 store the aggregate indicator ALONGSIDE its per-type cross-cut
+    # rows (and t8 mixes accuracy/precision/recall fractions with counts) even
+    # at the totals scope, so a SUM that pins no indicator roughly doubles the
+    # figure — the *_is_total pins above can't catch this.
+    if table in ("t7_appeals_recidivism", "t8_automated_means", "t9_human_resources") and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if not {"indicator", "indicator_key"} & pinned:
+            out.append(
+                f"'{table}' stores cross-cut indicator rows beside the headline "
+                f"figure (t8 also stores accuracy fractions), so an aggregate that "
+                f"pins no 'indicator'/'indicator_key' double-counts. Filter or "
+                f"group by 'indicator_key'."
+            )
     # Cross-tier comparability: VLOPs report H2-2025; non-VLOP harmonised filers
     # often report full-year or offset windows. Summing across tiers compares
     # different reporting periods.
@@ -3898,8 +3962,9 @@ def _leg_warnings(
     for agg in aggregates:
         if agg.function in ("SUM", "AVG") and agg.field_name in NON_ADDITIVE_MEASURES:
             out.append(
-                f"{agg.function}({agg.field_name}) aggregates a median across rows, which "
-                f"is not statistically meaningful — read it per row instead."
+                f"{agg.function}({agg.field_name}) aggregates a non-additive measure "
+                f"(a median or percentage) across rows, which is not statistically "
+                f"meaningful — read it per row, or weight it yourself."
             )
     # snap_metrics is tidy-long: its single generic `value` column mixes counts
     # and medians across non-comparable sections, so the name-keyed
@@ -3920,11 +3985,12 @@ def _leg_warnings(
                 "Filter or group by 'metric'."
             )
         else:
-            metric_values = {
-                v for c in (*(query.and_ or ()), *(query.or_ or ()), *(query.not_ or ()))
-                if c.field_name == "metric" for v in c.field_values
-            }
-            if any(isinstance(v, str) and "median" in v.lower() for v in metric_values):
+            metric_values = _pinned_values(query, "metric")
+            if any(isinstance(v, str) and "median" in v.lower() for v in metric_values) or (
+                not metric_values and "metric" in (group_by or [])
+            ):
+                # Fires both when a median metric is explicitly targeted and when
+                # grouping by metric (each median group still gets a summed median).
                 out.append(
                     "snap_metrics SUM/AVG over a 'median_*' metric isn't statistically "
                     "meaningful — read it per row instead."
@@ -3968,12 +4034,11 @@ def _leg_warnings(
         # Pinning doesn't make a rate or an average summable — warn when a SUM
         # explicitly targets the non-additive units/metrics.
         if any(a.function == "SUM" and a.field_name == "value" for a in aggregates):
-            filt = (*(query.and_ or ()), *(query.or_ or ()), *(query.not_ or ()))
-            pinned_units = {v for c in filt if c.field_name == "unit"
-                            for v in c.field_values}
-            pinned_metrics = {v for c in filt if c.field_name == "metric"
-                              for v in c.field_values}
-            if pinned_units & {"percent", "average"} or                     pinned_metrics & {"processed_rate", "accounts_per_processed"}:
+            pinned_units = _pinned_values(query, "unit")
+            pinned_metrics = _pinned_values(query, "metric")
+            if pinned_units & {"percent", "average"} or pinned_metrics & {
+                "processed_rate", "accounts_per_processed"
+            } or (not pinned_units and "unit" in (group_by or [])):
                 out.append(
                     "korea_metrics SUM over a 'percent'/'average' value isn't "
                     "statistically meaningful — read it per row instead."
@@ -4000,10 +4065,12 @@ def _leg_warnings(
             )
         if "legal_process" not in pinned:
             out.append(
-                "'google_userdata_metrics' reports an 'All' legal_process "
-                "aggregate alongside the per-process split for 2012-H2..2014-H1, "
-                "so an unpinned SUM double-counts those periods. Filter or group "
-                "by 'legal_process'."
+                "'google_userdata_metrics' files early volumes under an 'All' "
+                "legal_process and later ones as a per-process split (the two "
+                "grains never overlap for the same country and period, so an "
+                "unfiltered SUM is exact) — but filtering legal_process to only "
+                "one grain drops the other grain's real volume. Group by "
+                "'legal_process' to see the grain mix."
             )
     # microsoft_metrics' report split changes across eras (combined -> criminal/
     # emergencies/civil, with skype overlapping combined in 2013).
@@ -4229,6 +4296,13 @@ def _leg_warnings(
     if table == "japan_metrics" and any(
         a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
     ):
+        if "service" not in pinned:
+            out.append(
+                "'japan_metrics' spans nine services from three providers whose "
+                "figures aren't comparable (and Meta's shared section names span "
+                "Facebook, Instagram and Threads); this aggregate pins no "
+                "'service'. Filter or group by 'service'."
+            )
         if "section" not in pinned:
             out.append(
                 "'japan_metrics' spans incomparable sections (LY Corp "
@@ -4439,6 +4513,88 @@ def _leg_warnings(
                 "aggregate pins no 'company', so it may sum non-comparable values. "
                 "Filter or group by 'company'."
             )
+    # github_metrics mixes flows (requests), stocks (EU-DSA MAU levels) and
+    # banded national-security ranges in one count_low/count_high pair.
+    if table == "github_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name in ("count_low", "count_high")
+        for a in aggregates
+    ):
+        if "dataset" not in pinned:
+            out.append(
+                "'github_metrics' spans report areas whose measures aren't "
+                "comparable (request flows, EU-DSA MAU stock levels, banded "
+                "national-security ranges); this aggregate pins no 'dataset'. "
+                "Filter or group by 'dataset'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'github_metrics' datasets carry several metrics (e.g. received "
+                "vs disclosed, processed vs accounts/pages/repos affected) that "
+                "overlap or measure different things; this aggregate pins no "
+                "'metric'. Filter or group by 'metric'."
+            )
+        if _pinned_values(query, "dataset") & {"national_security", "eu_dsa_mau"} and any(
+            a.function == "SUM" for a in aggregates
+        ):
+            out.append(
+                "github_metrics 'national_security' and 'eu_dsa_mau' values are "
+                "banded ranges (and MAU is a stock, not a flow) — summing bounds "
+                "across rows is not meaningful. Read them per row."
+            )
+    # apple_national_security is banded ranges only — sums of bounds are not counts.
+    if table == "apple_national_security" and any(
+        a.function == "SUM"
+        and a.field_name in ("requests_low", "requests_high", "accounts_low", "accounts_high")
+        for a in aggregates
+    ):
+        out.append(
+            "'apple_national_security' values are banded ranges (e.g. 0–249), "
+            "not exact counts — a SUM of bounds across rows is not a count. "
+            "Read the bands per row."
+        )
+    # Banded national-security datasets stay non-additive even once pinned.
+    if table == "google_userdata_metrics" and _pinned_values(query, "dataset") & {
+        "us_fisa_content", "us_fisa_non_content", "us_nsl"
+    } and any(a.function == "SUM" for a in aggregates):
+        out.append(
+            "The US national-security datasets are banded ranges — summing "
+            "value_low/value_high bounds across periods is not a count. Read "
+            "the bands per period."
+        )
+    if table == "linkedin_metrics" and any(
+        isinstance(v, str) and v in ("fisa_requests", "ns_accounts", "ns_requests",
+                                     "nsl_accounts", "nsl_received")
+        for v in _pinned_values(query, "metric")
+    ) and any(a.function == "SUM" for a in aggregates):
+        out.append(
+            "LinkedIn's national-security metrics are banded ranges — summing "
+            "value_low/value_high bounds across periods is not a count. Read "
+            "the bands per period."
+        )
+    # Pinning a grain doesn't make a rate summable: a SUM that explicitly
+    # targets percent/rate/average rows (via the unit dimension or a
+    # rate-named metric) is still meaningless, however well-pinned.
+    if "unit" in spec.dimensions and any(
+        a.function == "SUM" and a.field_name in ("value", "value_low", "value_high")
+        for a in aggregates
+    ):
+        rate_units = _pinned_values(query, "unit") & {"percent", "rate", "average"}
+        rate_names = {
+            v for v in _pinned_values(query, "metric")
+            if isinstance(v, str) and any(
+                k in v.lower()
+                for k in ("rate", "share", "percentage", "prevalence", "pct_",
+                          "precision", "false positive")
+            )
+        }
+        # korea/android carry their own dedicated messages for this.
+        if (rate_units or rate_names) and table not in ("korea_metrics", "android_metrics"):
+            out.append(
+                f"'{table}' SUM explicitly targets percent/rate rows "
+                f"({', '.join(sorted(str(x) for x in (rate_units or rate_names)))}) — "
+                f"rates are not additive; use AVG with care (unweighted) or read "
+                f"them per row."
+            )
     return out
 
 
@@ -4447,7 +4603,13 @@ def _query_warnings(req: QueryRequest) -> list[str]:
     if req.legs:
         out: list[str] = []
         for name, leg in req.legs.items():
-            out += [f"leg '{name}': {w}" for w in _leg_warnings(leg.table, leg.query, [], leg.aggregates)]
+            # Each leg is implicitly grouped by the join keys, so they count as
+            # pinned dimensions — otherwise a composite joined on 'section' would
+            # be told it "pins no section".
+            out += [
+                f"leg '{name}': {w}"
+                for w in _leg_warnings(leg.table, leg.query, list(req.join_on or []), leg.aggregates)
+            ]
         return out
     return _leg_warnings(req.table, req.query, req.group_by, req.aggregates)
 
@@ -4512,12 +4674,20 @@ def explore(
         writer.writerow(result["columns"])
         writer.writerows([[_csv_safe(v) for v in row] for row in result["rows"]])
         stamp = _provenance()["generated"] or "snapshot"
+        # CSV has no in-band side channel — carry the guardrail advisories and
+        # the truncation flag as headers so scripted CSV consumers still see them.
+        advisory: dict[str, str] = {}
+        if result.get("warnings"):
+            advisory["X-Query-Warnings"] = _ascii_header(" | ".join(result["warnings"]))
+        if result.get("truncated"):
+            advisory["X-Result-Truncated"] = "true"
         return PlainTextResponse(
             buf.getvalue(),
             media_type="text/csv",
             headers={
                 "Content-Disposition": f'attachment; filename="transparency-explore-{stamp}.csv"',
                 **_provenance_headers(),
+                **advisory,
             },
         )
     return result
@@ -4864,7 +5034,7 @@ FIELD_HELP: dict[str, str] = {
     # ── GitHub transparency (tidy-long github_metrics) ──
     "dataset": "Which series within the table the row belongs to. github_metrics: e.g. government_takedowns_received / user_info_requests / national_security / dmca_takedowns / eu_dsa_mau. google_userdata_metrics: global / global_diplomatic / enterprise / enterprise_diplomatic / us_fisa_content / us_fisa_non_content / us_nsl. linkedin_metrics: member_data_requests / us_breakdown / content_removal_requests. tiktok_metrics: government_removals / information_requests / ip_removals (ip_removals is global-only). Pin a dataset before aggregating; metrics aren't comparable across datasets.",
     "category": "In-row breakdown within a github_metrics dataset — request type, abuse type, takedown type, etc. (empty when the dataset has no sub-breakdown).",
-    "metric": "Which reported count the row is, when a github_metrics dataset has several (e.g. received / disclosed; repos_affected / pages_affected / accounts_affected); otherwise 'count'.",
+    "metric": "Which reported measure the row is — each tidy-long dataset's own measure names (e.g. github received / disclosed; korea requests / accounts; ny_tos_stats the company's filed table name). Metrics measure different things: pin one before aggregating.",
     "count_low": "Reported value (github_metrics). Equals count_high for exact counts; for national_security and eu_dsa_mau the value is a banded range, so this is the lower bound.",
     "count_high": "Upper bound of the reported value (github_metrics); equals count_low for exact counts.",
     "year": "Calendar year of the github_metrics row.",
@@ -4934,8 +5104,13 @@ FIELD_HELP: dict[str, str] = {
 
 
 def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
-    """A runnable example query for a table — aggregate its first measure, or
-    (for the text-only t11) fetch the qualitative field for one service."""
+    """A runnable example query for a table — count its rows per group, or
+    (for the text-only t11) fetch the qualitative field for one service.
+
+    COUNT deliberately, not SUM: a copy-pasteable SUM example would commit
+    exactly the aggregation errors these datasets' docs forbid (summing rates
+    or medians, adding total rows to their own breakdown, mixing units) —
+    a row count is meaningful on every table without pinning anything."""
     measures = list(spec.measures)
     # Group by a dimension the table actually has — service_name for the DSA
     # tables, but gr_removals has no service_name, so fall back to its first
@@ -4945,8 +5120,8 @@ def _example_for(table: str, spec: TableSpec) -> dict[str, Any]:
         return {
             "table": table,
             "group_by": [group_dim],
-            "aggregates": [{"function": "SUM", "field_name": measures[0], "alias": "total"}],
-            "sort": [{"field_name": "total", "order": "desc"}],
+            "aggregates": [{"function": "COUNT", "field_name": measures[0], "alias": "reported_values"}],
+            "sort": [{"field_name": "reported_values", "order": "desc"}],
             "max_count": 10,
         }
     return {
@@ -5043,8 +5218,12 @@ def submit_query(
         )
     response.headers.update(rate_headers)
 
+    # Compile with one sentinel row past the effective cap so the runner can
+    # tell "exactly cap rows" from "more existed and were cut" — the result is
+    # trimmed back to the cap and flagged `truncated` instead of silently short.
+    row_cap = min(body.max_count, ROW_LIMIT)
     try:
-        sql, params, _columns = compile_query(body)
+        sql, params, _columns = compile_query(body.model_copy(update={"max_count": row_cap + 1}))
     except QueryCompileError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
 
@@ -5065,6 +5244,7 @@ def submit_query(
         submitted_by=principal["name"],
         callback_url=body.callback_url,
         warnings=_query_warnings(body),
+        row_cap=row_cap,
     )
     _store.put(job)
     JOB_QUEUE_DEPTH.inc()  # queued; decremented when _execute_job picks it up
@@ -5138,6 +5318,14 @@ def _render_result(
     prov_headers = _provenance_headers()
     job = _store.get(job_id)
     warnings = job.warnings if job else []
+    truncated = bool(job.truncated) if job else False
+    # CSV has no in-band side channel, so the guardrail advisories and the
+    # truncation flag ride in headers there (JSON carries them in the body too).
+    advisory_headers: dict[str, str] = {}
+    if warnings:
+        advisory_headers["X-Query-Warnings"] = _ascii_header(" | ".join(warnings))
+    if truncated:
+        advisory_headers["X-Result-Truncated"] = "true"
 
     if fmt == "csv":
         buf = io.StringIO()
@@ -5152,10 +5340,12 @@ def _render_result(
             headers={
                 "Content-Disposition": f'attachment; filename="transparency-{stamp}-{job_id[:8]}.csv"',
                 **prov_headers,
+                **advisory_headers,
             },
         )
 
     headers = dict(prov_headers)
+    headers.update(advisory_headers)
     if as_attachment:
         headers["Content-Disposition"] = f'attachment; filename="{job_id}.json"'
     # Stamp the result with dataset provenance so an exported JSON is self-describing
@@ -5165,6 +5355,7 @@ def _render_result(
             "columns": cols,
             "rows": rows,
             "row_count": len(rows),
+            "truncated": truncated,
             "warnings": warnings,  # ride along to the result, not just the 202
             "dataset": _provenance(),
         },

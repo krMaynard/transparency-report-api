@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Tasa de PHA en dispositivos por tipo de mercado</h3>
-        <p class="chart-sub">Porcentaje medio de dispositivos con una PHA instalada: dispositivos de consumo frente a dispositivos empresariales con Google Play Protect.</p>
+        <p class="chart-sub">Proporción de dispositivos con una PHA instalada, promediada sobre toda la ventana de informe 2019 – 2024 — todos los dispositivos frente a los dispositivos empresariales con Google Play Protect (ventanas idénticas, por lo que la comparación es justa).</p>
         <div class="chart-loading" id="mkt-loading">Cargando…</div>
         <canvas id="chart-mkt" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-mkt-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Tasa de instalación de PHA por país</h3>
-        <p class="chart-sub">Porcentaje medio de instalaciones de Google Play que fueron PHA, en los mercados Android de mayor volumen.</p>
+        <p class="chart-sub">Porcentaje de instalaciones de Google Play que fueron PHA en la última ventana de 12 meses informada, en los mercados Android de mayor volumen. Se omiten los países sin valor para esa ventana (las ventanas de cobertura difieren por país).</p>
         <div class="chart-loading" id="cty-loading">Cargando…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -691,7 +691,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Instalaciones de PHA por categoría de malware</h3>
-        <p class="chart-sub">La proporción media de cada categoría de malware sobre las instalaciones de PHA desde Google Play (las proporciones suman el 100 % dentro de un trimestre).</p>
+        <p class="chart-sub">La cuota de cada categoría de malware en las instalaciones de PHA desde Google Play en el último trimestre informado (las cuotas suman ~100 % dentro del trimestre).</p>
         <div class="chart-loading" id="cat-loading">Cargando…</div>
         <canvas id="chart-cat" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cat-table" class="sr-only"></div>
@@ -703,7 +703,7 @@ display: flex; align-items: center; justify-content: space-between;
   <!-- ── Categorías de malware por tasa de instalación ─────────────────────── -->
   <section class="data-section">
     <h2>Categorías de malware por tasa de instalación</h2>
-    <p class="sub">Tasa media de instalación de PHA desde Google Play por categoría de malware, todos los trimestres combinados.</p>
+    <p class="sub">Tasa de instalación de PHA desde Google Play por categoría de malware en el último trimestre informado. (Las categorías existen durante tramos distintos de la serie 2017 – 2024, así que un promedio de todos los trimestres compararía ventanas desiguales.)</p>
     <div class="results" id="catRates" aria-busy="true">
       <div class="results-loading">Cargando…</div>
     </div>
@@ -958,8 +958,13 @@ display: flex; align-items: center; justify-content: space-between;
   // section and metric, and stays under the explore row cap.
   function VER_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["devices_by_version"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["period","category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":450}; }
   function MKT_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["devices_with_pha"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
-  function CTY_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_country"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25}; }
-  function CAT_Q() { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]},{"operation":"EQ","field_name":"metric","field_values":["category_share"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25}; }
+  // Categories/countries cover different spans of the series, so an
+  // all-periods AVG compares unlike windows (a one-quarter category vs an
+  // 8-year one). These cuts pin the latest reported period instead.
+  function CTY_Q(period) { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_country"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]},{"operation":"EQ","field_name":"period","field_values":[period]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25}; }
+  function CAT_Q(period) { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]},{"operation":"EQ","field_name":"metric","field_values":["category_share"]},{"operation":"EQ","field_name":"period","field_values":[period]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25}; }
+  // Latest reported period of a section (one row: sort period desc, take 1).
+  function LATEST_Q(section) { return {"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[section]}]},"group_by":["period"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":1}; }
 
   function renderCharts(ver, mkt, cty, cat) {
     if (!ver.rows.length) { emptyChart('ver-loading'); } else {
@@ -986,11 +991,15 @@ display: flex; align-items: center; justify-content: space-between;
 
   // ── Load ──────────────────────────────────────────────────────────────────
   async function load() {
-    // Malware categories ranked by average Tasa de instalación de PHA (a fraction -> %).
+    // Malware categories ranked by Tasa de instalación de PHA in the latest quarter
+    // (a fraction -> %). Latest-quarter, not all-quarters average: categories
+    // cover unequal spans of the series, so their averages aren't comparable.
     try {
-      var d = await explore({"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
+      var lp = await explore({"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]}]},"group_by":["period"],"aggregates":[{"function":"COUNT","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"desc"}],"max_count":1});
+      var period = (lp.rows && lp.rows.length) ? lp.rows[0][0] : null;
+      var d = await explore({"table":"android_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["installs_by_category"]},{"operation":"EQ","field_name":"metric","field_values":["pha_rate"]},{"operation":"EQ","field_name":"period","field_values":[period]}]},"group_by":["category"],"aggregates":[{"function":"AVG","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":25});
       var rows = scale(d.rows || [], 1);
-      renderTable('catRates', rows, "Tasa media de instalación de PHA desde Google Play por categoría de malware.", "Categoría de malware", "Tasa media de instalación de PHA", pct);
+      renderTable('catRates', rows, "Tasa de instalación de PHA desde Google Play por categoría de malware, último trimestre.", "Categoría de malware", "Tasa de instalación de PHA", pct);
       fillProvenance(d.generated, d.version);
     } catch (err) {
       showError('catRates', "No se pudieron cargar las tasas por categoría de malware: " + err.message);
@@ -1011,7 +1020,12 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(VER_Q()), soft(MKT_Q()), soft(CTY_Q()), soft(CAT_Q())]).then(function (cs) {
+  var latest = function (section) { return soft(LATEST_Q(section)).then(function (d) { return d.rows.length ? d.rows[0][0] : null; }); };
+  Promise.all([
+    soft(VER_Q()), soft(MKT_Q()),
+    latest('installs_by_country').then(function (pd) { return pd ? soft(CTY_Q(pd)) : { rows: [] }; }),
+    latest('installs_by_category').then(function (pd) { return pd ? soft(CAT_Q(pd)) : { rows: [] }; }),
+  ]).then(function (cs) {
     renderCharts(cs[0], cs[1], cs[2], cs[3]);
   });
 })();

@@ -764,13 +764,13 @@ async function runSearch() {
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 段文字中检索。请在上方输入词语或短语。`;
+      `可在 ${fmt(d.companies.length)} 家公司的 ${fmt(d.page_total)} 段文字中检索。请在上方输入词语或短语。`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `显示与“${esc(q)}”匹配的 ${fmt(d.total)} 段中的 ${fmt(d.count)} 段，按相关度排序。`
-    : `没有段落匹配“${esc(q)}”。`;
+    ? `显示与“${q}”匹配的 ${fmt(d.total)} 段中的 ${fmt(d.count)} 段，按相关度排序。`
+    : `没有段落匹配“${q}”。`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
@@ -797,9 +797,13 @@ function fillFacets(d) {
 }
 
 async function setupNarratives() {
+  // Honour deep links like /narratives?source=ca-ab587 (advertised elsewhere).
+  const want = new URLSearchParams(location.search).get("source");
+  if (want && $("#nsrc").querySelector(`option[value="${CSS.escape(want)}"]`)) $("#nsrc").value = want;
+  const src0 = $("#nsrc").value;
   let d;
   try {
-    const res = await fetch("/api/narratives");
+    const res = await fetch("/api/narratives" + (src0 ? "?source=" + encodeURIComponent(src0) : ""));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     d = await res.json();
   } catch (err) {
@@ -810,7 +814,7 @@ async function setupNarratives() {
   if (d.mark_close) MARK_CLOSE = d.mark_close;
   fillFacets(d);
   $("#nsummary").textContent =
-    `可在 ${fmt(d.companies.length)} 份报告的 ${fmt(d.page_total)} 段文字中检索。请在上方输入词语或短语。`;
+    `可在 ${fmt(d.companies.length)} 家公司的 ${fmt(d.page_total)} 段文字中检索。请在上方输入词语或短语。`;
   fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });

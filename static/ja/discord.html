@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>無効化アカウントの推移</h3>
-        <p class="chart-sub">ポリシー違反により無効化されたアカウント（期間ごと）。</p>
+        <p class="chart-sub">ポリシー違反により無効化されたアカウント数（報告期間ごと）。Discord は 2024 年に四半期報告から半期報告へ移行したため、2 つの系列は長さの異なる期間を対象としており、直接比較できません。2022 年第 4 四半期は報告されていません。</p>
         <div class="chart-loading" id="req-loading">読み込み中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>国際的な政府要請：上位の国</h3>
-        <p class="chart-sub">国際的な政府情報要請でランク付けした国（全期間の合計）。</p>
+        <p class="chart-sub">国際的な政府情報リクエスト数の国別ランキング（2023 年第 2 四半期以降）。それ以前のレポートは米国の法的手続きのみを内訳としており、国別の国際テーブルはありません。</p>
         <div class="chart-loading" id="rem-loading">読み込み中…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
@@ -955,15 +955,22 @@ display: flex; align-items: center; justify-content: space-between;
   function REQ_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["accounts_disabled"]},{"operation":"EQ","field_name":"metric","field_values":["accounts_disabled"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
   function CTY_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["accounts_disabled"]},{"operation":"EQ","field_name":"metric","field_values":["accounts_disabled"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":12}; }
   function REM_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["international_government_information_requests"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["category"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
-  function USA_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests","information_produced"]}]},"group_by":["category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"category","order":"asc"}],"max_count":100}; }
+  function USA_Q() { return {"table":"discord_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["us_gov_info_requests"]},{"operation":"EQ","field_name":"period","field_values":["2024-H1"]},{"operation":"IN","field_name":"metric","field_values":["requests","information_produced"]}]},"group_by":["category","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"category","order":"asc"}],"max_count":100}; }
 
   function renderCharts(req, cty, rem, usa) {
     if (!req.rows.length) { emptyChart('req-loading'); } else {
-      srTable('chart-req-table', ["半期", "要請数"],
+      // Quarterly (2022–2023) and half-yearly (2024+) periods cover different
+      // spans — one continuous line would read the grain change as a trend
+      // (a half-year of volume looks like a jump vs a quarter). Split them
+      // into two labelled series instead.
+      var labels = req.rows.map(function (r) { return r[0]; });
+      var isH = function (pd) { return pd.indexOf('-H') >= 0; };
+      srTable('chart-req-table', ["期間", "無効化されたアカウント"],
         req.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
-      linesChart('chart-req', 'req-loading', 'chart-req-table',
-        req.rows.map(function (r) { return r[0]; }),
-        [{ label: "要請数", data: req.rows.map(function (r) { return r[1]; }) }]);
+      linesChart('chart-req', 'req-loading', 'chart-req-table', labels, [
+        { label: "四半期ごと（2022–2023）", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
+        { label: "半期ごと（2024 年以降）", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
+      ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
       srTable('chart-cty-table', ["ポリシーカテゴリ", "無効化アカウント"],
