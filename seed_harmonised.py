@@ -120,6 +120,12 @@ SLUG_META = {
     "fitbit": ("Fitbit", "online-platform"),
     "reddit": ("Reddit", "online-platform"),
     "just-eat-takeaway": ("Just Eat Takeaway", "online-platform"),
+    # Browser-fetched from the SOURCES-NEEDING-BROWSER §C backlog (harmonised
+    # template located but not yet pulled into the schema).
+    "riot": ("Riot Games", "online-platform"),
+    "flickr": ("Flickr", "online-platform"),
+    "jeuxvideo": ("Jeuxvideo.com", "online-platform"),
+    "glassdoor": ("Glassdoor", "online-platform"),
 }
 
 SECTIONS = [
