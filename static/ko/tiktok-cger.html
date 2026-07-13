@@ -674,7 +674,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>정책별 삭제 동영상(최근 분기)</h3>
-        <p class="chart-sub">가장 최근 분기에 커뮤니티 가이드라인 정책별로 삭제된 동영상. (정책별 세부 내역은 2025년 4분기부터 보고됩니다.)</p>
+        <p class="chart-sub">삭제된 동영상 in the most recent quarter, by Community Guidelines policy. (TikTok reports this count-based policy breakdown only for the most recent quarters.)</p>
         <div class="chart-loading" id="pol-loading">불러오는 중…</div>
         <canvas id="chart-pol" height="240" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-pol-table" class="sr-only"></div>
@@ -952,7 +952,7 @@ display: flex; align-items: center; justify-content: space-between;
   ];
   function VIDS_Q() { return {"table":"tiktok_cger_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["Total videos removed"]}].concat(ALL_GRAIN)},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":60}; }
   function PRO_Q() { return {"table":"tiktok_cger_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["Proactive removal rate"]}].concat(ALL_GRAIN)},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":60}; }
-  function POL_Q() { return {"table":"tiktok_cger_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["Total videos removed"]},{"operation":"EQ","field_name":"policy_type","field_values":["Policy"]},{"operation":"EQ","field_name":"task","field_values":["All"]}]},"group_by":["period","issue"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
+  function POL_Q() { return {"table":"tiktok_cger_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["Total videos removed"]},{"operation":"EQ","field_name":"policy_type","field_values":["Policy"]},{"operation":"EQ","field_name":"task_type","field_values":["All"]},{"operation":"EQ","field_name":"task","field_values":["All"]}]},"group_by":["period","issue"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":600}; }
   function RATES_Q() { return {"table":"tiktok_cger_metrics","query":{"and":[{"operation":"IN","field_name":"metric","field_values":["Proactive removal rate","Removal rate before any views","Removal rate within 24 hours"]}].concat(ALL_GRAIN)},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":300}; }
 
   // Given rows [period, key, n], keep only the latest period and return

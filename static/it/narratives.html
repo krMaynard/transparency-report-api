@@ -764,13 +764,13 @@ async function runSearch() {
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `Ricerca in ${fmt(d.page_total)} passaggi di ${fmt(d.companies.length)} report. Digita una parola o una frase qui sopra.`;
+      `Searching ${fmt(d.page_total)} passages from ${fmt(d.companies.length)} companies. Type a word or phrase above.`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `Visualizzazione di ${fmt(d.count)} di ${fmt(d.total)} passaggi corrispondenti per “${esc(q)}”, ordinati per pertinenza.`
-    : `Nessun passaggio corrisponde a “${esc(q)}”.`;
+    ? `Showing ${fmt(d.count)} of ${fmt(d.total)} matching passages for “${q}”, ranked by relevance.`
+    : `No passages match “${q}”.`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
@@ -797,9 +797,13 @@ function fillFacets(d) {
 }
 
 async function setupNarratives() {
+  // Honour deep links like /narratives?source=ca-ab587 (advertised elsewhere).
+  const want = new URLSearchParams(location.search).get("source");
+  if (want && $("#nsrc").querySelector(`option[value="${CSS.escape(want)}"]`)) $("#nsrc").value = want;
+  const src0 = $("#nsrc").value;
   let d;
   try {
-    const res = await fetch("/api/narratives");
+    const res = await fetch("/api/narratives" + (src0 ? "?source=" + encodeURIComponent(src0) : ""));
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     d = await res.json();
   } catch (err) {
@@ -810,7 +814,7 @@ async function setupNarratives() {
   if (d.mark_close) MARK_CLOSE = d.mark_close;
   fillFacets(d);
   $("#nsummary").textContent =
-    `Ricerca in ${fmt(d.page_total)} passaggi di ${fmt(d.companies.length)} report. Digita una parola o una frase qui sopra.`;
+    `Searching ${fmt(d.page_total)} passages from ${fmt(d.companies.length)} companies. Type a word or phrase above.`;
   fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });

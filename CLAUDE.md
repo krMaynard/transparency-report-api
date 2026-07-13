@@ -624,8 +624,10 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   Enterprise Cloud (GCP/Workspace), and the US national-security datasets
   (FISA content / FISA non-content / NSLs) as **banded ranges**
   (`value_low != value_high`, non-additive). **2012-H2..2014-H1 report an
-  `All` legal_process aggregate alongside the per-process split** — pin
-  `legal_process` before summing, and never SUM `percent` rows.
+  `All` legal_process aggregate alongside the per-process split** — the two
+  grains are disjoint by country × period (only the US is split in that
+  window), so an unfiltered SUM is the exact global total, but restricting to
+  one grain drops the other grain's volume; never SUM `percent` rows.
 - **Microsoft Law Enforcement Requests Report** — a single **tidy-long**
   `microsoft_metrics` table (one row per measured value: `period`/`section`/
   `country`/`metric`/`unit` + a `value`; dims stored inline). Per-country
@@ -942,8 +944,11 @@ every endpoint (query/explore/ask) gets composites through the same boundary.
   demo; restart clears all jobs. Production would need persistent storage.
 - **`sqlite3.interrupt()`** on `DELETE /jobs/{id}` while running: aborts the
   in-flight query without parsing SQL.
-- **100k row cap**: queries returning more rows fail with a helpful error
-  asking the caller to add a `LIMIT`.
+- **100k row cap + honest truncation**: results are capped at
+  `min(max_count, ROW_LIMIT)`; the compiled SQL fetches one sentinel row past
+  the cap so a cut result is flagged `truncated: true` on the job, the result
+  body, and an `X-Result-Truncated` header (CSV too) — never silently short.
+  Guardrail advisories also ride on CSV exports via `X-Query-Warnings`.
 - **Per-key query rate limit**: `POST /query` is throttled per API key
   (`QUERY_RATE_MAX`/`QUERY_RATE_WINDOW`, default 60/60s) via `_key_store.incr` —
   the same counter primitive as portal registration. Over-limit → `429` +

@@ -887,7 +887,7 @@
 
 <script>
 const $ = (s) => document.querySelector(s);
-const fmt = (n) => (n ?? 0).toLocaleString();
+const fmt = (n) => n == null ? "\u2014" : n.toLocaleString();
 // "2025-07-01/2025-12-31" -> "Jul–Dec 2025" (falls back to the raw value).
 const fmtPeriod = (p) => {
   const m = /^(\d{4})-(\d{2})-\d{2}\/(\d{4})-(\d{2})-\d{2}$/.exec(p || "");
@@ -940,8 +940,8 @@ function barChart(canvasId, fallbackId, labels, data, nameLabel, valueLabel) {
       indexAxis: "y",
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
-        y: { ticks: { color: "#e6edf3" }, grid: { display: false } },
+        x: {},
+        y: { grid: { display: false } },
       },
     },
   });
@@ -1108,8 +1108,8 @@ function drawTabChart(labels, data, nameLabel, valueLabel, colorKey) {
     type: "bar",
     data: { labels, datasets: [{ label: valueLabel, data, backgroundColor: TAB_COLORS[colorKey] || TAB_COLORS.blue, borderRadius: 4 }] },
     options: { indexAxis: "y", plugins: { legend: { display: false } },
-      scales: { x: { ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
-                y: { ticks: { color: "#e6edf3" }, grid: { display: false } } } },
+      scales: { x: {  },
+                y: { grid: { display: false } } } },
   });
 }
 
@@ -1188,9 +1188,9 @@ function drawStackedChart(labels, series, nameLabel, valueLabel) {
   tabChart = new Chart(canvas, {
     type: "bar",
     data: { labels, datasets: series.map(s => ({ label: s.label, data: s.data, backgroundColor: s.color, borderRadius: 4 })) },
-    options: { indexAxis: "y", plugins: { legend: { display: true, labels: { color: "#e6edf3" } } },
-      scales: { x: { stacked: true, ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
-                y: { stacked: true, ticks: { color: "#e6edf3" }, grid: { display: false } } } },
+    options: { indexAxis: "y", plugins: { legend: { display: true } },
+      scales: { x: { stacked: true,  },
+                y: { stacked: true, grid: { display: false } } } },
   });
 }
 
@@ -1324,9 +1324,12 @@ async function setupScope(table, breakdown) {
   caveat.classList.remove("hidden");
   let scopes = [];
   try {
+    // Group on scope_key (the language-neutral canonical label) so a pinned
+    // scope matches reports filed in any EU language, not just the English
+    // string; unmapped labels fall through as their filed text.
     const res = await fetch("/api/explore", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ table, group_by: ["scope"],
+      body: JSON.stringify({ table, group_by: ["scope_key"],
         aggregates: [{ function: "COUNT", field_name: "*", alias: "n" }],
         sort: [{ field_name: "n", order: "desc" }], max_count: 100 }),
     });
@@ -1372,7 +1375,7 @@ function buildQuery() {
   }
   // Pin a specific scope (the breakdown-table picker) — takes precedence over the
   // scope grain so an explicit choice like "Decisions upheld" still works.
-  if (scopePinned) and.push({ operation: "EQ", field_name: "scope", field_values: [$("#ex-scope").value] });
+  if (scopePinned) and.push({ operation: "EQ", field_name: "scope_key", field_values: [$("#ex-scope").value] });
   if (and.length) q.query = { and };
   return q;
 }
@@ -1411,8 +1414,8 @@ async function runExplore() {
       data: { labels, datasets: [{ label: legend, data: values, backgroundColor: "#3fb950", borderRadius: 4 }] },
       options: {
         indexAxis: "y", plugins: { legend: { display: false } },
-        scales: { x: { ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
-                  y: { ticks: { color: "#e6edf3" }, grid: { display: false } } },
+        scales: { x: {  },
+                  y: { grid: { display: false } } },
       },
     });
   } else {
@@ -1508,6 +1511,12 @@ function buildCompareQuery() {
     const and = [];
     if (dims.includes("category_is_total")) and.push({ operation: "EQ", field_name: "category_is_total", field_values: ["1"] });
     if (dims.includes("scope_is_total")) and.push({ operation: "EQ", field_name: "scope_is_total", field_values: ["1"] });
+    // t7/t8/t9 store cross-cut indicators (and t8 accuracy fractions) alongside
+    // the headline figure even at the totals scope, so a SUM without an
+    // indicator pin roughly doubles the count — pin the same headline
+    // indicator_key each curated tab uses.
+    const HEADLINE_IND = { t7_appeals_recidivism: APPEALS_IND, t8_automated_means: AUTOMATED_IND, t9_human_resources: MODERATOR_IND };
+    if (HEADLINE_IND[table]) and.push(HEADLINE_IND[table]);
     if (and.length) body.query = { and };
     return body;
   };
@@ -1571,8 +1580,8 @@ async function runCompare() {
                            backgroundColor: "#d29922", borderRadius: 4 }] },
       options: {
         indexAxis: "y", plugins: { legend: { display: false } },
-        scales: { x: { ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
-                  y: { ticks: { color: "#e6edf3" }, grid: { display: false } } },
+        scales: { x: {  },
+                  y: { grid: { display: false } } },
       },
     });
   } else {
@@ -1617,8 +1626,8 @@ function renderRows(d, chartSel, outSel, legend) {
       type: "bar",
       data: { labels: d.rows.map(r => r[0]), datasets: [{ label: legend, data: d.rows.map(r => r[1]), backgroundColor: "#a371f7", borderRadius: 4 }] },
       options: { indexAxis: "y", plugins: { legend: { display: false } },
-        scales: { x: { ticks: { color: "#9aa7b4" }, grid: { color: "#30363d" } },
-                  y: { ticks: { color: "#e6edf3" }, grid: { display: false } } } },
+        scales: { x: {  },
+                  y: { grid: { display: false } } } },
     });
     if (chartSel === "#ask-chart") askChart = c;
     $(chartSel).style.display = "";
@@ -1627,7 +1636,7 @@ function renderRows(d, chartSel, outSel, legend) {
   }
   const head = `<tr>${d.columns.map(c => `<th>${esc(c)}</th>`).join("")}</tr>`;
   const body = d.rows.map(r =>
-    `<tr>${r.map((v) => typeof v === "number" ? `<td class="num">${fmt(v)}</td>` : `<td>${esc(v)}</td>`).join("")}</tr>`
+    `<tr>${r.map((v) => typeof v === "number" || v == null ? `<td class="num">${fmt(v)}</td>` : `<td>${esc(v)}</td>`).join("")}</tr>`
   ).join("");
   out.innerHTML = d.rows.length ? `<table class="restable">${head}${body}</table>` : "<p class='sub'>No rows.</p>";
 }

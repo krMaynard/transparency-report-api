@@ -854,7 +854,8 @@ async function runStats() {
   }
   $("#ns-out").setAttribute("aria-busy", "false");
   const rows = d.rows || [];
-  $("#ns-summary").textContent = `Showing ${fmt(rows.length)} figures.`;
+  $("#ns-summary").textContent = `Showing ${fmt(rows.length)} figures.`
+    + (d.truncated ? " Results were truncated at the row cap — narrow the filters to see everything." : "");
   const head = '<tr><th scope="col">Company</th><th scope="col">Category</th>' +
     '<th scope="col">Filed label</th><th scope="col">Metric</th>' +
     '<th scope="col">Measure</th><th scope="col">Value</th></tr>';

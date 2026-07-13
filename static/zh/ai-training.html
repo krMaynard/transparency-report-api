@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>文本训练数据规模（按模型）</h3>
-        <p class="chart-sub">每个模型文本训练数据的分区间规模，以可比较的等级（1–3）表示。Google 的 Gemini 3 Pro 和 Meta 的 Muse Spark 披露了最大区间（&ldquo;超过 10 万亿个 token&rdquo;）；Microsoft 的 Phi-4 模型披露了中间区间。</p>
+        <p class="chart-sub">The banded size of each model's text training data, as a comparable rank (1–3, largest band = 3). 提供商s disclose only a coarse band (e.g. &ldquo;more than 10 trillion tokens&rdquo;), so ranks — not token counts — are the comparable quantity.</p>
         <div class="chart-loading" id="text-loading">加载中…</div>
         <canvas id="chart-text" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-text-table" class="sr-only"></div>

@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>GitHub 투명성 보고서 — Transparency Report API</title>
-<meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014–2024." />
+<meta name="description" content="GitHub's reported government takedowns, user-information requests, DMCA takedowns, automated detection, appeals, and EU-DSA monthly active users — a tidy-long dataset, 2014 onward." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -627,7 +627,7 @@ display: flex; align-items: center; justify-content: space-between;
 <main id="main" tabindex="-1">
 
   <header>
-    <span class="badge">GitHub · 2014 – 2024</span>
+    <span class="badge">GitHub · 2014 – 2026</span>
     <h1>GitHub 투명성 보고서</h1>
     <p>GitHub이 보고한 정부 삭제 요청, 사용자 정보 공개 요청(국가 안보 서신 포함), DMCA 삭제 및 우회 주장, 자동 탐지, 이의 제기 및 복원, 그리고 EU-DSA 월간 활성 사용자. tidy-long 형식의 데이터셋으로, 각 행은 dataset × 연도 × 기간 × 정부 × 분류 × 지표로 식별되는 하나의 측정값입니다. 정확한 건수는 하한/상한이 같으며, 국가 안보 서신/명령과 EU-DSA MAU는 구간 범위(하한 ≠ 상한)로 공표되므로 상한을 합산하면 최대 추정치가 됩니다.</p>
   </header>
@@ -639,7 +639,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>연도별 사용자 정보 요청</h3>
-        <p class="chart-sub">받은 요청 수와 법적 절차에 따라 공개된 계정 수(정확한 수치, 2021년부터 보고).</p>
+        <p class="chart-sub">Requests received vs. instances where information was disclosed under legal process (exact counts, reported since 2021; affected-account counts are a separate dataset).</p>
         <div class="chart-loading" id="ui-loading">불러오는 중…</div>
         <canvas id="chart-ui" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-ui-table" class="sr-only"></div>
@@ -663,7 +663,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>연도별 DMCA 삭제 통지</h3>
-        <p class="chart-sub">GitHub가 DMCA에 따라 처리한 저작권 삭제 통지.</p>
+        <p class="chart-sub">Copyright takedown notices GitHub processed under the DMCA (takedown notices only — counter notices and legal-action notices are excluded).</p>
         <div class="chart-loading" id="dmca-loading">불러오는 중…</div>
         <canvas id="chart-dmca" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-dmca-table" class="sr-only"></div>
@@ -673,19 +673,19 @@ display: flex; align-items: center; justify-content: space-between;
   </section>
 
   <div class="data-section">
-    <h2>보고 영역별 보고값</h2>
+    <h2>Dataset coverage by report area</h2>
     <div class="results" id="byDataset" aria-busy="true">
       <p class="loading">불러오는 중…</p>
     </div>
-    <p class="sub">각 보고 영역(<code>dataset</code>)에 대해 모든 연도, 기간, 정부 및 분류에 걸쳐 합산한 상한 건수.</p>
+    <p class="sub">For each report area (<code>dataset</code>), how many reported values the dataset carries. Row counts, not summed quantities — the areas mix stocks (MAU levels), flows (requests) and banded ranges, which cannot be meaningfully added.</p>
   </div>
 
   <div class="data-section">
-    <h2>보고량 기준 상위 분류</h2>
+    <h2>Most-reported categories</h2>
     <div class="results" id="byCategory" aria-busy="true">
       <p class="loading">불러오는 중…</p>
     </div>
-    <p class="sub">상한 건수 합계가 가장 큰 분류. 구간 범위는 상한값으로 기여하므로 합계는 최대 추정치입니다.</p>
+    <p class="sub">The categories with the most reported values. Row counts, not summed quantities — categories span unrelated report areas whose measures are not additive.</p>
   </div>
 
   <p class="hint">이 결과는 <a href="/ko/reports">쿼리 빌더</a>에서 세분화하거나 확장할 수 있고, 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서 확인하거나 <a href="/ko/methodology">방법론</a>을 읽어보세요.</p>
@@ -693,7 +693,7 @@ display: flex; align-items: center; justify-content: space-between;
 </main>
 
 <footer>
-  <p>출처: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub 투명성 보고서</a> — 정부 삭제, 사용자 정보 요청, DMCA, 자동 탐지, 이의 제기 및 EU-DSA MAU (2014–2024). 데이터 제공 <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
+  <p>출처: <a href="https://github.blog/transparency/" target="_blank" rel="noopener noreferrer">GitHub Transparency Report</a> — government takedowns, user-information requests, DMCA, automated detection, appeals, and EU-DSA MAU (2014 onward). Data via <a href="/api">Transparency Report API</a> · <a href="/ko/methodology">Methodology</a> · <a href="/ko/api-key">API key</a> · <a href="/ko/privacy">개인정보</a></p>
   <p class="provenance" id="provenance" hidden><span class="prov-label">스냅샷:</span> <span id="prov-snap"></span> · <span class="prov-label">인용 방법:</span> <span id="prov-cite"></span></p>
 </footer>
 
@@ -894,15 +894,15 @@ display: flex; align-items: center; justify-content: space-between;
 
   // ── Init ──────────────────────────────────────────────────────────────────
   async function init() {
-    var byDataset = {"table":"github_metrics","group_by":["dataset"],"aggregates":[{"function":"SUM","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":30};
-    var byCategory = {"table":"github_metrics","group_by":["category"],"aggregates":[{"function":"SUM","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":15};
+    var byDataset = {"table":"github_metrics","group_by":["dataset"],"aggregates":[{"function":"COUNT","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":30};
+    var byCategory = {"table":"github_metrics","group_by":["category"],"aggregates":[{"function":"COUNT","field_name":"count_high","alias":"count"}],"sort":[{"field_name":"count","order":"desc"}],"max_count":15};
 
     // Chart queries — each pins one dataset (metrics are not comparable across
     // report areas). These datasets carry exact counts, so count_low == count_high.
     var UI_Q   = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["user_info_requests"]}]},"group_by":["year","metric"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
     var GT_Q   = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["government_takedowns_received"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
     var GOV_Q  = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["government_takedowns_received"]}]},"group_by":["government"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10};
-    var DMCA_Q = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["dmca_takedowns"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
+    var DMCA_Q = {"table":"github_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["dmca_takedowns"]},{"operation":"EQ","field_name":"category","field_values":["Takedown notices or counter notice reversal"]}]},"group_by":["year"],"aggregates":[{"function":"SUM","field_name":"count_low","alias":"n"}],"sort":[{"field_name":"year","order":"asc"}],"max_count":100};
 
     // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
     // single failure can't block the rest of the page.
@@ -918,10 +918,11 @@ display: flex; align-items: center; justify-content: space-between;
           (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
         });
         var metrics = Object.keys(byMetric).sort().reverse(); // received before disclosed
-        srTable('chart-ui-table', ["연도"].concat(metrics),
+        var UI_LABELS = { received: "Requests received", disclosed: "Disclosures made" };
+        srTable('chart-ui-table', ["연도"].concat(metrics.map(function (m) { return UI_LABELS[m] || m; })),
           years.map(function (y) { return [y].concat(metrics.map(function (m) { return fmt(byMetric[m][y]); })); }));
         linesChart('chart-ui', 'ui-loading', 'chart-ui-table', years,
-          metrics.map(function (m) { return { label: m, data: years.map(function (y) { return byMetric[m][y] == null ? null : byMetric[m][y]; }) }; }));
+          metrics.map(function (m) { return { label: UI_LABELS[m] || m, data: years.map(function (y) { return byMetric[m][y] == null ? null : byMetric[m][y]; }) }; }));
       }
 
       if (!gt.rows.length) { emptyChart('gt-loading'); } else {

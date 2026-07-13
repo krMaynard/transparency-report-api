@@ -654,7 +654,7 @@ display: flex; align-items: center; justify-content: space-between;
 <main id="main" tabindex="-1">
 
   <header>
-    <span class="badge">Snap · 2024 H2 – 2025 H1</span>
+    <span class="badge">Snap · 2024 H1 – 2024 H2</span>
     <h1>Report di trasparenza di Snap</h1>
     <p>Misure di applicazione di Trust &amp; Safety dichiarate da Snap, richieste di rimozione di contenuti e account e richieste di informazioni da parte di governi (compresa la sicurezza nazionale degli Stati Uniti) e avvisi DMCA/relativi a marchi. Un set di dati tidy-long: ogni riga è un valore misurato identificato da periodo × sezione × categoria × sottocategorie × metrica. Le cifre <strong>non sono comparabili tra le sezioni</strong> e alcune metriche sono <strong>mediane</strong> — quindi non possono essere sommate; questa pagina fissa una singola sezione e metrica per ciascuna tabella.</p>
   </header>
@@ -713,7 +713,7 @@ display: flex; align-items: center; justify-content: space-between;
   <!-- ── Richieste di informazioni del governo degli Stati Uniti ─────────────────────── -->
   <section class="data-section">
     <h2>Richieste di informazioni del governo degli Stati Uniti</h2>
-    <p class="sub">I totali dichiarati per metrica all'interno della sezione United States Government Information Requests.</p>
+    <p class="sub">The reported count totals per metric within the United States Government Information Requests section. The per-request-type disclosure percentages are excluded — a percentage cannot be summed.</p>
     <div class="results" id="usGov" aria-busy="true">
       <div class="results-loading">Caricamento…</div>
     </div>
@@ -919,7 +919,7 @@ display: flex; align-items: center; justify-content: space-between;
   var SEC_INTL = "International Government Information " + 'Requests';
   var SEC_ADS = "Ads " + 'Moderation';
   function VIO_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_GLOBAL]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}],"not":[{"operation":"EQ","field_name":"sub_category_1","field_values":["Reactive and Proactive"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":20}; }
-  function CTY_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_COUNTRY]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  function CTY_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_TS]},{"operation":"EQ","field_name":"category","field_values":[CAT_COUNTRY]},{"operation":"EQ","field_name":"metric","field_values":["total_enforcements"]},{"operation":"EQ","field_name":"sub_category_2","field_values":["Reactive and Proactive"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function GOV_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_INTL]},{"operation":"EQ","field_name":"metric","field_values":["other_information_requests"]}]},"group_by":["sub_category_1"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function ADS_Q() { return {"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":[SEC_ADS]}]},"group_by":["period","metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":20}; }
 
@@ -973,7 +973,7 @@ display: flex; align-items: center; justify-content: space-between;
 
     // Richieste di informazioni del governo degli Stati Uniti: SUM per metric within that section.
     try {
-      var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
+      var d2 = await explore({"table":"snap_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["United States Government Information Requests"]}],"not":[{"operation":"EQ","field_name":"metric","field_values":["percentage_of_requests_where_some_data_was_produced"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"value"}],"sort":[{"field_name":"value","order":"desc"}],"max_count":30});
       renderTable('usGov', d2.rows || [], "Richieste di informazioni del governo degli Stati Uniti a Snap, totalizzate per metrica.", 'Metrica', 'Totale');
       if (d2.generated) fillProvenance(d2.generated, d2.version);
     } catch (err) {

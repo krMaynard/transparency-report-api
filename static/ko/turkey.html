@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>반기별 당국 삭제 요청</h3>
-        <p class="chart-sub">사법·행정 당국(제8조/8-A조)의 삭제 요청 총계를 반기별로, 플랫폼마다 한 선으로 표시.</p>
+        <p class="chart-sub">사법·행정 당국(제8조/8-A조)의 삭제 요청 총계를 반기별로, 플랫폼마다 한 선으로 표시. Meta's bundled Facebook + Instagram counts make the two lines overlap — they are one shared figure, not additive.</p>
         <div class="chart-loading" id="req-loading">불러오는 중…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>요청 주체별 요청(최근 반기)</h3>
-        <p class="chart-sub">가장 최근 반기의 당국 요청을 출처별(ICTA, 소비자정책 채널, 법원 명령)로, 플랫폼마다 표시.</p>
+        <p class="chart-sub">가장 최근 반기의 당국 요청을 출처별(ICTA, 소비자정책 채널, 법원 명령)로, 플랫폼마다 표시. Meta files identical bundled Facebook + Instagram figures under each platform, so the two bars repeat one shared count — don't add them.</p>
         <div class="chart-loading" id="cty-loading">불러오는 중…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -1022,11 +1022,13 @@ display: flex; align-items: center; justify-content: space-between;
     var dsets = platforms.map(function (p) {
       return { label: p, data: sources.map(function (m) {
         var hit = cur.find(function (r) { return r[1] === p && r[2] === m; });
-        return hit ? hit[3] : 0;
+        // null (not 0) when a channel wasn't reported, so the chart shows a
+        // gap instead of a false zero.
+        return hit ? hit[3] : null;
       }) };
     });
     srTable('chart-cty-table', ["당국 (" + latest + ")"].concat(platforms),
-      sources.map(function (m, i) { return [labels[i]].concat(dsets.map(function (d) { return fmt(d.data[i]); })); }));
+      sources.map(function (m, i) { return [labels[i]].concat(dsets.map(function (d) { return d.data[i] == null ? '\u2014' : fmt(d.data[i]); })); }));
     vbarsChart('chart-cty', 'cty-loading', 'chart-cty-table', labels, dsets);
   }
 
@@ -1049,7 +1051,7 @@ display: flex; align-items: center; justify-content: space-between;
     // Authority requests by source, summed over all half-years (Instagram only,
     // since authority counts can bundle Facebook + Instagram).
     try {
-      var d = await explore({"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Instagram"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
+      var d = await explore({"table":"turkey_metrics","query":{"and":[{"operation":"EQ","field_name":"platform","field_values":["Instagram"]},{"operation":"EQ","field_name":"section","field_values":["authority_requests"]},{"operation":"IN","field_name":"metric","field_values":["requests_icta","requests_consumer_policy","requests_court_orders"]}]},"group_by":["metric"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10});
       var rows = (d.rows || []).map(function (r) { return [AUTHORITY_LABELS[r[0]] || r[0], r[1]]; });
       renderTable('outcome합계s', rows, "Instagram에 대한 당국 요청을 요청 주체별로 합산.", "요청 주체", "총 요청");
       fillProvenance(d.generated, d.version);

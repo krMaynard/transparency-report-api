@@ -1932,6 +1932,16 @@ def build_google_traffic_db(data: dict[str, Any], db_path: str) -> int:
     rows = data.get("rows")
     if rows is None:
         raise ValueError("google traffic dataset is missing 'rows'")
+    # A couple of rows carry only an end date (no start_date, so no `year` in
+    # the source). Derive year from the end date so those disruptions remain
+    # reachable through the Year filter/facet instead of matching only "All".
+    i_end, i_year = expected_cols.index("end_date"), expected_cols.index("year")
+    fixed = []
+    for r in rows:
+        if r[i_year] is None and r[i_end]:
+            r = list(r)
+            r[i_year] = int(str(r[i_end])[:4])
+        fixed.append(r)
     conn = sqlite3.connect(db_path)
     try:
         with conn:
@@ -1939,9 +1949,9 @@ def build_google_traffic_db(data: dict[str, Any], db_path: str) -> int:
                 "INSERT INTO google_traffic (country, iso2, product, start_date, "
                 "end_date, year, source, source_url, title, excerpt, "
                 "disruption_url) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-                rows,
+                fixed,
             )
-        return len(rows)
+        return len(fixed)
     finally:
         conn.close()
 

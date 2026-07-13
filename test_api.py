@@ -345,6 +345,34 @@ class TestQueryLifecycle:
         r = client.get(f"/api/jobs/{job['job_id']}/result", headers=MOMO)
         assert any("double-count" in w for w in r.json().get("warnings", []))
 
+    def test_job_truncation_is_flagged_not_silent(self):
+        # A job whose result is cut at max_count must say so: the job object and
+        # the result body carry truncated=true (regression — the runner used to
+        # return a silently short row set).
+        job = _submit_and_wait({
+            "table": "t4_notices", "group_by": ["service_name", "category_label"],
+            "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+            "max_count": 1,
+        })
+        assert job["status"] == "done"
+        assert job["truncated"] is True
+        assert job["row_count"] == 1
+        body = client.get(f"/api/jobs/{job['job_id']}/result", headers=MOMO).json()
+        assert body["truncated"] is True and len(body["rows"]) == 1
+
+    def test_job_not_truncated_at_exact_row_count(self):
+        # Exactly max_count rows without more behind them is NOT truncation.
+        job = _submit_and_wait({
+            "table": "t4_notices",
+            "group_by": ["service_name"],
+            "query": {"and": [{"operation": "EQ", "field_name": "service_name",
+                               "field_values": ["YouTube"]}]},
+            "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
+            "max_count": 1,
+        })
+        assert job["status"] == "done"
+        assert job["truncated"] is False
+
     def test_offset_pagination(self):
         base = {"table": "t4_notices", "group_by": ["service_name"],
                 "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}],
@@ -1488,15 +1516,17 @@ class TestTrafficDisruptions:
         assert d["count"] == d["total"] == 4
         assert d["country_count"] == 4 and d["product_count"] == 2
         assert set(d["facets"]) == {"country", "product", "year"}
-        # Years are the non-null start-date years, sorted.
-        assert d["facets"]["year"] == ["2009", "2021"]
+        # Years include end-date-only rows (their year is derived from the end
+        # date at seed time, so the Year filter can still reach them), sorted.
+        assert d["facets"]["year"] == ["2009", "2011", "2021"]
         assert d["facets"]["product"] == ["Web Search", "YouTube"]
         # Ordered by start_date with nulls last, so Syria (no start date) is last.
         assert [row["country"] for row in d["rows"]] == \
             ["Bangladesh", "Sudan", "Burkina Faso", "Syria"]
-        # The Syria row's missing start date surfaces as JSON null, not a crash.
+        # The Syria row's missing start date surfaces as JSON null, not a crash,
+        # and its year is derived from the end date so filters still reach it.
         syria = next(row for row in d["rows"] if row["country"] == "Syria")
-        assert syria["start_date"] is None and syria["year"] is None
+        assert syria["start_date"] is None and syria["year"] == "2011"
         assert syria["end_date"] == "2011-02-08"
 
     def test_catalogue_carries_provenance(self):
@@ -1898,6 +1928,53 @@ class TestExplore:
              "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
         assert "warnings" not in client.post("/api/explore", json=q).json()
 
+    def test_explore_not_clause_does_not_count_as_pin(self):
+        # A NOT condition excludes one value but still spans every other value
+        # of the field, so it must NOT suppress the grain/unit advisories
+        # (regression: not_/or_ fields used to count as "pinned").
+        q = {"table": "snap_metrics",
+             "query": {"not": [
+                 {"operation": "EQ", "field_name": "section", "field_values": ["Ads Moderation"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["total_ads_removed"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        warns = client.post("/api/explore", json=q).json().get("warnings", [])
+        assert any("section" in w for w in warns)
+        assert any("'metric'" in w for w in warns)
+
+    def test_explore_warns_on_snap_median_via_group_by(self):
+        # Grouping by metric still SUMs each metric's rows — a summed median per
+        # group is as meaningless as a summed median overall.
+        q = {"table": "snap_metrics", "group_by": ["section", "metric"],
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        warns = client.post("/api/explore", json=q).json().get("warnings", [])
+        assert any("median" in w.lower() for w in warns)
+
+    def test_explore_warns_on_apple_ns_band_sum(self):
+        q = {"table": "apple_national_security", "group_by": ["request_type"],
+             "aggregates": [{"function": "SUM", "field_name": "requests_low", "alias": "n"}]}
+        warns = client.post("/api/explore", json=q).json().get("warnings", [])
+        assert any("banded" in w.lower() for w in warns)
+
+    def test_explore_warns_on_github_unpinned_dataset(self):
+        q = {"table": "github_metrics",
+             "aggregates": [{"function": "SUM", "field_name": "count_high", "alias": "n"}]}
+        warns = client.post("/api/explore", json=q).json().get("warnings", [])
+        assert any("dataset" in w for w in warns)
+
+    def test_explore_warns_on_pinned_rate_sum(self):
+        # Pinning the grain doesn't make a percent summable — an explicit SUM
+        # over percent-unit rows still warns.
+        q = {"table": "india_metrics",
+             "query": {"and": [
+                 {"operation": "EQ", "field_name": "unit", "field_values": ["percent"]},
+                 {"operation": "EQ", "field_name": "section", "field_values": ["content_actioned_proactive"]},
+                 {"operation": "EQ", "field_name": "metric", "field_values": ["proactive_rate"]},
+             ]},
+             "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}]}
+        warns = client.post("/api/explore", json=q).json().get("warnings", [])
+        assert any("not additive" in w or "rate" in w.lower() for w in warns)
+
     def test_explore_reserved_word_alias(self):
         # Aliases are emitted double-quoted, so a SQL keyword like 'values' is a
         # valid output-column name (regression: the /snap page's first panel used
@@ -2057,6 +2134,19 @@ class TestCompositeQueries:
         p1 = client.post("/api/explore", json={**base, "offset": 1}).json()["rows"]
         assert p0a and p0a == p0b                 # repeated pull is byte-identical
         assert p1 and p0a[0][0] != p1[0][0]       # page 2 is a different row
+
+    def test_additive_derived_treats_missing_leg_as_zero(self):
+        # A service present in only one leg used to get NULL from `a + b` and
+        # silently vanish from sums/rankings; additive terms now COALESCE to 0.
+        # Division (see the ratio tests) still propagates NULL — a rate with a
+        # missing operand stays undefined.
+        q = _ratio_query(derived=[{"alias": "combined", "expr": "actions.a + appeals.p"}],
+                         sort=[])
+        r = client.post("/api/explore", json=q)
+        assert r.status_code == 200
+        rows = {row[0]: row for row in r.json()["rows"]}
+        assert rows["YouTube"][3] == 1009      # 9 + 1000
+        assert rows["Facebook"][3] == 500      # no t5 rows -> counted as 0, kept
 
     def test_division_is_real_not_integer(self):
         # SUM of INTEGER columns must not integer-divide (9/1000 → 0).

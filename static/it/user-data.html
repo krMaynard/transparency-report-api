@@ -655,7 +655,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Google · Semestrale · 2009 – 2025</span>
     <h1>Richieste di dati utenti Google</h1>
-    <p>Le richieste governative di informazioni sugli utenti dichiarate da Google, dall'esportazione in blocco del Transparency Report: richieste, account e quota di richieste con divulgazione di dati, per paese × procedura legale, più il segmento diplomatico/MLAT, le richieste Enterprise Cloud (GCP e Google Workspace) e le cifre di sicurezza nazionale USA (FISA e National Security Letters), pubblicate solo come <strong>intervalli</strong>. Un set di dati tidy-long: ogni riga è un valore misurato identificato da dataset × semestre × paese × procedura legale × metrica. Gli intervalli non sono additivi e le percentuali non vanno mai sommate — e 2012 H2 – 2014 H1 dichiarano un aggregato 'All' accanto alla ripartizione per procedura, quindi ogni vista di questa pagina fissa una singola granularità.</p>
+    <p>Google's reported government requests for user information, from the Transparency Report bulk export: requests, accounts and the share of requests where some data was disclosed, per country × legal process, plus the diplomatic/MLAT slice, Enterprise Cloud (GCP and Google Workspace) requests, and the US national-security figures (FISA and National Security Letters), which are reportable only as <strong>banded ranges</strong>. A tidy-long dataset: each row is one measured value identified by dataset × half-year × country × legal process × metric. Ranges are not additive and percentages must never be summed — and 2012 H2 – 2014 H1 report an 'All' aggregate alongside the per-process split — the charts below pick the correct grain for each view (the two grains are disjoint, so the global totals sum both).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Richieste globali di dati utenti</h3>
-        <p class="chart-sub">Richieste ricevute per semestre: la somma delle cifre per procedura (dal 2012 H2) accanto all'aggregato 'All' dichiarato da Google per i primi periodi.</p>
+        <p class="chart-sub">Richieste received worldwide per half-year. Google filed early periods as an 'All'-process aggregate and later ones as a per-process split — the two grains never overlap for the same country and period, so their sum is the exact global total.</p>
         <div class="chart-loading" id="req-loading">Caricamento…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Top 10 paesi per richieste</h3>
-        <p class="chart-sub">Paesi classificati per richieste di dati utenti, cifre per procedura sommate (dal 2012 H2; i primi periodi solo-'All' sono esclusi per evitare doppi conteggi).</p>
+        <p class="chart-sub">Countries ranked by user-data requests, all periods combined. The early 'All'-grain filings and the later per-process split are disjoint, so summing both grains counts every request exactly once.</p>
         <div class="chart-loading" id="cty-loading">Caricamento…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Richieste per procedura legale</h3>
-        <p class="chart-sub">Richieste di dati utenti per tipo di procedura legale, tutti i periodi combinati (aggregato 'All' escluso).</p>
+        <p class="chart-sub">Richieste di dati utenti per tipo di procedura legale, tutti i periodi combinati (aggregato 'All' escluso). The per-process breakdown covers only the United States before 2014 H2, so early periods contribute US volume only.</p>
         <div class="chart-loading" id="prc-loading">Caricamento…</div>
         <canvas id="chart-prc" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-prc-table" class="sr-only"></div>
@@ -951,26 +951,25 @@ display: flex; align-items: center; justify-content: space-between;
 
   // Chart queries. Filter values are dataset codes, so the localization
   // generator's prose find/replace can never rewrite them.
-  function REQ_SPLIT_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function REQ_ALL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  // The 'All' legal-process grain and the per-process split are DISJOINT
+  // complements: no (country, period) carries both (during 2012 H2 – 2014 H1
+  // only the US is split; every other country files only 'All'). So the true
+  // global total is the unfiltered sum across both grains — filtering either
+  // grain out drops real volume.
+  function REQ_TOTAL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
+  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function PRC_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["legal_process"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":15}; }
   function NSL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["us_nsl"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"lo"},{"function":"SUM","field_name":"value_high","alias":"hi"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
 
-  function renderCharts(reqSplit, reqAll, cty, prc, nsl) {
-    if (!reqSplit.rows.length && !reqAll.rows.length) { emptyChart('req-loading'); } else {
-      var byPeriod = {};
-      reqSplit.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).split = r[1]; });
-      reqAll.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).all = r[1]; });
-      var periods = Object.keys(byPeriod).sort();
-      var splitLbl = "Somma delle cifre per procedura";
-      var allLbl = "Aggregato 'All' come dichiarato";
-      srTable('chart-req-table', ["Semestre", splitLbl, allLbl],
-        periods.map(function (p) { return [p, fmt(byPeriod[p].split), fmt(byPeriod[p].all)]; }));
-      linesChart('chart-req', 'req-loading', 'chart-req-table', periods, [
-        { label: splitLbl, data: periods.map(function (p) { return byPeriod[p].split == null ? null : byPeriod[p].split; }) },
-        { label: allLbl, data: periods.map(function (p) { return byPeriod[p].all == null ? null : byPeriod[p].all; }) },
-      ]);
+  function renderCharts(reqTotale, cty, prc, nsl) {
+    if (!reqTotale.rows.length) { emptyChart('req-loading'); } else {
+      var lbl = "Richieste received";
+      srTable('chart-req-table', ["Semestre", lbl],
+        reqTotale.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      linesChart('chart-req', 'req-loading', 'chart-req-table',
+        reqTotale.rows.map(function (r) { return r[0]; }), [
+          { label: lbl, data: reqTotale.rows.map(function (r) { return r[1]; }) },
+        ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
       srTable('chart-cty-table', ["Paese", "Richieste"],
@@ -1025,8 +1024,8 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(REQ_SPLIT_Q()), soft(REQ_ALL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4]);
+  Promise.all([soft(REQ_TOTAL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3]);
   });
 })();
 </script>

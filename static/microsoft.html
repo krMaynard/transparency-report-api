@@ -943,7 +943,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   // Chart queries. Filter values are dataset codes, so the localization
   // generator's prose find/replace can never rewrite them.
-  var SECTION_LABELS = { "combined": "Combined (2013\u20132016)", "skype": "Skype (2013)", "criminal": "Criminal", "emergencies": "Emergencies", "civil": "Civil" };
+  var SECTION_LABELS = { "combined": "Combined (2013\u20132016)", "skype": "Skype (2013; also included in Combined)", "criminal": "Criminal", "emergencies": "Emergencies", "civil": "Civil" };
   var OUTCOME_LABELS = { "disclosed_content": "Content disclosed", "disclosed_noncontent": "Non-content data only", "no_data_found": "No data found", "rejected": "Rejected", "requests": "Requests", "accounts_specified": "Accounts specified" };
   function REQ_Q() { return {"table":"microsoft_metrics","query":{"and":[{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period","section"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":150}; }
   function CTY_Q() { return {"table":"microsoft_metrics","query":{"and":[{"operation":"EQ","field_name":"section","field_values":["criminal"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }

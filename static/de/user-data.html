@@ -655,7 +655,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Google · Halbjährlich · 2009 – 2025</span>
     <h1>Google-Nutzerdaten-Anfragen</h1>
-    <p>Googles gemeldete behördliche Anfragen nach Nutzerinformationen aus dem Bulk-Export des Transparency Report: Anfragen, Konten und der Anteil der Anfragen mit Offenlegung, pro Land × Rechtsverfahren, plus der diplomatische/MLAT-Anteil, Enterprise-Cloud-Anfragen (GCP und Google Workspace) und die US-Sicherheitszahlen (FISA und National Security Letters), die nur als <strong>Bandbreiten</strong> berichtet werden. Ein Tidy-Long-Datensatz: Jede Zeile ist ein gemessener Wert, identifiziert durch Datensatz × Halbjahr × Land × Rechtsverfahren × Metrik. Bandbreiten sind nicht additiv, Prozentsätze dürfen nie summiert werden — und 2012 H2 – 2014 H1 melden ein 'All'-Aggregat neben der Aufschlüsselung, daher legt jede Ansicht dieser Seite eine einzelne Granularität fest.</p>
+    <p>Google's reported government requests for user information, from the Transparency Report bulk export: requests, accounts and the share of requests where some data was disclosed, per country × legal process, plus the diplomatic/MLAT slice, Enterprise Cloud (GCP and Google Workspace) requests, and the US national-security figures (FISA and National Security Letters), which are reportable only as <strong>banded ranges</strong>. A tidy-long dataset: each row is one measured value identified by dataset × half-year × country × legal process × metric. Ranges are not additive and percentages must never be summed — and 2012 H2 – 2014 H1 report an 'All' aggregate alongside the per-process split — the charts below pick the correct grain for each view (the two grains are disjoint, so the global totals sum both).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Weltweite Anfragen nach Nutzerdaten</h3>
-        <p class="chart-sub">Eingegangene Anfragen pro Halbjahr: die Summe der Zahlen pro Verfahren (ab 2012 H2) neben dem 'All'-Aggregat, das Google für die frühen Perioden meldete.</p>
+        <p class="chart-sub">Anfragen received worldwide per half-year. Google filed early periods as an 'All'-process aggregate and later ones as a per-process split — the two grains never overlap for the same country and period, so their sum is the exact global total.</p>
         <div class="chart-loading" id="req-loading">Wird geladen…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Top 10 Länder nach Anfragen</h3>
-        <p class="chart-sub">Länder nach Nutzerdaten-Anfragen, Zahlen pro Verfahren summiert (ab 2012 H2; die frühen Nur-'All'-Perioden sind ausgeschlossen, um Doppelzählung zu vermeiden).</p>
+        <p class="chart-sub">Countries ranked by user-data requests, all periods combined. The early 'All'-grain filings and the later per-process split are disjoint, so summing both grains counts every request exactly once.</p>
         <div class="chart-loading" id="cty-loading">Wird geladen…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Anfragen nach Rechtsverfahren</h3>
-        <p class="chart-sub">Nutzerdaten-Anfragen pro Rechtsverfahrenstyp, alle Perioden zusammen ('All'-Aggregat ausgeschlossen).</p>
+        <p class="chart-sub">Nutzerdaten-Anfragen pro Rechtsverfahrenstyp, alle Perioden zusammen ('All'-Aggregat ausgeschlossen). The per-process breakdown covers only the United States before 2014 H2, so early periods contribute US volume only.</p>
         <div class="chart-loading" id="prc-loading">Wird geladen…</div>
         <canvas id="chart-prc" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-prc-table" class="sr-only"></div>
@@ -951,26 +951,25 @@ display: flex; align-items: center; justify-content: space-between;
 
   // Chart queries. Filter values are dataset codes, so the localization
   // generator's prose find/replace can never rewrite them.
-  function REQ_SPLIT_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function REQ_ALL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]},{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
-  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
+  // The 'All' legal-process grain and the per-process split are DISJOINT
+  // complements: no (country, period) carries both (during 2012 H2 – 2014 H1
+  // only the US is split; every other country files only 'All'). So the true
+  // global total is the unfiltered sum across both grains — filtering either
+  // grain out drops real volume.
+  function REQ_TOTAL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
+  function CTY_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["country"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":10}; }
   function PRC_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["global"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}],"not":[{"operation":"EQ","field_name":"legal_process","field_values":["All"]}]},"group_by":["legal_process"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"n"}],"sort":[{"field_name":"n","order":"desc"}],"max_count":15}; }
   function NSL_Q() { return {"table":"google_userdata_metrics","query":{"and":[{"operation":"EQ","field_name":"dataset","field_values":["us_nsl"]},{"operation":"EQ","field_name":"metric","field_values":["requests"]}]},"group_by":["period"],"aggregates":[{"function":"SUM","field_name":"value_low","alias":"lo"},{"function":"SUM","field_name":"value_high","alias":"hi"}],"sort":[{"field_name":"period","order":"asc"}],"max_count":50}; }
 
-  function renderCharts(reqSplit, reqAll, cty, prc, nsl) {
-    if (!reqSplit.rows.length && !reqAll.rows.length) { emptyChart('req-loading'); } else {
-      var byPeriod = {};
-      reqSplit.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).split = r[1]; });
-      reqAll.rows.forEach(function (r) { (byPeriod[r[0]] = byPeriod[r[0]] || {}).all = r[1]; });
-      var periods = Object.keys(byPeriod).sort();
-      var splitLbl = "Summe der Zahlen pro Verfahren";
-      var allLbl = "'All'-Aggregat wie gemeldet";
-      srTable('chart-req-table', ["Halbjahr", splitLbl, allLbl],
-        periods.map(function (p) { return [p, fmt(byPeriod[p].split), fmt(byPeriod[p].all)]; }));
-      linesChart('chart-req', 'req-loading', 'chart-req-table', periods, [
-        { label: splitLbl, data: periods.map(function (p) { return byPeriod[p].split == null ? null : byPeriod[p].split; }) },
-        { label: allLbl, data: periods.map(function (p) { return byPeriod[p].all == null ? null : byPeriod[p].all; }) },
-      ]);
+  function renderCharts(reqGesamt, cty, prc, nsl) {
+    if (!reqGesamt.rows.length) { emptyChart('req-loading'); } else {
+      var lbl = "Anfragen received";
+      srTable('chart-req-table', ["Halbjahr", lbl],
+        reqGesamt.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
+      linesChart('chart-req', 'req-loading', 'chart-req-table',
+        reqGesamt.rows.map(function (r) { return r[0]; }), [
+          { label: lbl, data: reqGesamt.rows.map(function (r) { return r[1]; }) },
+        ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {
       srTable('chart-cty-table', ["Land", "Anfragen"],
@@ -1025,8 +1024,8 @@ display: flex; align-items: center; justify-content: space-between;
   // Chart queries fail soft ({rows:[]} -> per-chart "no data" state) so a
   // single failure can't block the rest of the page.
   var soft = function (q) { return explore(q).catch(function (err) { console.error(err); return { rows: [] }; }); };
-  Promise.all([soft(REQ_SPLIT_Q()), soft(REQ_ALL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
-    renderCharts(cs[0], cs[1], cs[2], cs[3], cs[4]);
+  Promise.all([soft(REQ_TOTAL_Q()), soft(CTY_Q()), soft(PRC_Q()), soft(NSL_Q())]).then(function (cs) {
+    renderCharts(cs[0], cs[1], cs[2], cs[3]);
   });
 })();
 </script>
