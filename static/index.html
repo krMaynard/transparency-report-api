@@ -1108,7 +1108,7 @@ function drawTabChart(labels, data, nameLabel, valueLabel, colorKey) {
     type: "bar",
     data: { labels, datasets: [{ label: valueLabel, data, backgroundColor: TAB_COLORS[colorKey] || TAB_COLORS.blue, borderRadius: 4 }] },
     options: { indexAxis: "y", plugins: { legend: { display: false } },
-      scales: { x: {  },
+      scales: { x: {},
                 y: { grid: { display: false } } } },
   });
 }
@@ -1189,7 +1189,7 @@ function drawStackedChart(labels, series, nameLabel, valueLabel) {
     type: "bar",
     data: { labels, datasets: series.map(s => ({ label: s.label, data: s.data, backgroundColor: s.color, borderRadius: 4 })) },
     options: { indexAxis: "y", plugins: { legend: { display: true } },
-      scales: { x: { stacked: true,  },
+      scales: { x: { stacked: true },
                 y: { stacked: true, grid: { display: false } } } },
   });
 }
@@ -1414,7 +1414,7 @@ async function runExplore() {
       data: { labels, datasets: [{ label: legend, data: values, backgroundColor: "#3fb950", borderRadius: 4 }] },
       options: {
         indexAxis: "y", plugins: { legend: { display: false } },
-        scales: { x: {  },
+        scales: { x: {},
                   y: { grid: { display: false } } },
       },
     });
@@ -1580,7 +1580,7 @@ async function runCompare() {
                            backgroundColor: "#d29922", borderRadius: 4 }] },
       options: {
         indexAxis: "y", plugins: { legend: { display: false } },
-        scales: { x: {  },
+        scales: { x: {},
                   y: { grid: { display: false } } },
       },
     });
@@ -1626,7 +1626,7 @@ function renderRows(d, chartSel, outSel, legend) {
       type: "bar",
       data: { labels: d.rows.map(r => r[0]), datasets: [{ label: legend, data: d.rows.map(r => r[1]), backgroundColor: "#a371f7", borderRadius: 4 }] },
       options: { indexAxis: "y", plugins: { legend: { display: false } },
-        scales: { x: {  },
+        scales: { x: {},
                   y: { grid: { display: false } } } },
     });
     if (chartSel === "#ask-chart") askChart = c;
