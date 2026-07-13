@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>無効化アカウントの推移</h3>
-        <p class="chart-sub">ポリシー違反により無効化されたアカウント（期間ごと）。 Discord switched from quarterly to half-yearly reports in 2024, so the two series cover different-length windows and are not directly comparable; 2022 Q4 was not reported.</p>
+        <p class="chart-sub">ポリシー違反により無効化されたアカウント数（報告期間ごと）。Discord は 2024 年に四半期報告から半期報告へ移行したため、2 つの系列は長さの異なる期間を対象としており、直接比較できません。2022 年第 4 四半期は報告されていません。</p>
         <div class="chart-loading" id="req-loading">読み込み中…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>国際的な政府要請：上位の国</h3>
-        <p class="chart-sub">Countries ranked by international government information requests, 2023 Q2 onward — earlier reports break out only US legal process, with no per-country international table.</p>
+        <p class="chart-sub">国際的な政府情報リクエスト数の国別ランキング（2023 年第 2 四半期以降）。それ以前のレポートは米国の法的手続きのみを内訳としており、国別の国際テーブルはありません。</p>
         <div class="chart-loading" id="rem-loading">読み込み中…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
@@ -965,11 +965,11 @@ display: flex; align-items: center; justify-content: space-between;
       // into two labelled series instead.
       var labels = req.rows.map(function (r) { return r[0]; });
       var isH = function (pd) { return pd.indexOf('-H') >= 0; };
-      srTable('chart-req-table', ["期間", "無効化アカウント"],
+      srTable('chart-req-table', ["期間", "無効化されたアカウント"],
         req.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       linesChart('chart-req', 'req-loading', 'chart-req-table', labels, [
-        { label: "Per quarter (2022–2023)", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
-        { label: "Per half-year (2024+)", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
+        { label: "四半期ごと（2022–2023）", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
+        { label: "半期ごと（2024 年以降）", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
       ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {

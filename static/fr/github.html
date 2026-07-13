@@ -639,7 +639,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Demandes d'informations sur les utilisateurs par an</h3>
-        <p class="chart-sub">Requests received vs. instances where information was disclosed under legal process (exact counts, reported since 2021; affected-account counts are a separate dataset).</p>
+        <p class="chart-sub">Demandes reçues vs cas où des informations ont été divulguées dans le cadre d'une procédure légale (comptes exacts, déclaré depuis 2021 ; le nombre de comptes concernés constitue un jeu de données distinct).</p>
         <div class="chart-loading" id="ui-loading">Chargement…</div>
         <canvas id="chart-ui" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-ui-table" class="sr-only"></div>
@@ -663,7 +663,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Avis de retrait DMCA par an</h3>
-        <p class="chart-sub">Copyright takedown notices GitHub processed under the DMCA (takedown notices only — counter notices and legal-action notices are excluded).</p>
+        <p class="chart-sub">Avis de retrait pour droit d'auteur traités par GitHub au titre du DMCA (avis de retrait uniquement — les contre-avis et les avis d'action en justice sont exclus).</p>
         <div class="chart-loading" id="dmca-loading">Chargement…</div>
         <canvas id="chart-dmca" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-dmca-table" class="sr-only"></div>
@@ -673,19 +673,19 @@ display: flex; align-items: center; justify-content: space-between;
   </section>
 
   <div class="data-section">
-    <h2>Dataset coverage by report area</h2>
+    <h2>Couverture du jeu de données par domaine de rapport</h2>
     <div class="results" id="byDataset" aria-busy="true">
       <p class="loading">Chargement…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), how many reported values the dataset carries. Row counts, not summed quantities — the areas mix stocks (MAU levels), flows (requests) and banded ranges, which cannot be meaningfully added.</p>
+    <p class="sub">Pour chaque domaine de rapport (<code>dataset</code>), le nombre de valeurs déclarées que contient le jeu de données. Des comptes de lignes, pas des quantités additionnées — les domaines mêlent des stocks (niveaux de MAU), des flux (demandes) et des fourchettes, qui ne peuvent pas être additionnés de manière significative.</p>
   </div>
 
   <div class="data-section">
-    <h2>Most-reported categories</h2>
+    <h2>Catégories les plus déclarées</h2>
     <div class="results" id="byCategory" aria-busy="true">
       <p class="loading">Chargement…</p>
     </div>
-    <p class="sub">The categories with the most reported values. Row counts, not summed quantities — categories span unrelated report areas whose measures are not additive.</p>
+    <p class="sub">Les catégories comptant le plus de valeurs déclarées. Des comptes de lignes, pas des quantités additionnées — les catégories couvrent des domaines de rapport sans lien dont les mesures ne sont pas additives.</p>
   </div>
 
   <p class="hint">Affinez ou étendez ces résultats dans le <a href="/fr/reports">générateur de requêtes</a>, parcourez la liste complète des champs sur la page <a href="/fr/schema">Schéma</a>, ou lisez la <a href="/fr/methodology">Méthodologie</a>.</p>
@@ -918,7 +918,7 @@ display: flex; align-items: center; justify-content: space-between;
           (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
         });
         var metrics = Object.keys(byMetric).sort().reverse(); // received before disclosed
-        var UI_LABELS = { received: "Requests received", disclosed: "Disclosures made" };
+        var UI_LABELS = { received: "Demandes reçues", disclosed: "Divulgations effectuées" };
         srTable('chart-ui-table', ["Année"].concat(metrics.map(function (m) { return UI_LABELS[m] || m; })),
           years.map(function (y) { return [y].concat(metrics.map(function (m) { return fmt(byMetric[m][y]); })); }));
         linesChart('chart-ui', 'ui-loading', 'chart-ui-table', years,

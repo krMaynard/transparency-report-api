@@ -764,13 +764,13 @@ async function runSearch() {
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `Searching ${fmt(d.page_total)} passages from ${fmt(d.companies.length)} companies. Type a word or phrase above.`;
+      `Se buscan ${fmt(d.page_total)} pasajes de ${fmt(d.companies.length)} empresas. Escribe una palabra o frase arriba.`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `Showing ${fmt(d.count)} of ${fmt(d.total)} matching passages for “${q}”, ranked by relevance.`
-    : `No passages match “${q}”.`;
+    ? `Mostrando ${fmt(d.count)} de ${fmt(d.total)} pasajes coincidentes para “${q}”, ordenados por relevancia.`
+    : `Ningún pasaje coincide con “${q}”.`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
@@ -814,7 +814,7 @@ async function setupNarratives() {
   if (d.mark_close) MARK_CLOSE = d.mark_close;
   fillFacets(d);
   $("#nsummary").textContent =
-    `Searching ${fmt(d.page_total)} passages from ${fmt(d.companies.length)} companies. Type a word or phrase above.`;
+    `Se buscan ${fmt(d.page_total)} pasajes de ${fmt(d.companies.length)} empresas. Escribe una palabra o frase arriba.`;
   fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });

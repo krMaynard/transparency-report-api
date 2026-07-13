@@ -655,7 +655,7 @@ display: flex; align-items: center; justify-content: space-between;
   <header>
     <span class="badge">Google · Semestriel · 2009 – 2025</span>
     <h1>Demandes de données utilisateurs Google</h1>
-    <p>Google's reported government requests for user information, from the Transparency Report bulk export: requests, accounts and the share of requests where some data was disclosed, per country × legal process, plus the diplomatic/MLAT slice, Enterprise Cloud (GCP and Google Workspace) requests, and the US national-security figures (FISA and National Security Letters), which are reportable only as <strong>banded ranges</strong>. A tidy-long dataset: each row is one measured value identified by dataset × half-year × country × legal process × metric. Ranges are not additive and percentages must never be summed — and 2012 H2 – 2014 H1 report an 'All' aggregate alongside the per-process split — the charts below pick the correct grain for each view (the two grains are disjoint, so the global totals sum both).</p>
+    <p>Google's reported government requests for user information, from the Transparency Report bulk export: requests, accounts and the share of requests where some data was disclosed, per country × legal process, plus the diplomatic/MLAT slice, Enterprise Cloud (GCP and Google Workspace) requests, and the US national-security figures (FISA and National Security Letters), which are reportable only as <strong>banded ranges</strong>. A tidy-long dataset: each row is one measured value identified by dataset × half-year × country × legal process × metric. Ranges are not additive and percentages must never be summed — and 2012 H2 – 2014 H1 report an 'All' aggregate alongside the per-process split — les graphiques ci-dessous choisissent la granularité correcte pour chaque vue (les deux granularités sont disjointes, les totaux mondiaux les additionnent donc toutes deux).</p>
   </header>
 
   <div class="error hidden" id="load-error" role="alert"></div>
@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Demandes mondiales de données utilisateurs</h3>
-        <p class="chart-sub">Demandes received worldwide per half-year. Google filed early periods as an 'All'-process aggregate and later ones as a per-process split — the two grains never overlap for the same country and period, so their sum is the exact global total.</p>
+        <p class="chart-sub">Demandes reçues dans le monde par semestre. Google a déclaré les premières périodes sous un agrégat de procédure 'All' et les suivantes en ventilation par procédure — les deux granularités ne se chevauchent jamais pour un même pays et une même période, leur somme est donc le total mondial exact.</p>
         <div class="chart-loading" id="req-loading">Chargement…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -675,7 +675,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Top 10 des pays par demandes</h3>
-        <p class="chart-sub">Countries ranked by user-data requests, all periods combined. The early 'All'-grain filings and the later per-process split are disjoint, so summing both grains counts every request exactly once.</p>
+        <p class="chart-sub">Pays classés par demandes de données d'utilisateurs, toutes périodes confondues. Les premiers dépôts à la granularité 'All' et la ventilation ultérieure par procédure sont disjoints, additionner les deux granularités compte donc chaque demande exactement une fois.</p>
         <div class="chart-loading" id="cty-loading">Chargement…</div>
         <canvas id="chart-cty" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-cty-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Demandes par procédure légale</h3>
-        <p class="chart-sub">Demandes de données utilisateurs par type de procédure légale, toutes périodes combinées (agrégat 'All' exclu). The per-process breakdown covers only the United States before 2014 H2, so early periods contribute US volume only.</p>
+        <p class="chart-sub">Demandes de données d'utilisateurs par type de procédure légale, toutes périodes confondues (agrégat 'All' exclu). La ventilation par procédure ne couvre que les États-Unis avant le S2 2014, les premières périodes n'apportent donc que du volume américain.</p>
         <div class="chart-loading" id="prc-loading">Chargement…</div>
         <canvas id="chart-prc" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-prc-table" class="sr-only"></div>
@@ -963,7 +963,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   function renderCharts(reqTotal, cty, prc, nsl) {
     if (!reqTotal.rows.length) { emptyChart('req-loading'); } else {
-      var lbl = "Demandes received";
+      var lbl = "Demandes reçues";
       srTable('chart-req-table', ["Semestre", lbl],
         reqTotal.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       linesChart('chart-req', 'req-loading', 'chart-req-table',

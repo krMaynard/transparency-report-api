@@ -764,13 +764,13 @@ async function runSearch() {
   if (!d.searched) {
     // No query yet: prompt, and show how much prose is searchable.
     $("#nsummary").textContent =
-      `Searching ${fmt(d.page_total)} passages from ${fmt(d.companies.length)} companies. Type a word or phrase above.`;
+      `${fmt(d.companies.length)} 社の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
     $("#nout").innerHTML = "";
     return;
   }
   $("#nsummary").textContent = d.total
-    ? `Showing ${fmt(d.count)} of ${fmt(d.total)} matching passages for “${q}”, ranked by relevance.`
-    : `No passages match “${q}”.`;
+    ? `「${q}」に一致する ${fmt(d.total)} 箇所中 ${fmt(d.count)} 箇所を関連度順に表示しています。`
+    : `「${q}」に一致する箇所はありません。`;
 
   $("#nout").innerHTML = '<div class="hits">' + d.results.map((r) => {
     const href = safeHref(r.archived_url);
@@ -814,7 +814,7 @@ async function setupNarratives() {
   if (d.mark_close) MARK_CLOSE = d.mark_close;
   fillFacets(d);
   $("#nsummary").textContent =
-    `Searching ${fmt(d.page_total)} passages from ${fmt(d.companies.length)} companies. Type a word or phrase above.`;
+    `${fmt(d.companies.length)} 社の報告書、${fmt(d.page_total)} 箇所を検索します。上に単語やフレーズを入力してください。`;
   fillProvenance(d);
   $("#nbtn").addEventListener("click", runSearch);
   $("#nq").addEventListener("keydown", (e) => { if (e.key === "Enter") runSearch(); });

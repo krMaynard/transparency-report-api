@@ -695,7 +695,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <!-- Headline stats -->
   <div class="stats" id="stats" aria-busy="true">
-    <div class="stat"><div class="num" id="stat-requests">—</div><div class="lbl">Request entries (a request naming several products or reasons counts once in each)</div></div>
+    <div class="stat"><div class="num" id="stat-requests">—</div><div class="lbl">请求条目数（一项涉及多个产品或理由的请求会在每一项中各计一次）</div></div>
     <div class="stat"><div class="num" id="stat-items">—</div><div class="lbl">被要求删除的项目</div></div>
     <div class="stat"><div class="num" id="stat-countries">—</div><div class="lbl">涉及国家</div></div>
     <div class="stat"><div class="num" id="stat-periods">—</div><div class="lbl">报告期</div></div>
@@ -1266,7 +1266,7 @@ display: flex; align-items: center; justify-content: space-between;
       // A truncated period series would render a misleading partial trend —
       // surface it instead of charting it.
       if (results[0].truncated || results[1].truncated) {
-        errEl.textContent = 'The period series hit the row cap and would be incomplete — please report this.';
+        errEl.textContent = '期间序列达到行数上限，将会不完整——请报告此问题。';
         errEl.classList.remove('hidden');
       }
       // Sort chronologically using allPeriods order (avoids lexicographic sorting bugs)

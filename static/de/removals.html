@@ -695,7 +695,7 @@ display: flex; align-items: center; justify-content: space-between;
 
   <!-- Headline stats -->
   <div class="stats" id="stats" aria-busy="true">
-    <div class="stat"><div class="num" id="stat-requests">—</div><div class="lbl">Request entries (a request naming several products or reasons counts once in each)</div></div>
+    <div class="stat"><div class="num" id="stat-requests">—</div><div class="lbl">Anfrage-Einträge (eine Anfrage mit mehreren Produkten oder Gründen zählt in jedem einmal)</div></div>
     <div class="stat"><div class="num" id="stat-items">—</div><div class="lbl">Zur Entfernung gemeldete Inhalte</div></div>
     <div class="stat"><div class="num" id="stat-countries">—</div><div class="lbl">Vertretene Länder</div></div>
     <div class="stat"><div class="num" id="stat-periods">—</div><div class="lbl">Berichtszeiträume</div></div>
@@ -1266,7 +1266,7 @@ display: flex; align-items: center; justify-content: space-between;
       // A truncated period series would render a misleading partial trend —
       // surface it instead of charting it.
       if (results[0].truncated || results[1].truncated) {
-        errEl.textContent = 'The period series hit the row cap and would be incomplete — please report this.';
+        errEl.textContent = 'Die Periodenreihe hat die Zeilenobergrenze erreicht und wäre unvollständig — bitte melden Sie dies.';
         errEl.classList.remove('hidden');
       }
       // Sort chronologically using allPeriods order (avoids lexicographic sorting bugs)

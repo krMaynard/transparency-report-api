@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>Comptes désactivés au fil du temps</h3>
-        <p class="chart-sub">Comptes désactivés pour violation des politiques, par période. Discord switched from quarterly to half-yearly reports in 2024, so the two series cover different-length windows and are not directly comparable; 2022 Q4 was not reported.</p>
+        <p class="chart-sub">Comptes désactivés pour violation des règles, par période de rapport. Discord est passé de rapports trimestriels à semestriels en 2024, les deux séries couvrent donc des fenêtres de durées différentes et ne sont pas directement comparables ; le T4 2022 n'a pas été déclaré.</p>
         <div class="chart-loading" id="req-loading">Chargement…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>Demandes gouvernementales internationales : principaux pays</h3>
-        <p class="chart-sub">Countries ranked by international government information requests, 2023 Q2 onward — earlier reports break out only US legal process, with no per-country international table.</p>
+        <p class="chart-sub">Pays classés par demandes internationales d'informations gouvernementales, à partir du T2 2023 — les rapports antérieurs ne détaillent que la procédure légale américaine, sans tableau international par pays.</p>
         <div class="chart-loading" id="rem-loading">Chargement…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
@@ -968,8 +968,8 @@ display: flex; align-items: center; justify-content: space-between;
       srTable('chart-req-table', ["Période", "Comptes désactivés"],
         req.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       linesChart('chart-req', 'req-loading', 'chart-req-table', labels, [
-        { label: "Per quarter (2022–2023)", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
-        { label: "Per half-year (2024+)", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
+        { label: "Par trimestre (2022–2023)", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
+        { label: "Par semestre (2024+)", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
       ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {

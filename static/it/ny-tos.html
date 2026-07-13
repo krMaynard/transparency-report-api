@@ -855,7 +855,7 @@ async function runStats() {
   $("#ns-out").setAttribute("aria-busy", "false");
   const rows = d.rows || [];
   $("#ns-summary").textContent = `Visualizzazione di ${fmt(rows.length)} cifre.`
-    + (d.truncated ? " Results were truncated at the row cap — narrow the filters to see everything." : "");
+    + (d.truncated ? " I risultati sono stati troncati al limite di righe — restringi i filtri per vedere tutto." : "");
   const head = '<tr><th scope="col">Azienda</th><th scope="col">Categoria</th>' +
     '<th scope="col">Etichetta presentata</th><th scope="col">Metrica</th>' +
     '<th scope="col">Misura</th><th scope="col">Valore</th></tr>';

@@ -667,7 +667,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>비활성화 계정 추이</h3>
-        <p class="chart-sub">정책 위반으로 비활성화된 계정(보고 기간별). Discord switched from quarterly to half-yearly reports in 2024, so the two series cover different-length windows and are not directly comparable; 2022 Q4 was not reported.</p>
+        <p class="chart-sub">정책 위반으로 비활성화된 계정 수(보고 기간별). Discord는 2024년에 분기 보고에서 반기 보고로 전환했으므로 두 시리즈는 기간 길이가 달라 직접 비교할 수 없습니다. 2022년 4분기는 보고되지 않았습니다.</p>
         <div class="chart-loading" id="req-loading">불러오는 중…</div>
         <canvas id="chart-req" height="140" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-req-table" class="sr-only"></div>
@@ -683,7 +683,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card">
         <h3>국제 정부 요청: 상위 국가</h3>
-        <p class="chart-sub">Countries ranked by international government information requests, 2023 Q2 onward — earlier reports break out only US legal process, with no per-country international table.</p>
+        <p class="chart-sub">국제 정부 정보 요청 수 기준 국가 순위(2023년 2분기 이후) — 이전 보고서는 미국 법적 절차만 구분하며 국가별 국제 표가 없습니다.</p>
         <div class="chart-loading" id="rem-loading">불러오는 중…</div>
         <canvas id="chart-rem" height="220" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-rem-table" class="sr-only"></div>
@@ -965,11 +965,11 @@ display: flex; align-items: center; justify-content: space-between;
       // into two labelled series instead.
       var labels = req.rows.map(function (r) { return r[0]; });
       var isH = function (pd) { return pd.indexOf('-H') >= 0; };
-      srTable('chart-req-table', ["기간", "비활성화 계정"],
+      srTable('chart-req-table', ["기간", "비활성화된 계정"],
         req.rows.map(function (r) { return [r[0], fmt(r[1])]; }));
       linesChart('chart-req', 'req-loading', 'chart-req-table', labels, [
-        { label: "Per quarter (2022–2023)", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
-        { label: "Per half-year (2024+)", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
+        { label: "분기별(2022–2023)", data: req.rows.map(function (r) { return isH(r[0]) ? null : r[1]; }) },
+        { label: "반기별(2024년 이후)", data: req.rows.map(function (r) { return isH(r[0]) ? r[1] : null; }) },
       ]);
     }
     if (!cty.rows.length) { emptyChart('cty-loading'); } else {

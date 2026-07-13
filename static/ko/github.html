@@ -639,7 +639,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>연도별 사용자 정보 요청</h3>
-        <p class="chart-sub">Requests received vs. instances where information was disclosed under legal process (exact counts, reported since 2021; affected-account counts are a separate dataset).</p>
+        <p class="chart-sub">받은 요청 수와 법적 절차에 따라 정보가 공개된 건수(정확한 수치, 2021년부터 보고. 영향을 받은 계정 수는 별도의 데이터셋입니다).</p>
         <div class="chart-loading" id="ui-loading">불러오는 중…</div>
         <canvas id="chart-ui" height="150" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-ui-table" class="sr-only"></div>
@@ -663,7 +663,7 @@ display: flex; align-items: center; justify-content: space-between;
 
       <div class="chart-card wide">
         <h3>연도별 DMCA 삭제 통지</h3>
-        <p class="chart-sub">Copyright takedown notices GitHub processed under the DMCA (takedown notices only — counter notices and legal-action notices are excluded).</p>
+        <p class="chart-sub">GitHub가 DMCA에 따라 처리한 저작권 삭제 통지(삭제 통지만 포함. 이의 통지와 법적 조치 통지는 제외).</p>
         <div class="chart-loading" id="dmca-loading">불러오는 중…</div>
         <canvas id="chart-dmca" height="120" aria-hidden="true" class="hidden"></canvas>
         <div id="chart-dmca-table" class="sr-only"></div>
@@ -673,19 +673,19 @@ display: flex; align-items: center; justify-content: space-between;
   </section>
 
   <div class="data-section">
-    <h2>Dataset coverage by report area</h2>
+    <h2>보고 영역별 데이터셋 수록 현황</h2>
     <div class="results" id="byDataset" aria-busy="true">
       <p class="loading">불러오는 중…</p>
     </div>
-    <p class="sub">For each report area (<code>dataset</code>), how many reported values the dataset carries. Row counts, not summed quantities — the areas mix stocks (MAU levels), flows (requests) and banded ranges, which cannot be meaningfully added.</p>
+    <p class="sub">각 보고 영역(<code>dataset</code>)별로 데이터셋이 담고 있는 보고 값의 수. 행 수이며 합산 수량이 아닙니다 — 각 영역에는 저량(MAU 수준), 유량(요청), 구간 범위가 섞여 있어 의미 있는 합산이 불가능합니다.</p>
   </div>
 
   <div class="data-section">
-    <h2>Most-reported categories</h2>
+    <h2>보고 값이 많은 카테고리</h2>
     <div class="results" id="byCategory" aria-busy="true">
       <p class="loading">불러오는 중…</p>
     </div>
-    <p class="sub">The categories with the most reported values. Row counts, not summed quantities — categories span unrelated report areas whose measures are not additive.</p>
+    <p class="sub">보고 값이 가장 많은 카테고리. 행 수이며 합산 수량이 아닙니다 — 카테고리는 서로 무관한 보고 영역에 걸쳐 있어 그 지표를 합산할 수 없습니다.</p>
   </div>
 
   <p class="hint">이 결과는 <a href="/ko/reports">쿼리 빌더</a>에서 세분화하거나 확장할 수 있고, 전체 필드 목록은 <a href="/ko/schema">스키마</a> 페이지에서 확인하거나 <a href="/ko/methodology">방법론</a>을 읽어보세요.</p>
@@ -918,7 +918,7 @@ display: flex; align-items: center; justify-content: space-between;
           (byMetric[r[1]] = byMetric[r[1]] || {})[r[0]] = r[2];
         });
         var metrics = Object.keys(byMetric).sort().reverse(); // received before disclosed
-        var UI_LABELS = { received: "Requests received", disclosed: "Disclosures made" };
+        var UI_LABELS = { received: "받은 요청", disclosed: "공개 건수" };
         srTable('chart-ui-table', ["연도"].concat(metrics.map(function (m) { return UI_LABELS[m] || m; })),
           years.map(function (y) { return [y].concat(metrics.map(function (m) { return fmt(byMetric[m][y]); })); }));
         linesChart('chart-ui', 'ui-loading', 'chart-ui-table', years,

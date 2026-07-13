@@ -855,7 +855,7 @@ async function runStats() {
   $("#ns-out").setAttribute("aria-busy", "false");
   const rows = d.rows || [];
   $("#ns-summary").textContent = `${fmt(rows.length)}개의 수치 표시 중.`
-    + (d.truncated ? " Results were truncated at the row cap — narrow the filters to see everything." : "");
+    + (d.truncated ? " 결과가 행 수 상한에서 잘렸습니다 — 필터를 좁혀 전체를 확인하세요." : "");
   const head = '<tr><th scope="col">회사</th><th scope="col">분류</th>' +
     '<th scope="col">제출된 라벨</th><th scope="col">지표</th>' +
     '<th scope="col">측정 항목</th><th scope="col">값</th></tr>';

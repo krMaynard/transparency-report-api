@@ -855,7 +855,7 @@ async function runStats() {
   $("#ns-out").setAttribute("aria-busy", "false");
   const rows = d.rows || [];
   $("#ns-summary").textContent = `${fmt(rows.length)} 件の数値を表示中。`
-    + (d.truncated ? " Results were truncated at the row cap — narrow the filters to see everything." : "");
+    + (d.truncated ? " 結果は行数上限で打ち切られました。すべて表示するには、フィルタを絞り込んでください。" : "");
   const head = '<tr><th scope="col">企業</th><th scope="col">カテゴリ</th>' +
     '<th scope="col">提出時のラベル</th><th scope="col">指標</th>' +
     '<th scope="col">測定項目</th><th scope="col">値</th></tr>';
