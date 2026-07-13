@@ -139,7 +139,7 @@ EXPLORE_RATE_WINDOW = int(os.getenv("EXPLORE_RATE_WINDOW_SECONDS", "60"))
 # a question into the validated QueryRequest model — never SQL — which then runs
 # through the same compile_query path as /api/explore. Off unless ANTHROPIC_API_KEY
 # is set (LLM calls cost money); IP-rate-limited more tightly than /api/explore.
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-8")
+ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-5")
 NL_QUERY_ENABLED = bool(os.getenv("ANTHROPIC_API_KEY"))
 ASK_RATE_MAX = int(os.getenv("ASK_RATE_MAX_PER_WINDOW", "10"))
 ASK_RATE_WINDOW = int(os.getenv("ASK_RATE_WINDOW_SECONDS", "60"))
@@ -3796,6 +3796,11 @@ def _translate_question(question: str) -> dict[str, Any]:
     resp = _anthropic_client.messages.create(
         model=ANTHROPIC_MODEL,
         max_tokens=1024,
+        # Disable thinking: this is a cheap, schema-constrained NL→JSON translation
+        # that needs no reasoning, and the default model (claude-sonnet-5) would
+        # otherwise run adaptive thinking, consuming the 1024-token budget and
+        # risking a truncated structured query. Accepted on Sonnet 5 / Opus 4.x.
+        thinking={"type": "disabled"},
         system=_ask_system_prompt(),
         messages=[{"role": "user", "content": question}],
         output_config={"format": {"type": "json_schema", "schema": _ASK_SCHEMA}},

@@ -215,7 +215,7 @@ LEFT JOINs).
 
 `POST /api/ask` lets anyone ask a question in natural language ("Which platforms
 received the most Article 16 notices?"). An LLM (**Claude**, `ANTHROPIC_MODEL`,
-default `claude-opus-4-8`) translates it into the **structured `QueryRequest`** —
+default `claude-sonnet-5`) translates it into the **structured `QueryRequest`** —
 using JSON-schema structured outputs, so the model returns a constrained object,
 **never SQL**. That object is then run through the *same* `compile_query` trust
 boundary as every other query: the model only *proposes*, and the existing
@@ -690,7 +690,7 @@ All tuneable values are read from environment variables at startup:
 | `EXPLORE_RATE_MAX_PER_WINDOW` | `60` | Max public `/api/explore` queries per IP per window |
 | `EXPLORE_RATE_WINDOW_SECONDS` | `60` | Public explore rate-limit window |
 | `ANTHROPIC_API_KEY` | _(unset — `/api/ask` disabled)_ | Set to enable natural-language queries (Claude); read by the SDK |
-| `ANTHROPIC_MODEL` | `claude-opus-4-8` | Model used to translate questions into structured queries |
+| `ANTHROPIC_MODEL` | `claude-sonnet-5` | Model used to translate questions into structured queries |
 | `ASK_RATE_MAX_PER_WINDOW` | `10` | Max public `/api/ask` (LLM) calls per IP per window |
 | `ASK_RATE_WINDOW_SECONDS` | `60` | Public ask rate-limit window |
 | `ASK_CACHE_SIZE` | `256` | In-process cache of question→query, so a repeat question skips the LLM call |

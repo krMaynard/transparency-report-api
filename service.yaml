@@ -57,7 +57,7 @@ spec:
                   name: research-api-redis-url
                   key: latest
             # Enables the natural-language "Ask" box (POST /api/ask). Off (503)
-            # until this secret exists; IP-rate-limited. Model = claude-opus-4-8.
+            # until this secret exists; IP-rate-limited. Model = claude-sonnet-5.
             - name: ANTHROPIC_API_KEY
               valueFrom:
                 secretKeyRef:

@@ -1,0 +1,26 @@
+# Caddy reverse proxy for the self-hosted transparency API.
+#
+# Caddy terminates TLS and provisions/renews a Let's Encrypt certificate
+# automatically for the hostname below — point the domain's A (and AAAA) records
+# at this host first, and make sure ports 80 and 443 are open. The app sits on
+# the internal Docker network at web:8080 and is never exposed to the host.
+#
+# Optional: set a global ACME contact email for expiry notices by uncommenting:
+# {
+# 	email you@example.com
+# }
+
+transparency.kieranmaynard.com {
+	encode zstd gzip
+
+	# App emits its own HSTS + security headers and runs uvicorn with
+	# --proxy-headers, so it reads the real client IP from X-Forwarded-For
+	# (used by the per-IP rate limits on /api/explore, /api/ask, /api/narratives).
+	reverse_proxy web:8080
+
+	# Route Caddy's access logs to stdout (visible via `docker compose logs caddy`).
+	log {
+		output stdout
+		format console
+	}
+}
