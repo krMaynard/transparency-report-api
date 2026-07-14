@@ -362,16 +362,21 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `section`/`category`/`metric`/`unit` + a `value`; dims stored inline). The
   six-monthly transparency reports platforms publish under Türkiye's Law 5651
   (Additional Art. 4) on the content-removal / access-blocking decisions notified
-  to them, from two publishers' static English PDFs: **Meta**
-  (`platform` `Facebook`/`Instagram`, H1 2023 → H1 2025, from
-  `transparency.meta.com/sr/`) and **X** (`platform` `X`, H1 2021 → H1 2025, from
-  `transparency.x.com`). Two request streams (`section`): `individual_requests`
+  to them, from three publishers: **Meta**
+  (`platform` `Facebook`/`Instagram`, H1 2023 → H1 2025, static English PDFs from
+  `transparency.meta.com/sr/`), **X** (`platform` `X`, H1 2021 → H1 2025, from
+  `transparency.x.com`), and **TikTok** (`platform` `TikTok`, 2021 H1 → 2025 H2,
+  from its standalone Turkish "Bireysel Talepler Raporu" for the BTK at
+  `tiktok.com/safety/tr-TR/transparency/btk-raporu` — an HTML page, no PDF).
+  Two request streams (`section`): `individual_requests`
   (Art. 9/9-A — personality/privacy applications via a form) and
   `authority_requests` (Art. 8/8-A — the ICTA, the Consumer-Policy channel, and
   court orders). Meta reports both streams as report-level totals (blank
   `category`); X reports only the individual stream, broken down by issue
   `category` (`Abuse`/`Hateful Conduct`/`Copyright`/… kept verbatim) with a
   request volume (`metric='requests'`) and an `action_rate` (`unit='percent'`).
+  TikTok, like X, reports only the individual stream (blank `category`), as its
+  half-year `applications_received` total.
   `value` is `REAL` (to hold X's action-rate percentages). Pin a `section`
   **and a `metric`** before aggregating — requests ≠ reported entities ≠ removed
   entities, `requests_icta`/`_consumer_policy`/`_court_orders` are parts of
@@ -379,9 +384,9 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   every request; authority counts can also bundle Facebook + Instagram), and
   `action_rate` is a percent (never SUM); `_leg_warnings` warns on both. X's
   per-category `requests` are additive (disjoint issues), so summing them across
-  categories is a legitimate grand total. TikTok/YouTube publish no retrievable
-  standalone Türkiye Law 5651 report (their Turkish figures live only in global
-  tools).
+  categories is a legitimate grand total. **Google / YouTube** publishes no
+  standalone Türkiye Law 5651 report (its Turkish figures live only in the global
+  `transparencyreport.google.com` tool as a country slice).
 - **EU Terrorist Content Online Regulation (TCOR)** — a single **tidy-long**
   `tco_metrics` table (one row per measured value: `publisher`/`role`/`period`/
   `section`/`category`/`metric`/`unit` + a `value`; dims stored inline). The
@@ -535,10 +540,17 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   South Korea's **Network Act** (Art. 64-5) and **Telecommunications Business
   Act** (Art. 22-5) on the technical/managerial measures they take against the
   circulation of *illegal sexual content* (illegally-filmed content, deepfake /
-  "fake" images and videos, and child/youth sexual-abuse material). **Google**
-  publishes one per calendar year covering **Search and YouTube jointly**
-  (`publisher='Google'`; no per-product split); this holds **all six reports so
-  far (2020 → 2025)**. The **2024 and 2025** reports publish a full **monthly**
+  "fake" images and videos, and child/youth sexual-abuse material). Three
+  `publisher`s: **Google** publishes one per calendar year covering **Search and
+  YouTube jointly** (no per-product split), all six reports so far (2020 → 2025),
+  and **Naver** + **Kakao** each file the standardized §64-5 template with the KCC
+  (now KMCC), whose per-provider PDFs on board 1156 hold 2020 → 2025. Google's own
+  report carries the fuller detail below; Naver and Kakao publish only the year's
+  figures on the template, so they populate `annual_summary` **only** (received /
+  removed, transcribed from the KMCC PDFs and cross-checked — received against the
+  report's 피해자등+기관·단체 split; their by-reason splits aren't stored, as the
+  reports allow a request to be double-counted across reasons). The **2024 and
+  2025** Google reports publish a full **monthly**
   breakdown (`period` a month `YYYY-MM`) in four `section`s, each a **cross-cut
   of the SAME requests** (so NOT additive across sections): `requests_received`
   (by complainant — Victims/User + Agency/Gov, `metric='requests'`),
