@@ -3338,6 +3338,22 @@ class TestTurkeyTable:
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"] == [["2024 H2", 2842], ["2025 H1", 9471]]
 
+    def test_turkey_tiktok_applications_by_period(self):
+        # TikTok's standalone BTK report — individual applications received per
+        # half-year (fixture matches the filed Turkish report's Table 1 totals).
+        job = _submit_and_wait({
+            "table": "turkey_metrics", "group_by": ["period"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "platform", "field_values": ["TikTok"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["applications_received"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2024 H1", 256], ["2024 H2", 1243], ["2025 H2", 259]]
+
     def test_turkey_unpinned_sum_warns(self):
         # A SUM pinning neither section nor metric would mix the two request
         # streams and add unrelated quantities (requests vs entities).
@@ -3406,11 +3422,14 @@ class TestTurkeyTable:
         assert data["columns"] == ["platform", "period", "section", "category", "metric", "unit", "value"]
         assert data["rows"] and all(len(r) == 7 for r in data["rows"])
         assert {r[5] for r in data["rows"]} == {"count", "percent"}
-        assert {r[0] for r in data["rows"]} == {"Facebook", "Instagram", "X"}
+        assert {r[0] for r in data["rows"]} == {"Facebook", "Instagram", "X", "TikTok"}
         assert {r[2] for r in data["rows"]} <= {"individual_requests", "authority_requests"}
-        # Meta rows carry a blank category; X rows carry an issue label.
-        assert all(r[3] == "" for r in data["rows"] if r[0] in ("Facebook", "Instagram"))
+        # Meta & TikTok rows carry a blank category; X rows carry an issue label.
+        assert all(r[3] == "" for r in data["rows"] if r[0] in ("Facebook", "Instagram", "TikTok"))
         assert all(r[3] for r in data["rows"] if r[0] == "X")
+        # TikTok reports only the individual stream (Art. 9/9-A), like X.
+        assert {r[2] for r in data["rows"] if r[0] == "TikTok"} == {"individual_requests"}
+        assert {r[4] for r in data["rows"] if r[0] == "TikTok"} == {"applications_received"}
 
 
 class TestTcoTable:
@@ -4032,6 +4051,7 @@ class TestKoreaNetworkActTable:
         job = _submit_and_wait({
             "table": "korea_network_act_metrics", "group_by": ["period"],
             "query": {"and": [
+                {"operation": "EQ", "field_name": "publisher", "field_values": ["Google"]},
                 {"operation": "EQ", "field_name": "section", "field_values": ["annual_summary"]},
                 {"operation": "EQ", "field_name": "metric", "field_values": ["urls_received"]},
             ]},
@@ -4041,6 +4061,25 @@ class TestKoreaNetworkActTable:
         assert job["status"] == "done"
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"] == [["2020", 61], ["2025", 115280]]
+
+    def test_naver_kakao_annual_summary(self):
+        # Naver & Kakao file the KMCC §64-5 template — annual received/removed only.
+        # 2023 fixture: Naver 54 received / 5 removed; Kakao 51 received / 51 removed.
+        job = _submit_and_wait({
+            "table": "korea_network_act_metrics", "group_by": ["publisher", "metric"],
+            "query": {"and": [
+                {"operation": "IN", "field_name": "publisher", "field_values": ["Naver", "Kakao"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["annual_summary"]},
+                {"operation": "EQ", "field_name": "period", "field_values": ["2023"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "publisher", "order": "asc"},
+                     {"field_name": "metric", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["Kakao", "urls_received", 51], ["Kakao", "urls_removed", 51],
+                                ["Naver", "urls_received", 54], ["Naver", "urls_removed", 5]]
 
     def test_unpinned_sum_warns(self):
         # A SUM pinning no section mixes the four cross-cuts of the same requests.
@@ -4064,10 +4103,13 @@ class TestKoreaNetworkActTable:
                           .joinpath("korea-network-act.json").read_text(encoding="utf-8"))
         assert data["columns"] == ["publisher", "period", "section", "category", "metric", "unit", "value"]
         assert data["rows"] and all(len(r) == 7 for r in data["rows"])
-        assert {r[0] for r in data["rows"]} == {"Google"}
+        assert {r[0] for r in data["rows"]} == {"Google", "Naver", "Kakao"}
         assert {r[2] for r in data["rows"]} == {
             "requests_received", "request_reasons", "processed_result",
             "removal_reasons", "annual_summary"}
+        # Only Google publishes the detailed monthly breakdown; Naver & Kakao file
+        # the KMCC template and populate annual_summary only.
+        assert {r[2] for r in data["rows"] if r[0] != "Google"} == {"annual_summary"}
         # Detailed monthly sections cover 2024 + 2025 (twelve months each);
         # annual_summary covers 2020–2025 with a year-granularity period.
         monthly = {r[1] for r in data["rows"] if r[2] != "annual_summary"}
@@ -4083,11 +4125,24 @@ class TestKoreaNetworkActTable:
         assert sec_total("requests_received", 2024) == 158052
         assert sec_total("processed_result", 2024) == 158044  # 8 fewer than received (source quirk)
         assert sec_total("removal_reasons", 2024) == 142211
-        # annual_summary series (urls_received) grows across the six reports.
-        recv = {int(r[1]): r[6] for r in data["rows"]
-                if r[2] == "annual_summary" and r[4] == "urls_received"}
-        assert recv == {2020: 61, 2021: 31281, 2022: 47162,
-                        2023: 90616, 2024: 158052, 2025: 115280}
+        # annual_summary series (urls_received) grows across the six reports —
+        # pinned per publisher (the three share the same year keys).
+        def recv(pub):
+            return {int(r[1]): r[6] for r in data["rows"] if r[0] == pub
+                    and r[2] == "annual_summary" and r[4] == "urls_received"}
+        assert recv("Google") == {2020: 61, 2021: 31281, 2022: 47162,
+                                  2023: 90616, 2024: 158052, 2025: 115280}
+        assert recv("Naver") == {2020: 0, 2021: 94, 2022: 56,
+                                 2023: 54, 2024: 91, 2025: 30}
+        assert recv("Kakao") == {2020: 70, 2021: 169, 2022: 75,
+                                 2023: 51, 2024: 66, 2025: 31}
+        # removed never exceeds received for any provider-year.
+        for r in data["rows"]:
+            if r[2] == "annual_summary" and r[4] == "urls_removed":
+                recvd = next((x[6] for x in data["rows"] if x[0] == r[0]
+                              and x[1] == r[1] and x[4] == "urls_received"), None)
+                assert recvd is not None, f"no urls_received for {r[0]} {r[1]}"
+                assert 0 <= r[6] <= recvd
 
 
 class TestJapanTable:
