@@ -81,6 +81,8 @@ Built to demonstrate two things:
 | `data/taiwan-anti-fraud.json` | Vendored snapshot of Taiwan's Anti-Fraud Act data (sibling `dsa-transparency-data/taiwan-anti-fraud/build_taiwan.py`) — a tidy-long `columns`+`rows` list; seeded into the `taiwan_metrics` table by `seed.build_taiwan_db` |
 | `data/turkey-law5651.json` | Vendored snapshot of Türkiye's Law No. 5651 platform transparency reports (sibling `dsa-transparency-data/turkey-law5651/build_turkey.py`) — a tidy-long `columns`+`rows` list; seeded into the `turkey_metrics` table by `seed.build_turkey_db` |
 | `data/meta-cser.json` | Vendored snapshot of Meta's Community Standards Enforcement Report (sibling `dsa-transparency-data/meta-cser/build_cser.py`) — a tidy-long `columns`+`rows` list; seeded into the `cser_metrics` table by `seed.build_cser_db` |
+| `data/esafety-bose.json` | Australia eSafety BOSE (Basic Online Safety Expectations) transparency findings — a tidy-long `columns`+`rows` list; **built in-repo by `scripts/build_esafety_bose.py`** (no sibling extractor; figures transcribed from the archived eSafety reports); seeded into the `esafety_bose_metrics` table by `seed.build_esafety_bose_db` |
+| `scripts/build_esafety_bose.py` | Builds `data/esafety-bose.json` from the transcribed eSafety report figures (CSEA periodic Figure 4 + AI-companion findings), with page citations inline and a fail-loud cross-check that the four Meta services sum to the report's stated Meta aggregate |
 | `data/tiktok-cger.json` | Vendored snapshot of TikTok's Community Guidelines Enforcement Report (sibling `dsa-transparency-data/tiktok-cger/build_cger.py`) — a tidy-long `columns`+`rows` list (global `All`-location cut); seeded into the `tiktok_cger_metrics` table by `seed.build_tiktok_cger_db` |
 | `data/tco-regulation.json` | Vendored snapshot of the EU Terrorist Content Online Regulation transparency reports (sibling `dsa-transparency-data/tco-regulation/build_tco.py`) — a tidy-long `columns`+`rows` list across the authority (Art. 8 / Commission) and platform (Art. 7) streams; seeded into the `tco_metrics` table by `seed.build_tco_db` |
 | `data/ai-training-transparency.json` | Vendored snapshot of the EU AI Act Art. 53(1)(d) training-data transparency summaries (sibling `dsa-transparency-data/ai-training-transparency/build_ai_training.py`) — a tidy-long `columns`+`rows` list across providers' public summaries of training content (Google + Meta + OpenAI PDFs + Microsoft Hugging Face cards); seeded into the `ai_training_metrics` table by `seed.build_ai_training_db` |
@@ -533,6 +535,40 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `section` **and** `metric` before aggregating, and never mix the
   `percent`/`days`/`hours`/`count` units; `_leg_warnings` warns on all three.
   The `/singapore` dataset page is English-only (like `/mandates`).
+- **Australia eSafety BOSE (Basic Online Safety Expectations)** — a single
+  **tidy-long** `esafety_bose_metrics` table (one row per measured value:
+  `service`/`period`/`section`/`category`/`metric`/`unit` + a `value`; dims
+  inline). The figures Australia's **eSafety Commissioner** publishes from the
+  mandatory **transparency notices** it issues under the **Online Safety Act
+  2021** (the BOSE regime — the online-safety-code analog to Singapore's Code of
+  Practice). Unlike the other datasets there is **no sibling-repo extractor** —
+  the figures are **transcribed** from the archived reports by
+  `scripts/build_esafety_bose.py` (each row page/figure-cited in that builder,
+  with a fail-loud cross-check that the four Meta services sum to the report's
+  stated Meta aggregate). Two report streams. **`csea_periodic`** — the CSEA &
+  sexual-extortion periodic report (notices given 22 Jul 2024; reporting period
+  15 Jun–15 Dec 2024, `period='2024-06-15..2024-12-15'`; Aug 2025 report + Feb
+  2026 update): per-service `user_reports_global` (count of user reports of child
+  sexual exploitation & abuse) and `median_response_minutes` (median time a human
+  moderator took to reach an outcome, in `minutes`) from **Figure 4**, plus
+  Australia-specific and aggregate totals under the service labels
+  `All services (total)` and `Meta services (aggregate)` (metrics
+  `user_reports_global` / `user_reports_australia`). The **AI-companion**
+  non-periodic findings (notices to Chai, Character.AI, Chub AI, Nomi; reporting
+  period 1 Jul–30 Sep 2025, `period='2025-07-01..2025-09-30'`):
+  `ai_companion_reports` (per-provider `user_reports` by `category` = harm type
+  `pornography`/`csea`/`self_harm`), `ai_companion_staff` (`trust_safety_staff`
+  headcount as at 30 Sep 2025 — Chai's `6.5` is a fractional FTE), and
+  `survey_prevalence` (eSafety's 2026 representative survey of children aged
+  10–17: `ever_used` / `used_past_4_weeks` percentages, per `AI companion` vs
+  `AI companion or assistant` and per provider). `unit` is `count`, `minutes` or
+  `percent` — **never SUM across units, or SUM a percent/median**. The
+  `All services (total)` and `Meta services (aggregate)` rows **OVERLAP** the
+  per-service rows (the four Meta services sum to the Meta aggregate 8,877,600,
+  itself part of the 11,458,969 all-services total), so pin a single `service`
+  (or exclude the total/aggregate labels) before summing; pin `section` **and**
+  `metric` too. `_leg_warnings` warns on all three. No dataset page yet (query
+  via `/api/query`/`/api/explore`/`/schema`).
 - **Korea Network Act (illegal-sexual-content)** — a single **tidy-long**
   `korea_network_act_metrics` table (one row per measured value: `publisher`/
   `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The

@@ -387,6 +387,25 @@ _SINGAPORE_FIXTURE = {
 }
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
+# A small slice of the eSafety BOSE dataset (esafety-bose.json shape): the CSEA
+# periodic per-service reports + median response time, the Meta aggregate total,
+# and the AI-companion per-provider figures across all four sections.
+# [service, period, section, category, metric, unit, value]
+_ESAFETY_FIXTURE = {
+    "columns": ["service", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Facebook", "2024-06-15..2024-12-15", "csea_periodic", "", "user_reports_global", "count", 6700000],
+        ["Facebook", "2024-06-15..2024-12-15", "csea_periodic", "", "median_response_minutes", "minutes", 706],
+        ["Snapchat", "2024-06-15..2024-12-15", "csea_periodic", "", "user_reports_global", "count", 1361148],
+        ["Meta services (aggregate)", "2024-06-15..2024-12-15", "csea_periodic", "", "user_reports_global", "count", 8877600],
+        ["Character.AI", "2025-07-01..2025-09-30", "ai_companion_reports", "csea", "user_reports", "count", 1527],
+        ["Nomi", "2025-07-01..2025-09-30", "ai_companion_reports", "self_harm", "user_reports", "count", 2],
+        ["Chub AI", "2025-07-01..2025-09-30", "ai_companion_staff", "", "trust_safety_staff", "count", 0],
+        ["AI companion", "2026", "survey_prevalence", "children_10_17", "ever_used", "percent", 8],
+    ],
+}
+seed.build_esafety_bose_db(_ESAFETY_FIXTURE, _DB)
+
 # A small slice of the Korea Network Act dataset (korea-network-act.json shape):
 # a couple of months of Google's illegal-sexual-content figures (2024 + 2025)
 # across the request/removal cross-cuts, plus the annual_summary rollup series —

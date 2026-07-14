@@ -1312,6 +1312,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "esafety_bose_metrics": TableSpec(
+        "Australia eSafety Commissioner — Basic Online Safety Expectations (BOSE) transparency findings. The figures eSafety publishes from the mandatory transparency notices it issues to service providers under the Online Safety Act 2021, requiring them to report on how they meet the Expectations. One row per measured value, identified by service × period × section × category × metric. Two report streams. `csea_periodic` — the CSEA & sexual-extortion periodic report (notices given 22 Jul 2024; reporting period 15 Jun–15 Dec 2024, i.e. period '2024-06-15..2024-12-15'; Aug 2025 report, Feb 2026 update): per-service `user_reports_global` (count of user reports of child sexual exploitation & abuse) and `median_response_minutes` (median time a human moderator took to reach an outcome, in minutes) from Figure 4, plus Australia-specific and aggregate totals held under the service labels 'All services (total)' and 'Meta services (aggregate)' with metrics `user_reports_global` / `user_reports_australia`. The AI-companion non-periodic findings (notices to Chai, Character.AI, Chub AI, Nomi; reporting period 1 Jul–30 Sep 2025, period '2025-07-01..2025-09-30'): `ai_companion_reports` (per-provider `user_reports` broken down by `category` = harm type pornography / csea / self_harm), `ai_companion_staff` (`trust_safety_staff`, headcount as at 30 Sep 2025 — Chai's 6.5 is a fractional FTE), and `survey_prevalence` (eSafety's 2026 representative survey of children aged 10–17: `ever_used` / `used_past_4_weeks` percentages, per 'AI companion' vs 'AI companion or assistant' and per provider). Units are count, minutes or percent — NEVER SUM across units, and never SUM a percent or a median. The service totals 'All services (total)' and 'Meta services (aggregate)' OVERLAP the per-service rows (the four Meta services — Facebook, Instagram, Facebook Messenger, Threads — sum to the Meta aggregate 8,877,600, which is part of the 11,458,969 all-services total), so pin a single service (or exclude the '(total)'/'(aggregate)' labels) before summing user_reports_global, and pin section + metric before aggregating anything.",
+        "FROM esafety_bose_metrics f",
+        {
+            "service":  "f.service",
+            "period":   "f.period",
+            "section":  "f.section",
+            "category": "f.category",
+            "metric":   "f.metric",
+            "unit":     "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "korea_network_act_metrics": TableSpec(
         "Korea Network Act illegal-sexual-content transparency report — the annual report online service providers must publish under South Korea's Network Act (Art. 64-5) and Telecommunications Business Act (Art. 22-5) on the technical/managerial measures they take against the circulation of illegal sexual content (illegally-filmed content, deepfake / 'fake' images and videos, and child/youth sexual-abuse material). Google publishes one per calendar year covering Search and YouTube jointly; this holds all six reports so far (2020 → 2025). One row per measured value identified by publisher × period × section × category × metric. The 2024 and 2025 reports publish a full MONTHLY breakdown, in four sections each a cross-cut of the SAME requests (NOT additive across sections), with 'period' a month ('YYYY-MM'): 'requests_received' (removal requests by complainant — 'Victims etc. (User Requests)' + 'Agency and Org (Gov Requests)', metric 'requests'), 'request_reasons' (the same requests by reason — Illegal Photos and Videos / Fake Images and Videos / Child or Youth Sexual Abuse Content, metric 'requests'), 'processed_result' (the same requests by outcome — 'Removed Voluntarily by the Company' + four 'Not Removed - …' reasons + two 'KCSC Assessment - …' rows, metric 'urls') and 'removal_reasons' (the removed URLs by reason, metric 'urls_removed'). Within a monthly section the categories are DISJOINT and sum to the section total (the report's 'Total' rows are dropped), so summing over 'category' within one section is a legitimate grand total, and summing over 'period' within a year gives the annual total — but pin a 'section' (and 'metric') first, and never sum across sections (requests received ≠ processed outcomes ≠ removed URLs). The 2020–2023 reports are prose-only; their headline figures, plus a rollup of 2024/2025, live in section 'annual_summary' (category 'All', 'period' a YEAR 'YYYY', metric 'urls_received' / 'urls_removed') — a comparable 2020→2025 series that sits BESIDE the monthly sections (a rollup of them, so don't sum it together with them).",
         "FROM korea_network_act_metrics f",
@@ -4265,6 +4280,34 @@ def _leg_warnings(
             out.append(
                 "'singapore_metrics' platform_report metric names are each "
                 "vendor's own and aren't comparable across services; this "
+                "aggregate pins no 'service'. Filter or group by 'service'."
+            )
+    # esafety_bose_metrics mixes counts, median minutes and survey percentages
+    # across incomparable sections, and carries overlapping aggregate totals
+    # ('All services (total)', 'Meta services (aggregate)') beside per-service rows.
+    if table == "esafety_bose_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'esafety_bose_metrics' spans the CSEA periodic report and the "
+                "AI-companion findings across incomparable sections "
+                "(csea_periodic, ai_companion_reports, ai_companion_staff, "
+                "survey_prevalence); this aggregate pins no 'section'. Filter or "
+                "group by 'section'."
+            )
+        if "metric" not in pinned:
+            out.append(
+                "'esafety_bose_metrics' reports distinct metrics in incompatible "
+                "units (user report counts, median_response_minutes, survey "
+                "percentages) that aren't comparable; this aggregate pins no "
+                "'metric'. Filter or group by 'metric'."
+            )
+        if "service" not in pinned:
+            out.append(
+                "'esafety_bose_metrics' carries aggregate totals ('All services "
+                "(total)', 'Meta services (aggregate)') that OVERLAP the "
+                "per-service rows, so summing over 'service' double-counts; this "
                 "aggregate pins no 'service'. Filter or group by 'service'."
             )
     # korea_network_act_metrics has four monthly sections that are cross-cuts of
