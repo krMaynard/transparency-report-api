@@ -151,7 +151,7 @@ def validate(rows: list[list]) -> None:
     # Column arity.
     for r in rows:
         assert len(r) == len(COLUMNS), f"bad row arity: {r}"
-        assert isinstance(r[6], (int, float)), f"non-numeric value: {r}"
+        assert isinstance(r[6], (int, float)) and not isinstance(r[6], bool), f"non-numeric value: {r}"
 
 
 def main() -> None:
