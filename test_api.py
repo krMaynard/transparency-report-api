@@ -3970,8 +3970,9 @@ class TestKoreaNetworkActTable:
         # removed never exceeds received for any provider-year.
         for r in data["rows"]:
             if r[2] == "annual_summary" and r[4] == "urls_removed":
-                recvd = next(x[6] for x in data["rows"] if x[0] == r[0]
-                             and x[1] == r[1] and x[4] == "urls_received")
+                recvd = next((x[6] for x in data["rows"] if x[0] == r[0]
+                              and x[1] == r[1] and x[4] == "urls_received"), None)
+                assert recvd is not None, f"no urls_received for {r[0]} {r[1]}"
                 assert 0 <= r[6] <= recvd
 
 
