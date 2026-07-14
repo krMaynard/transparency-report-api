@@ -3922,6 +3922,85 @@ class TestSingaporeTable:
         assert all(isinstance(r[6], (int, float)) for r in data["rows"])
 
 
+class TestEsafetyBoseTable:
+    def test_esafety_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "esafety_bose_metrics" in names
+
+    def test_esafety_fields_endpoint(self):
+        body = client.get("/api/fields?table=esafety_bose_metrics", headers=MOMO).json()
+        assert {"service", "period", "section", "category", "metric", "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_esafety_csea_per_service_figure(self):
+        # Facebook: global CSEA user reports 6.7M, median human-moderator response 706 min.
+        job = _submit_and_wait({
+            "table": "esafety_bose_metrics", "fields": ["metric", "unit", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["csea_periodic"]},
+            ]},
+            "sort": [{"field_name": "metric", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [
+            ["median_response_minutes", "minutes", 706],
+            ["user_reports_global", "count", 6700000],
+        ]
+
+    def test_esafety_ai_companion_figure(self):
+        job = _submit_and_wait({
+            "table": "esafety_bose_metrics", "fields": ["category", "unit", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["Character.AI"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["ai_companion_reports"]},
+            ]},
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["csea", "count", 1527]]
+
+    def test_esafety_unpinned_sum_warns(self):
+        # A SUM pinning none of section/metric/service mixes units + overlapping totals.
+        r = client.post("/api/explore", json={
+            "table": "esafety_bose_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        warnings = " ".join(r.json().get("warnings", []))
+        assert "section" in warnings and "metric" in warnings and "service" in warnings
+
+    def test_esafety_pinned_sum_no_warning(self):
+        r = client.post("/api/explore", json={
+            "table": "esafety_bose_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "service", "field_values": ["Facebook"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["csea_periodic"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["user_reports_global"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert not r.json().get("warnings")
+
+    def test_vendored_esafety_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("esafety-bose.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["service", "period", "section", "category", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 7 for r in data["rows"])
+        assert {r[2] for r in data["rows"]} == {
+            "csea_periodic", "ai_companion_reports", "ai_companion_staff", "survey_prevalence"}
+        assert all(isinstance(r[6], (int, float)) for r in data["rows"])
+        # The four Meta services must sum to the report's stated Meta aggregate.
+        def g(svc):
+            return next(r[6] for r in data["rows"]
+                        if r[0] == svc and r[4] == "user_reports_global")
+        assert sum(g(s) for s in ("Facebook", "Instagram", "Facebook Messenger", "Threads")) == 8_877_600
+
+
 class TestKoreaNetworkActTable:
     def test_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]

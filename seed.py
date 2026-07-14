@@ -117,6 +117,13 @@ _DEFAULT_SINGAPORE_SOURCE = os.getenv(
     "SEED_SINGAPORE_SOURCE_JSON",
     os.path.join(HERE, "data", "singapore-online-safety.json"),
 )
+# eSafety BOSE (Basic Online Safety Expectations) transparency findings —
+# vendored in-repo (built by scripts/build_esafety_bose.py from the archived
+# eSafety reports; no sibling-repo extractor, the figures are transcribed).
+_DEFAULT_ESAFETY_SOURCE = os.getenv(
+    "SEED_ESAFETY_SOURCE_JSON",
+    os.path.join(HERE, "data", "esafety-bose.json"),
+)
 # Korea Network Act (illegal-sexual-content) transparency report — vendored
 # in-repo (from the sibling data repo's korea-network-act/build_korea_network_act.py).
 _DEFAULT_KOREA_NETWORK_ACT_SOURCE = os.getenv(
@@ -617,6 +624,27 @@ CREATE TABLE singapore_metrics (
     value    REAL
 );
 CREATE INDEX idx_singapore_section ON singapore_metrics(section);
+
+-- eSafety BOSE (Basic Online Safety Expectations) transparency findings
+-- (scripts/build_esafety_bose.py). Australia's eSafety Commissioner publishes
+-- findings from the mandatory transparency notices it issues under the Online
+-- Safety Act 2021. Tidy-long: one row per measured value. Two streams
+-- (section): `csea_periodic` (the CSEA & sexual-extortion periodic report —
+-- user reports of CSEA per service, global, + median human-moderator response
+-- time in minutes; reporting period 15 Jun–15 Dec 2024) and the AI-companion
+-- non-periodic findings (`ai_companion_reports` per-provider user reports by
+-- harm, `ai_companion_staff` trust-&-safety headcount, `survey_prevalence`
+-- eSafety's 2026 child-usage survey). Dims inline.
+CREATE TABLE esafety_bose_metrics (
+    service  TEXT NOT NULL,     -- platform/provider, or an aggregate/total label
+    period   TEXT NOT NULL,     -- reporting window 'YYYY-MM-DD..YYYY-MM-DD' or 'YYYY'
+    section  TEXT NOT NULL,     -- csea_periodic / ai_companion_reports / ai_companion_staff / survey_prevalence
+    category TEXT NOT NULL,     -- harm/reason label; '' where not applicable
+    metric   TEXT NOT NULL,     -- user_reports_global, median_response_minutes, user_reports, ...
+    unit     TEXT NOT NULL,     -- count / minutes / percent
+    value    REAL
+);
+CREATE INDEX idx_esafety_section ON esafety_bose_metrics(section);
 
 -- Korea Network Act (illegal-sexual-content) transparency report
 -- (korea-network-act/build_korea_network_act.py). Tidy-long: Google's annual
@@ -1554,6 +1582,36 @@ def build_singapore_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_esafety_bose_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the esafety_bose_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long esafety-bose.json (`columns` header + `rows` in column order),
+    built by scripts/build_esafety_bose.py. Returns the fact-row count.
+    """
+    if data is None:
+        raise ValueError("esafety bose dataset is None")
+    expected_cols = ["service", "period", "section", "category",
+                     "metric", "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"esafety bose dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("esafety bose dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO esafety_bose_metrics (service, period, section, "
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_korea_network_act_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the korea_network_act_metrics table in an existing DB at db_path.
 
@@ -2200,6 +2258,8 @@ def main() -> None:
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
                         help="Path to singapore-online-safety.json")
+    parser.add_argument("--esafety-source", default=_DEFAULT_ESAFETY_SOURCE,
+                        help="Path to esafety-bose.json (Australia eSafety BOSE findings)")
     parser.add_argument("--korea-network-act-source", default=_DEFAULT_KOREA_NETWORK_ACT_SOURCE,
                         help="Path to korea-network-act.json")
     parser.add_argument("--japan-source", default=_DEFAULT_JAPAN_SOURCE,
@@ -2416,6 +2476,17 @@ def main() -> None:
     else:
         print(f"  (skipping Singapore online safety — not found: "
               f"{args.singapore_source})")
+
+    if os.path.isfile(args.esafety_source):
+        with open(args.esafety_source, "r", encoding="utf-8") as f:
+            esafety_data = json.load(f)
+        esafety_rows = build_esafety_bose_db(esafety_data, args.db)
+        print(f"  esafety BOSE: {esafety_rows} metric rows across "
+              f"{len({r[0] for r in esafety_data['rows']})} services, "
+              f"{len({r[2] for r in esafety_data['rows']})} sections")
+    else:
+        print(f"  (skipping eSafety BOSE — not found: "
+              f"{args.esafety_source})")
 
     if os.path.isfile(args.korea_network_act_source):
         with open(args.korea_network_act_source, "r", encoding="utf-8") as f:
