@@ -198,13 +198,17 @@ seed.build_taiwan_db(_TAIWAN_FIXTURE, _DB)
 
 # A small slice of the Türkiye Law 5651 dataset (turkey-law5651.json shape):
 # Meta (Facebook + Instagram, both request streams — individual Art. 9/9-A and
-# authority Art. 8/8-A with the per-authority breakdown, blank category) plus X
+# authority Art. 8/8-A with the per-authority breakdown, blank category), X
 # (individual stream broken down by issue category, with a requests count and an
-# action_rate percent).
+# action_rate percent), and TikTok (its standalone BTK report — individual stream
+# only, blank category, just applications_received per half-year).
 # [platform, period, section, category, metric, unit, value]
 _TURKEY_FIXTURE = {
     "columns": ["platform", "period", "section", "category", "metric", "unit", "value"],
     "rows": [
+        ["TikTok", "2024 H1", "individual_requests", "", "applications_received", "count", 256],
+        ["TikTok", "2024 H2", "individual_requests", "", "applications_received", "count", 1243],
+        ["TikTok", "2025 H2", "individual_requests", "", "applications_received", "count", 259],
         ["Facebook", "2024 H2", "individual_requests", "", "applications_received", "count", 294],
         ["Facebook", "2024 H2", "authority_requests", "", "requests_total", "count", 2724],
         ["Facebook", "2024 H2", "authority_requests", "", "requests_icta", "count", 2350],
@@ -383,9 +387,29 @@ _SINGAPORE_FIXTURE = {
 }
 seed.build_singapore_db(_SINGAPORE_FIXTURE, _DB)
 
+# A small slice of the eSafety BOSE dataset (esafety-bose.json shape): the CSEA
+# periodic per-service reports + median response time, the Meta aggregate total,
+# and the AI-companion per-provider figures across all four sections.
+# [service, period, section, category, metric, unit, value]
+_ESAFETY_FIXTURE = {
+    "columns": ["service", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Facebook", "2024-06-15..2024-12-15", "csea_periodic", "", "user_reports_global", "count", 6700000],
+        ["Facebook", "2024-06-15..2024-12-15", "csea_periodic", "", "median_response_minutes", "minutes", 706],
+        ["Snapchat", "2024-06-15..2024-12-15", "csea_periodic", "", "user_reports_global", "count", 1361148],
+        ["Meta services (aggregate)", "2024-06-15..2024-12-15", "csea_periodic", "", "user_reports_global", "count", 8877600],
+        ["Character.AI", "2025-07-01..2025-09-30", "ai_companion_reports", "csea", "user_reports", "count", 1527],
+        ["Nomi", "2025-07-01..2025-09-30", "ai_companion_reports", "self_harm", "user_reports", "count", 2],
+        ["Chub AI", "2025-07-01..2025-09-30", "ai_companion_staff", "", "trust_safety_staff", "count", 0],
+        ["AI companion", "2026", "survey_prevalence", "children_10_17", "ever_used", "percent", 8],
+    ],
+}
+seed.build_esafety_bose_db(_ESAFETY_FIXTURE, _DB)
+
 # A small slice of the Korea Network Act dataset (korea-network-act.json shape):
 # a couple of months of Google's illegal-sexual-content figures (2024 + 2025)
-# across the request/removal cross-cuts, plus the annual_summary rollup series.
+# across the request/removal cross-cuts, plus the annual_summary rollup series —
+# and Naver + Kakao, which file the KMCC template and populate annual_summary only.
 # [publisher, period, section, category, metric, unit, value]
 _KOREA_NETWORK_ACT_FIXTURE = {
     "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
@@ -402,6 +426,11 @@ _KOREA_NETWORK_ACT_FIXTURE = {
         ["Google", "2020", "annual_summary", "All", "urls_removed", "count", 42],
         ["Google", "2025", "annual_summary", "All", "urls_received", "count", 115280],
         ["Google", "2025", "annual_summary", "All", "urls_removed", "count", 92334],
+        # Naver & Kakao — annual_summary only (the KMCC §64-5 template's yearly figures).
+        ["Naver", "2023", "annual_summary", "All", "urls_received", "count", 54],
+        ["Naver", "2023", "annual_summary", "All", "urls_removed", "count", 5],
+        ["Kakao", "2023", "annual_summary", "All", "urls_received", "count", 51],
+        ["Kakao", "2023", "annual_summary", "All", "urls_removed", "count", 51],
     ],
 }
 seed.build_korea_network_act_db(_KOREA_NETWORK_ACT_FIXTURE, _DB)
