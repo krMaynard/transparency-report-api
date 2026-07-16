@@ -1268,6 +1268,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "ovhcloud_metrics": TableSpec(
+        "OVHcloud EU DSA transparency report — OVH Groupe SAS (Roubaix, France), Europe's largest cloud/hosting provider (~450,000 servers, 1.6M customers), reporting as a DSA hosting INTERMEDIARY for 2024-02-17 … 2024-12-31 (a narrative PDF, not the harmonised Art. 15/24 template). As an infrastructure host it can't see or selectively remove customer content, so there are NO content-moderation removals; it discloses authority orders and illegal-content notices. One row per measured value, identified by section × category × metric; publisher is 'OVHcloud', period is '2024'. Three sections: 'member_state_orders' (Art. 9/10/15 authority orders received, category = country germany/belgium/spain/france/poland; metric 'orders_received' count, 'median_implementation_hours' hours) — the report's per-country order counts are DISJOINT so summing them over category is a legitimate total (France 3,339 and Belgium 2,932 dominate; total 6,919). 'illegal_content_notices' (Art. 16 notices via the abuse form, category = ip_infringement/csam/violent_or_shocking/personal_data/phishing/other; metric 'notices_received' count, 'median_action_seconds' seconds, 'automated_share_pct' percent) — the six notice counts are disjoint; note 'personal_data' reports (4,642) are excluded from the DSA-scope total below because data-protection complaints aren't DSA 'illegal content'. 'notice_totals' (category 'all'; metric 'total_notices_received' 3,296,689, 'dsa_scope_notices' 923,765 = the six categories minus personal_data, 'out_of_scope_notices' 2,372,924) — a report-wide rollup that already sums the per-category notices. unit is 'count' / 'hours' / 'seconds' / 'percent'. Pin a 'section' (and usually 'metric') before aggregating: never sum across sections (order counts, notice counts and the totals rollup aren't additive), and median times / automation percentages are rates that must never be SUMmed.",
+        "FROM ovhcloud_metrics f",
+        {
+            "publisher": "f.publisher",
+            "period":    "f.period",
+            "section":   "f.section",
+            "category":  "f.category",
+            "metric":    "f.metric",
+            "unit":      "f.unit",
+        },
+        {
+            "value": "f.value",
+        },
+    ),
     "ai_training_metrics": TableSpec(
         "EU AI Act (Reg. 2024/1689) Art. 53(1)(d) training-data transparency summaries — the public summary of training content each general-purpose AI provider must publish on the AI Office's standardised template (in force Aug 2025). One row per disclosed field, identified by provider × model × section × field. `section` is 'modality' (field = Text/Image/Audio/Video/Other; value = the banded training-data size, e.g. 'More than 10 trillion tokens'; the numeric `size_rank` = 1/2/3 across the three bands, 0 = 'Not applicable', so coarse sizes are comparable across providers), 'general' (data_cutoff, ongoing_collection) or 'data_source' (publicly_available / commercially_licensed / third_party_private / personal_data / synthetic; value = Yes/No/Not applicable). `value` is text; `size_rank` is an ordinal rank (compare with MIN/MAX, don't SUM). Cross-provider, comparable; a starting set (Google + Microsoft) that expands as more providers' summaries are archived.",
         "FROM ai_training_metrics f",
@@ -2592,6 +2607,12 @@ def china_page() -> FileResponse:
 def china12321_page() -> FileResponse:
     """Serve the China 12321 telecom-spam dataset page (reads POST /api/explore)."""
     return _serve_page("china-12321.html", "China 12321 page")
+
+
+@app.get("/ovhcloud", response_class=HTMLResponse)
+def ovhcloud_page() -> FileResponse:
+    """Serve the OVHcloud DSA transparency dataset page (reads POST /api/explore)."""
+    return _serve_page("ovhcloud.html", "OVHcloud page")
 
 
 @app.get("/dsa-db", response_class=HTMLResponse)
@@ -4221,6 +4242,20 @@ def _leg_warnings(
                 "'china12321_metrics' category 'sms' already sums 'sms_spam' + "
                 "'sms_illegal'; summing categories together double-counts. This "
                 "aggregate pins no 'category'. Filter or group by 'category'."
+            )
+    # ovhcloud_metrics spans different sections and units — order counts, notice
+    # counts, median response times and automation percentages — and its
+    # 'notice_totals' section already sums the per-category notices.
+    if table == "ovhcloud_metrics" and any(
+        a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
+    ):
+        if "section" not in pinned:
+            out.append(
+                "'ovhcloud_metrics' mixes sections and units — order counts, "
+                "notice counts, median response times (hours/seconds) and "
+                "automation percentages — and the 'notice_totals' section already "
+                "sums the per-category notices. This aggregate pins no 'section'. "
+                "Filter or group by 'section' (and usually 'metric')."
             )
     # cser_metrics mixes counts and rate-percentages across metrics, and carries
     # a 'Cross-Policy Data' aggregate alongside the per-policy-area rows.

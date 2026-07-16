@@ -3784,6 +3784,67 @@ class TestChina12321Table:
         assert r.status_code == 200 and "china12321_metrics" in r.text
 
 
+class TestOvhcloudTable:
+    def test_ovhcloud_table_listed(self):
+        names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "ovhcloud_metrics" in names
+
+    def test_ovhcloud_fields_endpoint(self):
+        body = client.get("/api/fields?table=ovhcloud_metrics", headers=MOMO).json()
+        assert {"publisher", "period", "section", "category", "metric",
+                "unit"} <= set(body["dimensions"]["fields"])
+        assert "value" in body["measures"]["fields"]
+
+    def test_ovhcloud_france_orders(self):
+        # France received 3,339 member-state authority orders in 2024.
+        r = client.post("/api/explore", json={
+            "table": "ovhcloud_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["member_state_orders"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["france"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["orders_received"]},
+            ]},
+            "fields": ["value", "unit"],
+        })
+        assert r.status_code == 200
+        assert r.json()["rows"][0] == [3339, "count"]
+
+    def test_ovhcloud_notices_reconcile(self):
+        # The six per-category notice counts minus personal_data (not DSA
+        # 'illegal content') equal the report's DSA-scope total (923,765).
+        cat = client.post("/api/explore", json={
+            "table": "ovhcloud_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["illegal_content_notices"]},
+                {"operation": "EQ", "field_name": "metric", "field_values": ["notices_received"]},
+            ]},
+            "fields": ["category", "value"],
+        }).json()["rows"]
+        by_cat = {c: v for c, v in cat}
+        dsa_scope = client.post("/api/explore", json={
+            "table": "ovhcloud_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "metric", "field_values": ["dsa_scope_notices"]},
+            ]},
+            "fields": ["value"],
+        }).json()["rows"][0][0]
+        assert sum(by_cat.values()) - by_cat["personal_data"] == dsa_scope
+
+    def test_ovhcloud_unpinned_sum_warns(self):
+        # Summing 'value' across sections/units double-counts (notice_totals
+        # already sums the categories), so an unpinned SUM warns to pin a section.
+        r = client.post("/api/explore", json={
+            "table": "ovhcloud_metrics",
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        assert "section" in " ".join(r.json().get("warnings", []))
+
+    def test_ovhcloud_page_served(self):
+        r = client.get("/ovhcloud")
+        assert r.status_code == 200 and "ovhcloud_metrics" in r.text
+
+
 class TestCserTable:
     def test_cser_table_listed(self):
         names = [t["name"] for t in client.get("/api/tables", headers=MOMO).json()["tables"]]
