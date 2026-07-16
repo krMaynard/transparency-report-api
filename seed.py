@@ -124,6 +124,14 @@ _DEFAULT_ESAFETY_SOURCE = os.getenv(
     "SEED_ESAFETY_SOURCE_JSON",
     os.path.join(HERE, "data", "esafety-bose.json"),
 )
+# eSafety BOSE transparency-notice metric streams (the earlier/adjacent notice
+# rounds: first & second CSEA notices, online hate, age assurance, TVE) —
+# vendored in-repo (built by scripts/build_esafety_bose_notices.py; transcribed).
+# Seeded into the SAME esafety_bose_metrics table as _DEFAULT_ESAFETY_SOURCE.
+_DEFAULT_ESAFETY_NOTICES_SOURCE = os.getenv(
+    "SEED_ESAFETY_NOTICES_SOURCE_JSON",
+    os.path.join(HERE, "data", "esafety-bose-notices.json"),
+)
 # Korea Network Act (illegal-sexual-content) transparency report — vendored
 # in-repo (from the sibling data repo's korea-network-act/build_korea_network_act.py).
 _DEFAULT_KOREA_NETWORK_ACT_SOURCE = os.getenv(
@@ -2260,6 +2268,8 @@ def main() -> None:
                         help="Path to singapore-online-safety.json")
     parser.add_argument("--esafety-source", default=_DEFAULT_ESAFETY_SOURCE,
                         help="Path to esafety-bose.json (Australia eSafety BOSE findings)")
+    parser.add_argument("--esafety-notices-source", default=_DEFAULT_ESAFETY_NOTICES_SOURCE,
+                        help="Path to esafety-bose-notices.json (eSafety BOSE notice-round streams)")
     parser.add_argument("--korea-network-act-source", default=_DEFAULT_KOREA_NETWORK_ACT_SOURCE,
                         help="Path to korea-network-act.json")
     parser.add_argument("--japan-source", default=_DEFAULT_JAPAN_SOURCE,
@@ -2487,6 +2497,17 @@ def main() -> None:
     else:
         print(f"  (skipping eSafety BOSE — not found: "
               f"{args.esafety_source})")
+
+    if os.path.isfile(args.esafety_notices_source):
+        with open(args.esafety_notices_source, "r", encoding="utf-8") as f:
+            esafety_notices_data = json.load(f)
+        esafety_notices_rows = build_esafety_bose_db(esafety_notices_data, args.db)
+        print(f"  esafety BOSE notices: {esafety_notices_rows} metric rows across "
+              f"{len({r[0] for r in esafety_notices_data['rows']})} services, "
+              f"{len({r[2] for r in esafety_notices_data['rows']})} sections")
+    else:
+        print(f"  (skipping eSafety BOSE notices — not found: "
+              f"{args.esafety_notices_source})")
 
     if os.path.isfile(args.korea_network_act_source):
         with open(args.korea_network_act_source, "r", encoding="utf-8") as f:

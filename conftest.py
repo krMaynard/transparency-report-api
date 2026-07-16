@@ -402,6 +402,22 @@ _ESAFETY_FIXTURE = {
 }
 seed.build_esafety_bose_db(_ESAFETY_FIXTURE, _DB)
 
+# A small slice of the eSafety BOSE transparency-NOTICE streams
+# (esafety-bose-notices.json shape) — same table, notice-round sections: online-
+# hate staffing snapshots, an age-assurance MAU age band, and a TVEC proactive/
+# reported pair. Loaded via a second call into the same esafety_bose_metrics table.
+_ESAFETY_NOTICES_FIXTURE = {
+    "columns": ["service", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["Twitter", "2022-10-27", "hate_staffing", "ts_staff_global", "staff_count", "count", 4062],
+        ["Twitter", "2023-05-31", "hate_staffing", "ts_staff_global", "staff_count", "count", 2849],
+        ["Instagram", "2024-01-01..2024-07-31", "age_mau", "13_17", "avg_monthly_active_end_users", "count", 1088980],
+        ["YouTube", "2023-04-01..2024-02-29", "tvec_proactive_detection", "all", "pct_proactively_detected", "percent", 95.3],
+        ["YouTube", "2023-04-01..2024-02-29", "tvec_proactive_detection", "all", "pct_reported", "percent", 4.7],
+    ],
+}
+seed.build_esafety_bose_db(_ESAFETY_NOTICES_FIXTURE, _DB)
+
 # A small slice of the Korea Network Act dataset (korea-network-act.json shape):
 # a couple of months of Google's illegal-sexual-content figures (2024 + 2025)
 # across the request/removal cross-cuts, plus the annual_summary rollup series.

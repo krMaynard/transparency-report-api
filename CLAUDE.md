@@ -83,6 +83,8 @@ Built to demonstrate two things:
 | `data/meta-cser.json` | Vendored snapshot of Meta's Community Standards Enforcement Report (sibling `dsa-transparency-data/meta-cser/build_cser.py`) — a tidy-long `columns`+`rows` list; seeded into the `cser_metrics` table by `seed.build_cser_db` |
 | `data/esafety-bose.json` | Australia eSafety BOSE (Basic Online Safety Expectations) transparency findings — a tidy-long `columns`+`rows` list; **built in-repo by `scripts/build_esafety_bose.py`** (no sibling extractor; figures transcribed from the archived eSafety reports); seeded into the `esafety_bose_metrics` table by `seed.build_esafety_bose_db` |
 | `scripts/build_esafety_bose.py` | Builds `data/esafety-bose.json` from the transcribed eSafety report figures (CSEA periodic Figure 4 + AI-companion findings), with page citations inline and a fail-loud cross-check that the four Meta services sum to the report's stated Meta aggregate |
+| `data/esafety-bose-notices.json` | eSafety BOSE transparency-**notice** metric streams (the earlier/adjacent notice rounds — first & second CSEA notices, online hate, age assurance, TVE) — a tidy-long `columns`+`rows` list; **built in-repo by `scripts/build_esafety_bose_notices.py`**; seeded into the SAME `esafety_bose_metrics` table by `seed.build_esafety_bose_db` (a second load block) |
+| `scripts/build_esafety_bose_notices.py` | Builds `data/esafety-bose-notices.json` from the transcribed figures of eSafety's five BOSE notice-round reports (2022–2025), each a `section` family (`csea22_*`/`csea23_*`/`hate_*`/`age_*`/`tvec_*`), with page/table citations inline and fail-loud cross-checks (proactive+reported shares → 100%, MAU age bands summing, derived staffing % changes) |
 | `data/tiktok-cger.json` | Vendored snapshot of TikTok's Community Guidelines Enforcement Report (sibling `dsa-transparency-data/tiktok-cger/build_cger.py`) — a tidy-long `columns`+`rows` list (global `All`-location cut); seeded into the `tiktok_cger_metrics` table by `seed.build_tiktok_cger_db` |
 | `data/tco-regulation.json` | Vendored snapshot of the EU Terrorist Content Online Regulation transparency reports (sibling `dsa-transparency-data/tco-regulation/build_tco.py`) — a tidy-long `columns`+`rows` list across the authority (Art. 8 / Commission) and platform (Art. 7) streams; seeded into the `tco_metrics` table by `seed.build_tco_db` |
 | `data/ai-training-transparency.json` | Vendored snapshot of the EU AI Act Art. 53(1)(d) training-data transparency summaries (sibling `dsa-transparency-data/ai-training-transparency/build_ai_training.py`) — a tidy-long `columns`+`rows` list across providers' public summaries of training content (Google + Meta + OpenAI PDFs + Microsoft Hugging Face cards); seeded into the `ai_training_metrics` table by `seed.build_ai_training_db` |
@@ -563,7 +565,40 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   itself part of the 11,458,969 all-services total), so pin a single `service`
   (or exclude the total/aggregate labels) before summing; pin `section` **and**
   `metric` too. `_leg_warnings` warns on all three. No dataset page yet (query
-  via `/api/query`/`/api/explore`/`/schema`).
+  via `/api/query`/`/api/explore`/`/schema`). **Alongside those two streams**,
+  the SAME table also carries the quantitative figures from eSafety's earlier /
+  adjacent BOSE transparency-**notice** rounds — a second vendored snapshot
+  (`data/esafety-bose-notices.json`, built by
+  `scripts/build_esafety_bose_notices.py`, seeded via a second
+  `build_esafety_bose_db` call), each round its own `section` family (all figures
+  self-reported by the providers, unverified by eSafety, over each notice's own
+  reporting period): **`csea22_*`** (first CSEA non-periodic notices, 2022 —
+  Apple/Meta/WhatsApp/Microsoft/Skype/Snap/Omegle: median time-to-action +
+  detection-method shares), **`csea23_*`** (second CSEA notices,
+  `2022-01-24..2023-01-31` — Google/Twitter/TikTok/Discord/Twitch:
+  proactive-detection rates, underage users removed global+Australia, response
+  times, moderator languages), **`hate_*`** (X Corp/Twitter online-hate notice,
+  24 Jan 2022–31 May 2023 — the flagship pre/post-acquisition trust-&-safety
+  staffing headcounts by snapshot date, staffing % change, report volumes,
+  identification-source split, Twitter Blue enforcement, reinstatement/amnesty),
+  **`age_*`** (the "Behind the screen" age-assurance §20 Information Requests,
+  `2024-01-01..2024-07-31` — 8 social-media services: Australian monthly-active
+  users by age band, under-13 report volumes + median response minutes, under-13
+  bans with proactive/user-report split, Snap age-tool accuracy), and
+  **`tvec_*`** (terrorist & violent extremist material mandatory notices,
+  `2023-04-01..2024-02-29` — Google/Meta/WhatsApp/Reddit/Telegram; X supplied
+  nothing: proactive detection by surface, %-sent-for-human-review, median
+  response times global+Australia, staffing headcounts by date, language
+  coverage, appeals by alert-source × target, plus a `tvec_csea_*` sub-stream
+  Reddit & Telegram also answered). These notice sections mix
+  `percent`/`hours`/`minutes`/`count`/`approx_count` and carry overlapping grains
+  (surface breakdowns, global-vs-Australia columns, employees-vs-contractors,
+  appeal splits) and per-provider-incomparable definitions, so **always pin
+  `section` + `metric` + `service` (usually `category`) before aggregating**;
+  `_leg_warnings` (same section/metric/service check) covers them. Snapshot dates
+  are stored as the `period` (e.g. `2022-10-27`); banded ranges use `_low`/`_high`
+  metric suffixes; single-bound values (">99%", "~66%") store the number. Both
+  snapshots are **hand-transcribed** and merit review against the source PDFs.
 - **Korea Network Act (illegal-sexual-content)** — a single **tidy-long**
   `korea_network_act_metrics` table (one row per measured value: `publisher`/
   `period`/`section`/`category`/`metric`/`unit` + a `value`; dims inline). The
