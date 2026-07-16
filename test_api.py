@@ -4019,6 +4019,56 @@ class TestEsafetyBoseTable:
                         if r[0] == svc and r[4] == "user_reports_global")
         assert sum(g(s) for s in ("Facebook", "Instagram", "Facebook Messenger", "Threads")) == 8_877_600
 
+    def test_esafety_notices_hate_staffing(self):
+        # Online-hate staffing snapshots ride in the same table under hate_staffing.
+        job = _submit_and_wait({
+            "table": "esafety_bose_metrics", "group_by": ["period"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["hate_staffing"]},
+                {"operation": "EQ", "field_name": "category", "field_values": ["ts_staff_global"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "n"}],
+            "sort": [{"field_name": "period", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
+        assert body["rows"] == [["2022-10-27", 4062], ["2023-05-31", 2849]]
+
+    def test_esafety_notices_tvec_pair(self):
+        # A TVEC proactive/reported pair sums to 100% (a builder cross-check, via the API).
+        r = client.post("/api/explore", json={
+            "table": "esafety_bose_metrics", "group_by": ["metric"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "section", "field_values": ["tvec_proactive_detection"]},
+                {"operation": "EQ", "field_name": "service", "field_values": ["YouTube"]},
+            ]},
+            "aggregates": [{"function": "SUM", "field_name": "value", "alias": "v"}],
+        })
+        assert r.status_code == 200
+        got = {row[0]: row[1] for row in r.json()["rows"]}
+        assert got["pct_proactively_detected"] + got["pct_reported"] == 100.0
+
+    def test_vendored_esafety_notices_dataset_shape(self):
+        import json
+        import pathlib
+        data = json.loads(pathlib.Path(__file__).with_name("data")
+                          .joinpath("esafety-bose-notices.json").read_text(encoding="utf-8"))
+        assert data["columns"] == ["service", "period", "section", "category", "metric", "unit", "value"]
+        assert data["rows"] and all(len(r) == 7 for r in data["rows"])
+        assert all(isinstance(r[6], (int, float)) for r in data["rows"])
+        sections = {r[2] for r in data["rows"]}
+        # every notice-family prefix is represented
+        assert any(s.startswith("csea22_") for s in sections)
+        assert any(s.startswith("csea23_") for s in sections)
+        assert any(s.startswith("hate_") for s in sections)
+        assert any(s.startswith("age_") for s in sections)
+        assert any(s.startswith("tvec_") for s in sections)
+        # Behind-the-screen MAU age bands sum within each provider (Twitch excepted).
+        idx = {(r[0], r[3]): r[6] for r in data["rows"]
+               if r[2] == "age_mau" and r[4] == "avg_monthly_active_end_users"}
+        for svc in ("Discord", "Facebook", "Instagram", "Snapchat", "TikTok", "YouTube"):
+            assert idx[(svc, "13_15")] + idx[(svc, "16_17")] == idx[(svc, "13_17")]
+
 
 class TestKoreaNetworkActTable:
     def test_table_listed(self):
