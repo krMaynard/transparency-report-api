@@ -706,6 +706,8 @@ def validate(rows: list[list]) -> None:
     def chg(svc, cat, d0, d1):
         v0 = idx[(svc, d0, "tvec_staffing", cat, "staff_count")]
         v1 = idx[(svc, d1, "tvec_staffing", cat, "staff_count")]
+        if v0 == 0:  # guard: some categories (e.g. content_moderators_employed) are 0
+            return 0.0 if v1 == 0 else float("inf")
         return round((v1 - v0) / v0 * 100, 1)
     assert chg("Meta", "trust_safety_staff_other", "2023-03-31", "2023-12-31") == -27.8, "Meta T&S-other %chg"
     assert chg("Google", "content_moderators_employed", "2023-04-01", "2024-02-29") == 7.9, "Google mods %chg"
