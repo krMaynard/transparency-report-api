@@ -259,7 +259,9 @@ seed.build_tco_db(_TCO_FIXTURE, _DB)
 # A small slice of the EU AI Act training-data transparency dataset
 # (ai-training-transparency.json shape): the modality size bands (with the
 # comparable size_rank), the general fields and the data-source flags for a
-# Google, a Meta and a Microsoft model (Meta adds the crawled/user_data sources).
+# Google, a Meta and a Microsoft model (Meta adds the crawled/user_data sources),
+# plus xAI (Yes to every data source) and Bria (licensed-only, and the band text
+# annotated with the exact figure it filed instead of ticking a band).
 _AI_TRAINING_FIXTURE = {
     "columns": ["provider", "model", "released", "section", "field", "value", "size_rank"],
     "rows": [
@@ -281,6 +283,20 @@ _AI_TRAINING_FIXTURE = {
          "Not applicable. Images are not part of the training", 0],
         ["Microsoft", "phi-4", "12-Dec-2024", "general", "data_cutoff",
          "30-Jun-2024", None],
+        ["xAI", "Grok 4.5", "July 2026", "modality", "Text",
+         "More than 10 trillion tokens", 3],
+        ["xAI", "Grok 4.5", "July 2026", "modality", "Video",
+         "More than 1 million hours", 3],
+        ["xAI", "Grok 4.5", "July 2026", "general", "data_cutoff", "06/2026", None],
+        ["xAI", "Grok 4.5", "July 2026", "data_source", "crawled", "Yes", None],
+        ["xAI", "Grok 4.5", "July 2026", "data_source", "user_data", "Yes", None],
+        ["Bria", "Bria 3.2", "June 2025", "modality", "Text",
+         "1 billion to 10 trillion tokens (reported as: up to 19.2 billion tokens)", 2],
+        ["Bria", "Bria 3.2", "June 2025", "modality", "Image",
+         "1 million to 1 billion images (reported as: 479 million images)", 2],
+        ["Bria", "Bria 3.2", "June 2025", "data_source", "publicly_available", "No", None],
+        ["Bria", "Bria 3.2", "June 2025", "data_source", "commercially_licensed", "Yes", None],
+        ["Bria", "Bria 3.2", "June 2025", "data_source", "crawled", "No", None],
     ],
 }
 seed.build_ai_training_db(_AI_TRAINING_FIXTURE, _DB)

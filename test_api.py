@@ -3582,6 +3582,76 @@ class TestAiTrainingTable:
         assert vals["Google"] == "More than 10 trillion tokens"
         assert vals["Microsoft"] == "1 billion to 10 trillion tokens"
 
+    def test_ai_training_xai_all_data_sources_yes(self):
+        # xAI's Grok 4.5 summary answers Yes to every data-source category.
+        r = client.post("/api/explore", json={
+            "table": "ai_training_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "provider", "field_values": ["xAI"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["data_source"]},
+            ]},
+            "fields": ["field", "value"],
+        })
+        assert r.status_code == 200
+        vals = {row[0]: row[1] for row in r.json()["rows"]}
+        assert vals and set(vals.values()) == {"Yes"}
+
+    def test_ai_training_bria_licensed_only(self):
+        # Bria 3.2 is the licensed-only filer: no public datasets, no crawling.
+        r = client.post("/api/explore", json={
+            "table": "ai_training_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "provider", "field_values": ["Bria"]},
+                {"operation": "EQ", "field_name": "section", "field_values": ["data_source"]},
+            ]},
+            "fields": ["field", "value"],
+        })
+        assert r.status_code == 200
+        vals = {row[0]: row[1] for row in r.json()["rows"]}
+        assert vals["commercially_licensed"] == "Yes"
+        assert vals["publicly_available"] == "No" and vals["crawled"] == "No"
+
+    def test_ai_training_bria_band_keeps_filed_figure(self):
+        # Bria filed exact figures instead of ticking a band: the value keeps the
+        # filed figure verbatim while size_rank still places it in the band.
+        r = client.post("/api/explore", json={
+            "table": "ai_training_metrics",
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "provider", "field_values": ["Bria"]},
+                {"operation": "EQ", "field_name": "field", "field_values": ["Text"]},
+            ]},
+            "fields": ["value", "size_rank"],
+        })
+        assert r.status_code == 200
+        row = r.json()["rows"][0]
+        assert "19.2 billion tokens" in row[0] and row[1] == 2
+
+    def test_vendored_ai_training_dataset_shape(self):
+        # Guard the real vendored snapshot (the fixture above is only a slice):
+        # every modality row must carry a comparable size_rank, and the two
+        # newest filings must be present.
+        import os
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "data", "ai-training-transparency.json")
+        with open(path, encoding="utf-8") as fh:
+            data = json.load(fh)
+        assert data["columns"] == ["provider", "model", "released", "section",
+                                   "field", "value", "size_rank"]
+        for row in data["rows"]:
+            assert len(row) == len(data["columns"]), f"bad row arity: {row}"
+            section, value, rank = row[3], row[5], row[6]
+            assert isinstance(value, str) and value, f"row without a filed value: {row}"
+            if section == "modality":
+                assert rank in (0, 1, 2, 3), f"modality row without a band rank: {row}"
+                # A "Not applicable" modality is rank 0, and only rank 0.
+                assert ("not applicable" in value.lower()) == (rank == 0), row
+            else:
+                assert rank is None, f"non-modality row carrying a rank: {row}"
+        providers = {r[0] for r in data["rows"]}
+        assert {"xAI", "Bria"} <= providers
+        xai = {r[4]: r[5] for r in data["rows"] if r[0] == "xAI" and r[3] == "data_source"}
+        assert set(xai.values()) == {"Yes"}, "xAI is the Yes-to-everything filer"
+
     def test_ai_training_page_served(self):
         r = client.get("/ai-training")
         assert r.status_code == 200 and "ai_training_metrics" in r.text
