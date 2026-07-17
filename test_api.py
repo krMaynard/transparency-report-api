@@ -3640,6 +3640,7 @@ class TestAiTrainingTable:
         for row in data["rows"]:
             assert len(row) == len(data["columns"]), f"bad row arity: {row}"
             section, value, rank = row[3], row[5], row[6]
+            assert isinstance(value, str) and value, f"row without a filed value: {row}"
             if section == "modality":
                 assert rank in (0, 1, 2, 3), f"modality row without a band rank: {row}"
                 # A "Not applicable" modality is rank 0, and only rank 0.
