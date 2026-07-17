@@ -106,6 +106,10 @@ _DEFAULT_CIIRC_SOURCE = os.getenv(
 _DEFAULT_CHINA12321_SOURCE = os.getenv(
     "SEED_CHINA12321_SOURCE_JSON", os.path.join(HERE, "data", "china-12321.json")
 )
+# OVHcloud EU DSA transparency report (ovhcloud-transparency/build_ovhcloud.py).
+_DEFAULT_OVHCLOUD_SOURCE = os.getenv(
+    "SEED_OVHCLOUD_SOURCE_JSON", os.path.join(HERE, "data", "ovhcloud-transparency.json")
+)
 # Meta Community Standards Enforcement Report — vendored in-repo (from the
 # sibling data repo's meta-cser/build_cser.py).
 _DEFAULT_CSER_SOURCE = os.getenv(
@@ -599,6 +603,25 @@ CREATE TABLE china12321_metrics (
     value     REAL
 );
 CREATE INDEX idx_china12321_period ON china12321_metrics(period);
+
+-- OVHcloud EU DSA transparency report (ovhcloud-transparency/build_ovhcloud.py).
+-- OVH Groupe SAS (Roubaix, France), Europe's largest cloud/hosting provider, as a
+-- DSA hosting intermediary. A narrative PDF (not the Art. 15/24 harmonised
+-- template), period 2024-02-17 … 2024-12-31. No content-moderation removals (an
+-- infrastructure host cannot see or selectively remove customer content); it
+-- discloses authority orders per member state and Art. 16 illegal-content notices
+-- by category. Tidy-long: one row per measured value, by section × category ×
+-- metric.
+CREATE TABLE ovhcloud_metrics (
+    publisher TEXT NOT NULL,     -- OVHcloud
+    period    TEXT NOT NULL,     -- '2024' (report period 2024-02-17 … 2024-12-31)
+    section   TEXT NOT NULL,     -- member_state_orders / illegal_content_notices / notice_totals
+    category  TEXT NOT NULL,     -- country (germany…) / content category (ip_infringement…) / 'all'
+    metric    TEXT NOT NULL,     -- orders_received / median_implementation_hours / notices_received / median_action_seconds / automated_share_pct / total_notices_received / dsa_scope_notices / out_of_scope_notices
+    unit      TEXT NOT NULL,     -- count / hours / seconds / percent
+    value     REAL
+);
+CREATE INDEX idx_ovhcloud_period ON ovhcloud_metrics(period);
 
 -- Meta Community Standards Enforcement Report (meta-cser/build_cser.py). Meta's
 -- voluntary quarterly content-moderation report, Facebook + Instagram, 2017 Q4
@@ -1710,6 +1733,36 @@ def build_china12321_db(data: dict[str, Any], db_path: str) -> int:
         conn.close()
 
 
+def build_ovhcloud_db(data: dict[str, Any], db_path: str) -> int:
+    """Populate the ovhcloud_metrics table in an existing DB at db_path.
+
+    The DB must already contain the table (created by SCHEMA). The dataset is the
+    tidy-long ovhcloud-transparency.json (`columns` header + `rows` in column
+    order). Returns the fact-row count.
+    """
+    if not isinstance(data, dict):
+        raise ValueError("ovhcloud dataset must be a dictionary")
+    expected_cols = ["publisher", "period", "section", "category", "metric",
+                     "unit", "value"]
+    if data.get("columns") != expected_cols:
+        raise ValueError(f"ovhcloud dataset columns {data.get('columns')} "
+                         f"don't match the expected order {expected_cols}")
+    rows = data.get("rows")
+    if rows is None:
+        raise ValueError("ovhcloud dataset is missing 'rows'")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO ovhcloud_metrics (publisher, period, section, "
+                "category, metric, unit, value) VALUES (?,?,?,?,?,?,?)",
+                rows,
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def build_cser_db(data: dict[str, Any], db_path: str) -> int:
     """Populate the cser_metrics table in an existing DB at db_path.
 
@@ -2262,6 +2315,8 @@ def main() -> None:
                         help="Path to china-ciirc.json")
     parser.add_argument("--china12321-source", default=_DEFAULT_CHINA12321_SOURCE,
                         help="Path to china-12321.json")
+    parser.add_argument("--ovhcloud-source", default=_DEFAULT_OVHCLOUD_SOURCE,
+                        help="Path to ovhcloud-transparency.json")
     parser.add_argument("--cser-source", default=_DEFAULT_CSER_SOURCE,
                         help="Path to meta-cser.json")
     parser.add_argument("--singapore-source", default=_DEFAULT_SINGAPORE_SOURCE,
@@ -2464,6 +2519,15 @@ def main() -> None:
               f"{len({r[1] for r in china12321_data['rows']})} bulletins")
     else:
         print(f"  (skipping China 12321 — not found: {args.china12321_source})")
+
+    if os.path.isfile(args.ovhcloud_source):
+        with open(args.ovhcloud_source, "r", encoding="utf-8") as f:
+            ovhcloud_data = json.load(f)
+        ovhcloud_rows = build_ovhcloud_db(ovhcloud_data, args.db)
+        print(f"  ovhcloud: {ovhcloud_rows} rows across "
+              f"{len({r[2] for r in ovhcloud_data['rows']})} sections")
+    else:
+        print(f"  (skipping OVHcloud — not found: {args.ovhcloud_source})")
 
     if os.path.isfile(args.cser_source):
         with open(args.cser_source, "r", encoding="utf-8") as f:

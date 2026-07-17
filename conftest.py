@@ -344,6 +344,31 @@ _CHINA12321_FIXTURE = {
 }
 seed.build_china12321_db(_CHINA12321_FIXTURE, _DB)
 
+# A slice of the OVHcloud dataset (ovhcloud-transparency.json shape): a couple of
+# member-state order rows, all six illegal-content-notice counts (so the
+# DSA-scope reconciliation holds — the six minus personal_data = dsa_scope), a
+# couple of rate rows, and the report-wide totals.
+_OVHCLOUD_FIXTURE = {
+    "columns": ["publisher", "period", "section", "category", "metric", "unit", "value"],
+    "rows": [
+        ["OVHcloud", "2024", "member_state_orders", "france", "orders_received", "count", 3339],
+        ["OVHcloud", "2024", "member_state_orders", "france", "median_implementation_hours", "hours", 8],
+        ["OVHcloud", "2024", "member_state_orders", "belgium", "orders_received", "count", 2932],
+        ["OVHcloud", "2024", "member_state_orders", "spain", "median_implementation_hours", "hours", 145],
+        ["OVHcloud", "2024", "illegal_content_notices", "ip_infringement", "notices_received", "count", 794377],
+        ["OVHcloud", "2024", "illegal_content_notices", "ip_infringement", "automated_share_pct", "percent", 42.83],
+        ["OVHcloud", "2024", "illegal_content_notices", "csam", "notices_received", "count", 2415],
+        ["OVHcloud", "2024", "illegal_content_notices", "violent_or_shocking", "notices_received", "count", 1055],
+        ["OVHcloud", "2024", "illegal_content_notices", "personal_data", "notices_received", "count", 4642],
+        ["OVHcloud", "2024", "illegal_content_notices", "phishing", "notices_received", "count", 96075],
+        ["OVHcloud", "2024", "illegal_content_notices", "other", "notices_received", "count", 29843],
+        ["OVHcloud", "2024", "notice_totals", "all", "total_notices_received", "count", 3296689],
+        ["OVHcloud", "2024", "notice_totals", "all", "dsa_scope_notices", "count", 923765],
+        ["OVHcloud", "2024", "notice_totals", "all", "out_of_scope_notices", "count", 2372924],
+    ],
+}
+seed.build_ovhcloud_db(_OVHCLOUD_FIXTURE, _DB)
+
 # A small slice of the Meta CSER dataset (meta-cser.json shape): Facebook +
 # Instagram, a couple of policy areas and quarters, mixing count metrics
 # (Content Actioned) and percent metrics (Proactive rate, prevalence bounds),
