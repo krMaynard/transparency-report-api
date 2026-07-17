@@ -162,7 +162,7 @@ threat model demands it.
 | **Railway** | Fastest to ship elsewhere | Push-to-deploy, managed Redis add-on, automatic HTTPS |
 | **Fly.io** | Low-latency / multi-region | Built-in secrets, automatic HTTPS, `fly redis create` |
 | **AWS ECS + ElastiCache** | Existing AWS footprint | More ops overhead, more control |
-| **Hetzner / VPS + Caddy** | Lowest cost, full control | Single server + Caddy for automatic Let's Encrypt TLS; fine until you need HA |
+| **Hetzner / VPS + Caddy** | Lowest cost, full control | Single server + Caddy for automatic Let's Encrypt TLS; fine until you need HA. **Wired up:** `docker-compose.prod.yml` + `Caddyfile` — see [`DEPLOY-SELFHOST.md`](DEPLOY-SELFHOST.md) |
 
 For Railway/Fly.io: push the repo, set the same env vars from step 5 in their
 dashboard, provision a Redis add-on for `REDIS_URL`, and you get HTTPS + a domain

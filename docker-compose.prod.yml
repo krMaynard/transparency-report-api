@@ -1,0 +1,50 @@
+# Production self-hosting stack — the single-VPS replacement for Cloud Run + Upstash.
+#
+#   API server (self-seeding image) + local Redis + Caddy (automatic HTTPS).
+#
+# Quick start (see DEPLOY-SELFHOST.md for the full runbook):
+#   cp .env.example .env         # fill in real production values
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Caddy is the only ingress (ports 80/443); the app and Redis stay on the
+# internal network and are never published to the host.
+services:
+  web:
+    build: .
+    env_file: .env
+    environment:
+      # Local Redis (below) replaces Upstash — persists jobs/sessions/keys across
+      # restarts and is shared if you ever scale to multiple app replicas.
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+    expose:
+      - "8080"          # internal only — reached via Caddy, not the host
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # Persist to disk so issued keys / sessions / jobs survive a restart.
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    env_file: .env
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data       # ACME account + issued certificates (keep this!)
+      - caddy-config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  caddy-data:
+  caddy-config:

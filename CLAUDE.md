@@ -147,6 +147,9 @@ Built to demonstrate two things:
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
+| `docker-compose.prod.yml` | Self-hosting stack (single VPS): the app image + local persistent Redis + Caddy (automatic HTTPS) — the low-cost alternative to Cloud Run + Upstash. See `DEPLOY-SELFHOST.md` |
+| `Caddyfile` | Caddy reverse-proxy config for the self-hosted stack — TLS termination + Let's Encrypt for `transparency.kieranmaynard.com` → `web:8080` |
+| `DEPLOY-SELFHOST.md` | Runbook for the single-VPS self-hosting path (prereqs, `.env`, launch, verify, ops) |
 | `scripts/refresh-dataset.sh` | Re-vendor `data/vlop-dsa.json` from the canonical sibling-repo dataset |
 | `scripts/revendor_data.py` | Re-vendor the **non-VLOP** snapshots (`data/harmonised-reports.json` + `data/report-locations.csv`) from the sibling `dsa-transparency-data` repo and report any extracted platform still missing a `seed_harmonised.SLUG_META` entry. Run by the `revendor-data.yml` workflow (nightly / on dispatch); also runnable locally (`--check` for a dry run) |
 | `scripts/_demo_server.py` | Shared helper: seed DB + run a temp server (used by the GIF generators) |
@@ -1039,7 +1042,7 @@ every endpoint (query/explore/ask) gets composites through the same boundary.
 - **Structured params, not SQL**: the only way to query is the validated
   parameter model, compiled to one parameterised SELECT — no caller SQL runs.
 - **NL→query via LLM, same trust boundary** (`POST /api/ask`): an LLM (Claude;
-  `ANTHROPIC_MODEL`, default `claude-opus-4-8`) translates a question into the
+  `ANTHROPIC_MODEL`, default `claude-sonnet-5`) translates a question into the
   *structured* `QueryRequest` using JSON-schema structured outputs — never SQL —
   which then goes through the exact same `compile_query` validation as everything
   else. The model only proposes; `compile_query` disposes (bad field → `422`).
