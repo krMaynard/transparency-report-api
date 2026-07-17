@@ -25,8 +25,8 @@ Redis (jobs / issued keys / Google sessions), persisted to a Docker volume.
 
 - A VPS with a public IPv4 (and ideally IPv6), Docker Engine + the Compose plugin
   installed, and ports **80** and **443** open.
-- A domain whose **A** (and **AAAA**) records point at the VPS. The bundled
-  `Caddyfile` uses `transparency.kieranmaynard.com` — edit it if yours differs.
+- A domain whose **A** (and **AAAA**) records point at the VPS. Set
+  `SITE_ADDRESS` in `.env`; it defaults to `transparency.kieranmaynard.com`.
 - Clone this repo onto the box (the build context is the repo root).
 
 ## 2. Configure `.env`
@@ -39,6 +39,7 @@ Then edit `.env`. The settings that matter for a real deployment:
 
 | Variable | Set to | Why |
 |---|---|---|
+| `SITE_ADDRESS` | your public hostname | Hostname Caddy serves and provisions TLS for. |
 | `UPSTASH_REDIS_REST_URL` / `_TOKEN` | **empty** (delete the placeholder lines) | The app prefers Upstash when these are set — leave them blank so it uses the local `REDIS_URL` that `docker-compose.prod.yml` injects. **Easy to miss:** the sample values in `.env.example` are non-empty. |
 | `DOWNLOAD_URL_SECRET` | `openssl rand -hex 32` | Stable HMAC secret so signed download links survive restarts. |
 | `ALLOW_DEMO_KEYS` | `0` | Disable the hard-coded demo keys + open registration in production. |

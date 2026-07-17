@@ -3800,7 +3800,11 @@ def _translate_question(question: str) -> dict[str, Any]:
         # that needs no reasoning, and the default model (claude-sonnet-5) would
         # otherwise run adaptive thinking, consuming the 1024-token budget and
         # risking a truncated structured query. Accepted on Sonnet 5 / Opus 4.x.
-        thinking={"type": "disabled"},
+        thinking=(
+            {"type": "disabled"}
+            if ("sonnet-5" in ANTHROPIC_MODEL or "opus-4" in ANTHROPIC_MODEL)
+            else anthropic.NOT_GIVEN
+        ),
         system=_ask_system_prompt(),
         messages=[{"role": "user", "content": question}],
         output_config={"format": {"type": "json_schema", "schema": _ASK_SCHEMA}},
