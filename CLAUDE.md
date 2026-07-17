@@ -417,12 +417,15 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   general-purpose AI model must publish on the AI Office's standardised template
   (Reg. (EU) 2024/1689, in force 2 Aug 2025). There is no single registry of the
   *filled* summaries — each provider self-publishes in its own format — so the
-  builder reads two source shapes: **Microsoft's** machine-readable Hugging Face
+  builder reads three source shapes: **Microsoft's** machine-readable Hugging Face
   "data summary cards" (parsed by their stable numeric template codes, so any
-  provider using that markdown template parses for free) and **Google's**
-  transparency-report PDF (the size bands are checkbox selections not in the text
-  layer, so Google's values are curated from the rendered form and cross-checked
-  with fail-loud anchors on the PDF text). Three `section`s: **`modality`**
+  provider using that markdown template parses for free); the **PDF** filings
+  (Google/Meta/OpenAI/xAI/Swiss AI/SpeakLeash — the size bands are checkbox
+  selections, which render in the text layer for some (☒/☐) and not at all for
+  others, so those values are curated from the rendered form and cross-checked
+  with fail-loud anchors on the PDF text); and **HTML** summaries published as a
+  web page or a Hugging Face Space rather than a document (Bria, SmolLM3 —
+  archived under `raw/` and anchor-checked the same way). Three `section`s: **`modality`**
   (`field` = Text/Image/Audio/Video/Other; `value` = the banded training-data
   size, e.g. `More than 10 trillion tokens`; **`size_rank`** = 1/2/3 across the
   three bands, 0 = "Not applicable", so coarse sizes are **numerically comparable
@@ -432,12 +435,25 @@ via its own `TableSpec` (so `/api/query`/`/api/explore`/`/api/ask` reach them):
   `value` = Yes/No/…).
   `value` is text; `size_rank` is an **ordinal rank** — compare it with
   MIN/MAX/AVG, **never SUM** (`_leg_warnings` warns on a `size_rank` SUM).
-  Coverage is a starting, expandable set (Google + Meta + Microsoft + OpenAI;
-  6 model entries) — Meta's and OpenAI's are filed on the AI Office's full
+  Coverage is a starting, expandable set (Google + Meta + Microsoft + OpenAI +
+  xAI + Swiss AI + SpeakLeash + Hugging Face + Bria; 11 model entries) — Meta's,
+  OpenAI's and xAI's are filed on the AI Office's full
   template (Meta groups Image & Video as one "Perception" modality, recorded on
-  both rows; both break out `crawled` / `user_data` data-source categories the
+  both rows; all three break out `crawled` / `user_data` data-source categories the
   others don't — OpenAI's `user_data` is Yes via data from other products
   (ChatGPT/Codex), though model-interaction data itself was not used).
+  The rows are **sparse**: each summary fills only the categories it addresses, so
+  a **missing `data_source` row means the summary is silent, not "No"**. Two
+  filers deviate from the template and are **annotated in `value`** rather than
+  normalised away: Meta's combined Image & Video band, and **Bria**, which wrote
+  exact figures instead of ticking a band (`1 billion to 10 trillion tokens
+  (reported as: up to 19.2 billion tokens)`; `size_rank` is the band those figures
+  fall in) and files no Audio/Video/Other rows at all. Two filings are worth
+  knowing about when reading the set: **xAI** (Grok 4.5, on the Union market
+  14 Jul 2026) answers **Yes to every data-source category** and is the only filer
+  that is **not** a Code-of-Practice signatory, while **Bria** (3.2) is the only
+  one with **both** `publicly_available` = No **and** `crawled` = No — trained
+  exclusively on commercially licensed data.
   The `/ai-training` dataset page is English-only (like `/mandates`).
 - **Regional content-moderation transparency-law reports** — a single
   **tidy-long** `regional_metrics` table (one row per measured value:
