@@ -3793,22 +3793,21 @@ def _translate_question(question: str) -> dict[str, Any]:
 
     if _anthropic_client is None:
         _anthropic_client = anthropic.Anthropic()
-    resp = _anthropic_client.messages.create(
-        model=ANTHROPIC_MODEL,
-        max_tokens=1024,
-        # Disable thinking: this is a cheap, schema-constrained NL→JSON translation
-        # that needs no reasoning, and the default model (claude-sonnet-5) would
-        # otherwise run adaptive thinking, consuming the 1024-token budget and
-        # risking a truncated structured query. Accepted on Sonnet 5 / Opus 4.x.
-        thinking=(
-            {"type": "disabled"}
-            if ("sonnet-5" in ANTHROPIC_MODEL or "opus-4" in ANTHROPIC_MODEL)
-            else anthropic.NOT_GIVEN
-        ),
-        system=_ask_system_prompt(),
-        messages=[{"role": "user", "content": question}],
-        output_config={"format": {"type": "json_schema", "schema": _ASK_SCHEMA}},
-    )
+    request: dict[str, Any] = {
+        "model": ANTHROPIC_MODEL,
+        "max_tokens": 1024,
+        "system": _ask_system_prompt(),
+        "messages": [{"role": "user", "content": question}],
+        "output_config": {"format": {"type": "json_schema", "schema": _ASK_SCHEMA}},
+    }
+    # Disable thinking: this is a cheap, schema-constrained NL→JSON translation
+    # that needs no reasoning, and the default model (claude-sonnet-5) would
+    # otherwise run adaptive thinking, consuming the 1024-token budget and
+    # risking a truncated structured query. Accepted on Sonnet 5 / Opus 4.x;
+    # omit the parameter entirely for models that do not support this value.
+    if "sonnet-5" in ANTHROPIC_MODEL or "opus-4" in ANTHROPIC_MODEL:
+        request["thinking"] = {"type": "disabled"}
+    resp = _anthropic_client.messages.create(**request)
     text = next(b.text for b in resp.content if b.type == "text")
     return json.loads(text)
 
