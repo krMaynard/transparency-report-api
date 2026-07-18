@@ -222,6 +222,31 @@ display: flex; align-items: center; justify-content: space-between;
   }
   .btn-ghost:hover { background: rgba(255,255,255,.2); }
 
+  /* ── Agent onboarding banner ───────────────────────────────── */
+  .agent-banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    margin: 0 0 28px; padding: 18px 20px;
+    background: color-mix(in srgb, var(--accent) 9%, var(--panel));
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+    border-radius: 14px;
+  }
+  .agent-banner-copy { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+  .agent-banner-icon {
+    width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px;
+    display: grid; place-items: center; color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 14%, var(--panel));
+  }
+  .agent-banner h2 { margin: 0 0 2px; font-size: 15px; }
+  .agent-banner p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+  .agent-banner-link {
+    flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+    color: var(--accent-dark); font-size: 13px; font-weight: 700; text-decoration: none;
+    padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--panel);
+  }
+  [data-theme="dark"] .agent-banner-link { color: var(--accent); }
+  .agent-banner-link:hover { border-color: var(--accent); }
+
   /* ── Feature cards ──────────────────────────────────────────── */
   .feature-grid {
     display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
@@ -293,6 +318,8 @@ display: flex; align-items: center; justify-content: space-between;
     .wrap { padding: 20px 1rem; }
     .hero { padding: 28px 24px; }
     .hero h1 { font-size: 22px; }
+    .agent-banner { align-items: stretch; flex-direction: column; }
+    .agent-banner-link { justify-content: center; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -728,6 +755,25 @@ display: flex; align-items: center; justify-content: space-between;
         <a href="/docs" class="btn-ghost">API-Referenz</a>
       </div>
     </section>
+
+    <aside class="agent-banner" aria-labelledby="agent-banner-heading">
+      <div class="agent-banner-copy">
+        <div class="agent-banner-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <rect x="3" y="5" width="14" height="11" rx="2"/>
+            <path d="M7 9l2 2-2 2m4-1h2M10 2v3"/>
+          </svg>
+        </div>
+        <div>
+          <h2 id="agent-banner-heading">KI-Agent verbinden</h2>
+          <p>Gib deinem Programmier- oder Recherche-Agenten die offizielle Anleitung, damit er die MCP-Tools des Transparency Report einrichtet.</p>
+        </div>
+      </div>
+      <a class="agent-banner-link" href="/agent-setup/prompt.md">
+        Agenten-Anleitung öffnen
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M2 6.5h9M7.5 3l3.5 3.5L7.5 10"/></svg>
+      </a>
+    </aside>
 
     <!-- Feature cards -->
     <p class="section-label">Was es hier gibt</p>

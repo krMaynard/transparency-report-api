@@ -1316,6 +1316,16 @@ class TestDashboard:
         r = client.get("/")
         assert r.status_code == 200 and "text/html" in r.headers["content-type"]
         assert "Platform transparency data" in r.text
+        assert 'href="/agent-setup/prompt.md"' in r.text
+
+    def test_agent_setup_prompt_served_as_markdown(self):
+        r = client.get("/agent-setup/prompt.md")
+        assert r.status_code == 200
+        assert r.headers["content-type"].startswith("text/markdown")
+        assert r.headers["x-content-type-options"] == "nosniff"
+        assert "# Transparency Report API agent setup" in r.text
+        assert "codex mcp add transparency-report-api" in r.text
+        assert "claude mcp add transparency-report-api" in r.text
 
     def test_dashboard_served_at_reports(self):
         r = client.get("/reports")
