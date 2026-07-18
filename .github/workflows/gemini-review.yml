@@ -10,7 +10,7 @@ name: Gemini Review
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
 
 # One review per PR; a new push cancels the in-flight review instead of stacking.
 concurrency:

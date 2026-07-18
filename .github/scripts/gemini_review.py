@@ -201,5 +201,16 @@ def main() -> int:
     return 0
 
 
+def entrypoint() -> int:
+    """Keep the advisory workflow green even on unexpected infrastructure errors."""
+    try:
+        return main()
+    except Exception as exc:
+        # subprocess failures, malformed API JSON, and GitHub comment failures
+        # must not turn this optional review into a merge-blocking check.
+        warn(f"Gemini review skipped — unexpected {type(exc).__name__}: {exc}")
+        return 0
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(entrypoint())
