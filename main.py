@@ -2540,7 +2540,13 @@ def agent_setup_prompt() -> FileResponse:
     return FileResponse(
         path,
         media_type="text/markdown; charset=utf-8",
-        headers={"Cache-Control": "no-cache", "X-Content-Type-Options": "nosniff"},
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Content-Type-Options": "nosniff",
+            # Some browsers download text/markdown instead of displaying it;
+            # the banner link is human-facing, so ask for inline rendering.
+            "Content-Disposition": "inline",
+        },
     )
 
 

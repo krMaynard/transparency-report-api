@@ -1323,6 +1323,7 @@ class TestDashboard:
         assert r.status_code == 200
         assert r.headers["content-type"].startswith("text/markdown")
         assert r.headers["x-content-type-options"] == "nosniff"
+        assert r.headers["content-disposition"] == "inline"
         assert "# Transparency Report API agent setup" in r.text
         assert "codex mcp add transparency-report-api" in r.text
         assert "claude mcp add transparency-report-api" in r.text
@@ -2548,6 +2549,14 @@ class TestLocalization:
         }
         for loc, marker in markers.items():
             assert marker in client.get(f"/{loc}/").text, loc
+
+    def test_agent_banner_on_every_locale_home(self):
+        # The agent-onboarding banner links to the locale-agnostic guide from
+        # every locale's home page (the guide itself is machine-oriented English).
+        for loc in self.LOCALES:
+            html = client.get(f"/{loc}/").text
+            assert 'href="/agent-setup/prompt.md"' in html, loc
+            assert 'class="agent-banner"' in html, loc
 
     def test_switcher_links_across_locales(self):
         # The in-site switcher on the Spanish dashboard points at the same page
