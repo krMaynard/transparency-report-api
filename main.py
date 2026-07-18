@@ -2531,6 +2531,25 @@ def home_page() -> FileResponse:
     return _serve_page("home.html", "Home page")
 
 
+@app.get("/agent-setup/prompt.md")
+def agent_setup_prompt() -> FileResponse:
+    """Serve first-party setup instructions that coding agents can follow."""
+    path = os.path.join(STATIC_DIR, "agent-setup-prompt.md")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Agent setup guide not found.")
+    return FileResponse(
+        path,
+        media_type="text/markdown; charset=utf-8",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Content-Type-Options": "nosniff",
+            # Some browsers download text/markdown instead of displaying it;
+            # the banner link is human-facing, so ask for inline rendering.
+            "Content-Disposition": "inline",
+        },
+    )
+
+
 @app.get("/reports", response_class=HTMLResponse)
 def dashboard_page() -> FileResponse:
     """Serve the public VLOP transparency dashboard (reads GET /api/overview)."""

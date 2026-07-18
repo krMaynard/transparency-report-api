@@ -14471,5 +14471,32 @@ for _loc, _tag in (("es", "es-ES"), ("fr", "fr-FR"), ("de", "de-DE"), ("it", "it
         "const fmt = (n) => n == null ? \"\\u2014\" : n.toLocaleString('" + _tag + "');",
     ))
 
+# Homepage agent-onboarding banner. The machine-oriented prompt itself stays
+# locale-agnostic, while the public callout follows the selected site language.
+_AGENT_BANNER = {
+    "Connect your AI agent": {
+        "es": "Conecta tu agente de IA", "fr": "Connectez votre agent IA",
+        "de": "KI-Agent verbinden", "it": "Collega il tuo agente IA",
+        "ja": "AI エージェントを接続", "zh": "连接你的 AI 智能体", "ko": "AI 에이전트 연결",
+    },
+    "Give your coding or research agent the first-party setup guide and let it configure the Transparency Report MCP tools.": {
+        "es": "Proporciona a tu agente de programación o investigación la guía oficial para que configure las herramientas MCP de Transparency Report.",
+        "fr": "Donnez à votre agent de programmation ou de recherche le guide officiel afin qu’il configure les outils MCP de Transparency Report.",
+        "de": "Gib deinem Programmier- oder Recherche-Agenten die offizielle Anleitung, damit er die MCP-Tools des Transparency Report einrichtet.",
+        "it": "Fornisci al tuo agente di programmazione o ricerca la guida ufficiale affinché configuri gli strumenti MCP di Transparency Report.",
+        "ja": "コーディングまたは調査エージェントに公式セットアップガイドを渡し、Transparency Report の MCP ツールを設定させます。",
+        "zh": "将官方设置指南交给你的编程或研究智能体，让它配置 Transparency Report MCP 工具。",
+        "ko": "코딩 또는 리서치 에이전트에게 공식 설정 가이드를 제공해 Transparency Report MCP 도구를 구성하도록 하세요.",
+    },
+    "Open agent guide": {
+        "es": "Abrir guía para agentes", "fr": "Ouvrir le guide pour agents",
+        "de": "Agenten-Anleitung öffnen", "it": "Apri la guida per agenti",
+        "ja": "エージェントガイドを開く", "zh": "打开智能体指南", "ko": "에이전트 가이드 열기",
+    },
+}
+for _loc in ("es", "fr", "de", "it", "ja", "zh", "ko"):
+    for _english, _translations in _AGENT_BANNER.items():
+        PAGES[_loc].setdefault("home.html", []).append((_english, _translations[_loc]))
+
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
