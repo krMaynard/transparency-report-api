@@ -20,6 +20,10 @@ services:
       - redis
     expose:
       - "8080"          # internal only — reached via Caddy, not the host
+    ports:
+      # Loopback-only origin for Cloudflare Tunnel. This is never reachable
+      # from the LAN or public internet; cloudflared runs on the host.
+      - "127.0.0.1:18080:8080"
     restart: unless-stopped
 
   redis:

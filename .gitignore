@@ -4,6 +4,7 @@ __pycache__/
 .venv-mcp/
 .venv-scrape/
 venv/
+.env
 # scrape-reports.py fetches raw VLOP report files here on demand (not vendored)
 data/reports/
 demo.db
