@@ -12,7 +12,10 @@ spec:
   template:
     metadata:
       annotations:
-        autoscaling.knative.dev/minScale: "1"
+        # Scale to zero when idle. A pinned instance costs ~$18/month, which is
+        # hard to justify at this traffic level (~1k requests/day, mostly
+        # crawlers). Set this to "1" if cold starts ever become a problem.
+        autoscaling.knative.dev/minScale: "0"
         autoscaling.knative.dev/maxScale: "4"
     spec:
       containerConcurrency: 40

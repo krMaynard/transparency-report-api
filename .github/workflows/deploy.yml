@@ -94,6 +94,8 @@ jobs:
         # (roles/secretmanager.secretVersionAdder) + run.developer; pre-create the
         # secret and grant the runtime SA roles/secretmanager.secretAccessor once
         # if you'd rather not grant the deployer roles/secretmanager.admin.
+        # Granting the deployer roles/secretmanager.secretAccessor too lets it skip
+        # adding a redundant version when the key hasn't changed (see below).
         if: ${{ vars.DEPLOY != 'false' }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -106,8 +108,19 @@ jobs:
           SECRET=research-api-anthropic-key
           gcloud secrets describe "$SECRET" --project "$PROJECT_ID" >/dev/null 2>&1 \
             || gcloud secrets create "$SECRET" --replication-policy=automatic --project "$PROJECT_ID"
-          printf '%s' "$ANTHROPIC_API_KEY" \
-            | gcloud secrets versions add "$SECRET" --data-file=- --project "$PROJECT_ID"
+          # Only add a version when the key actually changed. Secret Manager bills
+          # per *active* version, so adding one on every deploy accrues cost without
+          # changing behaviour — this had built up to 153 versions (~$9/month).
+          # If the deployer SA can't read the secret, CURRENT stays empty and we add
+          # a version as before, so this degrades to the previous behaviour.
+          CURRENT="$(gcloud secrets versions access latest --secret "$SECRET" \
+            --project "$PROJECT_ID" 2>/dev/null || true)"
+          if [ "$CURRENT" = "$ANTHROPIC_API_KEY" ]; then
+            echo "ANTHROPIC_API_KEY unchanged — reusing the existing secret version."
+          else
+            printf '%s' "$ANTHROPIC_API_KEY" \
+              | gcloud secrets versions add "$SECRET" --data-file=- --project "$PROJECT_ID"
+          fi
           # Project number for the runtime (Compute default) SA, parsed from the
           # WIF provider var — avoids gcloud projects describe, which needs the
           # Cloud Resource Manager API (not enabled for the deployer SA).
