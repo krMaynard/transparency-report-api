@@ -246,7 +246,11 @@ def _xlsx_to_csvs(xlsx_path: Path, dest: Path) -> list[Path]:
               "Run: pip install openpyxl")
         return []
     import re as _re
-    wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+    try:
+        wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+    except Exception as exc:
+        print(f"  WARN could not read {xlsx_path.name} as XLSX — skipping: {exc}")
+        return []
     written: list[Path] = []
     for i, sheet_name in enumerate(wb.sheetnames, start=1):
         ws = wb[sheet_name]
