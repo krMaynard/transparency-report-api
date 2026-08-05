@@ -10,7 +10,7 @@
 # 	email you@example.com
 # }
 
-{$SITE_ADDRESS:transparency.kieranmaynard.com} {
+{$SITE_ADDRESS:transparency.krm.fyi} {
 	encode zstd gzip
 
 	# App emits its own HSTS + security headers and runs uvicorn with

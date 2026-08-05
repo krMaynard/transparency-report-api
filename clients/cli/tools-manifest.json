@@ -1,6 +1,6 @@
 {
   "api_name": "dsa-research",
-  "base_url": "https://transparency.kieranmaynard.com",
+  "base_url": "https://transparency.krm.fyi",
   "description": "Query the aggregated EU Digital Services Act VLOP transparency reports (tables 3–11) with structured parameters (no SQL). Pick a `table` (GET /tables), describe filters/group_by/aggregates, get a job id, then poll for results as JSON or CSV. Query syntax follows the TikTok Research API: boolean and/or/not clauses of {operation, field_name, field_values}.",
   "mcp_ready": "full",
   "http_transport": "standard",

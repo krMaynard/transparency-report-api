@@ -26,7 +26,7 @@ Redis (jobs / issued keys / Google sessions), persisted to a Docker volume.
 - A VPS with a public IPv4 (and ideally IPv6), Docker Engine + the Compose plugin
   installed, and ports **80** and **443** open.
 - A domain whose **A** (and **AAAA**) records point at the VPS. Set
-  `SITE_ADDRESS` in `.env`; it defaults to `transparency.kieranmaynard.com`.
+  `SITE_ADDRESS` in `.env`; it defaults to `transparency.krm.fyi`.
 - Clone this repo onto the box (the build context is the repo root).
 
 ## 2. Configure `.env`
@@ -45,7 +45,7 @@ Then edit `.env`. The settings that matter for a real deployment:
 | `ALLOW_DEMO_KEYS` | `0` | Disable the hard-coded demo keys + open registration in production. |
 | `GOOGLE_CLIENT_ID` | your OAuth 2.0 **Web** client ID | Enables Google sign-in. Add the site origin to the client's Authorized JavaScript origins. |
 | `ADMIN_EMAILS` | your email(s), comma-separated | Admin kill-switch over registrations. |
-| `PUBLIC_BASE_URL` | `https://transparency.kieranmaynard.com` | Absolute links in webhook callbacks / signed downloads. |
+| `PUBLIC_BASE_URL` | `https://transparency.krm.fyi` | Absolute links in webhook callbacks / signed downloads. |
 | `ANTHROPIC_API_KEY` | your key (optional) | Enables the NL "Ask" box. Leave empty to keep `/api/ask` off (503). |
 | `ANTHROPIC_MODEL` | `claude-sonnet-5` (default) | Model that translates questions → structured queries. Sonnet is the cost/quality middle tier; set `claude-haiku-4-5` to go cheaper or `claude-opus-4-8` for max quality. |
 | `ALLOWED_ORIGINS` | empty (same-origin) | The bundled dashboard is same-origin; only set this if a separate frontend calls the API cross-origin. |
@@ -69,10 +69,10 @@ docker compose -f docker-compose.prod.yml logs -f caddy
 
 ```bash
 # Liveness/readiness (through Caddy, over HTTPS):
-curl -fsS https://transparency.kieranmaynard.com/healthz
-curl -fsS https://transparency.kieranmaynard.com/readyz
+curl -fsS https://transparency.krm.fyi/healthz
+curl -fsS https://transparency.krm.fyi/readyz
 # Build id + which Redis backend is active ("redis" expected, not "upstash"/"memory"):
-curl -fsS https://transparency.kieranmaynard.com/version
+curl -fsS https://transparency.krm.fyi/version
 ```
 
 Open the dashboard at the domain root and confirm the "Ask" box works (if

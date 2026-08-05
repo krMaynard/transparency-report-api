@@ -42,7 +42,7 @@ spec:
             - name: LOG_FORMAT
               value: "json"
             - name: PUBLIC_BASE_URL          # absolute links in callbacks/downloads
-              value: "https://transparency.kieranmaynard.com"
+              value: "https://transparency.krm.fyi"
             # Lock browser CORS to your frontend origin(s); omit if same-origin only.
             # - name: ALLOWED_ORIGINS
             #   value: "https://app.example.com"

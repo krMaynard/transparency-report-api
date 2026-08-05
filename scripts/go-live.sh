@@ -21,7 +21,7 @@ set -euo pipefail
 PROJECT="${PROJECT:-transparency-site}"
 REGION="${REGION:-us-central1}"
 SERVICE="${SERVICE:-research-api}"
-DOMAIN="${DOMAIN:-transparency.kieranmaynard.com}"
+DOMAIN="${DOMAIN:-transparency.krm.fyi}"
 CLIENT_ID="${CLIENT_ID:-694282548149-5ro3pokkjgp8d4ht5n8jmm8o9gqug961.apps.googleusercontent.com}"
 # ADMIN_EMAILS is PII → not hardcoded (public repo). Sourced from env or prompt.
 ADMIN_EMAILS="${ADMIN_EMAILS:-}"

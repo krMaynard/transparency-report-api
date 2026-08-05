@@ -148,7 +148,7 @@ Built to demonstrate two things:
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
 | `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
 | `docker-compose.prod.yml` | Self-hosting stack (single VPS): the app image + local persistent Redis + Caddy (automatic HTTPS) — the low-cost alternative to Cloud Run + Upstash. See `DEPLOY-SELFHOST.md` |
-| `Caddyfile` | Caddy reverse-proxy config for the self-hosted stack — TLS termination + Let's Encrypt for `transparency.kieranmaynard.com` → `web:8080` |
+| `Caddyfile` | Caddy reverse-proxy config for the self-hosted stack — TLS termination + Let's Encrypt for `transparency.krm.fyi` → `web:8080` |
 | `DEPLOY-SELFHOST.md` | Runbook for the single-VPS self-hosting path (prereqs, `.env`, launch, verify, ops) |
 | `scripts/refresh-dataset.sh` | Re-vendor `data/vlop-dsa.json` from the canonical sibling-repo dataset |
 | `scripts/revendor_data.py` | Re-vendor the **non-VLOP** snapshots (`data/harmonised-reports.json` + `data/report-locations.csv`) from the sibling `dsa-transparency-data` repo and report any extracted platform still missing a `seed_harmonised.SLUG_META` entry. Run by the `revendor-data.yml` workflow (nightly / on dispatch); also runnable locally (`--check` for a dry run) |
