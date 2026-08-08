@@ -15,14 +15,14 @@ Highlights of the corpus:
 - **EU Digital Services Act (DSA) transparency reports** — content-moderation
   statistics for the 25 designated Very Large Online Platforms / Search Engines
   (H2 2025, tables 3–11 of the DSA Implementing Regulation template; vendored at
-  `data/vlop-dsa.json`), **plus 79 non-VLOP services** that file the same EU
+  `data/vlop-dsa.json`), **plus 80 non-VLOP services** that file the same EU
   harmonised template (Ceneo, Cloudflare, Dailymotion, Carrefour, DuckDuckGo,
-  Expedia, Nintendo eShop, Square Enix, Miniclip, Roblox, Vinted, …; vendored at
+  Expedia, Nintendo eShop, Square Enix, Miniclip, Roblox, Vimeo, Vinted, …; vendored at
   `data/harmonised-reports.json`, loaded by `seed_harmonised.py`). All share the
   `t3`–`t11` star schema, so the query API spans both — while the VLOP dashboard's
   headline `/api/overview` stays scoped to VLOP-tier reports. Sourced from the companion
   [dsa-transparency-data](https://github.com/krMaynard/dsa-transparency-data)
-  catalogue (239 platforms, 78 of which publish the harmonised template).
+  catalogue (239 platforms, 79 of which publish the harmonised template).
 - **The EU DSA Transparency Database** — the *decision-level* Statements of
   Reasons (a compact re-aggregation of the Commission's monthly aggregates, top
   60 platforms, 2023-09 onward), distinct from the Art. 15/24 aggregated reports above.
@@ -561,7 +561,7 @@ Star schema — shared dimension tables plus one fact table per Annex I report
 part. The `reports` table carries a `tier` per submitted report, so the same
 `t3`–`t11` tables hold both the 25 VLOP services (tier `vlop`) and the non-VLOP
 harmonised reports (tier `online-platform`/`hosting`/`intermediary`) appended by
-`seed_harmonised.py` — 68 services across 45 reports today, growing as more
+`seed_harmonised.py` — 80 services across 82 reports today, growing as more
 non-VLOP platforms are ingested.
 DSA dimensions: `services(id, name, platform)` (platform = parent company),
 `categories(id, code, label)`, `sections`, `indicators`, `scopes`, `surfaces`.
