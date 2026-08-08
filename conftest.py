@@ -851,6 +851,22 @@ _NY_STATS_FIXTURE = [
 ]
 seed.build_ny_tos_stats(_NY_STATS_FIXTURE, _DB)
 
+_STATE_STATS_FIXTURE = [
+    {"jurisdiction": "California", "law": "AB 587", "company": "snap-inc",
+     "period": "2023 Q4", "category": "hate_speech_or_racism",
+     "original_label": "Hate Speech", "geographic_scope": "united_states",
+     "content_format": "", "grain": "category_total", "metric": "Human Report",
+     "submetric": "Total Content or Accounts Flagged(1)", "value": "91548",
+     "unit": "count", "page": "5", "source_file": "snap-2023-q4-cc142e.pdf"},
+    {"jurisdiction": "New York", "law": "GBS 1102 (S895B)", "company": "snap-inc",
+     "period": "2025 Q3", "category": "hate_speech_or_racism",
+     "original_label": "Hate Speech", "geographic_scope": "reported",
+     "content_format": "", "grain": "category_total", "metric": "human_report",
+     "submetric": "flagged_total", "value": "482240", "unit": "count", "page": "4",
+     "source_file": "2025-q3-snap-inc.pdf"},
+]
+seed.build_state_tos_stats(_STATE_STATS_FIXTURE, _DB)
+
 os.environ.setdefault("DB_PATH", _DB)
 os.environ.setdefault("API_KEYS_JSON", '{"momo":{"name":"momo"},"honggildong":{"name":"honggildong"}}')
 # Google sign-in config for the auth tests (token verification is monkeypatched).
