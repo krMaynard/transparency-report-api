@@ -15,14 +15,14 @@ Highlights of the corpus:
 - **EU Digital Services Act (DSA) transparency reports** — content-moderation
   statistics for the 25 designated Very Large Online Platforms / Search Engines
   (H2 2025, tables 3–11 of the DSA Implementing Regulation template; vendored at
-  `data/vlop-dsa.json`), **plus 43 non-VLOP platforms** that file the same EU
+  `data/vlop-dsa.json`), **plus 79 non-VLOP services** that file the same EU
   harmonised template (Ceneo, Cloudflare, Dailymotion, Carrefour, DuckDuckGo,
   Expedia, Nintendo eShop, Square Enix, Miniclip, Roblox, Vinted, …; vendored at
   `data/harmonised-reports.json`, loaded by `seed_harmonised.py`). All share the
   `t3`–`t11` star schema, so the query API spans both — while the VLOP dashboard's
   headline `/api/overview` stays scoped to VLOP-tier reports. Sourced from the companion
   [dsa-transparency-data](https://github.com/krMaynard/dsa-transparency-data)
-  catalogue (232 non-VLOP platforms, 66 of which file the harmonised template).
+  catalogue (239 platforms, 78 of which publish the harmonised template).
 - **The EU DSA Transparency Database** — the *decision-level* Statements of
   Reasons (a compact re-aggregation of the Commission's monthly aggregates, top
   60 platforms, 2023-09 onward), distinct from the Art. 15/24 aggregated reports above.

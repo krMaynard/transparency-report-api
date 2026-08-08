@@ -126,6 +126,9 @@ SLUG_META = {
     "flickr": ("Flickr", "online-platform"),
     "jeuxvideo": ("Jeuxvideo.com", "online-platform"),
     "glassdoor": ("Glassdoor", "online-platform"),
+    "akamai": ("Akamai", "intermediary"),
+    "upwork": ("Upwork", "online-platform"),
+    "xkom": ("x-kom", "online-platform"),
 }
 
 SECTIONS = [
