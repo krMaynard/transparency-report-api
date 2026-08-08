@@ -1397,6 +1397,20 @@ class TestDashboard:
             t = client.get(path).text
             assert 'href="/catalog"' in t and 'href="/mcp"' in t
 
+    def test_eu_dsa_precedes_ai_act_in_every_sidebar(self):
+        import pathlib
+
+        static_dir = pathlib.Path(__file__).with_name("static")
+        sidebar_pages = []
+        for page in static_dir.glob("*.html"):
+            text = page.read_text()
+            if 'aria-label="Application navigation"' not in text:
+                continue
+            sidebar_pages.append(page)
+            sidebar = text.split('<aside class="sidebar"', 1)[1].split("</aside>", 1)[0]
+            assert sidebar.index('href="/reports"') < sidebar.index('href="/ai-training"'), page
+        assert len(sidebar_pages) >= 39
+
     def test_localized_catalog_and_mcp(self):
         assert client.get("/es/catalog").status_code == 200
         assert client.get("/ja/mcp").status_code == 200
