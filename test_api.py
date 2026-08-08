@@ -1713,9 +1713,14 @@ class TestCAAB587Reports:
         assert rows and set(rows[0]) == {
             "company", "platform", "period", "period_original", "access",
             "source_url", "filename", "archived", "sha256", "bytes"}
-        # The AB 587 PDFs aren't mirrored in-repo — every row points at oag.ca.gov.
+        # Every filing keeps the OAG source and carries a verified repository mirror.
         assert all(r["access"] == "public" for r in rows)
-        assert all(not r["archived"] for r in rows)
+        assert all(r["source_url"].startswith("https://oag.ca.gov/") for r in rows)
+        assert all(r["archived"].startswith(
+            "https://github.com/krMaynard/dsa-transparency-data/blob/main/ca-ab587/pdfs/"
+        ) for r in rows)
+        assert all(len(r["sha256"]) == 64 for r in rows)
+        assert all(int(r["bytes"]) > 0 for r in rows)
         assert all("oag.ca.gov" in r["source_url"] for r in rows)
 
 

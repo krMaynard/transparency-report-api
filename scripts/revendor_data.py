@@ -1,23 +1,25 @@
 #!/usr/bin/env python3
-"""Re-vendor the non-VLOP data snapshots from the sibling dsa-transparency-data repo.
+"""Re-vendor data snapshots from the sibling dsa-transparency-data repo.
 
 The API serves a *frozen snapshot* of the data-collection pipeline that lives in
 the separate `dsa-transparency-data` repo (scrapers, raw archives, the canonical
-extracted CSVs, the report-locations catalogue). This script regenerates the two
+extracted CSVs, the report-locations catalogue). This script regenerates the
 vendored artifacts the Docker image is seeded from:
 
   * data/harmonised-reports.json  <- <data-repo>/harmonised-reports/extracted/<slug>/NN_*.csv
   * data/report-locations.csv     <- <data-repo>/dsa_reports.csv
+  * data/ca-ab587-reports.csv     <- <data-repo>/ca-ab587/ca_ab587_reports.csv
+  * data/ca-ab587-narratives.json <- <data-repo>/ca-ab587/ca-ab587-narratives.json
 
 and reports any **new extracted platforms that aren't yet curated in
 `seed_harmonised.SLUG_META`** (display name + tier). Those still seed — they fall
 back to (slug, "online-platform") — but a human should give them a real name, so
 the script surfaces a ready-to-paste snippet instead of guessing silently.
 
-It writes a Markdown summary (for a PR body / job summary) to --summary-out (or
+It writes a Markdown summary (for a PR body or job summary) to --summary-out (or
 stdout). It is the mechanical half of the "collect upstream, then surface in the
-API" flow; the `.github/workflows/revendor-data.yml` workflow runs it on a
-schedule / on demand and opens a PR with whatever changed.
+API" flow. The `.github/workflows/revendor-data.yml` workflow runs it on a
+schedule or on demand and opens a PR with whatever changed.
 
 Usage:
     python scripts/revendor_data.py                       # re-vendor in place
@@ -44,6 +46,10 @@ DEFAULT_DATA_REPO = os.getenv(
 )
 VENDORED_SNAPSHOT = os.path.join(REPO, "data", "harmonised-reports.json")
 VENDORED_RL_CSV = os.path.join(REPO, "data", "report-locations.csv")
+VENDORED_CA_AB587_CSV = os.path.join(REPO, "data", "ca-ab587-reports.csv")
+CA_AB587_CSV_REL = os.path.join("ca-ab587", "ca_ab587_reports.csv")
+VENDORED_CA_AB587_NARRATIVES = os.path.join(REPO, "data", "ca-ab587-narratives.json")
+CA_AB587_NARRATIVES_REL = os.path.join("ca-ab587", "ca-ab587-narratives.json")
 VENDORED_APPLE = os.path.join(REPO, "data", "apple-transparency.json")
 APPLE_SRC_REL = os.path.join("apple-transparency", "apple-transparency.json")
 VENDORED_GITHUB = os.path.join(REPO, "data", "github-transparency.json")
@@ -142,6 +148,14 @@ def main() -> int:
     n_platforms = len(slugs)
     with open(rl_src, encoding="utf-8") as f:
         n_rl_rows = sum(1 for _ in f) - 1  # minus header
+    ca_ab587_csv_src = os.path.join(args.data_repo, CA_AB587_CSV_REL)
+    ca_ab587_narratives_src = os.path.join(args.data_repo, CA_AB587_NARRATIVES_REL)
+    ca_ab587_present = os.path.isfile(ca_ab587_csv_src)
+    ca_ab587_narratives_present = os.path.isfile(ca_ab587_narratives_src)
+    n_ca_ab587_rows = 0
+    if ca_ab587_present:
+        with open(ca_ab587_csv_src, encoding="utf-8") as f:
+            n_ca_ab587_rows = sum(1 for _ in f) - 1
     uncurated = _uncurated(slugs)
     stale = _stale(slugs)
     unknown_surf = _unknown_surfaces(extracted_dir)
@@ -161,6 +175,10 @@ def main() -> int:
     if not args.check:
         sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
         shutil.copyfile(rl_src, VENDORED_RL_CSV)
+        if ca_ab587_present:
+            shutil.copyfile(ca_ab587_csv_src, VENDORED_CA_AB587_CSV)
+        if ca_ab587_narratives_present:
+            shutil.copyfile(ca_ab587_narratives_src, VENDORED_CA_AB587_NARRATIVES)
         if apple_present:
             shutil.copyfile(apple_src, VENDORED_APPLE)
         if github_present:
@@ -182,6 +200,12 @@ def main() -> int:
         "",
         f"- `data/harmonised-reports.json` — **{n_platforms}** extracted report files",
         f"- `data/report-locations.csv` — **{n_rl_rows}** catalogue rows",
+        (f"- `data/ca-ab587-reports.csv`: **{n_ca_ab587_rows}** filing rows"
+         if ca_ab587_present else
+         "- `data/ca-ab587-reports.csv`: **missing upstream, skipped**"),
+        ("- `data/ca-ab587-narratives.json`: present upstream"
+         if ca_ab587_narratives_present else
+         "- `data/ca-ab587-narratives.json`: **missing upstream, skipped**"),
         f"- `data/apple-transparency.json` — {'present upstream' if apple_present else '**missing upstream — skipped**'}",
         f"- `data/github-transparency.json` — {'present upstream' if github_present else '**missing upstream — skipped**'}",
         f"- `data/snap-transparency.json` — {'present upstream' if snap_present else '**missing upstream — skipped**'}",

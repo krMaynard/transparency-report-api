@@ -40,7 +40,10 @@ SKIP_SLUGS = {"linkedin", "pinterest", "wikipedia"}
 # loaded under another slug. Their facts attach to that platform's existing
 # `services` row (a new `reports` row per period), instead of a duplicate service.
 # slug -> the display name of the base service to attach to.
-EXTRA_PERIODS = {"aboutyou2": "AboutYou"}  # AboutYou's consecutive Dec-2025 period
+EXTRA_PERIODS = {
+    "aboutyou2": "AboutYou",      # AboutYou's consecutive Dec-2025 period
+    "vimeo-2024": "Vimeo",        # Vimeo's first harmonised reporting period
+}
 
 # slug -> (display service name, tier). Tier is informational (online-platform /
 # hosting / intermediary); none of these are VLOPs.
@@ -126,6 +129,10 @@ SLUG_META = {
     "flickr": ("Flickr", "online-platform"),
     "jeuxvideo": ("Jeuxvideo.com", "online-platform"),
     "glassdoor": ("Glassdoor", "online-platform"),
+    "akamai": ("Akamai", "intermediary"),
+    "upwork": ("Upwork", "online-platform"),
+    "xkom": ("x-kom", "online-platform"),
+    "vimeo-2025": ("Vimeo", "online-platform"),
 }
 
 SECTIONS = [
