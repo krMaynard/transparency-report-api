@@ -22,7 +22,7 @@ Highlights of the corpus:
   `t3`–`t11` star schema, so the query API spans both — while the VLOP dashboard's
   headline `/api/overview` stays scoped to VLOP-tier reports. Sourced from the companion
   [dsa-transparency-data](https://github.com/krMaynard/dsa-transparency-data)
-  catalogue (239 platforms, 79 of which publish the harmonised template).
+  catalogue (241 platforms, 81 of which publish the harmonised template).
 - **The EU DSA Transparency Database** — the *decision-level* Statements of
   Reasons (a compact re-aggregation of the Commission's monthly aggregates, top
   60 platforms, 2023-09 onward), distinct from the Art. 15/24 aggregated reports above.

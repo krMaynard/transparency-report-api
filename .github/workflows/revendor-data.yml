@@ -1,8 +1,8 @@
 name: Re-vendor data
 
-# Keeps the vendored non-VLOP snapshots (data/harmonised-reports.json +
-# data/report-locations.csv) in sync with the upstream dsa-transparency-data
-# repo. Runs nightly, on demand, or instantly when the data repo dispatches a
+# Keeps the vendored non-VLOP snapshots and California AB 587 corpus in sync
+# with the upstream dsa-transparency-data repo. Runs nightly, on demand, or
+# instantly when the data repo dispatches a
 # `data-updated` event (see that repo's notify-revendor.yml). If anything
 # changed it opens/updates a single PR with a summary of new platforms that
 # still need a SLUG_META entry.
@@ -76,8 +76,8 @@ jobs:
           branch: auto/revendor-data
           base: main
           delete-branch: true
-          commit-message: "Re-vendor non-VLOP data snapshots from dsa-transparency-data"
-          title: "Re-vendor non-VLOP data snapshots"
+          commit-message: "Re-vendor data snapshots from dsa-transparency-data"
+          title: "Re-vendor data snapshots"
           body-path: ${{ runner.temp }}/revendor-summary.md
           labels: |
             automated
@@ -85,3 +85,5 @@ jobs:
           add-paths: |
             data/harmonised-reports.json
             data/report-locations.csv
+            data/ca-ab587-reports.csv
+            data/ca-ab587-narratives.json
