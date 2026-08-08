@@ -3202,6 +3202,7 @@ class TestNYTosStatsTable:
         body = client.get(f"/api/jobs/{job['job_id']}/result?format=json", headers=MOMO).json()
         assert body["rows"][0][0] == 20000
 
+
     def test_korea_warns_on_summing_percentages(self):
         # Pinning unit=percent doesn't make a rate summable — SUM still warns.
         q = {"table": "korea_metrics", "group_by": ["platform"],
@@ -3221,6 +3222,40 @@ class TestNYTosStatsTable:
         assert data["columns"] == ["platform", "service", "period", "category",
                                     "metric", "unit", "value"]
         assert all(len(r) == 7 for r in data["rows"][:50])
+
+
+class TestStateTosStatsTable:
+    def test_merged_state_stats_is_queryable(self):
+        names = [table["name"] for table in
+                 client.get("/api/tables", headers=MOMO).json()["tables"]]
+        assert "state_tos_stats" in names
+        fields = client.get("/api/fields?table=state_tos_stats", headers=MOMO).json()
+        assert {"jurisdiction", "law", "company", "category", "geographic_scope",
+                "source_file", "page"} <= set(fields["dimensions"]["fields"])
+
+    def test_same_company_connects_both_jurisdictions(self):
+        job = _submit_and_wait({
+            "table": "state_tos_stats",
+            "fields": ["jurisdiction", "company", "period", "value"],
+            "query": {"and": [{"operation": "EQ", "field_name": "company",
+                                "field_values": ["snap-inc"]}]},
+            "sort": [{"field_name": "jurisdiction", "order": "asc"}],
+        })
+        assert job["status"] == "done"
+        body = client.get(f"/api/jobs/{job['job_id']}/result?format=json",
+                          headers=MOMO).json()
+        assert body["rows"] == [
+            ["California", "snap-inc", "2023 Q4", 91548],
+            ["New York", "snap-inc", "2025 Q3", 482240],
+        ]
+
+    def test_merged_state_stats_warns_on_scope_and_jurisdiction(self):
+        query = {"table": "state_tos_stats", "group_by": ["company"],
+                 "aggregates": [{"function": "SUM", "field_name": "value",
+                                  "alias": "v"}]}
+        warnings = client.post("/api/explore", json=query).json().get("warnings", [])
+        assert any("jurisdiction" in warning for warning in warnings)
+        assert any("geographic_scope" in warning for warning in warnings)
 
 
 class TestTaiwanTable:
@@ -3672,7 +3707,9 @@ class TestAiTrainingTable:
             else:
                 assert rank is None, f"non-modality row carrying a rank: {row}"
         providers = {r[0] for r in data["rows"]}
-        assert {"xAI", "Bria"} <= providers
+        assert {"xAI", "Bria", "EuroLLM Team",
+                "Polish Ministry of Digital Affairs (PLLuM)"} <= providers
+        assert len({(row[0], row[1]) for row in data["rows"]}) == 15
         xai = {r[4]: r[5] for r in data["rows"] if r[0] == "xAI" and r[3] == "data_source"}
         assert set(xai.values()) == {"Yes"}, "xAI is the Yes-to-everything filer"
 

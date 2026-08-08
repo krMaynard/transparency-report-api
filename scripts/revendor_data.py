@@ -10,6 +10,8 @@ vendored artifacts the Docker image is seeded from:
   * data/report-locations.csv     <- <data-repo>/dsa_reports.csv
   * data/ca-ab587-reports.csv     <- <data-repo>/ca-ab587/ca_ab587_reports.csv
   * data/ca-ab587-narratives.json <- <data-repo>/ca-ab587/ca-ab587-narratives.json
+  * data/state-tos-stats.csv      <- <data-repo>/state-tos-stats/state_tos_stats.csv
+  * data/ai-training-transparency.json <- <data-repo>/ai-training-transparency/ai-training-transparency.json
 
 and reports any **new extracted platforms that aren't yet curated in
 `seed_harmonised.SLUG_META`** (display name + tier). Those still seed — they fall
@@ -50,6 +52,10 @@ VENDORED_CA_AB587_CSV = os.path.join(REPO, "data", "ca-ab587-reports.csv")
 CA_AB587_CSV_REL = os.path.join("ca-ab587", "ca_ab587_reports.csv")
 VENDORED_CA_AB587_NARRATIVES = os.path.join(REPO, "data", "ca-ab587-narratives.json")
 CA_AB587_NARRATIVES_REL = os.path.join("ca-ab587", "ca-ab587-narratives.json")
+VENDORED_STATE_STATS = os.path.join(REPO, "data", "state-tos-stats.csv")
+STATE_STATS_REL = os.path.join("state-tos-stats", "state_tos_stats.csv")
+VENDORED_AI_TRAINING = os.path.join(REPO, "data", "ai-training-transparency.json")
+AI_TRAINING_REL = os.path.join("ai-training-transparency", "ai-training-transparency.json")
 VENDORED_APPLE = os.path.join(REPO, "data", "apple-transparency.json")
 APPLE_SRC_REL = os.path.join("apple-transparency", "apple-transparency.json")
 VENDORED_GITHUB = os.path.join(REPO, "data", "github-transparency.json")
@@ -150,8 +156,16 @@ def main() -> int:
         n_rl_rows = sum(1 for _ in f) - 1  # minus header
     ca_ab587_csv_src = os.path.join(args.data_repo, CA_AB587_CSV_REL)
     ca_ab587_narratives_src = os.path.join(args.data_repo, CA_AB587_NARRATIVES_REL)
+    state_stats_src = os.path.join(args.data_repo, STATE_STATS_REL)
+    ai_training_src = os.path.join(args.data_repo, AI_TRAINING_REL)
     ca_ab587_present = os.path.isfile(ca_ab587_csv_src)
     ca_ab587_narratives_present = os.path.isfile(ca_ab587_narratives_src)
+    state_stats_present = os.path.isfile(state_stats_src)
+    n_state_stats_rows = 0
+    if state_stats_present:
+        with open(state_stats_src, encoding="utf-8") as f:
+            n_state_stats_rows = sum(1 for _ in f) - 1
+    ai_training_present = os.path.isfile(ai_training_src)
     n_ca_ab587_rows = 0
     if ca_ab587_present:
         with open(ca_ab587_csv_src, encoding="utf-8") as f:
@@ -179,6 +193,10 @@ def main() -> int:
             shutil.copyfile(ca_ab587_csv_src, VENDORED_CA_AB587_CSV)
         if ca_ab587_narratives_present:
             shutil.copyfile(ca_ab587_narratives_src, VENDORED_CA_AB587_NARRATIVES)
+        if state_stats_present:
+            shutil.copyfile(state_stats_src, VENDORED_STATE_STATS)
+        if ai_training_present:
+            shutil.copyfile(ai_training_src, VENDORED_AI_TRAINING)
         if apple_present:
             shutil.copyfile(apple_src, VENDORED_APPLE)
         if github_present:
@@ -206,6 +224,12 @@ def main() -> int:
         ("- `data/ca-ab587-narratives.json`: present upstream"
          if ca_ab587_narratives_present else
          "- `data/ca-ab587-narratives.json`: **missing upstream, skipped**"),
+        (f"- `data/state-tos-stats.csv`: **{n_state_stats_rows}** statistic cells"
+         if state_stats_present else
+         "- `data/state-tos-stats.csv`: **missing upstream, skipped**"),
+        ("- `data/ai-training-transparency.json`: present upstream"
+         if ai_training_present else
+         "- `data/ai-training-transparency.json`: **missing upstream, skipped**"),
         f"- `data/apple-transparency.json` — {'present upstream' if apple_present else '**missing upstream — skipped**'}",
         f"- `data/github-transparency.json` — {'present upstream' if github_present else '**missing upstream — skipped**'}",
         f"- `data/snap-transparency.json` — {'present upstream' if snap_present else '**missing upstream — skipped**'}",

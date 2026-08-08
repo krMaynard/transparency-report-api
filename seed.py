@@ -46,6 +46,11 @@ _DEFAULT_NY_TOS_SOURCE = os.getenv(
 _DEFAULT_NY_STATS_SOURCE = os.getenv(
     "SEED_NY_TOS_STATS_CSV", os.path.join(HERE, "data", "ny-tos-normalized.csv")
 )
+# California AB 587 + New York GBS 1102 statistics, unioned on their shared
+# statutory categories while retaining jurisdiction, scope, and provenance.
+_DEFAULT_STATE_STATS_SOURCE = os.getenv(
+    "SEED_STATE_TOS_STATS_CSV", os.path.join(HERE, "data", "state-tos-stats.csv")
+)
 # Apple Transparency dataset — vendored in-repo (from the sibling data repo's
 # apple-transparency/build_apple.py); not in krMaynard.github.io like gr/vlop.
 _DEFAULT_APPLE_SOURCE = os.getenv(
@@ -963,6 +968,27 @@ CREATE TABLE ny_tos_stats (
 );
 CREATE INDEX idx_nys_category ON ny_tos_stats(shha_category);
 CREATE INDEX idx_nys_company  ON ny_tos_stats(company);
+
+CREATE TABLE state_tos_stats (
+    jurisdiction    TEXT NOT NULL,
+    law             TEXT NOT NULL,
+    company         TEXT NOT NULL,
+    period          TEXT NOT NULL,
+    category        TEXT NOT NULL,
+    original_label  TEXT NOT NULL,
+    geographic_scope TEXT NOT NULL,
+    content_format  TEXT NOT NULL,
+    grain           TEXT NOT NULL,
+    metric          TEXT NOT NULL,
+    submetric       TEXT NOT NULL,
+    value           REAL,
+    unit            TEXT NOT NULL,
+    page            INTEGER,
+    source_file     TEXT NOT NULL
+);
+CREATE INDEX idx_sts_jurisdiction ON state_tos_stats(jurisdiction);
+CREATE INDEX idx_sts_company      ON state_tos_stats(company);
+CREATE INDEX idx_sts_category     ON state_tos_stats(category);
 
 -- Narrative full text across the report corpora, indexed for full-text search
 -- (SQLite FTS5). Prose, not numbers. Two `source`s ride in one table:
@@ -2125,6 +2151,10 @@ def build_ny_tos_reports(rows: list[dict[str, str]], db_path: str) -> int:
 _NY_STATS_COLUMNS = ("company", "period", "shha_category", "original_label",
                      "content_format", "grain", "metric", "submetric",
                      "value", "unit", "page")
+_STATE_STATS_COLUMNS = ("jurisdiction", "law", "company", "period", "category",
+                        "original_label", "geographic_scope", "content_format",
+                        "grain", "metric", "submetric", "value", "unit", "page",
+                        "source_file")
 
 
 def build_ca_ab587_reports(rows: list[dict[str, str]], db_path: str) -> int:
@@ -2271,6 +2301,26 @@ def build_ny_tos_stats(rows: list[dict[str, str]], db_path: str) -> int:
         conn.close()
 
 
+def build_state_tos_stats(rows: list[dict[str, str]], db_path: str) -> int:
+    """Populate the jurisdiction-aware AB 587 / GBS 1102 statistics union."""
+    if rows and (missing := set(_STATE_STATS_COLUMNS) - set(rows[0])):
+        raise ValueError(f"state_tos_stats source is missing columns: {sorted(missing)}")
+    conn = sqlite3.connect(db_path)
+    try:
+        with conn:
+            conn.executemany(
+                "INSERT INTO state_tos_stats (" + ",".join(_STATE_STATS_COLUMNS) + ") "
+                "VALUES (" + ",".join("?" for _ in _STATE_STATS_COLUMNS) + ")",
+                [tuple(r.get(column, "") if column not in ("value", "page")
+                       else (None if r.get(column) in (None, "") else r.get(column))
+                       for column in _STATE_STATS_COLUMNS)
+                 for r in rows],
+            )
+        return len(rows)
+    finally:
+        conn.close()
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Seed demo.db from the VLOP DSA dataset.")
     parser.add_argument("--source", default=_DEFAULT_SOURCE, help="Path to vlop-dsa.json")
@@ -2283,6 +2333,8 @@ def main() -> None:
                         help="Path to ny-tos-reports.csv (NY ToS catalogue)")
     parser.add_argument("--ny-stats", default=_DEFAULT_NY_STATS_SOURCE,
                         help="Path to ny-tos-normalized.csv (normalized NY ToS stats)")
+    parser.add_argument("--state-stats", default=_DEFAULT_STATE_STATS_SOURCE,
+                        help="Path to state-tos-stats.csv (CA AB 587 + NY GBS 1102 stats)")
     parser.add_argument("--ca-ab587", default=_DEFAULT_CA_AB587_SOURCE,
                         help="Path to ca-ab587-reports.csv (California AB 587 catalogue)")
     parser.add_argument("--ca-ab587-narratives", default=_DEFAULT_CA_AB587_NARRATIVES_SOURCE,
@@ -2403,6 +2455,13 @@ def main() -> None:
         print(f"  ny_tos_stats: {n} rows from {os.path.basename(args.ny_stats)}")
     else:
         print(f"  (skipping NY ToS stats — not found: {args.ny_stats})")
+
+    if os.path.isfile(args.state_stats):
+        state_stat_rows = _load_report_locations_csv(args.state_stats)
+        n = build_state_tos_stats(state_stat_rows, args.db)
+        print(f"  state_tos_stats: {n} rows from {os.path.basename(args.state_stats)}")
+    else:
+        print(f"  (skipping state ToS stats — not found: {args.state_stats})")
 
     if os.path.isfile(args.apple_source):
         with open(args.apple_source, "r", encoding="utf-8") as f:

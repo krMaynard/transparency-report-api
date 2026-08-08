@@ -39,8 +39,11 @@ Highlights of the corpus:
   ecosystem-security (PHA / malware) report, and Google's Traffic & Disruptions
   catalogue.
 - **Terms-of-Service & narrative corpora** — New York's and California's ToS
-  reports, plus full-text search over the DSA Table-11 prose, Google's CA AB 2013
-  AI-training summary, and LY Corporation's bilingual Japan report.
+  reports, including a jurisdiction-aware `state_tos_stats` union that connects
+  their shared statutory categories without conflating periods, scopes, or
+  company-specific metrics; plus full-text search over the DSA Table-11 prose,
+  Google's CA AB 2013 AI-training summary, and LY Corporation's bilingual Japan
+  report.
 
 A query names one of the **report tables** (`GET /api/tables`) and then
 describes filters, group-bys, and aggregates over that table's fields. Every

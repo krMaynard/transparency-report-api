@@ -1176,6 +1176,21 @@ TABLES: dict[str, TableSpec] = {
             "value": "f.value",
         },
     ),
+    "state_tos_stats": TableSpec(
+        "California AB 587 and New York GBS 1102 (S895B / Stop Hiding Hate Act) enforcement statistics joined through their five shared statutory content categories. This is a tidy-long UNION, not a sum or a gap-fill: California historical values do not stand in for missing New York values. Filter to one jurisdiction, company, metric/submetric, unit, grain, and geographic_scope before aggregating. Every cell retains the filed label, source PDF, and page. California coverage is a conservative extraction from 12 filings (2023 Q3–2024 H1); New York coverage is 2025 Q3.",
+        "FROM state_tos_stats f",
+        {
+            "jurisdiction": "f.jurisdiction", "law": "f.law",
+            "company": "f.company", "period": "f.period",
+            "category": "f.category", "original_label": "f.original_label",
+            "geographic_scope": "f.geographic_scope",
+            "content_format": "f.content_format", "grain": "f.grain",
+            "metric": "f.metric", "submetric": "f.submetric",
+            "unit": "f.unit", "source_file": "f.source_file",
+            "page": "f.page",
+        },
+        {"value": "f.value"},
+    ),
     "taiwan_metrics": TableSpec(
         "Taiwan Anti-Fraud Act (詐欺犯罪危害防制條例) transparency data — two streams. (1) The National Police Agency's Article 42 enforcement stream (publisher 'NPA-165', section 'dns_blocked_sites'): fraud websites whose DNS resolution was suspended, aggregated to sites-blocked counts per month × official site-category (網站性質, e.g. 金融保險/電子商務/釣魚網站). (2) The designated ad platforms' statutory 詐欺防制計畫透明度報告 (publishers 'Google'/'LINE'/'TikTok'; Meta's not yet retrievable): Art. 32/33 notification and enforcement statistics in section 'afa_transparency_report', plus TikTok's voluntary proactive figures in 'platform_enforcement'; platform periods are coverage windows ('YYYY-MM..YYYY-MM'), not months. A tidy-long table: one row per measured value, identified by publisher × period × section × category × metric. Pin a section AND a metric before aggregating — requests ≠ URLs ≠ accounts, and some platform metrics are parts/subsets of others.",
         "FROM taiwan_metrics f",
@@ -4591,32 +4606,42 @@ def _leg_warnings(
     # stay in each company's own terms (flagged vs actioned vs warned…), counts
     # and percent rates share one `value` column, and Strava's per-format
     # breakdown rows coexist with their own category totals.
-    if table == "ny_tos_stats" and any(
+    if table in ("ny_tos_stats", "state_tos_stats") and any(
         a.function in ("SUM", "AVG") and a.field_name == "value" for a in aggregates
     ):
         if "unit" not in pinned:
             out.append(
-                "'ny_tos_stats' keeps counts and percent rates in one 'value' column; "
+                f"'{table}' keeps counts and percent rates in one 'value' column; "
                 "this aggregate pins no 'unit', so it may sum a rate with a count. "
                 "Filter unit='count' (or 'percent'), or group by 'unit'."
             )
         if "grain" not in pinned:
             out.append(
-                "'ny_tos_stats' carries category totals alongside Strava's per-format "
+                f"'{table}' carries category totals alongside breakdown rows; "
                 "breakdown; this aggregate pins no 'grain', so it may double-count. "
                 "Filter grain='category_total' (or 'breakdown'), or group by 'grain'."
             )
         if not {"metric", "submetric"} & pinned:
             out.append(
-                "'ny_tos_stats' metrics are each company's own (flagged vs actioned vs "
+                f"'{table}' metrics are each company's own (flagged vs actioned vs "
                 "warned…), so an aggregate that pins neither 'metric' nor 'submetric' "
                 "adds unrelated measures. Filter or group by 'metric'/'submetric'."
             )
         if "company" not in pinned:
             out.append(
-                "'ny_tos_stats' metrics are not comparable across companies; this "
+                f"'{table}' metrics are not comparable across companies; this "
                 "aggregate pins no 'company', so it may sum non-comparable values. "
                 "Filter or group by 'company'."
+            )
+        if table == "state_tos_stats" and "jurisdiction" not in pinned:
+            out.append(
+                "'state_tos_stats' unions two laws and reporting periods; this aggregate "
+                "pins no 'jurisdiction'. Filter or group by 'jurisdiction'."
+            )
+        if table == "state_tos_stats" and "geographic_scope" not in pinned:
+            out.append(
+                "'state_tos_stats' mixes global, United States, and filer-reported scopes; "
+                "this aggregate pins no 'geographic_scope'. Filter or group by it."
             )
     # github_metrics mixes flows (requests), stocks (EU-DSA MAU levels) and
     # banded national-security ranges in one count_low/count_high pair.
@@ -5159,6 +5184,10 @@ FIELD_HELP: dict[str, str] = {
     "content_format": "Strava's per-format breakdown (Activity, Photo, Post, …); empty for other filers.",
     "grain": "'category_total' (the category's own row) or 'breakdown' (Strava's per-format rows). Summing both double-counts — pin one.",
     "submetric": "The source column within `metric`, in the company's own terms (e.g. Snap's 'flagged_total', Strava's 'flagged_by_users').",
+    "jurisdiction": "The law's filing jurisdiction. In state_tos_stats: California or New York. Pin this before aggregating; the merged table is a union, not a gap-fill.",
+    "law": "The governing transparency law for the row (AB 587 or GBS 1102 (S895B)).",
+    "geographic_scope": "The population represented by the filed metric (for example global, united_states, or reported when the PDF does not expose a reusable scope label). Never add overlapping scopes.",
+    "source_file": "Archived source PDF containing this value. Use with page to verify the extraction.",
     # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
     "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream, monthly periods) or a designated ad platform's statutory report ('Google'/'LINE'/'TikTok', coverage-window periods like '2024-07..2025-06'; Meta's report exists but isn't retrievable yet). Pin this before comparing values — each publisher reports different quantities over different windows.",
     # ── Google user-data / Microsoft LERR / LinkedIn (tidy-long, ranged) ──
