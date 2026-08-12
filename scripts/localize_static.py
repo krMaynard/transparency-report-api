@@ -191,8 +191,8 @@ COMMON = {
     </a>''', '''      Clave de API
     </a>'''),
         ('''API Reference''', '''Referencia de la API'''),
-        ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-         '''Por <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+        ('''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+         '''Por <a href="https://krm.fyi/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Privacidad</a>'''),
         ('''      Privacy
     </a>''', '''      Privacidad
@@ -247,8 +247,8 @@ COMMON = {
     </a>''', '''      Clé d’API
     </a>'''),
         ('''API Reference''', '''Référence API'''),
-        ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-         '''Par <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+        ('''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+         '''Par <a href="https://krm.fyi/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Confidentialité</a>'''),
         ('''      Privacy
     </a>''', '''      Confidentialité
@@ -303,8 +303,8 @@ COMMON = {
     </a>''', '''      API-Schlüssel
     </a>'''),
         ('''API Reference''', '''API-Referenz'''),
-        ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-         '''Von <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+        ('''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+         '''Von <a href="https://krm.fyi/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Datenschutz</a>'''),
         ('''      Privacy
     </a>''', '''      Datenschutz
@@ -359,8 +359,8 @@ COMMON = {
     </a>''', '''      Chiave API
     </a>'''),
         ('''API Reference''', '''Riferimento API'''),
-        ('''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-         '''Di <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+        ('''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+         '''Di <a href="https://krm.fyi/">Kieran Maynard</a>'''),
         ('''>Privacy</a>''', '''>Privacy</a>'''),
         ('''      Privacy
     </a>''', '''      Privacy
@@ -1903,8 +1903,8 @@ COMMON["ja"] = [
     </a>'''),
     (r'''API Reference''',
      r'''API リファレンス'''),
-    (r'''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-     r'''作成：<a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+    (r'''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+     r'''作成：<a href="https://krm.fyi/">Kieran Maynard</a>'''),
     (r'''>Privacy</a>''',
      r'''>プライバシー</a>'''),
     (r'''      Privacy
@@ -2667,8 +2667,8 @@ COMMON["zh"] = [
     </a>'''),
     (r'''API Reference''',
      r'''API 参考'''),
-    (r'''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-     r'''作者：<a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+    (r'''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+     r'''作者：<a href="https://krm.fyi/">Kieran Maynard</a>'''),
     (r'''>Privacy</a>''',
      r'''>隐私</a>'''),
     (r'''      Privacy
@@ -3430,8 +3430,8 @@ COMMON["ko"] = [
     </a>'''),
     (r'''API Reference''',
      r'''API 레퍼런스'''),
-    (r'''By <a href="https://kieranmaynard.com/">Kieran Maynard</a>''',
-     r'''제작: <a href="https://kieranmaynard.com/">Kieran Maynard</a>'''),
+    (r'''By <a href="https://krm.fyi/">Kieran Maynard</a>''',
+     r'''제작: <a href="https://krm.fyi/">Kieran Maynard</a>'''),
     (r'''>Privacy</a>''',
      r'''>개인정보</a>'''),
     (r'''      Privacy
@@ -14497,6 +14497,59 @@ _AGENT_BANNER = {
 for _loc in ("es", "fr", "de", "it", "ja", "zh", "ko"):
     for _english, _translations in _AGENT_BANNER.items():
         PAGES[_loc].setdefault("home.html", []).append((_english, _translations[_loc]))
+
+# NY ToS catalogue refresh after the Attorney General made every listed filing
+# public. These supersede the older full-paragraph keys in _NY_TOS above.
+_NY_TOS_CURRENT = {
+    "<p class=\"sub\">New York's <strong>Stop Hiding Hate Act</strong> (S895B) requires social-media platforms with over $100M in annual revenue and NY users to file <strong>twice-yearly</strong> terms-of-service reports with the state Attorney General, describing how they define and moderate hateful conduct, disinformation, and harassment. This catalogues every published filing. <a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">View the Attorney General's current filing index</a>. Served by the public, read-only <code>GET /api/ny-tos-reports</code>.</p>": {
+        "es": "<p class=\"sub\">La <strong>Stop Hiding Hate Act</strong> de Nueva York (S895B) exige que las plataformas de redes sociales con más de 100 millones de dólares de ingresos anuales y usuarios en NY presenten informes de condiciones de servicio <strong>dos veces al año</strong> ante la Fiscalía General del estado, describiendo cómo definen y moderan la conducta de odio, la desinformación y el acoso. Aquí se cataloga cada presentación publicada. <a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">Ver el índice actual de presentaciones de la Fiscalía General</a>. Servido por el endpoint público de solo lectura <code>GET /api/ny-tos-reports</code>.</p>",
+        "fr": "<p class=\"sub\">La <strong>Stop Hiding Hate Act</strong> de New York (S895B) impose aux plateformes de réseaux sociaux réalisant plus de 100 millions de dollars de chiffre d’affaires annuel et comptant des utilisateurs à New York de déposer <strong>deux fois par an</strong> des rapports sur leurs conditions d’utilisation auprès du procureur général de l’État. Ce catalogue recense chaque dépôt publié. <a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">Voir l’index actuel des dépôts du procureur général</a>. Fourni par l’endpoint public en lecture seule <code>GET /api/ny-tos-reports</code>.</p>",
+        "de": "<p class=\"sub\">New Yorks <strong>Stop Hiding Hate Act</strong> (S895B) verpflichtet Social-Media-Plattformen mit mehr als 100 Mio. US-Dollar Jahresumsatz und Nutzern in New York, <strong>zweimal jährlich</strong> Berichte zu ihren Nutzungsbedingungen beim Generalstaatsanwalt einzureichen. Dieser Katalog erfasst jede veröffentlichte Einreichung. <a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">Aktuellen Einreichungsindex des Generalstaatsanwalts ansehen</a>. Bereitgestellt über den öffentlichen, schreibgeschützten Endpunkt <code>GET /api/ny-tos-reports</code>.</p>",
+        "it": "<p class=\"sub\">Lo <strong>Stop Hiding Hate Act</strong> di New York (S895B) impone alle piattaforme social con oltre 100 milioni di dollari di ricavi annui e utenti nello Stato di presentare <strong>due volte l’anno</strong> report sui termini di servizio al procuratore generale. Questo catalogo raccoglie ogni deposito pubblicato. <a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">Vedi l’indice corrente dei depositi del procuratore generale</a>. Fornito dall’endpoint pubblico di sola lettura <code>GET /api/ny-tos-reports</code>.</p>",
+        "ja": "<p class=\"sub\">ニューヨーク州の <strong>Stop Hiding Hate Act</strong>（S895B）は、年間収益が1億ドルを超え、ニューヨーク州に利用者を持つソーシャルメディア・プラットフォームに対し、州司法長官への利用規約報告書の提出を<strong>年2回</strong>義務付けています。このカタログには公開された全提出書類を収録しています。<a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">司法長官による最新の提出書類一覧を見る</a>。公開読み取り専用エンドポイント <code>GET /api/ny-tos-reports</code> から提供。</p>",
+        "zh": "<p class=\"sub\">纽约州 <strong>Stop Hiding Hate Act</strong>（S895B）要求年收入超过1亿美元且在纽约拥有用户的社交媒体平台，<strong>每年两次</strong>向州总检察长提交服务条款报告。本目录收录所有已公布的提交文件。<a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">查看总检察长当前的提交文件索引</a>。由公开只读端点 <code>GET /api/ny-tos-reports</code> 提供。</p>",
+        "ko": "<p class=\"sub\">뉴욕주의 <strong>Stop Hiding Hate Act</strong>(S895B)는 연매출 1억 달러를 초과하고 뉴욕 사용자가 있는 소셜 미디어 플랫폼에 연 <strong>2회</strong> 서비스 약관 보고서를 주 법무장관에게 제출하도록 요구합니다. 이 카탈로그에는 공개된 모든 제출물이 수록됩니다. <a href=\"https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports\" target=\"_blank\" rel=\"noopener noreferrer\">법무장관의 최신 제출물 목록 보기</a>. 공개 읽기 전용 엔드포인트 <code>GET /api/ny-tos-reports</code>에서 제공됩니다.</p>",
+    },
+    "<p><strong>Access</strong> — whether the filing's PDF is publicly downloadable. All 29 filings currently listed by the Attorney General are public and mirrored; the field remains so a future filing listed before its PDF is released can still appear in the catalogue.</p>": {
+        "es": "<p><strong>Acceso</strong> — indica si el PDF se puede descargar públicamente. Las 29 presentaciones que actualmente enumera la Fiscalía General son públicas y están archivadas; el campo se conserva para que futuras presentaciones puedan aparecer antes de que se publique su PDF.</p>",
+        "fr": "<p><strong>Accès</strong> — indique si le PDF est téléchargeable publiquement. Les 29 dépôts actuellement répertoriés par le procureur général sont publics et archivés ; ce champ est conservé afin qu’un futur dépôt puisse apparaître avant la publication de son PDF.</p>",
+        "de": "<p><strong>Zugang</strong> — gibt an, ob die PDF öffentlich heruntergeladen werden kann. Alle 29 derzeit vom Generalstaatsanwalt aufgeführten Einreichungen sind öffentlich und archiviert; das Feld bleibt bestehen, damit künftige Einreichungen schon vor Freigabe ihrer PDF im Katalog erscheinen können.</p>",
+        "it": "<p><strong>Accesso</strong> — indica se il PDF è scaricabile pubblicamente. Tutti i 29 depositi attualmente elencati dal procuratore generale sono pubblici e archiviati; il campo resta disponibile affinché un deposito futuro possa apparire prima della pubblicazione del relativo PDF.</p>",
+        "ja": "<p><strong>アクセス</strong> — PDFを公開でダウンロードできるかを示します。司法長官が現在掲載している29件はすべて公開・アーカイブ済みです。今後、PDF公開前の提出書類もカタログに表示できるよう、この項目は残しています。</p>",
+        "zh": "<p><strong>访问</strong> — 表示 PDF 是否可公开下载。总检察长目前列出的29份文件均已公开并存档；保留此字段，以便未来的文件可在 PDF 发布前先出现在目录中。</p>",
+        "ko": "<p><strong>접근</strong> — PDF의 공개 다운로드 가능 여부를 나타냅니다. 법무장관이 현재 게시한 29건은 모두 공개 및 보관되었으며, 향후 PDF 공개 전에도 제출물을 목록에 표시할 수 있도록 이 필드를 유지합니다.</p>",
+    },
+    "<p><strong>Report</strong> — the filing on the Attorney General's site. <strong>Archived</strong> — a checksum-verified snapshot mirrored in this project's open-data repository, in case the live link moves.</p>": {
+        "es": "<p><strong>Informe</strong> — la presentación en el sitio de la Fiscalía General. <strong>Archivado</strong> — una copia verificada mediante suma de comprobación en el repositorio de datos abiertos del proyecto, por si cambia el enlace original.</p>",
+        "fr": "<p><strong>Rapport</strong> — le dépôt sur le site du procureur général. <strong>Archive</strong> — une copie dont la somme de contrôle a été vérifiée dans le dépôt de données ouvertes du projet, au cas où le lien d’origine changerait.</p>",
+        "de": "<p><strong>Bericht</strong> — die Einreichung auf der Website des Generalstaatsanwalts. <strong>Archiv</strong> — eine per Prüfsumme verifizierte Kopie im Open-Data-Repository des Projekts, falls sich der Originallink ändert.</p>",
+        "it": "<p><strong>Report</strong> — il deposito sul sito del procuratore generale. <strong>Archivio</strong> — una copia verificata tramite checksum nel repository open data del progetto, nel caso in cui il link originale cambi.</p>",
+        "ja": "<p><strong>レポート</strong> — 司法長官サイト上の提出書類。<strong>アーカイブ</strong> — 元のリンクが移動した場合に備え、チェックサムを検証してプロジェクトのオープンデータ・リポジトリに保存したコピー。</p>",
+        "zh": "<p><strong>报告</strong> — 总检察长网站上的提交文件。<strong>存档</strong> — 在本项目开放数据仓库中保存并经校验和验证的副本，以防原始链接变更。</p>",
+        "ko": "<p><strong>보고서</strong> — 법무장관 사이트의 제출물. <strong>보관본</strong> — 원본 링크가 변경될 경우를 대비해 체크섬을 검증하여 프로젝트의 오픈 데이터 저장소에 보관한 사본입니다.</p>",
+    },
+    "<p class=\"sub\">Figures extracted from seven 2025 Q3 filings and normalized onto the act's five categories. The three Q3 filings released later and all Q4 filings are archived and catalogued above, but are not yet included in this statistics table. Only the <em>category</em> is normalized — each company reports its own metrics, so <strong>figures are not comparable across companies</strong>, and some category mappings are broader or narrower than the statute. <a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">Methodology &amp; caveats</a>. Queryable as the <code>ny_tos_stats</code> table via <code>POST /api/explore</code>.</p>": {
+        "es": "<p class=\"sub\">Cifras extraídas de siete presentaciones del tercer trimestre de 2025 y normalizadas sobre las cinco categorías de la ley. Las tres presentaciones del tercer trimestre publicadas más tarde y todas las del cuarto trimestre están archivadas y catalogadas arriba, pero todavía no se incluyen en esta tabla. Solo se normaliza la <em>categoría</em>: cada empresa informa sus propias métricas, por lo que <strong>las cifras no son comparables entre empresas</strong>. <a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">Metodología y advertencias</a>. Consultable como <code>ny_tos_stats</code> vía <code>POST /api/explore</code>.</p>",
+        "fr": "<p class=\"sub\">Chiffres extraits de sept dépôts du T3 2025 et normalisés selon les cinq catégories de la loi. Les trois dépôts du T3 publiés plus tard et tous ceux du T4 sont archivés et catalogués ci-dessus, mais ne figurent pas encore dans ce tableau. Seule la <em>catégorie</em> est normalisée : chaque entreprise publie ses propres indicateurs, de sorte que <strong>les chiffres ne sont pas comparables entre entreprises</strong>. <a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">Méthodologie et réserves</a>. Interrogeable comme <code>ny_tos_stats</code> via <code>POST /api/explore</code>.</p>",
+        "de": "<p class=\"sub\">Zahlen aus sieben Einreichungen für Q3 2025, normalisiert auf die fünf gesetzlichen Kategorien. Die drei später veröffentlichten Q3-Berichte und alle Q4-Berichte sind oben archiviert und katalogisiert, aber noch nicht in dieser Statistiktabelle enthalten. Nur die <em>Kategorie</em> ist normalisiert; jedes Unternehmen meldet eigene Kennzahlen, daher sind <strong>die Zahlen nicht unternehmensübergreifend vergleichbar</strong>. <a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">Methodik und Hinweise</a>. Als <code>ny_tos_stats</code> über <code>POST /api/explore</code> abfragbar.</p>",
+        "it": "<p class=\"sub\">Dati estratti da sette depositi del terzo trimestre 2025 e normalizzati sulle cinque categorie della legge. I tre depositi del terzo trimestre pubblicati successivamente e tutti quelli del quarto trimestre sono archiviati e catalogati sopra, ma non sono ancora inclusi in questa tabella. Viene normalizzata solo la <em>categoria</em>; ogni azienda usa metriche proprie, quindi <strong>i dati non sono confrontabili tra aziende</strong>. <a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">Metodologia e avvertenze</a>. Interrogabile come <code>ny_tos_stats</code> tramite <code>POST /api/explore</code>.</p>",
+        "ja": "<p class=\"sub\">2025年第3四半期の7件の提出書類から抽出し、法律の5分類に正規化した数値です。後に公開された同四半期の3件と第4四半期の全提出書類は上でアーカイブ・収録されていますが、この統計表にはまだ含まれていません。正規化されるのは<em>カテゴリー</em>のみで、各社の指標は異なるため、<strong>企業間で数値を比較できません</strong>。<a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">方法と注意事項</a>。<code>POST /api/explore</code> の <code>ny_tos_stats</code> テーブルとして照会できます。</p>",
+        "zh": "<p class=\"sub\">数据提取自2025年第三季度的7份文件，并按法律规定的5个类别进行标准化。后来公布的3份第三季度文件和全部第四季度文件已在上方存档和收录，但尚未纳入本统计表。仅<em>类别</em>经过标准化；各公司报告的指标不同，因此<strong>公司间数据不可比较</strong>。<a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">方法与注意事项</a>。可通过 <code>POST /api/explore</code> 查询 <code>ny_tos_stats</code> 表。</p>",
+        "ko": "<p class=\"sub\">2025년 3분기 제출물 7건에서 추출해 법의 5개 범주에 맞춰 정규화한 수치입니다. 이후 공개된 3분기 제출물 3건과 모든 4분기 제출물은 위에 보관·수록되어 있지만 이 통계표에는 아직 포함되지 않았습니다. <em>범주</em>만 정규화되며 회사마다 지표가 달라 <strong>회사 간 수치를 비교할 수 없습니다</strong>. <a href=\"https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md\" target=\"_blank\" rel=\"noopener noreferrer\">방법론 및 주의사항</a>. <code>POST /api/explore</code>의 <code>ny_tos_stats</code> 표로 조회할 수 있습니다.</p>",
+    },
+    "Extracted New York Terms-of-Service enforcement statistics": {
+        "es": "Estadísticas extraídas de aplicación de condiciones de servicio de Nueva York",
+        "fr": "Statistiques extraites sur l’application des conditions d’utilisation de New York",
+        "de": "Extrahierte New Yorker Durchsetzungsstatistiken zu Nutzungsbedingungen",
+        "it": "Statistiche estratte sull’applicazione dei termini di servizio di New York",
+        "ja": "ニューヨーク州利用規約報告書から抽出した執行統計",
+        "zh": "纽约服务条款报告提取的执法统计",
+        "ko": "뉴욕 서비스 약관 보고서에서 추출한 집행 통계",
+    },
+}
+for _loc in ("es", "fr", "de", "it", "ja", "zh", "ko"):
+    for _english, _translations in _NY_TOS_CURRENT.items():
+        PAGES[_loc].setdefault("ny-tos.html", []).append((_english, _translations[_loc]))
 
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))

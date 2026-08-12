@@ -37,7 +37,7 @@
     color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
   }
-  /* Top site bar — mirrors kieranmaynard.com */
+  /* Top site bar — mirrors krm.fyi */
   .page-header { position: sticky; top: 0; z-index: 200; }
   .site-nav {
     display: flex; justify-content: space-between; align-items: center;
@@ -270,14 +270,14 @@ display: flex; align-items: center;
 <a class="skip-link" href="#main">Aller au contenu</a>
 <div class="page-header">
 <nav class="site-nav" aria-label="Site">
-  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <a href="https://krm.fyi/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Travaux</a>
-      <a href="https://kieranmaynard.com/transparency.html">Produits</a>
-      <a href="https://kieranmaynard.com/consulting.html">Conseil</a>
-      <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+      <a href="https://krm.fyi/work.html">Travaux</a>
+      <a href="https://krm.fyi/transparency.html">Produits</a>
+      <a href="https://krm.fyi/consulting.html">Conseil</a>
+      <a href="https://krm.fyi/blog.html">Blog</a>
+      <a href="https://krm.fyi/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
       <summary class="lang-current" aria-label="Langue" title="Langue">
@@ -323,15 +323,6 @@ display: flex; align-items: center;
 <aside class="sidebar" id="sidebar" aria-label="Navigation de l’application">
   <nav>
     <div class="nav-section">Réglementaire</div>
-
-    <a href="/fr/ai-training" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
-        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
-      </svg>
-      Loi IA de l'UE
-    </a>
-
     <a href="/fr/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
@@ -339,6 +330,14 @@ display: flex; align-items: center;
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
       DSA de l'UE
+    </a>
+
+    <a href="/fr/ai-training" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
+        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
+      </svg>
+      Loi IA de l'UE
     </a>
     <a href="/dsa-db" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
@@ -639,11 +638,11 @@ display: flex; align-items: center;
 
     <hr class="nav-hr">
 
-    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+    <a href="https://krm.fyi/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
       </svg>
-      kieranmaynard.com
+      krm.fyi
     </a>
 
     <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -653,7 +652,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Par <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/fr/privacy">Confidentialité</a></div>
+  <div class="sidebar-footer">Par <a href="https://krm.fyi/">Kieran Maynard</a> · <a href="/fr/privacy">Confidentialité</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -668,12 +667,12 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card" id="locations-card">
-    <p class="sub">Le <strong>Stop Hiding Hate Act</strong> de New York (S895B) impose aux plateformes de réseaux sociaux réalisant plus de 100 M$ de chiffre d’affaires annuel et comptant des utilisateurs new-yorkais de déposer <strong>deux fois par an</strong> des rapports sur leurs conditions générales d’utilisation auprès du procureur général de l’État, décrivant comment elles définissent et modèrent les contenus haineux, la désinformation et le harcèlement. Ce catalogue recense chaque dépôt publié. Fourni par l’endpoint public en lecture seule <code>GET /api/ny-tos-reports</code>.</p>
+    <p class="sub">La <strong>Stop Hiding Hate Act</strong> de New York (S895B) impose aux plateformes de réseaux sociaux réalisant plus de 100 millions de dollars de chiffre d’affaires annuel et comptant des utilisateurs à New York de déposer <strong>deux fois par an</strong> des rapports sur leurs conditions d’utilisation auprès du procureur général de l’État. Ce catalogue recense chaque dépôt publié. <a href="https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports" target="_blank" rel="noopener noreferrer">Voir l’index actuel des dépôts du procureur général</a>. Fourni par l’endpoint public en lecture seule <code>GET /api/ny-tos-reports</code>.</p>
     <details class="legend">
       <summary>Ce que signifient les colonnes</summary>
       <p><strong>Plateforme</strong> — la plateforme ou la marque filiale nommée dans le dépôt, lorsque l’entreprise dépose pour l’une d’elles (p. ex. <em>Twitch</em> et <em>GoodReads</em> d’Amazon). <strong>Période</strong> — la période couverte par le dépôt.</p>
-      <p><strong>Accès</strong> — si le PDF du dépôt est téléchargeable publiquement : <em>public</em> = servi depuis le répertoire ouvert du procureur général ; <em>auth-required</em> = servi depuis un répertoire protégé par identification, il n’est donc catalogué qu’avec son lien source.</p>
-      <p><strong>Rapport</strong> — le dépôt sur le site du procureur général. <strong>Archivé</strong> — une copie du PDF hébergée dans le dépôt de données ouvertes de ce projet (dépôts publics uniquement), au cas où le lien original change.</p>
+      <p><strong>Accès</strong> — indique si le PDF est téléchargeable publiquement. Les 29 dépôts actuellement répertoriés par le procureur général sont publics et archivés ; ce champ est conservé afin qu’un futur dépôt puisse apparaître avant la publication de son PDF.</p>
+      <p><strong>Rapport</strong> — le dépôt sur le site du procureur général. <strong>Archive</strong> — une copie dont la somme de contrôle a été vérifiée dans le dépôt de données ouvertes du projet, au cas où le lien d’origine changerait.</p>
     </details>
     <div class="controls">
       <label>Période <select id="rl-period"><option value="">Toutes</option></select></label>
@@ -689,7 +688,7 @@ display: flex; align-items: center;
 
   <section class="card" id="stats-card">
     <h2>Statistiques d'application</h2>
-    <p class="sub">Chiffres extraits des dépôts et normalisés selon les cinq catégories de la loi. Seule la <em>catégorie</em> est normalisée — chaque entreprise déclare ses propres métriques, donc <strong>les chiffres ne sont pas comparables entre entreprises</strong>, et certaines correspondances de catégories sont plus larges ou plus étroites que la loi. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Méthodologie et mises en garde</a>. Interrogeable via la table <code>ny_tos_stats</code> avec <code>POST /api/explore</code>.</p>
+    <p class="sub">Chiffres extraits de sept dépôts du T3 2025 et normalisés selon les cinq catégories de la loi. Les trois dépôts du T3 publiés plus tard et tous ceux du T4 sont archivés et catalogués ci-dessus, mais ne figurent pas encore dans ce tableau. Seule la <em>catégorie</em> est normalisée : chaque entreprise publie ses propres indicateurs, de sorte que <strong>les chiffres ne sont pas comparables entre entreprises</strong>. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Méthodologie et réserves</a>. Interrogeable comme <code>ny_tos_stats</code> via <code>POST /api/explore</code>.</p>
     <div class="controls">
       <label>Catégorie <select id="ns-category"><option value="">Toutes</option></select></label>
       <label>Entreprise <select id="ns-company"><option value="">Toutes</option></select></label>
@@ -818,6 +817,7 @@ async function setupLocations() {
 // Category-total grain only: Strava's per-format breakdown would double count.
 const NS_CATEGORIES = ["hate_speech_or_racism", "extremism_or_radicalization",
   "disinformation_or_misinformation", "harassment", "foreign_political_interference"];
+const NY_ARCHIVE_BASE = "https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/pdfs/";
 const nsCatLabel = (k) => esc(k).replace(/_/g, " ");
 
 function nsQuery() {
@@ -829,9 +829,9 @@ function nsQuery() {
   if (co) and.push({ operation: "EQ", field_name: "company", field_values: [co] });
   return {
     table: "ny_tos_stats",
-    fields: ["company", "shha_category", "original_label", "metric", "submetric", "unit", "value"],
+    fields: ["company", "period", "shha_category", "original_label", "metric", "submetric", "unit", "value", "page"],
     query: { and },
-    sort: [{ field_name: "company", order: "asc" }],
+    sort: [{ field_name: "period", order: "desc" }, { field_name: "company", order: "asc" }],
     max_count: 500,
   };
 }
@@ -862,21 +862,26 @@ async function runStats() {
   const rows = d.rows || [];
   $("#ns-summary").textContent = `Affichage de ${fmt(rows.length)} chiffres.`
     + (d.truncated ? " Les résultats ont été tronqués au plafond de lignes — affinez les filtres pour tout voir." : "");
-  const head = '<tr><th scope="col">Entreprise</th><th scope="col">Catégorie</th>' +
+  const head = '<tr><th scope="col">Entreprise</th><th scope="col">Période</th><th scope="col">Catégorie</th>' +
     '<th scope="col">Libellé déposé</th><th scope="col">Métrique</th>' +
-    '<th scope="col">Mesure</th><th scope="col">Valeur</th></tr>';
+    '<th scope="col">Mesure</th><th scope="col">Valeur</th><th scope="col">Source</th></tr>';
   const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
   const body = rows.map(r => {
-    const [co, cat, label, metric, sub, unit, value] = r;
+    const [co, period, cat, label, metric, sub, unit, value, page] = r;
     const val = value == null ? '<span class="na">N/A</span>'
       : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
-    const cells = [esc(co), nsCatLabel(cat), esc(label),
-      esc(metric || ""), esc(sub || ""), val];
+    const sourceUrl = safeHref(NY_ARCHIVE_BASE + "2025-q3-" + encodeURIComponent(co) + ".pdf"
+      + (page == null ? "" : "#page=" + encodeURIComponent(page)));
+    const source = sourceUrl
+      ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">PDF${page == null ? "" : " p. " + esc(page)}</a>`
+      : "";
+    const cells = [esc(co), esc(period), nsCatLabel(cat), esc(label),
+      esc(metric || ""), esc(sub || ""), val, source];
     return "<tr>" + cells.map((c, i) =>
       `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
   }).join("");
   $("#ns-out").innerHTML = rows.length
-    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    ? `<table class="restable"><caption class="sr-only">Statistiques extraites sur l’application des conditions d’utilisation de New York</caption><thead>${head}</thead><tbody>${body}</tbody></table>`
     : "<p class='sub'>Aucun chiffre correspondant.</p>";
 }
 

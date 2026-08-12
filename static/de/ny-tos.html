@@ -37,7 +37,7 @@
     color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
   }
-  /* Top site bar — mirrors kieranmaynard.com */
+  /* Top site bar — mirrors krm.fyi */
   .page-header { position: sticky; top: 0; z-index: 200; }
   .site-nav {
     display: flex; justify-content: space-between; align-items: center;
@@ -270,14 +270,14 @@ display: flex; align-items: center;
 <a class="skip-link" href="#main">Zum Inhalt springen</a>
 <div class="page-header">
 <nav class="site-nav" aria-label="Seite">
-  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <a href="https://krm.fyi/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Arbeit</a>
-      <a href="https://kieranmaynard.com/transparency.html">Produkte</a>
-      <a href="https://kieranmaynard.com/consulting.html">Beratung</a>
-      <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Kontakt</a>
+      <a href="https://krm.fyi/work.html">Arbeit</a>
+      <a href="https://krm.fyi/transparency.html">Produkte</a>
+      <a href="https://krm.fyi/consulting.html">Beratung</a>
+      <a href="https://krm.fyi/blog.html">Blog</a>
+      <a href="https://krm.fyi/contact.html">Kontakt</a>
     </div>
     <details class="lang-switcher">
       <summary class="lang-current" aria-label="Sprache" title="Sprache">
@@ -323,15 +323,6 @@ display: flex; align-items: center;
 <aside class="sidebar" id="sidebar" aria-label="Anwendungsnavigation">
   <nav>
     <div class="nav-section">Regulierung</div>
-
-    <a href="/de/ai-training" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
-        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
-      </svg>
-      KI-Verordnung (EU)
-    </a>
-
     <a href="/de/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
@@ -339,6 +330,14 @@ display: flex; align-items: center;
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
       EU-DSA
+    </a>
+
+    <a href="/de/ai-training" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
+        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
+      </svg>
+      KI-Verordnung (EU)
     </a>
     <a href="/dsa-db" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
@@ -639,11 +638,11 @@ display: flex; align-items: center;
 
     <hr class="nav-hr">
 
-    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+    <a href="https://krm.fyi/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
       </svg>
-      kieranmaynard.com
+      krm.fyi
     </a>
 
     <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -653,7 +652,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">Von <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/de/privacy">Datenschutz</a></div>
+  <div class="sidebar-footer">Von <a href="https://krm.fyi/">Kieran Maynard</a> · <a href="/de/privacy">Datenschutz</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -668,12 +667,12 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card" id="locations-card">
-    <p class="sub">Der <strong>Stop Hiding Hate Act</strong> von New York (S895B) verpflichtet Social-Media-Plattformen mit über 100 Mio. $ Jahresumsatz und Nutzern in NY, <strong>zweimal jährlich</strong> Berichte zu ihren Nutzungsbedingungen beim Generalstaatsanwalt des Staates einzureichen, in denen sie darlegen, wie sie hasserfülltes Verhalten, Desinformation und Belästigung definieren und moderieren. Hier wird jede veröffentlichte Einreichung katalogisiert. Bereitgestellt vom öffentlichen, schreibgeschützten <code>GET /api/ny-tos-reports</code>.</p>
+    <p class="sub">New Yorks <strong>Stop Hiding Hate Act</strong> (S895B) verpflichtet Social-Media-Plattformen mit mehr als 100 Mio. US-Dollar Jahresumsatz und Nutzern in New York, <strong>zweimal jährlich</strong> Berichte zu ihren Nutzungsbedingungen beim Generalstaatsanwalt einzureichen. Dieser Katalog erfasst jede veröffentlichte Einreichung. <a href="https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports" target="_blank" rel="noopener noreferrer">Aktuellen Einreichungsindex des Generalstaatsanwalts ansehen</a>. Bereitgestellt über den öffentlichen, schreibgeschützten Endpunkt <code>GET /api/ny-tos-reports</code>.</p>
     <details class="legend">
       <summary>Was die Spalten bedeuten</summary>
       <p><strong>Plattform</strong> — die in der Einreichung genannte Tochterplattform oder Marke, wenn das Unternehmen für eine solche einreicht (z. B. <em>Twitch</em> vs. <em>GoodReads</em> von Amazon). <strong>Zeitraum</strong> — der Berichtszeitraum, den die Einreichung abdeckt.</p>
-      <p><strong>Zugang</strong> — ob die PDF der Einreichung öffentlich herunterladbar ist: <em>public</em> = aus dem offenen Verzeichnis des Generalstaatsanwalts bereitgestellt; <em>auth-required</em> = aus einem anmeldepflichtigen Verzeichnis bereitgestellt, daher nur mit Quelllink katalogisiert.</p>
-      <p><strong>Bericht</strong> — die Einreichung auf der Website des Generalstaatsanwalts. <strong>Archiviert</strong> — eine Kopie der PDF, gespiegelt im Open-Data-Repository dieses Projekts (nur öffentliche Einreichungen), falls der Originallink umzieht.</p>
+      <p><strong>Zugang</strong> — gibt an, ob die PDF öffentlich heruntergeladen werden kann. Alle 29 derzeit vom Generalstaatsanwalt aufgeführten Einreichungen sind öffentlich und archiviert; das Feld bleibt bestehen, damit künftige Einreichungen schon vor Freigabe ihrer PDF im Katalog erscheinen können.</p>
+      <p><strong>Bericht</strong> — die Einreichung auf der Website des Generalstaatsanwalts. <strong>Archiv</strong> — eine per Prüfsumme verifizierte Kopie im Open-Data-Repository des Projekts, falls sich der Originallink ändert.</p>
     </details>
     <div class="controls">
       <label>Zeitraum <select id="rl-period"><option value="">Alle</option></select></label>
@@ -689,7 +688,7 @@ display: flex; align-items: center;
 
   <section class="card" id="stats-card">
     <h2>Durchsetzungsstatistiken</h2>
-    <p class="sub">Aus den Einreichungen extrahierte Zahlen, normalisiert auf die fünf Kategorien des Gesetzes. Nur die <em>Kategorie</em> wird normalisiert — jedes Unternehmen meldet seine eigenen Metriken, daher sind <strong>die Zahlen zwischen Unternehmen nicht vergleichbar</strong>, und manche Kategorie-Zuordnungen sind weiter oder enger gefasst als das Gesetz. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Methodik &amp; Vorbehalte</a>. Abfragbar als Tabelle <code>ny_tos_stats</code> über <code>POST /api/explore</code>.</p>
+    <p class="sub">Zahlen aus sieben Einreichungen für Q3 2025, normalisiert auf die fünf gesetzlichen Kategorien. Die drei später veröffentlichten Q3-Berichte und alle Q4-Berichte sind oben archiviert und katalogisiert, aber noch nicht in dieser Statistiktabelle enthalten. Nur die <em>Kategorie</em> ist normalisiert; jedes Unternehmen meldet eigene Kennzahlen, daher sind <strong>die Zahlen nicht unternehmensübergreifend vergleichbar</strong>. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Methodik und Hinweise</a>. Als <code>ny_tos_stats</code> über <code>POST /api/explore</code> abfragbar.</p>
     <div class="controls">
       <label>Kategorie <select id="ns-category"><option value="">Alle</option></select></label>
       <label>Unternehmen <select id="ns-company"><option value="">Alle</option></select></label>
@@ -818,6 +817,7 @@ async function setupLocations() {
 // Category-total grain only: Strava's per-format breakdown would double count.
 const NS_CATEGORIES = ["hate_speech_or_racism", "extremism_or_radicalization",
   "disinformation_or_misinformation", "harassment", "foreign_political_interference"];
+const NY_ARCHIVE_BASE = "https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/pdfs/";
 const nsCatLabel = (k) => esc(k).replace(/_/g, " ");
 
 function nsQuery() {
@@ -829,9 +829,9 @@ function nsQuery() {
   if (co) and.push({ operation: "EQ", field_name: "company", field_values: [co] });
   return {
     table: "ny_tos_stats",
-    fields: ["company", "shha_category", "original_label", "metric", "submetric", "unit", "value"],
+    fields: ["company", "period", "shha_category", "original_label", "metric", "submetric", "unit", "value", "page"],
     query: { and },
-    sort: [{ field_name: "company", order: "asc" }],
+    sort: [{ field_name: "period", order: "desc" }, { field_name: "company", order: "asc" }],
     max_count: 500,
   };
 }
@@ -862,21 +862,26 @@ async function runStats() {
   const rows = d.rows || [];
   $("#ns-summary").textContent = `Zeige ${fmt(rows.length)} Werte.`
     + (d.truncated ? " Die Ergebnisse wurden an der Zeilenobergrenze abgeschnitten — grenzen Sie die Filter ein, um alles zu sehen." : "");
-  const head = '<tr><th scope="col">Unternehmen</th><th scope="col">Kategorie</th>' +
+  const head = '<tr><th scope="col">Unternehmen</th><th scope="col">Zeitraum</th><th scope="col">Kategorie</th>' +
     '<th scope="col">Eingereichte Bezeichnung</th><th scope="col">Metrik</th>' +
-    '<th scope="col">Messgröße</th><th scope="col">Wert</th></tr>';
+    '<th scope="col">Messgröße</th><th scope="col">Wert</th><th scope="col">Source</th></tr>';
   const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
   const body = rows.map(r => {
-    const [co, cat, label, metric, sub, unit, value] = r;
+    const [co, period, cat, label, metric, sub, unit, value, page] = r;
     const val = value == null ? '<span class="na">N/A</span>'
       : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
-    const cells = [esc(co), nsCatLabel(cat), esc(label),
-      esc(metric || ""), esc(sub || ""), val];
+    const sourceUrl = safeHref(NY_ARCHIVE_BASE + "2025-q3-" + encodeURIComponent(co) + ".pdf"
+      + (page == null ? "" : "#page=" + encodeURIComponent(page)));
+    const source = sourceUrl
+      ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">PDF${page == null ? "" : " p. " + esc(page)}</a>`
+      : "";
+    const cells = [esc(co), esc(period), nsCatLabel(cat), esc(label),
+      esc(metric || ""), esc(sub || ""), val, source];
     return "<tr>" + cells.map((c, i) =>
       `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
   }).join("");
   $("#ns-out").innerHTML = rows.length
-    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    ? `<table class="restable"><caption class="sr-only">Extrahierte New Yorker Durchsetzungsstatistiken zu Nutzungsbedingungen</caption><thead>${head}</thead><tbody>${body}</tbody></table>`
     : "<p class='sub'>Keine passenden Werte.</p>";
 }
 
