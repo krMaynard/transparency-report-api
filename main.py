@@ -1171,6 +1171,7 @@ TABLES: dict[str, TableSpec] = {
             "metric":         "f.metric",
             "submetric":      "f.submetric",
             "unit":           "f.unit",
+            "page":           "f.page",
         },
         {
             "value": "f.value",
@@ -5188,6 +5189,7 @@ FIELD_HELP: dict[str, str] = {
     "law": "The governing transparency law for the row (AB 587 or GBS 1102 (S895B)).",
     "geographic_scope": "The population represented by the filed metric (for example global, united_states, or reported when the PDF does not expose a reusable scope label). Never add overlapping scopes.",
     "source_file": "Archived source PDF containing this value. Use with page to verify the extraction.",
+    "page": "The 1-based page number in the archived source PDF, for verifying the reported value in context.",
     # ── Taiwan Anti-Fraud Act (tidy-long taiwan_metrics) ──
     "publisher": "Who published the figures: 'NPA-165' (the National Police Agency / 165 anti-fraud hotline government stream, monthly periods) or a designated ad platform's statutory report ('Google'/'LINE'/'TikTok', coverage-window periods like '2024-07..2025-06'; Meta's report exists but isn't retrievable yet). Pin this before comparing values — each publisher reports different quantities over different windows.",
     # ── Google user-data / Microsoft LERR / LinkedIn (tidy-long, ranged) ──

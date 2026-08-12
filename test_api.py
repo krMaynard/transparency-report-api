@@ -1675,6 +1675,13 @@ class TestNYTosReports:
         r = client.get("/ny-tos")
         assert r.status_code == 200
         assert "/api/ny-tos-reports" in r.text and 'id="rl-period"' in r.text
+        assert "https://krm.fyi/" in r.text and "kieranmaynard.com" not in r.text
+        assert "social-media-tos-reporting/reports" in r.text
+        assert "All 29 filings currently listed" in r.text
+        assert "all Q4 filings" in r.text
+        assert 'field_name: "page"' not in r.text  # raw fields, not a filter
+        assert '"value", "page"]' in r.text
+        assert '<th scope="col">Source</th>' in r.text
 
 
 # ── Public CA AB 587-reports catalogue (GET /api/ca-ab587-reports) ───────────
@@ -3163,8 +3170,19 @@ class TestNYTosStatsTable:
     def test_ny_stats_fields_endpoint(self):
         body = client.get("/api/fields?table=ny_tos_stats", headers=MOMO).json()
         assert {"company", "shha_category", "original_label", "content_format",
-                "grain", "metric", "submetric", "unit"} <= set(body["dimensions"]["fields"])
+                "grain", "metric", "submetric", "unit", "page"} <= set(body["dimensions"]["fields"])
         assert "value" in body["measures"]["fields"]
+
+    def test_ny_stats_exposes_source_page(self):
+        body = client.post("/api/explore", json={
+            "table": "ny_tos_stats",
+            "fields": ["company", "page", "value"],
+            "query": {"and": [
+                {"operation": "EQ", "field_name": "company", "field_values": ["discord-inc"]},
+            ]},
+        }).json()
+        assert body["columns"] == ["company", "page", "value"]
+        assert body["rows"] == [["discord-inc", 13, 279]]
 
     def test_ny_stats_snap_value(self):
         # Snap hate-speech flagged (human report) = 482,240 (fixture).

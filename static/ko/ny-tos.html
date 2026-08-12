@@ -37,7 +37,7 @@
     color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
   }
-  /* Top site bar — mirrors kieranmaynard.com */
+  /* Top site bar — mirrors krm.fyi */
   .page-header { position: sticky; top: 0; z-index: 200; }
   .site-nav {
     display: flex; justify-content: space-between; align-items: center;
@@ -270,14 +270,14 @@ display: flex; align-items: center;
 <a class="skip-link" href="#main">본문 바로가기</a>
 <div class="page-header">
 <nav class="site-nav" aria-label="사이트">
-  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <a href="https://krm.fyi/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">경력</a>
-      <a href="https://kieranmaynard.com/transparency.html">제품</a>
-      <a href="https://kieranmaynard.com/consulting.html">컨설팅</a>
-      <a href="https://kieranmaynard.com/blog.html">블로그</a>
-      <a href="https://kieranmaynard.com/contact.html">문의하기</a>
+      <a href="https://krm.fyi/work.html">경력</a>
+      <a href="https://krm.fyi/transparency.html">제품</a>
+      <a href="https://krm.fyi/consulting.html">컨설팅</a>
+      <a href="https://krm.fyi/blog.html">블로그</a>
+      <a href="https://krm.fyi/contact.html">문의하기</a>
     </div>
     <details class="lang-switcher">
       <summary class="lang-current" aria-label="언어" title="언어">
@@ -323,15 +323,6 @@ display: flex; align-items: center;
 <aside class="sidebar" id="sidebar" aria-label="애플리케이션 내비게이션">
   <nav>
     <div class="nav-section">규제</div>
-
-    <a href="/ko/ai-training" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
-        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
-      </svg>
-      EU AI법
-    </a>
-
     <a href="/ko/reports" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
@@ -339,6 +330,14 @@ display: flex; align-items: center;
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
       EU DSA
+    </a>
+
+    <a href="/ko/ai-training" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
+        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
+      </svg>
+      EU AI법
     </a>
     <a href="/dsa-db" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
@@ -639,11 +638,11 @@ display: flex; align-items: center;
 
     <hr class="nav-hr">
 
-    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+    <a href="https://krm.fyi/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
       </svg>
-      kieranmaynard.com
+      krm.fyi
     </a>
 
     <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -653,7 +652,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">제작: <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/ko/privacy">개인정보</a></div>
+  <div class="sidebar-footer">제작: <a href="https://krm.fyi/">Kieran Maynard</a> · <a href="/ko/privacy">개인정보</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -668,12 +667,12 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card" id="locations-card">
-    <p class="sub">뉴욕주의 <strong>Stop Hiding Hate Act</strong>(S895B)는 연간 매출 1억 달러를 초과하고 뉴욕주 사용자를 보유한 소셜미디어 플랫폼에 대해, 증오 행위·허위정보·괴롭힘을 어떻게 정의하고 조치하는지 설명하는 이용약관 보고서를 <strong>연 2회</strong> 주 법무장관에게 제출하도록 요구합니다. 이 페이지는 공개된 모든 제출물을 목록화합니다. 공개·읽기 전용 <code>GET /api/ny-tos-reports</code>가 제공합니다.</p>
+    <p class="sub">뉴욕주의 <strong>Stop Hiding Hate Act</strong>(S895B)는 연매출 1억 달러를 초과하고 뉴욕 사용자가 있는 소셜 미디어 플랫폼에 연 <strong>2회</strong> 서비스 약관 보고서를 주 법무장관에게 제출하도록 요구합니다. 이 카탈로그에는 공개된 모든 제출물이 수록됩니다. <a href="https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports" target="_blank" rel="noopener noreferrer">법무장관의 최신 제출물 목록 보기</a>. 공개 읽기 전용 엔드포인트 <code>GET /api/ny-tos-reports</code>에서 제공됩니다.</p>
     <details class="legend">
       <summary>각 열의 의미</summary>
       <p><strong>플랫폼</strong> — 기업이 특정 자회사 플랫폼이나 브랜드별로 제출하는 경우, 해당 제출물에 명시된 자회사 플랫폼 또는 브랜드(예: 아마존의 <em>Twitch</em>와 <em>GoodReads</em>). <strong>기간</strong> — 해당 제출물이 다루는 보고 기간.</p>
-      <p><strong>접근</strong> — 제출물의 PDF를 공개적으로 내려받을 수 있는지 여부: <em>public</em> ＝법무장관의 공개 디렉터리에서 제공; <em>auth-required</em> ＝로그인이 필요한 디렉터리에서 제공되므로 출처 링크만으로 목록화됨.</p>
-      <p><strong>보고서</strong> — 법무장관 사이트의 제출물. <strong>아카이브</strong> — 실시간 링크가 이동할 경우에 대비해 이 프로젝트의 오픈 데이터 저장소에 미러링한 PDF의 스냅샷(공개 제출물만 해당).</p>
+      <p><strong>접근</strong> — PDF의 공개 다운로드 가능 여부를 나타냅니다. 법무장관이 현재 게시한 29건은 모두 공개 및 보관되었으며, 향후 PDF 공개 전에도 제출물을 목록에 표시할 수 있도록 이 필드를 유지합니다.</p>
+      <p><strong>보고서</strong> — 법무장관 사이트의 제출물. <strong>보관본</strong> — 원본 링크가 변경될 경우를 대비해 체크섬을 검증하여 프로젝트의 오픈 데이터 저장소에 보관한 사본입니다.</p>
     </details>
     <div class="controls">
       <label>기간 <select id="rl-period"><option value="">전체</option></select></label>
@@ -689,7 +688,7 @@ display: flex; align-items: center;
 
   <section class="card" id="stats-card">
     <h2>집행 통계</h2>
-    <p class="sub">제출물에서 추출하여 이 법의 다섯 가지 분류로 정규화한 수치입니다. 정규화되는 것은 <em>분류</em>뿐이며, 각 회사는 자체 지표를 보고하므로 <strong>수치는 회사 간에 비교할 수 없습니다</strong>. 또한 일부 분류 매핑은 법률의 정의보다 넓거나 좁습니다. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">방법론 및 유의 사항</a>. <code>ny_tos_stats</code> 테이블로 <code>POST /api/explore</code>에서 조회할 수 있습니다.</p>
+    <p class="sub">2025년 3분기 제출물 7건에서 추출해 법의 5개 범주에 맞춰 정규화한 수치입니다. 이후 공개된 3분기 제출물 3건과 모든 4분기 제출물은 위에 보관·수록되어 있지만 이 통계표에는 아직 포함되지 않았습니다. <em>범주</em>만 정규화되며 회사마다 지표가 달라 <strong>회사 간 수치를 비교할 수 없습니다</strong>. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">방법론 및 주의사항</a>. <code>POST /api/explore</code>의 <code>ny_tos_stats</code> 표로 조회할 수 있습니다.</p>
     <div class="controls">
       <label>분류 <select id="ns-category"><option value="">전체</option></select></label>
       <label>회사 <select id="ns-company"><option value="">전체</option></select></label>
@@ -818,6 +817,7 @@ async function setupLocations() {
 // Category-total grain only: Strava's per-format breakdown would double count.
 const NS_CATEGORIES = ["hate_speech_or_racism", "extremism_or_radicalization",
   "disinformation_or_misinformation", "harassment", "foreign_political_interference"];
+const NY_ARCHIVE_BASE = "https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/pdfs/";
 const nsCatLabel = (k) => esc(k).replace(/_/g, " ");
 
 function nsQuery() {
@@ -829,9 +829,9 @@ function nsQuery() {
   if (co) and.push({ operation: "EQ", field_name: "company", field_values: [co] });
   return {
     table: "ny_tos_stats",
-    fields: ["company", "shha_category", "original_label", "metric", "submetric", "unit", "value"],
+    fields: ["company", "period", "shha_category", "original_label", "metric", "submetric", "unit", "value", "page"],
     query: { and },
-    sort: [{ field_name: "company", order: "asc" }],
+    sort: [{ field_name: "period", order: "desc" }, { field_name: "company", order: "asc" }],
     max_count: 500,
   };
 }
@@ -862,21 +862,26 @@ async function runStats() {
   const rows = d.rows || [];
   $("#ns-summary").textContent = `${fmt(rows.length)}개의 수치 표시 중.`
     + (d.truncated ? " 결과가 행 수 상한에서 잘렸습니다 — 필터를 좁혀 전체를 확인하세요." : "");
-  const head = '<tr><th scope="col">회사</th><th scope="col">분류</th>' +
+  const head = '<tr><th scope="col">회사</th><th scope="col">기간</th><th scope="col">분류</th>' +
     '<th scope="col">제출된 라벨</th><th scope="col">지표</th>' +
-    '<th scope="col">측정 항목</th><th scope="col">값</th></tr>';
+    '<th scope="col">측정 항목</th><th scope="col">값</th><th scope="col">Source</th></tr>';
   const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
   const body = rows.map(r => {
-    const [co, cat, label, metric, sub, unit, value] = r;
+    const [co, period, cat, label, metric, sub, unit, value, page] = r;
     const val = value == null ? '<span class="na">N/A</span>'
       : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
-    const cells = [esc(co), nsCatLabel(cat), esc(label),
-      esc(metric || ""), esc(sub || ""), val];
+    const sourceUrl = safeHref(NY_ARCHIVE_BASE + "2025-q3-" + encodeURIComponent(co) + ".pdf"
+      + (page == null ? "" : "#page=" + encodeURIComponent(page)));
+    const source = sourceUrl
+      ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">PDF${page == null ? "" : " p. " + esc(page)}</a>`
+      : "";
+    const cells = [esc(co), esc(period), nsCatLabel(cat), esc(label),
+      esc(metric || ""), esc(sub || ""), val, source];
     return "<tr>" + cells.map((c, i) =>
       `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
   }).join("");
   $("#ns-out").innerHTML = rows.length
-    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    ? `<table class="restable"><caption class="sr-only">뉴욕 서비스 약관 보고서에서 추출한 집행 통계</caption><thead>${head}</thead><tbody>${body}</tbody></table>`
     : "<p class='sub'>일치하는 수치가 없습니다.</p>";
 }
 

@@ -37,7 +37,7 @@
     color: var(--fg); font: 15px/1.6 'Open Sans', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     min-height: 100vh;
   }
-  /* Top site bar — mirrors kieranmaynard.com */
+  /* Top site bar — mirrors krm.fyi */
   .page-header { position: sticky; top: 0; z-index: 200; }
   .site-nav {
     display: flex; justify-content: space-between; align-items: center;
@@ -270,14 +270,14 @@ display: flex; align-items: center;
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="page-header">
 <nav class="site-nav" aria-label="Site">
-  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <a href="https://krm.fyi/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Work</a>
-      <a href="https://kieranmaynard.com/transparency.html">Products</a>
-      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
-      <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+      <a href="https://krm.fyi/work.html">Work</a>
+      <a href="https://krm.fyi/transparency.html">Products</a>
+      <a href="https://krm.fyi/consulting.html">Consulting</a>
+      <a href="https://krm.fyi/blog.html">Blog</a>
+      <a href="https://krm.fyi/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
       <summary class="lang-current" aria-label="Language" title="Language">
@@ -638,11 +638,11 @@ display: flex; align-items: center;
 
     <hr class="nav-hr">
 
-    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+    <a href="https://krm.fyi/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
       </svg>
-      kieranmaynard.com
+      krm.fyi
     </a>
 
     <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -652,7 +652,7 @@ display: flex; align-items: center;
       GitHub
     </a>
   </nav>
-  <div class="sidebar-footer">By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
+  <div class="sidebar-footer">By <a href="https://krm.fyi/">Kieran Maynard</a> · <a href="/privacy">Privacy</a></div>
 </aside>
 
 <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
@@ -667,12 +667,12 @@ display: flex; align-items: center;
 
  <main id="main" tabindex="-1">
   <section class="card" id="locations-card">
-    <p class="sub">New York's <strong>Stop Hiding Hate Act</strong> (S895B) requires social-media platforms with over $100M in annual revenue and NY users to file <strong>twice-yearly</strong> terms-of-service reports with the state Attorney General, describing how they define and moderate hateful conduct, disinformation, and harassment. This catalogues every published filing. Served by the public, read-only <code>GET /api/ny-tos-reports</code>.</p>
+    <p class="sub">New York's <strong>Stop Hiding Hate Act</strong> (S895B) requires social-media platforms with over $100M in annual revenue and NY users to file <strong>twice-yearly</strong> terms-of-service reports with the state Attorney General, describing how they define and moderate hateful conduct, disinformation, and harassment. This catalogues every published filing. <a href="https://ag.ny.gov/resources/organizations/social-media-tos-reporting/reports" target="_blank" rel="noopener noreferrer">View the Attorney General's current filing index</a>. Served by the public, read-only <code>GET /api/ny-tos-reports</code>.</p>
     <details class="legend">
       <summary>What the columns mean</summary>
       <p><strong>Platform</strong> — the child platform or brand named in the filing, when the company files for one (e.g. Amazon's <em>Twitch</em> vs <em>GoodReads</em>). <strong>Period</strong> — the reporting period the filing covers.</p>
-      <p><strong>Access</strong> — whether the filing's PDF is publicly downloadable: <em>public</em> = served from the AG's open directory; <em>auth-required</em> = served from a login-gated directory, so it's catalogued with its source link only.</p>
-      <p><strong>Report</strong> — the filing on the AG site. <strong>Archived</strong> — a snapshot of the PDF mirrored in this project's open-data repository (public filings only), in case the live link moves.</p>
+      <p><strong>Access</strong> — whether the filing's PDF is publicly downloadable. All 29 filings currently listed by the Attorney General are public and mirrored; the field remains so a future filing listed before its PDF is released can still appear in the catalogue.</p>
+      <p><strong>Report</strong> — the filing on the Attorney General's site. <strong>Archived</strong> — a checksum-verified snapshot mirrored in this project's open-data repository, in case the live link moves.</p>
     </details>
     <div class="controls">
       <label>Period <select id="rl-period"><option value="">All</option></select></label>
@@ -688,7 +688,7 @@ display: flex; align-items: center;
 
   <section class="card" id="stats-card">
     <h2>Enforcement statistics</h2>
-    <p class="sub">Figures extracted from the filings and normalized onto the act's five categories. Only the <em>category</em> is normalized — each company reports its own metrics, so <strong>figures are not comparable across companies</strong>, and some category mappings are broader or narrower than the statute. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Methodology &amp; caveats</a>. Queryable as the <code>ny_tos_stats</code> table via <code>POST /api/explore</code>.</p>
+    <p class="sub">Figures extracted from seven 2025 Q3 filings and normalized onto the act's five categories. The three Q3 filings released later and all Q4 filings are archived and catalogued above, but are not yet included in this statistics table. Only the <em>category</em> is normalized — each company reports its own metrics, so <strong>figures are not comparable across companies</strong>, and some category mappings are broader or narrower than the statute. <a href="https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/NORMALIZATION.md" target="_blank" rel="noopener noreferrer">Methodology &amp; caveats</a>. Queryable as the <code>ny_tos_stats</code> table via <code>POST /api/explore</code>.</p>
     <div class="controls">
       <label>Category <select id="ns-category"><option value="">All</option></select></label>
       <label>Company <select id="ns-company"><option value="">All</option></select></label>
@@ -817,6 +817,7 @@ async function setupLocations() {
 // Category-total grain only: Strava's per-format breakdown would double count.
 const NS_CATEGORIES = ["hate_speech_or_racism", "extremism_or_radicalization",
   "disinformation_or_misinformation", "harassment", "foreign_political_interference"];
+const NY_ARCHIVE_BASE = "https://github.com/krMaynard/dsa-transparency-data/blob/main/ny-tos-reports/pdfs/";
 const nsCatLabel = (k) => esc(k).replace(/_/g, " ");
 
 function nsQuery() {
@@ -828,9 +829,9 @@ function nsQuery() {
   if (co) and.push({ operation: "EQ", field_name: "company", field_values: [co] });
   return {
     table: "ny_tos_stats",
-    fields: ["company", "shha_category", "original_label", "metric", "submetric", "unit", "value"],
+    fields: ["company", "period", "shha_category", "original_label", "metric", "submetric", "unit", "value", "page"],
     query: { and },
-    sort: [{ field_name: "company", order: "asc" }],
+    sort: [{ field_name: "period", order: "desc" }, { field_name: "company", order: "asc" }],
     max_count: 500,
   };
 }
@@ -861,21 +862,26 @@ async function runStats() {
   const rows = d.rows || [];
   $("#ns-summary").textContent = `Showing ${fmt(rows.length)} figures.`
     + (d.truncated ? " Results were truncated at the row cap — narrow the filters to see everything." : "");
-  const head = '<tr><th scope="col">Company</th><th scope="col">Category</th>' +
+  const head = '<tr><th scope="col">Company</th><th scope="col">Period</th><th scope="col">Category</th>' +
     '<th scope="col">Filed label</th><th scope="col">Metric</th>' +
-    '<th scope="col">Measure</th><th scope="col">Value</th></tr>';
+    '<th scope="col">Measure</th><th scope="col">Value</th><th scope="col">Source</th></tr>';
   const labels = [...head.matchAll(/<th[^>]*>(.*?)<\/th>/g)].map(m => m[1]);
   const body = rows.map(r => {
-    const [co, cat, label, metric, sub, unit, value] = r;
+    const [co, period, cat, label, metric, sub, unit, value, page] = r;
     const val = value == null ? '<span class="na">N/A</span>'
       : unit === "percent" ? esc(String(value)) + "%" : fmt(value);
-    const cells = [esc(co), nsCatLabel(cat), esc(label),
-      esc(metric || ""), esc(sub || ""), val];
+    const sourceUrl = safeHref(NY_ARCHIVE_BASE + "2025-q3-" + encodeURIComponent(co) + ".pdf"
+      + (page == null ? "" : "#page=" + encodeURIComponent(page)));
+    const source = sourceUrl
+      ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">PDF${page == null ? "" : " p. " + esc(page)}</a>`
+      : "";
+    const cells = [esc(co), esc(period), nsCatLabel(cat), esc(label),
+      esc(metric || ""), esc(sub || ""), val, source];
     return "<tr>" + cells.map((c, i) =>
       `<td data-label="${esc(labels[i] || "")}">${c}</td>`).join("") + "</tr>";
   }).join("");
   $("#ns-out").innerHTML = rows.length
-    ? `<table class="restable"><thead>${head}</thead><tbody>${body}</tbody></table>`
+    ? `<table class="restable"><caption class="sr-only">Extracted New York Terms-of-Service enforcement statistics</caption><thead>${head}</thead><tbody>${body}</tbody></table>`
     : "<p class='sub'>No matching figures.</p>";
 }
 
