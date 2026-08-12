@@ -2541,6 +2541,18 @@ def vendored_asset(filename: str) -> FileResponse:
     )
 
 
+@app.get("/static/webgl-hero.js")
+def webgl_hero_asset() -> FileResponse:
+    """Serve the dashboard's first-party progressive-enhancement module."""
+    path = os.path.join(STATIC_DIR, "webgl-hero.js")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Asset not found.")
+    return FileResponse(
+        path, media_type="text/javascript",
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 @app.get("/", response_class=HTMLResponse)
 def home_page() -> FileResponse:
     """Serve the product home page."""

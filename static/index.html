@@ -359,14 +359,14 @@
 <div class="page-header">
 <!-- ── Site banner ──────────────────────────────────────────────────────── -->
 <nav class="site-nav" aria-label="Site">
-  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <a href="https://krm.fyi/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Work</a>
-      <a href="https://kieranmaynard.com/transparency.html">Products</a>
-      <a href="https://kieranmaynard.com/consulting.html">Consulting</a>
-      <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Contact</a>
+      <a href="https://krm.fyi/work.html">Work</a>
+      <a href="https://krm.fyi/transparency.html">Products</a>
+      <a href="https://krm.fyi/consulting.html">Consulting</a>
+      <a href="https://krm.fyi/blog.html">Blog</a>
+      <a href="https://krm.fyi/contact.html">Contact</a>
     </div>
     <details class="lang-switcher">
       <summary class="lang-current" aria-label="Language" title="Language">
@@ -739,11 +739,11 @@
 
     <hr class="nav-hr">
 
-    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+    <a href="https://krm.fyi/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
       </svg>
-      kieranmaynard.com
+      krm.fyi
     </a>
 
     <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -754,7 +754,7 @@
     </a>
   </nav>
   <div class="sidebar-footer">
-    By <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/privacy">Privacy</a>
+    By <a href="https://krm.fyi/">Kieran Maynard</a> · <a href="/privacy">Privacy</a>
   </div>
 </aside>
 
@@ -1097,7 +1097,10 @@ function tabFilters(extra) {
 function buildTabQuery(tab) {
   const and = tabFilters(tab.filters);
   if (tab.qual) {
-    return { table: tab.qual.table, fields: tab.qual.fields, max_count: 6,
+    return { table: tab.qual.table, fields: tab.qual.fields,
+             sort: [{ field_name: "service_name", order: "asc" },
+                    { field_name: "indicator", order: "asc" }],
+             max_count: 500,
              ...(and.length ? { query: { and } } : {}) };
   }
   if (tab.composite) {
@@ -1225,12 +1228,21 @@ function drawStackedChart(labels, series, nameLabel, valueLabel) {
 function renderQual(d) {
   if (tabChart) { tabChart.destroy(); tabChart = null; }
   $("#tab-chart").style.display = "none";
-  const rows = d.rows || [];
+  const seen = new Set();
+  const rows = (d.rows || []).filter(r => {
+    const service = String(r[0] || "");
+    if (!service || seen.has(service)) return false;
+    seen.add(service); return true;
+  }).slice(0, 10);
   const fb = $("#tab-fallback");
   fb.classList.remove("sr-only");
   fb.innerHTML = rows.length
-    ? rows.map(r => `<div class="ql-card"><div class="who">${esc(r[0])} · ${esc(r[1])}</div>` +
-        `<div class="txt">${esc(String(r[2] || "").slice(0, 280))}…</div></div>`).join("")
+    ? rows.map(r => {
+        const text = String(r[2] || "");
+        const excerpt = text.length > 280 ? text.slice(0, 280) + "…" : text;
+        return `<div class="ql-card"><div class="who">${esc(r[0])} · ${esc(r[1])}</div>` +
+          `<div class="txt">${esc(excerpt)}</div></div>`;
+      }).join("")
     : "<p class='sub'>No qualitative entries for this scope.</p>";
 }
 
@@ -1323,6 +1335,7 @@ async function onTableChange() {
   // For breakdown tables, default to one bar per metric (group by indicator)
   // rather than per service, which would sum across scopes.
   if (breakdown && t.dimensions.includes("indicator")) $("#ex-dim").value = "indicator";
+  else if (t.dimensions.includes("service_name")) $("#ex-dim").value = "service_name";
   const mSel = $("#ex-measure"), aggSel = $("#ex-agg");
   if (t.measures.length) {
     fillSelect(aggSel, ["SUM", "AVG", "MAX", "MIN", "COUNT"]);

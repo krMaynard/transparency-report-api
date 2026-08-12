@@ -1339,6 +1339,12 @@ class TestDashboard:
         assert "STATEMENT_CATEGORY_ILLEGAL_OR_HARMFUL_SPEECH" in r.text  # t4 by-category breakdown
         # The tab strip is a complete ARIA tab pattern.
         assert 'role="tablist"' in r.text and 'aria-selected' in r.text
+        assert "https://krm.fyi/" in r.text and "kieranmaynard.com" not in r.text
+        # Qualitative excerpts are sampled across services deterministically, and
+        # the generic builder defaults to a readable service label rather than an ID.
+        assert 'field_name: "service_name", order: "asc"' in r.text
+        assert 'seen.has(service)' in r.text
+        assert 't.dimensions.includes("service_name")' in r.text
 
     def test_methodology_page_served(self):
         r = client.get("/methodology")
@@ -1423,6 +1429,13 @@ class TestDashboard:
         # Chart.js is self-hosted, not loaded from a CDN.
         assert "/static/vendor/chart.umd.js" in r.text
         assert "cdn.jsdelivr.net" not in r.text
+
+    def test_dashboard_webgl_module_served(self):
+        r = client.get("/static/webgl-hero.js")
+        assert r.status_code == 200
+        assert "javascript" in r.headers["content-type"]
+        assert r.headers.get("cache-control") == "no-cache"
+        assert "data-webgl-hero" in r.text
 
     def test_vendored_chartjs_served(self):
         r = client.get("/static/vendor/chart.umd.js")

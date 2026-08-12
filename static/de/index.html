@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="/static/vendor/chart.umd.js" defer></script>
+<script type="module" src="/static/webgl-hero.js"></script>
 <script>
   // Match the main site: set the theme before first paint to avoid a flash.
   (function () {
@@ -193,6 +194,24 @@
   }
   header h1 { margin: 0 0 6px; font-size: 26px; }
   header p { margin: 0; color: var(--muted); }
+  .webgl-hero {
+    position: relative; overflow: hidden; isolation: isolate;
+    min-height: 250px; display: flex; align-items: flex-end;
+    padding: clamp(1.5rem, 4vw, 2.5rem); margin-bottom: 22px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background:
+      radial-gradient(circle at 16% 20%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 34%),
+      linear-gradient(135deg, var(--panel), var(--panel2));
+    box-shadow: 0 12px 34px var(--shadow);
+  }
+  .webgl-hero__canvas {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    z-index: -1; opacity: 0; transition: opacity 500ms ease;
+  }
+  .webgl-hero.is-webgl-ready .webgl-hero__canvas { opacity: 0.9; }
+  .webgl-hero__content { position: relative; z-index: 1; max-width: 620px; }
+  header.webgl-hero h1 { font-size: clamp(2rem, 6vw, 4rem); line-height: 0.96; margin-bottom: 0.55rem; }
+  header.webgl-hero p { font-size: 1rem; max-width: 570px; }
   .stats { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 22px; }
   .stat {
     flex: 1 1 160px; background: var(--panel); border: 1px solid var(--border);
@@ -329,6 +348,7 @@
     }
     .sidebar.is-open { transform: translateX(0); }
     .wrap { padding: 20px 1rem; }
+    .webgl-hero { min-height: 220px; padding: 1.35rem; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -339,14 +359,14 @@
 <div class="page-header">
 <!-- ── Site banner ──────────────────────────────────────────────────────── -->
 <nav class="site-nav" aria-label="Seite">
-  <a href="https://kieranmaynard.com/" class="nav-name">Kieran Maynard</a>
+  <a href="https://krm.fyi/" class="nav-name">Kieran Maynard</a>
   <div class="nav-right">
     <div class="nav-links">
-      <a href="https://kieranmaynard.com/work.html">Arbeit</a>
-      <a href="https://kieranmaynard.com/transparency.html">Produkte</a>
-      <a href="https://kieranmaynard.com/consulting.html">Beratung</a>
-      <a href="https://kieranmaynard.com/blog.html">Blog</a>
-      <a href="https://kieranmaynard.com/contact.html">Kontakt</a>
+      <a href="https://krm.fyi/work.html">Arbeit</a>
+      <a href="https://krm.fyi/transparency.html">Produkte</a>
+      <a href="https://krm.fyi/consulting.html">Beratung</a>
+      <a href="https://krm.fyi/blog.html">Blog</a>
+      <a href="https://krm.fyi/contact.html">Kontakt</a>
     </div>
     <details class="lang-switcher">
       <summary class="lang-current" aria-label="Sprache" title="Sprache">
@@ -404,15 +424,6 @@
     </a>
 
     <div class="nav-section">Regulierung</div>
-
-    <a href="/de/ai-training" class="nav-item">
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
-        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
-      </svg>
-      KI-Verordnung (EU)
-    </a>
-
     <a href="/de/reports" class="nav-item is-active" aria-current="page">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <rect x="1" y="9" width="3" height="6" rx="1"/>
@@ -420,6 +431,14 @@
         <rect x="11" y="1" width="3" height="14" rx="1"/>
       </svg>
       EU-DSA
+    </a>
+
+    <a href="/de/ai-training" class="nav-item">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+        <rect x="4.5" y="4.5" width="7" height="7" rx="1"/>
+        <path d="M6.5 1.75v2M9.5 1.75v2M6.5 12.25v2M9.5 12.25v2M1.75 6.5h2M1.75 9.5h2M12.25 6.5h2M12.25 9.5h2" stroke-linecap="round"/>
+      </svg>
+      KI-Verordnung (EU)
     </a>
     <a href="/dsa-db" class="nav-item">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
@@ -720,11 +739,11 @@
 
     <hr class="nav-hr">
 
-    <a href="https://kieranmaynard.com/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
+    <a href="https://krm.fyi/" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M9 1h6v6l-2-2-5 5-1.5-1.5 5-5L9 1zM2 5h4v1.5H3.5v7h7V10H12v4H2V5z"/>
       </svg>
-      kieranmaynard.com
+      krm.fyi
     </a>
 
     <a href="https://github.com/krMaynard/transparency-report-api" class="nav-item is-ext" target="_blank" rel="noopener noreferrer">
@@ -735,7 +754,7 @@
     </a>
   </nav>
   <div class="sidebar-footer">
-    Von <a href="https://kieranmaynard.com/">Kieran Maynard</a> · <a href="/de/privacy">Datenschutz</a>
+    Von <a href="https://krm.fyi/">Kieran Maynard</a> · <a href="/de/privacy">Datenschutz</a>
   </div>
 </aside>
 
@@ -745,10 +764,13 @@
 <!-- ── Main content ──────────────────────────────────────────────────────── -->
 <div class="main-area">
 <div class="wrap">
-  <header>
-    <span class="badge">EU-DSA · Transparenzberichte</span>
-    <h1>DSA-Transparenzberichte</h1>
-    <p id="period">Statistiken zur Inhaltsmoderation aus den Transparenzberichten des Gesetzes über digitale Dienste der EU.</p>
+  <header class="webgl-hero" data-webgl-hero="transparency">
+    <canvas class="webgl-hero__canvas" aria-hidden="true"></canvas>
+    <div class="webgl-hero__content">
+      <span class="badge">EU-DSA · Transparenzberichte</span>
+      <h1>DSA-Transparenzberichte</h1>
+      <p id="period">Statistiken zur Inhaltsmoderation aus den Transparenzberichten des Gesetzes über digitale Dienste der EU.</p>
+    </div>
   </header>
 
  <main id="main" tabindex="-1">
@@ -1074,7 +1096,10 @@ function tabFilters(extra) {
 function buildTabQuery(tab) {
   const and = tabFilters(tab.filters);
   if (tab.qual) {
-    return { table: tab.qual.table, fields: tab.qual.fields, max_count: 6,
+    return { table: tab.qual.table, fields: tab.qual.fields,
+             sort: [{ field_name: "service_name", order: "asc" },
+                    { field_name: "indicator", order: "asc" }],
+             max_count: 500,
              ...(and.length ? { query: { and } } : {}) };
   }
   if (tab.composite) {
@@ -1202,12 +1227,21 @@ function drawStackedChart(labels, series, nameLabel, valueLabel) {
 function renderQual(d) {
   if (tabChart) { tabChart.destroy(); tabChart = null; }
   $("#tab-chart").style.display = "none";
-  const rows = d.rows || [];
+  const seen = new Set();
+  const rows = (d.rows || []).filter(r => {
+    const service = String(r[0] || "");
+    if (!service || seen.has(service)) return false;
+    seen.add(service); return true;
+  }).slice(0, 10);
   const fb = $("#tab-fallback");
   fb.classList.remove("sr-only");
   fb.innerHTML = rows.length
-    ? rows.map(r => `<div class="ql-card"><div class="who">${esc(r[0])} · ${esc(r[1])}</div>` +
-        `<div class="txt">${esc(String(r[2] || "").slice(0, 280))}…</div></div>`).join("")
+    ? rows.map(r => {
+        const text = String(r[2] || "");
+        const excerpt = text.length > 280 ? text.slice(0, 280) + "…" : text;
+        return `<div class="ql-card"><div class="who">${esc(r[0])} · ${esc(r[1])}</div>` +
+          `<div class="txt">${esc(excerpt)}</div></div>`;
+      }).join("")
     : "<p class='sub'>Keine qualitativen Einträge für diesen Geltungsbereich.</p>";
 }
 
@@ -1300,6 +1334,7 @@ async function onTableChange() {
   // For breakdown tables, default to one bar per metric (group by indicator)
   // rather than per service, which would sum across scopes.
   if (breakdown && t.dimensions.includes("indicator")) $("#ex-dim").value = "indicator";
+  else if (t.dimensions.includes("service_name")) $("#ex-dim").value = "service_name";
   const mSel = $("#ex-measure"), aggSel = $("#ex-agg");
   if (t.measures.length) {
     fillSelect(aggSel, ["SUM", "AVG", "MAX", "MIN", "COUNT"]);
