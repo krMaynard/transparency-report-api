@@ -10,6 +10,9 @@ vendored artifacts the Docker image is seeded from:
   * data/report-locations.csv     <- <data-repo>/dsa_reports.csv
   * data/ca-ab587-reports.csv     <- <data-repo>/ca-ab587/ca_ab587_reports.csv
   * data/ca-ab587-narratives.json <- <data-repo>/ca-ab587/ca-ab587-narratives.json
+  * data/ny-tos-reports.csv       <- <data-repo>/ny_tos_reports.csv
+  * data/ny-tos-normalized.csv    <- <data-repo>/ny-tos-reports/ny_tos_normalized.csv
+  * data/ny-tos-narratives.json   <- <data-repo>/ny-tos-reports/ny_tos_narratives.json
   * data/state-tos-stats.csv      <- <data-repo>/state-tos-stats/state_tos_stats.csv
   * data/ai-training-transparency.json <- <data-repo>/ai-training-transparency/ai-training-transparency.json
 
@@ -52,6 +55,12 @@ VENDORED_CA_AB587_CSV = os.path.join(REPO, "data", "ca-ab587-reports.csv")
 CA_AB587_CSV_REL = os.path.join("ca-ab587", "ca_ab587_reports.csv")
 VENDORED_CA_AB587_NARRATIVES = os.path.join(REPO, "data", "ca-ab587-narratives.json")
 CA_AB587_NARRATIVES_REL = os.path.join("ca-ab587", "ca-ab587-narratives.json")
+VENDORED_NY_TOS_CSV = os.path.join(REPO, "data", "ny-tos-reports.csv")
+NY_TOS_CSV_REL = "ny_tos_reports.csv"
+VENDORED_NY_TOS_NORMALIZED = os.path.join(REPO, "data", "ny-tos-normalized.csv")
+NY_TOS_NORMALIZED_REL = os.path.join("ny-tos-reports", "ny_tos_normalized.csv")
+VENDORED_NY_TOS_NARRATIVES = os.path.join(REPO, "data", "ny-tos-narratives.json")
+NY_TOS_NARRATIVES_REL = os.path.join("ny-tos-reports", "ny_tos_narratives.json")
 VENDORED_STATE_STATS = os.path.join(REPO, "data", "state-tos-stats.csv")
 STATE_STATS_REL = os.path.join("state-tos-stats", "state_tos_stats.csv")
 VENDORED_AI_TRAINING = os.path.join(REPO, "data", "ai-training-transparency.json")
@@ -156,10 +165,20 @@ def main() -> int:
         n_rl_rows = sum(1 for _ in f) - 1  # minus header
     ca_ab587_csv_src = os.path.join(args.data_repo, CA_AB587_CSV_REL)
     ca_ab587_narratives_src = os.path.join(args.data_repo, CA_AB587_NARRATIVES_REL)
+    ny_tos_csv_src = os.path.join(args.data_repo, NY_TOS_CSV_REL)
+    ny_tos_normalized_src = os.path.join(args.data_repo, NY_TOS_NORMALIZED_REL)
+    ny_tos_narratives_src = os.path.join(args.data_repo, NY_TOS_NARRATIVES_REL)
     state_stats_src = os.path.join(args.data_repo, STATE_STATS_REL)
     ai_training_src = os.path.join(args.data_repo, AI_TRAINING_REL)
     ca_ab587_present = os.path.isfile(ca_ab587_csv_src)
     ca_ab587_narratives_present = os.path.isfile(ca_ab587_narratives_src)
+    ny_tos_csv_present = os.path.isfile(ny_tos_csv_src)
+    ny_tos_normalized_present = os.path.isfile(ny_tos_normalized_src)
+    ny_tos_narratives_present = os.path.isfile(ny_tos_narratives_src)
+    n_ny_tos_rows = 0
+    if ny_tos_csv_present:
+        with open(ny_tos_csv_src, encoding="utf-8") as f:
+            n_ny_tos_rows = sum(1 for _ in f) - 1
     state_stats_present = os.path.isfile(state_stats_src)
     n_state_stats_rows = 0
     if state_stats_present:
@@ -193,6 +212,12 @@ def main() -> int:
             shutil.copyfile(ca_ab587_csv_src, VENDORED_CA_AB587_CSV)
         if ca_ab587_narratives_present:
             shutil.copyfile(ca_ab587_narratives_src, VENDORED_CA_AB587_NARRATIVES)
+        if ny_tos_csv_present:
+            shutil.copyfile(ny_tos_csv_src, VENDORED_NY_TOS_CSV)
+        if ny_tos_normalized_present:
+            shutil.copyfile(ny_tos_normalized_src, VENDORED_NY_TOS_NORMALIZED)
+        if ny_tos_narratives_present:
+            shutil.copyfile(ny_tos_narratives_src, VENDORED_NY_TOS_NARRATIVES)
         if state_stats_present:
             shutil.copyfile(state_stats_src, VENDORED_STATE_STATS)
         if ai_training_present:
@@ -224,6 +249,15 @@ def main() -> int:
         ("- `data/ca-ab587-narratives.json`: present upstream"
          if ca_ab587_narratives_present else
          "- `data/ca-ab587-narratives.json`: **missing upstream, skipped**"),
+        (f"- `data/ny-tos-reports.csv`: **{n_ny_tos_rows}** filing rows"
+         if ny_tos_csv_present else
+         "- `data/ny-tos-reports.csv`: **missing upstream, skipped**"),
+        ("- `data/ny-tos-normalized.csv`: present upstream"
+         if ny_tos_normalized_present else
+         "- `data/ny-tos-normalized.csv`: **missing upstream, skipped**"),
+        ("- `data/ny-tos-narratives.json`: present upstream"
+         if ny_tos_narratives_present else
+         "- `data/ny-tos-narratives.json`: **missing upstream, skipped**"),
         (f"- `data/state-tos-stats.csv`: **{n_state_stats_rows}** statistic cells"
          if state_stats_present else
          "- `data/state-tos-stats.csv`: **missing upstream, skipped**"),

@@ -3623,7 +3623,7 @@ def narratives(
     conn = _connect_ro()
     try:
         # Facets are scoped to the chosen source (companies differ per corpus:
-        # 11 NY ToS filers vs. ~70 DSA services), so the dropdowns stay coherent.
+        # relatively few NY ToS filers vs. ~70 DSA services), so the dropdowns stay coherent.
         facet_where = "WHERE source = ?" if source else ""
         facet_params = [source] if source else []
         companies = [r[0] for r in conn.execute(
