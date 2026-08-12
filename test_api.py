@@ -1606,6 +1606,19 @@ class TestTrafficDisruptions:
 # ── Public NY ToS-reports catalogue (GET /api/ny-tos-reports) ────────────────
 
 class TestNYTosReports:
+    def test_vendored_catalogue_archives_every_published_filing(self):
+        import csv
+        import pathlib
+
+        path = pathlib.Path(__file__).with_name("data").joinpath("ny-tos-reports.csv")
+        with path.open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        assert len(rows) == 29
+        assert {row["period"] for row in rows} == {"2025 Q3", "2025 Q4"}
+        assert {row["access"] for row in rows} == {"public"}
+        assert all(row["filename"] and row["archived"] and row["sha256"] and row["bytes"]
+                   for row in rows)
+
     def test_public_and_populated(self):
         r = client.get("/api/ny-tos-reports")  # no X-API-Key
         assert r.status_code == 200
@@ -1874,6 +1887,8 @@ class TestNarratives:
         data = json.loads(pathlib.Path(__file__).with_name("data")
                           .joinpath("ny-tos-narratives.json").read_text(encoding="utf-8"))
         assert data["columns"] == ["company", "platform", "period", "page", "heading", "text"]
+        assert data["coverage"] == "2025 Q3..2025 Q4"
+        assert len(data["rows"]) == 1324
         assert all(len(r) == 6 for r in data["rows"])
         assert all(isinstance(r[3], int) for r in data["rows"])  # page is an int
 
