@@ -1336,6 +1336,11 @@ class TestDashboard:
         # indicators / overlapping taxonomies (regression guard for the data fixes).
         assert "Number of measures solely taken by automated means" in r.text  # t8 Automated
         assert "Number of internal moderators employed by the provider" in r.text  # t9 moderators
+        assert "Number of external moderators contracted by the provider" in r.text
+        assert "Number of total moderators with sufficient linguistic expertise" in r.text
+        assert 'label: "Internal"' in r.text and 'label: "External"' in r.text
+        assert "Moderators by language" in r.text
+        assert "canonicalLanguageCode" in r.text  # folds DE/de-style filing variants
         assert "STATEMENT_CATEGORY_ILLEGAL_OR_HARMFUL_SPEECH" in r.text  # t4 by-category breakdown
         # The tab strip is a complete ARIA tab pattern.
         assert 'role="tablist"' in r.text and 'aria-selected' in r.text
@@ -1345,6 +1350,22 @@ class TestDashboard:
         assert 'field_name: "service_name", order: "asc"' in r.text
         assert 'seen.has(service)' in r.text
         assert 't.dimensions.includes("service_name")' in r.text
+
+    def test_dashboard_moderator_language_view_is_localized(self):
+        labels = {
+            "es": "Moderadores por idioma",
+            "fr": "Modérateurs par langue",
+            "de": "Moderatoren nach Sprache",
+            "it": "Moderatori per lingua",
+            "ja": "言語別モデレーター",
+            "zh": "按语言划分的审核人员",
+            "ko": "언어별 콘텐츠 검토 인력",
+        }
+        for locale, label in labels.items():
+            r = client.get(f"/{locale}/reports")
+            assert r.status_code == 200
+            assert label in r.text
+            assert 'label: "Moderators by language"' not in r.text
 
     def test_methodology_page_served(self):
         r = client.get("/methodology")

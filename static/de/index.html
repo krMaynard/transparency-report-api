@@ -331,6 +331,11 @@
   .ql-card .txt { font-size: 13px; color: var(--muted); }
   .secondary-h { font-size: 12px; text-transform: uppercase; letter-spacing: .05em;
     color: var(--muted); margin: 20px 0 8px; }
+  .tab-detail { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .tab-detail h3 { margin: 0 0 4px; font-size: 15px; }
+  .tab-detail .sub { margin-bottom: 10px; max-width: 68ch; }
+  .chart-frame { position: relative; width: 100%; height: 260px; }
+  .chart-frame canvas { width: 100% !important; height: 100% !important; }
   details.advanced { background: var(--panel); border: 1px solid var(--border);
     border-radius: 12px; padding: 4px 4px; margin-bottom: 18px; }
   details.advanced > summary { cursor: pointer; padding: 14px 18px; font-weight: 700; font-size: 15px; }
@@ -826,7 +831,9 @@
       <p class="sub" id="tab-sub"></p>
       <p class="note hidden" id="tab-note"></p>
       <div class="error" id="tab-error" role="alert"></div>
-      <canvas id="tab-chart" height="150" aria-hidden="true"></canvas>
+      <div class="chart-frame" id="tab-chart-frame">
+        <canvas id="tab-chart" height="150" aria-hidden="true"></canvas>
+      </div>
       <div id="tab-fallback" aria-live="polite"><p class="loading">Wird geladen…</p></div>
       <div id="tab-secondary"></div>
       <div id="tab-warn"></div>
@@ -1010,6 +1017,7 @@ const VLOP_TIER   = { operation: "EQ", field_name: "report_tier", field_values: 
 // TOTAL, the "All the entries" category, the "Total number" scope) — so a SUM is
 // the headline figure, never the total double-counted with its own breakdown.
 const SCOPE_TOTAL = { operation: "EQ", field_name: "scope_is_total", field_values: ["1"] };
+const SCOPE_BREAKDOWN = { operation: "EQ", field_name: "scope_is_total", field_values: ["0"] };
 const CAT_TOTAL   = { operation: "EQ", field_name: "category_is_total", field_values: ["1"] };
 const CAT_LEAF    = { operation: "EQ", field_name: "category_is_total", field_values: ["0"] };
 // Filter on indicator_key (the language-neutral canonical label) so the tab spans
@@ -1022,9 +1030,13 @@ const AUTOMATED_IND = { operation: "EQ", field_name: "indicator_key",
   field_values: ["Number of measures solely taken by automated means"] };
 // t9's total scope also carries a "linguistic expertise" indicator that overlaps the
 // headcount — pin internal + external moderators only (the two disjoint headcounts).
+const INTERNAL_MODERATOR_KEY = "Number of internal moderators employed by the provider";
+const EXTERNAL_MODERATOR_KEY = "Number of external moderators contracted by the provider";
+const LINGUISTIC_MODERATOR_KEY = "Number of total moderators with sufficient linguistic expertise";
 const MODERATOR_IND = { operation: "IN", field_name: "indicator_key",
-  field_values: ["Number of internal moderators employed by the provider",
-                 "Number of external moderators contracted by the provider"] };
+  field_values: [INTERNAL_MODERATOR_KEY, EXTERNAL_MODERATOR_KEY] };
+const LINGUISTIC_MODERATOR_IND = { operation: "EQ", field_name: "indicator_key",
+  field_values: [LINGUISTIC_MODERATOR_KEY] };
 // t4 carries two overlapping category taxonomies (STATEMENT_CATEGORY_* and the finer
 // KEYWORD_*), both with category_is_total=0 — restrict the breakdown to the primary
 // statement taxonomy so the bars don't sum a parent together with its own children
@@ -1071,9 +1083,16 @@ const TABS = [
     table: "t8_automated_means", measure: "value", valueLabel: "Maßnahmen", color: "amber",
     filters: [SCOPE_TOTAL, AUTOMATED_IND] },
   { tab: "Personal", title: "Inhaltsmoderatoren",
-    sub: "Beschäftigte interne und externe Inhaltsmoderatoren, Geltungsbereich „Gesamtzahl“ (DSA-Tabelle 9).",
+    sub: "Interne Beschäftigte und externe Auftragnehmer, getrennt im Geltungsbereich „Gesamtzahl“ dargestellt (DSA-Tabelle 9).",
     table: "t9_human_resources", measure: "value", valueLabel: "Moderatoren", color: "amber",
-    filters: [SCOPE_TOTAL, MODERATOR_IND] },
+    stacked: { dimension: "service_name", series: "indicator_key", filters: [SCOPE_TOTAL, MODERATOR_IND], rows: [
+      { value: INTERNAL_MODERATOR_KEY, label: "Intern", color: "#58a6ff" },
+      { value: EXTERNAL_MODERATOR_KEY, label: "Extern", color: "#d29922" },
+    ] },
+    secondary: { group: "scope_key", measure: "value", label: "Moderatoren nach Sprache",
+      sub: "Die 10 am häufigsten gemeldeten Sprachkompetenzen über alle Dienste hinweg. Mehrsprachige Moderatoren können in mehreren Balken erscheinen; sprachunabhängige Zeilen sind ausgeschlossen.",
+      nameLabel: "Sprache", valueLabel: "Sprachkompetenzen", transform: "languages",
+      filters: [SCOPE_BREAKDOWN, LINGUISTIC_MODERATOR_IND] } },
   { tab: "Nutzerreichweite", title: "Durchschnittliche monatlich aktive Nutzer (AMAR)",
     sub: "EU-weite durchschnittliche monatlich aktive Nutzer je Dienst (DSA-Tabelle 10).",
     table: "t10_amar", measure: "value", valueLabel: "AMAR (EU)", color: "blue",
@@ -1084,7 +1103,7 @@ const TABS = [
 ];
 
 const TAB_COLORS = { blue: "#58a6ff", green: "#3fb950", amber: "#d29922" };
-let tabChart = null, currentTab = null, currentScope = "vlop";
+let tabChart = null, secondaryChart = null, currentTab = null, currentScope = "vlop";
 
 function tabFilters(extra) {
   const and = [];
@@ -1094,7 +1113,7 @@ function tabFilters(extra) {
 }
 
 function buildTabQuery(tab) {
-  const and = tabFilters(tab.filters);
+  const and = tabFilters(tab.stacked ? tab.stacked.filters : tab.filters);
   if (tab.qual) {
     return { table: tab.qual.table, fields: tab.qual.fields,
              sort: [{ field_name: "service_name", order: "asc" },
@@ -1118,6 +1137,14 @@ function buildTabQuery(tab) {
       sort: [{ field_name: "value", order: "desc" }], max_count: 10,
     };
   }
+  if (tab.stacked) {
+    return {
+      table: tab.table, group_by: [tab.stacked.dimension, tab.stacked.series],
+      aggregates: [{ function: tab.agg || "SUM", field_name: tab.measure, alias: "value" }],
+      sort: [{ field_name: "value", order: "desc" }], max_count: 200,
+      ...(and.length ? { query: { and } } : {}),
+    };
+  }
   return {
     table: tab.table, group_by: ["service_name"],
     aggregates: [{ function: tab.agg || "SUM", field_name: tab.measure, alias: "value" }],
@@ -1127,17 +1154,18 @@ function buildTabQuery(tab) {
 }
 
 function drawTabChart(labels, data, nameLabel, valueLabel, colorKey) {
-  const canvas = $("#tab-chart"), fb = $("#tab-fallback");
+  const canvas = $("#tab-chart"), frame = $("#tab-chart-frame"), fb = $("#tab-fallback");
+  frame.style.height = `${Math.max(220, labels.length * 24)}px`;
   fb.innerHTML = miniTable(labels, data, nameLabel, valueLabel);
   if (tabChart) { tabChart.destroy(); tabChart = null; }
   if (!chartReady() || !labels.length) {
-    canvas.style.display = "none"; fb.classList.remove("sr-only"); return;
+    frame.style.display = "none"; fb.classList.remove("sr-only"); return;
   }
-  canvas.style.display = ""; fb.classList.add("sr-only");
+  frame.style.display = ""; canvas.style.display = ""; fb.classList.add("sr-only");
   tabChart = new Chart(canvas, {
     type: "bar",
     data: { labels, datasets: [{ label: valueLabel, data, backgroundColor: TAB_COLORS[colorKey] || TAB_COLORS.blue, borderRadius: 4 }] },
-    options: { indexAxis: "y", plugins: { legend: { display: false } },
+    options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false } },
       scales: { x: {},
                 y: { grid: { display: false } } } },
   });
@@ -1158,6 +1186,7 @@ async function renderTab(tab) {
   if (tab.note) { noteEl.innerHTML = WARN_SVG + "<span>" + esc(tab.note) + "</span>"; noteEl.classList.remove("hidden"); }
   else noteEl.classList.add("hidden");
   $("#tab-error").textContent = "";
+  if (secondaryChart) { secondaryChart.destroy(); secondaryChart = null; }
   $("#tab-secondary").innerHTML = "";
   $("#tab-warn").innerHTML = "";
   $("#tab-fallback").classList.remove("sr-only");
@@ -1169,7 +1198,7 @@ async function renderTab(tab) {
     d = await explore(q);
   } catch (err) {
     if (tabChart) { tabChart.destroy(); tabChart = null; }
-    $("#tab-chart").style.display = "none";
+    $("#tab-chart-frame").style.display = "none";
     $("#tab-fallback").innerHTML = "";
     $("#tab-error").textContent = "Diese Tabelle konnte nicht geladen werden: " + err.message;
     return;
@@ -1191,6 +1220,26 @@ async function renderTab(tab) {
     drawStackedChart(labels, series, "Plattform", tab.valueLabel);
     return;
   }
+  if (tab.stacked) {
+    const values = new Map();
+    d.rows.forEach(r => {
+      const name = String(r[0] || "");
+      const seriesKey = String(r[1] || "");
+      if (!name) return;
+      if (!values.has(name)) values.set(name, new Map());
+      values.get(name).set(seriesKey, Number(r[2]) || 0);
+    });
+    const ranked = [...values.entries()].map(([name, row]) => ({
+      name, row,
+      total: tab.stacked.rows.reduce((sum, s) => sum + (row.get(s.value) || 0), 0),
+    })).sort((a, b) => b.total - a.total).slice(0, 10);
+    const series = tab.stacked.rows.map(s => ({
+      label: s.label, color: s.color, data: ranked.map(x => x.row.get(s.value) || 0),
+    }));
+    drawStackedChart(ranked.map(x => x.name), series, "Plattform", tab.valueLabel);
+    if (tab.secondary) renderSecondary(tab);
+    return;
+  }
   drawTabChart(d.rows.map(r => r[0]), d.rows.map(r => r[1]), "Plattform", tab.valueLabel, tab.color);
   if (tab.secondary) renderSecondary(tab);
 }
@@ -1200,7 +1249,8 @@ const STACK_COLORS = ["#3fb950", "#58a6ff"];  // illegal content / ToS
 // A stacked horizontal bar for a multi-series (composite) tab, with a per-series
 // + total fallback table for when Chart.js is unavailable or for screen readers.
 function drawStackedChart(labels, series, nameLabel, valueLabel) {
-  const canvas = $("#tab-chart"), fb = $("#tab-fallback");
+  const canvas = $("#tab-chart"), frame = $("#tab-chart-frame"), fb = $("#tab-fallback");
+  frame.style.height = `${Math.max(240, labels.length * 26)}px`;
   const head = `<tr><th>${esc(nameLabel)}</th>` +
     series.map(s => `<th class="num">${esc(s.label)}</th>`).join("") +
     `<th class="num">Gesamt</th></tr>`;
@@ -1212,21 +1262,21 @@ function drawStackedChart(labels, series, nameLabel, valueLabel) {
   fb.innerHTML = `<table class="restable">${head}${body}</table>`;
   if (tabChart) { tabChart.destroy(); tabChart = null; }
   if (!chartReady() || !labels.length) {
-    canvas.style.display = "none"; fb.classList.remove("sr-only"); return;
+    frame.style.display = "none"; fb.classList.remove("sr-only"); return;
   }
-  canvas.style.display = ""; fb.classList.add("sr-only");
+  frame.style.display = ""; canvas.style.display = ""; fb.classList.add("sr-only");
   tabChart = new Chart(canvas, {
     type: "bar",
     data: { labels, datasets: series.map(s => ({ label: s.label, data: s.data, backgroundColor: s.color, borderRadius: 4 })) },
-    options: { indexAxis: "y", plugins: { legend: { display: true } },
+    options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: true } },
       scales: { x: { stacked: true },
-                y: { stacked: true, grid: { display: false } } } },
+                y: { stacked: true, grid: { display: false }, ticks: { autoSkip: false } } } },
   });
 }
 
 function renderQual(d) {
   if (tabChart) { tabChart.destroy(); tabChart = null; }
-  $("#tab-chart").style.display = "none";
+  $("#tab-chart-frame").style.display = "none";
   const seen = new Set();
   const rows = (d.rows || []).filter(r => {
     const service = String(r[0] || "");
@@ -1249,14 +1299,72 @@ async function renderSecondary(tab) {
   const and = tabFilters(tab.secondary.filters || null);
   const q = { table: tab.table, group_by: [tab.secondary.group],
     aggregates: [{ function: "SUM", field_name: tab.secondary.measure, alias: "value" }],
-    sort: [{ field_name: "value", order: "desc" }], max_count: 8,
+    sort: [{ field_name: "value", order: "desc" }], max_count: tab.secondary.transform === "languages" ? 200 : 8,
     ...(and.length ? { query: { and } } : {}) };
   try {
     const d = await explore(q);
     if (currentTab !== tab) return;
+    if (tab.secondary.transform === "languages") {
+      const totals = new Map();
+      d.rows.forEach(r => {
+        const code = canonicalLanguageCode(r[0]);
+        if (!code) return;
+        totals.set(code, (totals.get(code) || 0) + (Number(r[1]) || 0));
+      });
+      const rows = [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+      drawLanguageChart(tab.secondary, rows.map(r => languageLabel(r[0])), rows.map(r => r[1]));
+      return;
+    }
     $("#tab-secondary").innerHTML = `<p class="secondary-h">${esc(tab.secondary.label)}</p>` +
       miniTable(d.rows.map(r => r[0]), d.rows.map(r => r[1]), "Kategorie", tab.valueLabel);
   } catch (_) { /* secondary is best-effort */ }
+}
+
+// Some filers used upper-case country codes where the template expects language
+// codes. Fold those aliases before aggregating so, for example, DE and de appear
+// as one German bar. Rows explicitly reported as language-agnostic are not a
+// language breakdown and are intentionally left out of this view.
+const LANGUAGE_SCOPE_ALIASES = {
+  CZ: "cs", DK: "da", EE: "et", GR: "el", IE: "ga", SE: "sv", SI: "sl",
+};
+
+function canonicalLanguageCode(raw) {
+  const value = String(raw || "").trim();
+  if (!value || value.toLowerCase() === "agnostic" || value.toLowerCase() === "total number") return null;
+  return LANGUAGE_SCOPE_ALIASES[value] || value.toLowerCase();
+}
+
+function languageLabel(code) {
+  try {
+    const names = new Intl.DisplayNames([document.documentElement.lang || "en"], { type: "language" });
+    const name = names.of(code);
+    return name && name.toLowerCase() !== code.toLowerCase() ? `${name} (${code})` : code;
+  } catch (_) { return code; }
+}
+
+function drawLanguageChart(config, labels, data) {
+  const host = $("#tab-secondary");
+  host.innerHTML = `<section class="tab-detail" aria-labelledby="tab-language-title">` +
+    `<h3 id="tab-language-title">${esc(config.label)}</h3>` +
+    `<p class="sub">${esc(config.sub)}</p>` +
+    `<div class="chart-frame" id="tab-language-chart-frame">` +
+    `<canvas id="tab-language-chart" aria-hidden="true"></canvas></div>` +
+    `<div id="tab-language-fallback"></div></section>`;
+  const canvas = $("#tab-language-chart"), frame = $("#tab-language-chart-frame");
+  const fallback = $("#tab-language-fallback");
+  frame.style.height = `${Math.max(240, labels.length * 26)}px`;
+  fallback.innerHTML = miniTable(labels, data, config.nameLabel, config.valueLabel);
+  if (secondaryChart) { secondaryChart.destroy(); secondaryChart = null; }
+  if (!chartReady() || !labels.length) {
+    frame.style.display = "none"; fallback.classList.remove("sr-only"); return;
+  }
+  frame.style.display = ""; canvas.style.display = ""; fallback.classList.add("sr-only");
+  secondaryChart = new Chart(canvas, {
+    type: "bar",
+    data: { labels, datasets: [{ label: config.valueLabel, data, backgroundColor: TAB_COLORS.green, borderRadius: 4 }] },
+    options: { indexAxis: "y", maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: {}, y: { grid: { display: false }, ticks: { autoSkip: false } } } },
+  });
 }
 
 function setupTabs() {

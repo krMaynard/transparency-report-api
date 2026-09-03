@@ -14551,5 +14551,61 @@ for _loc in ("es", "fr", "de", "it", "ja", "zh", "ko"):
     for _english, _translations in _NY_TOS_CURRENT.items():
         PAGES[_loc].setdefault("ny-tos.html", []).append((_english, _translations[_loc]))
 
+# Table 9 dashboard detail views: employment type stays separate in the primary
+# stacked chart, while the secondary chart aggregates canonicalized language
+# scopes. Keep these additions together so every generated locale exposes the
+# same level of detail as the English source page.
+_MODERATOR_VIEWS = {
+    "Internal employees and external contractors, shown separately at the “Total number” scope (DSA Table 9).": {
+        "es": "Empleados internos y contratistas externos, mostrados por separado en el ámbito «Número total» (tabla 9 del DSA).",
+        "fr": "Salariés internes et prestataires externes, affichés séparément dans le champ « Nombre total » (tableau 9 du DSA).",
+        "de": "Interne Beschäftigte und externe Auftragnehmer, getrennt im Geltungsbereich „Gesamtzahl“ dargestellt (DSA-Tabelle 9).",
+        "it": "Dipendenti interni e collaboratori esterni, mostrati separatamente nell’ambito «Numero totale» (tabella 9 del DSA).",
+        "ja": "社内従業員と外部委託者を、「総数」の範囲で分けて表示します（DSA 表9）。",
+        "zh": "内部员工和外部承包人员在“总数”范围内分别显示（《数字服务法》第9表）。",
+        "ko": "내부 직원과 외부 계약 인력을 ‘전체 수’ 범위에서 구분해 표시합니다(DSA 표 9).",
+    },
+    'label: "Internal"': {
+        "es": 'label: "Internos"', "fr": 'label: "Internes"',
+        "de": 'label: "Intern"', "it": 'label: "Interni"',
+        "ja": 'label: "内部"', "zh": 'label: "内部"', "ko": 'label: "내부"',
+    },
+    'label: "External"': {
+        "es": 'label: "Externos"', "fr": 'label: "Externes"',
+        "de": 'label: "Extern"', "it": 'label: "Esterni"',
+        "ja": 'label: "外部"', "zh": 'label: "外部"', "ko": 'label: "외부"',
+    },
+    'label: "Moderators by language"': {
+        "es": 'label: "Moderadores por idioma"',
+        "fr": 'label: "Modérateurs par langue"',
+        "de": 'label: "Moderatoren nach Sprache"',
+        "it": 'label: "Moderatori per lingua"',
+        "ja": 'label: "言語別モデレーター"',
+        "zh": 'label: "按语言划分的审核人员"',
+        "ko": 'label: "언어별 콘텐츠 검토 인력"',
+    },
+    "Top 10 reported language competencies across services. Multilingual moderators can appear in more than one bar; language-agnostic rows are excluded.": {
+        "es": "Las 10 principales competencias lingüísticas declaradas en todos los servicios. Los moderadores multilingües pueden aparecer en más de una barra; se excluyen las filas sin idioma específico.",
+        "fr": "Les 10 principales compétences linguistiques déclarées pour l’ensemble des services. Les modérateurs multilingues peuvent figurer dans plusieurs barres ; les lignes sans langue particulière sont exclues.",
+        "de": "Die 10 am häufigsten gemeldeten Sprachkompetenzen über alle Dienste hinweg. Mehrsprachige Moderatoren können in mehreren Balken erscheinen; sprachunabhängige Zeilen sind ausgeschlossen.",
+        "it": "Le 10 competenze linguistiche più dichiarate nei vari servizi. I moderatori multilingue possono comparire in più barre; sono escluse le righe senza una lingua specifica.",
+        "ja": "各サービスで報告された言語能力の上位10件です。多言語対応のモデレーターは複数の棒に含まれる場合があります。言語非依存の行は除外しています。",
+        "zh": "各服务报告数量最多的10种语言能力。多语言审核人员可能出现在多个条形中；不依赖特定语言的行不包括在内。",
+        "ko": "서비스 전반에서 보고된 상위 10개 언어 역량입니다. 다국어 검토 인력은 여러 막대에 포함될 수 있으며, 특정 언어와 무관한 행은 제외됩니다.",
+    },
+    'nameLabel: "Language", valueLabel: "Language competencies"': {
+        "es": 'nameLabel: "Idioma", valueLabel: "Competencias lingüísticas"',
+        "fr": 'nameLabel: "Langue", valueLabel: "Compétences linguistiques"',
+        "de": 'nameLabel: "Sprache", valueLabel: "Sprachkompetenzen"',
+        "it": 'nameLabel: "Lingua", valueLabel: "Competenze linguistiche"',
+        "ja": 'nameLabel: "言語", valueLabel: "言語能力"',
+        "zh": 'nameLabel: "语言", valueLabel: "语言能力"',
+        "ko": 'nameLabel: "언어", valueLabel: "언어 역량"',
+    },
+}
+for _loc in ("es", "fr", "de", "it", "ja", "zh", "ko"):
+    for _english, _translations in _MODERATOR_VIEWS.items():
+        PAGES[_loc].setdefault("index.html", []).append((_english, _translations[_loc]))
+
 if __name__ == "__main__":
     raise SystemExit(main(sys.argv))
