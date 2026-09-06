@@ -659,7 +659,7 @@ display: flex; align-items: center;
     <h2>可复现性与引用</h2>
     <p class="sub">该数据库是一个静态、只读的<strong>快照</strong>。每个快照都带有一个不可变的<strong>数据集版本</strong>——它是其内容的指纹，因此只要数据发生变化它就会改变——以 <code>ETag</code> 和 <code>X-Dataset-Version</code> 头的形式发送，并且 DSA 报告表（t3–t11）中的每个事实行都会公开其来源报送的 <code>report_id</code>（其他数据集则通过自身的维度——平台、期间、数据集——来标识其来源）。一个数值由<em>数据集版本</em>、确切的<em>查询</em>，以及（对于 DSA 表）它所依据的 <code>report_id</code> 共同锁定——请将它们一并引用，这样便可重新获取这些行（仅凭版本和 report_id 只能标识一份来源报送，而非某个特定数值）。每当你排序或分页时，结果都会以完全确定的顺序返回，因此保存下来的提取结果可按字节级复现。快照的构建日期和涵盖期间会显示在每个仪表板的“Cite as”行中以及每次导出的头部，而某一行的 <code>report_id</code> 标识其来源报送（平台、期间和层级）；对于非 VLOP 平台，该报送在何处发布会按平台列示于<a href="/zh/catalog">报告位置</a>目录中。</p>
     <p class="hint"><strong>署名：</strong>请将该数字归于报送它的平台；本站只应作为访问工具加以标注。</p>
-    <p class="hint">示例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href="/zh/reports">DSA 报告</a> 和 <a href="/zh/removals">Google 删除请求</a> 仪表板的“Cite as”一行中。</p>
+    <p class="hint">示例：<code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href="/zh/reports">DSA 报告</a> 和 <a href="/zh/removals">Google 删除请求</a> 仪表板的“Cite as”一行中。</p>
 
     <h2>已知局限</h2>
     <ul class="toollist">

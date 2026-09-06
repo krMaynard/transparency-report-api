@@ -10,7 +10,7 @@ citation in this builder. Two report streams are captured:
 
   * `csea_periodic` — "Basic Online Safety Expectations. Summary of industry
     responses to the periodic notices on CSEA and sexual extortion" (notices
-    given 22 Jul 2024; reporting period 15 Jun–15 Dec 2024; Aug 2025 report,
+    given 22 Jul 2024; reporting period 15 Jul–15 Dec 2024; Aug 2025 report,
     Feb 2026 update). Figure 4: user reports of CSEA per service (global) and
     the median time to reach an outcome where a human moderator reviewed.
 
@@ -35,10 +35,40 @@ COLUMNS = ["service", "period", "section", "category", "metric", "unit", "value"
 
 # ---------------------------------------------------------------------------
 # Stream 1: CSEA & sexual-extortion periodic reporting — reporting period
-# 15 Jun–15 Dec 2024 (Aug 2025 report, updated Feb 2026).
+# 15 Jul–15 Dec 2024 (Aug 2025 report, updated Feb 2026).
 # Figure 4: "Number of user reports and median time taken to reach an outcome,
 # where reports were reviewed by human moderators – global."
-CSEA_PERIOD = "2024-06-15..2024-12-15"
+CSEA_PERIOD = "2024-07-15..2024-12-15"
+
+# Subsequent editions in the same four-report periodic-notice series. Report 2's
+# public snapshot is chiefly qualitative, so its two rows record the scope of
+# the edition. Report 3 publishes complaint counts in its accessible text.
+# Sources:
+#   /periodic-notice-report-2-snapshot (published 2026)
+#   /periodic-notice-report-3-snapshot (published 14 Jul 2026)
+CSEA_REPORT_2_PERIOD = "2025-01-01..2025-06-30"
+CSEA_REPORT_3_PERIOD = "2025-07-01..2025-12-31"
+
+CSEA_REPORT_2 = [
+    ("All providers (report 2)", "providers_in_scope", "count", 8),
+    ("All providers (report 2)", "providers_with_observed_safety_improvements", "count", 8),
+]
+
+CSEA_REPORT_3 = [
+    ("All complaints", "sexual_extortion_complaints", "count", 2_206),
+    ("Male complainants", "share_of_complaints", "percent", 85),
+    ("Males aged 18 to 24", "sexual_extortion_complaints", "count", 803),
+    ("Males aged 25 to 39", "sexual_extortion_complaints", "count", 574),
+    ("Instagram", "service_referenced_in_complaint", "count", 695),
+    ("WhatsApp", "service_referenced_in_complaint", "count", 612),
+    ("Telegram", "service_referenced_in_complaint", "count", 558),
+    ("Tinder", "initial_contact_service", "count", 162),
+    ("Instagram", "initial_contact_service", "count", 73),
+    ("Grindr", "initial_contact_service", "count", 60),
+    ("WhatsApp", "threat_service", "count", 596),
+    ("Telegram", "threat_service", "count", 547),
+    ("Instagram", "threat_service", "count", 241),
+]
 
 # service -> (user reports global, median response minutes | None)
 # Median times transcribed from Figure 4 (h/m) and converted to minutes.
@@ -121,6 +151,13 @@ def build_rows() -> list[list]:
     # --- CSEA Australia / aggregate totals ---
     for service, metric, unit, value in CSEA_AUS:
         rows.append([service, CSEA_PERIOD, "csea_periodic", "", metric, unit, value])
+    # --- Later CSEA periodic-report editions ---
+    for service, metric, unit, value in CSEA_REPORT_2:
+        rows.append([service, CSEA_REPORT_2_PERIOD, "csea_periodic_report_2", "",
+                     metric, unit, value])
+    for service, metric, unit, value in CSEA_REPORT_3:
+        rows.append([service, CSEA_REPORT_3_PERIOD, "csea_periodic_report_3",
+                     "sexual_extortion", metric, unit, value])
 
     # --- AI companion user reports by harm ---
     for provider, harms in AIC_USER_REPORTS.items():
@@ -161,7 +198,7 @@ def main() -> None:
         "source": "https://www.esafety.gov.au/industry/basic-online-safety-expectations",
         "regime": "Basic Online Safety Expectations (Online Safety Act 2021)",
         "publisher": "eSafety Commissioner (Australia)",
-        "coverage": "2024-06-15..2024-12-15 (CSEA); 2025-07-01..2025-09-30 (AI companions)",
+        "coverage": "2024-07-15..2025-12-31 (CSEA reports 1-3); 2025-07-01..2025-09-30 (AI companions)",
         "columns": COLUMNS,
         "rows": rows,
     }

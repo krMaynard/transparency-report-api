@@ -2140,7 +2140,7 @@ class TestExplore:
         assert "VLOSE" in body["field_help"]["report_tier"]
 
     def test_explore_warns_on_cross_tier_mix(self):
-        # Not pinning report_tier mixes VLOP (H2-2025) with non-VLOP (often full-year).
+        # Not pinning report_tier mixes VLOP (H1-2026) with non-VLOP (often full-year).
         q = {"table": "t4_notices", "group_by": ["service_name"],
              "query": {"and": [{"operation": "EQ", "field_name": "category_is_total", "field_values": ["1"]}]},
              "aggregates": [{"function": "SUM", "field_name": "notices", "alias": "n"}]}
@@ -4131,7 +4131,8 @@ class TestCserTable:
                           .joinpath("meta-cser.json").read_text(encoding="utf-8"))
         assert data["columns"] == ["app", "policy_area", "metric", "period", "unit", "value"]
         assert data["rows"] and all(len(r) == 6 for r in data["rows"])
-        assert {r[4] for r in data["rows"]} == {"count", "percent"}
+        assert {r[4] for r in data["rows"]} == {
+            "count", "percent", "percent_upper_bound"}
         assert {r[0] for r in data["rows"]} == {"Facebook", "Instagram"}
         # No N/A cells leaked through as a value.
         assert all(isinstance(r[5], (int, float)) for r in data["rows"])
@@ -4284,7 +4285,10 @@ class TestEsafetyBoseTable:
         assert data["columns"] == ["service", "period", "section", "category", "metric", "unit", "value"]
         assert data["rows"] and all(len(r) == 7 for r in data["rows"])
         assert {r[2] for r in data["rows"]} == {
-            "csea_periodic", "ai_companion_reports", "ai_companion_staff", "survey_prevalence"}
+            "csea_periodic", "csea_periodic_report_2", "csea_periodic_report_3",
+            "ai_companion_reports", "ai_companion_staff", "survey_prevalence"}
+        assert any(r[1] == "2025-07-01..2025-12-31" and
+                   r[4] == "sexual_extortion_complaints" for r in data["rows"])
         assert all(isinstance(r[6], (int, float)) for r in data["rows"])
         # The four Meta services must sum to the report's stated Meta aggregate.
         def g(svc):

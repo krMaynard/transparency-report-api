@@ -14,7 +14,7 @@ Highlights of the corpus:
 
 - **EU Digital Services Act (DSA) transparency reports** — content-moderation
   statistics for the 25 designated Very Large Online Platforms / Search Engines
-  (H2 2025, tables 3–11 of the DSA Implementing Regulation template; vendored at
+  (H1 2026, tables 3–11 of the DSA Implementing Regulation template; vendored at
   `data/vlop-dsa.json`), **plus 80 non-VLOP services** that file the same EU
   harmonised template (Ceneo, Cloudflare, Dailymotion, Carrefour, DuckDuckGo,
   Expedia, Nintendo eShop, Square Enix, Miniclip, Roblox, Vimeo, Vinted, …; vendored at

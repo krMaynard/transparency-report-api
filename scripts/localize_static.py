@@ -480,7 +480,7 @@ PAGES["es"]["index.html"] = [
      '''Promedio de destinatarios activos mensuales: la base de usuarios en la UE de una plataforma, usada como denominador para tasas normalizadas.'''),
     ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      '''Moderación que una plataforma realiza por iniciativa propia (no en respuesta a una denuncia u orden), por motivos legales o de condiciones del servicio.'''),
-    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
      '''Los declarantes no VLOP informan sobre periodos distintos (a menudo el año completo) que las VLOP (S2 2025); los totales brutos entre niveles no son directamente comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de la UE · informes de transparencia'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Informes de transparencia del DSA</h1>'''),
@@ -673,7 +673,7 @@ PAGES["fr"]["index.html"] = [
      '''Nombre moyen de destinataires actifs mensuels — la base d’utilisateurs de la plateforme dans l’UE, utilisée comme dénominateur pour les taux normalisés.'''),
     ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      '''Modération qu’une plateforme effectue de sa propre initiative (sans signalement ni injonction), pour des motifs juridiques ou de conditions d’utilisation.'''),
-    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
      '''Les déclarants non-VLOP couvrent des périodes différentes (souvent l’année entière) de celles des VLOP (S2 2025) ; les totaux bruts entre catégories ne sont pas directement comparables.'''),
     ('''EU DSA · transparency reports''', '''DSA de l’UE · rapports de transparence'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Rapports de transparence du DSA</h1>'''),
@@ -865,8 +865,8 @@ PAGES["de"]["index.html"] = [
      '''Durchschnittliche monatlich aktive Nutzer — die EU-Nutzerbasis einer Plattform, genutzt als Nenner für normalisierte Raten.'''),
     ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      '''Moderation, die eine Plattform aus eigener Initiative vornimmt (nicht auf eine Meldung oder Anordnung hin), aus rechtlichen oder AGB-Gründen.'''),
-    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
-     '''Nicht-VLOP-Meldende berichten über andere Zeiträume (oft das ganze Jahr) als VLOPs (H2 2025); Rohsummen über Stufen hinweg sind nicht direkt vergleichbar.'''),
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
+     '''Nicht-VLOP-Meldende berichten über andere Zeiträume (oft das ganze Jahr) als VLOPs (H1 2026); Rohsummen über Stufen hinweg sind nicht direkt vergleichbar.'''),
     ('''EU DSA · transparency reports''', '''EU-DSA · Transparenzberichte'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>DSA-Transparenzberichte</h1>'''),
     ('''Content-moderation statistics from the EU Digital Services Act transparency reports.''',
@@ -1977,7 +1977,7 @@ PAGES["ja"]["index.html"] = [
      r'''平均月間アクティブ利用者数 — プラットフォームの EU 域内の利用者規模。正規化した比率の分母として使われます。'''),
     (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      r'''プラットフォームが自らの判断で（通報や命令への対応ではなく）、法的またはサービス利用規約上の理由で行うモデレーション。'''),
-    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
      r'''非 VLOP の提出者は VLOP（2025 年下半期）とは異なる期間（多くは通年）で報告しているため、階層をまたいだ総計は直接比較できません。'''),
     (r'''EU DSA · transparency reports''',
      r'''EU DSA · 透明性レポート'''),
@@ -2741,7 +2741,7 @@ PAGES["zh"]["index.html"] = [
      r'''平均月活跃用户数——平台在欧盟的用户规模，用作归一化比率的分母。'''),
     (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      r'''平台基于法律或服务条款理由自行开展的审核（并非针对举报或命令的回应）。'''),
-    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
      r'''非 VLOP 报告方的报告周期与 VLOP（2025 下半年）不同（通常为整年），跨层级的原始总计不可直接比较。'''),
     (r'''EU DSA · transparency reports''',
      r'''欧盟 DSA · 透明度报告'''),
@@ -3504,7 +3504,7 @@ PAGES["ko"]["index.html"] = [
      r'''월평균 활성 이용자 수 — 플랫폼의 EU 이용자 규모로, 정규화된 비율의 분모로 사용됩니다.'''),
     (r'''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      r'''플랫폼이 (신고나 명령에 대한 대응이 아니라) 자체 판단으로 법적 또는 서비스 약관상의 이유로 수행하는 모더레이션.'''),
-    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+    (r'''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
      r'''비 VLOP 제출자는 VLOP(2025 하반기)와 다른 기간(대개 연간)을 보고하므로, 계층 간 원시 합계는 직접 비교할 수 없습니다.'''),
     (r'''EU DSA · transparency reports''',
      r'''EU DSA · 투명성 보고서'''),
@@ -4204,7 +4204,7 @@ PAGES["it"]["index.html"] = [
      '''Media dei destinatari attivi mensili: la base utenti nell'UE di una piattaforma, usata come denominatore per i tassi normalizzati.'''),
     ('''Moderation a platform does on its own (not in response to a notice or order), on legal or terms-of-service grounds.''',
      '''Moderazione che una piattaforma effettua di propria iniziativa (non in risposta a una notifica o a un ordine), per motivi legali o di condizioni del servizio.'''),
-    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H2 2025); raw totals across tiers aren't directly comparable.''',
+    ('''Non-VLOP filers report over different windows (often full-year) than VLOPs (H1 2026); raw totals across tiers aren't directly comparable.''',
      '''I dichiaranti non VLOP rendicontano su periodi diversi (spesso l'intero anno) rispetto alle VLOP (S2 2025); i totali grezzi tra i livelli non sono direttamente confrontabili.'''),
     ('''EU DSA · transparency reports''', '''DSA dell'UE · report di trasparenza'''),
     ('''<h1>DSA Transparency Reports</h1>''', '''<h1>Report di trasparenza del DSA</h1>'''),
@@ -5377,7 +5377,7 @@ _METH_EN = {
     "H_REPRO": '''Reproducibility &amp; citation''',
     "P_REPRO": '''The database is a static, read-only <strong>snapshot</strong>. Each snapshot carries an immutable <strong>dataset version</strong> — a fingerprint of its contents, so it changes whenever the data does — sent as an <code>ETag</code> and an <code>X-Dataset-Version</code> header, and every fact row in the DSA report tables (t3–t11) exposes the <code>report_id</code> of its source filing (the other datasets identify their source by their own dimensions — platform, period, dataset — instead). A figure is pinned by the <em>dataset version</em>, the exact <em>query</em>, and (for the DSA tables) the <em>report_id</em>(s) it draws from — so cite them together and the rows can be re-fetched (the version and report_id alone identify a source filing, not a particular number). Results come back in a fully deterministic order whenever you sort or paginate, so a saved pull is byte-reproducible. The snapshot's build date and covered period appear in the “Cite as” line on each dashboard and in the headers of every export, and a row's <code>report_id</code> identifies its source filing (platform, period and tier); for non-VLOP platforms, where that filing is published is listed by platform in the <a href="/catalog">Report locations</a> catalogue.''',
     "CITE_RULE": '''<strong>Attribution:</strong> attribute the figure to the platform that reported it; cite this site only as the access tool.''',
-    "CITE_EX": '''Example: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> The exact dataset version and covered period for the live snapshot appear in the “Cite as” line on the <a href="/reports">DSA Reports</a> and <a href="/removals">Google Removals</a> dashboards.''',
+    "CITE_EX": '''Example: <code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> The exact dataset version and covered period for the live snapshot appear in the “Cite as” line on the <a href="/reports">DSA Reports</a> and <a href="/removals">Google Removals</a> dashboards.''',
     "H_LIM": '''Known limitations''',
     "LC1": '''Snapshot, not live''',
     "LD1": '''Figures reflect the reports available when the snapshot was built; later corrections or newly-filed reports appear only in a subsequent snapshot (with a new dataset version).''',
@@ -5462,7 +5462,7 @@ _METH = {
         "P_SRC": "Construido enteramente a partir de información pública. Todo el flujo de procesamiento —extracción, normalización, la tabla de equivalencias y la capa de consulta— es de código abierto en <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>. Empieza a explorar: <a href=\"/reports\">Informes DSA</a> · <a href=\"/removals\">Retiradas de Google</a> · <a href=\"/schema\">Esquema</a>.",
         "TLEGEND": "Las nueve tablas de informes se descodifican así: <code>t3</code> órdenes de los Estados miembros · <code>t4</code> notificaciones (incl. alertadores fiables) · <code>t5</code> / <code>t6</code> acciones por iniciativa propia (contenido ilícito / condiciones del servicio) · <code>t7</code> recursos y reincidencia · <code>t8</code> uso de medios automatizados · <code>t9</code> recursos humanos · <code>t10</code> promedio de destinatarios activos mensuales · <code>t11</code> descripciones cualitativas.",
         "CITE_RULE": "<strong>Atribución:</strong> atribuye la cifra a la plataforma que la declaró; cita este sitio únicamente como la herramienta de acceso.",
-        "CITE_EX": "Ejemplo: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> La versión exacta del conjunto de datos y el periodo cubierto de la instantánea en directo aparecen en la línea “Cite as” de los paneles de <a href=\"/reports\">Informes DSA</a> y <a href=\"/removals\">Retiradas de Google</a>."
+        "CITE_EX": "Ejemplo: <code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> La versión exacta del conjunto de datos y el periodo cubierto de la instantánea en directo aparecen en la línea “Cite as” de los paneles de <a href=\"/reports\">Informes DSA</a> y <a href=\"/removals\">Retiradas de Google</a>."
     },
     "fr": {
         "TITLE": "Méthodologie · Transparency Report",
@@ -5503,7 +5503,7 @@ _METH = {
         "P_SRC": "Construit entièrement à partir de rapports publics. L'ensemble du pipeline — extraction, normalisation, table de correspondance et couche de requête — est open source à l'adresse <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>. Commencez à explorer : <a href=\"/reports\">Rapports DSA</a> · <a href=\"/removals\">Retraits Google</a> · <a href=\"/schema\">Schéma</a>.",
         "TLEGEND": "Les neuf tables de rapport se décodent ainsi : <code>t3</code> injonctions des États membres · <code>t4</code> signalements (y compris signaleurs de confiance) · <code>t5</code> / <code>t6</code> actions de propre initiative (contenu illicite / conditions de service) · <code>t7</code> recours &amp; récidive · <code>t8</code> recours aux moyens automatisés · <code>t9</code> ressources humaines · <code>t10</code> moyenne mensuelle des destinataires actifs · <code>t11</code> descriptions qualitatives.",
         "CITE_RULE": "<strong>Attribution :</strong> attribuez le chiffre à la plateforme qui l'a déclaré ; ne citez ce site qu'en tant qu'outil d'accès.",
-        "CITE_EX": "Exemple : <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> La version exacte du jeu de données et la période couverte pour l'instantané en direct figurent dans la ligne « Cite as » des tableaux de bord <a href=\"/reports\">Rapports DSA</a> et <a href=\"/removals\">Retraits Google</a>."
+        "CITE_EX": "Exemple : <code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> La version exacte du jeu de données et la période couverte pour l'instantané en direct figurent dans la ligne « Cite as » des tableaux de bord <a href=\"/reports\">Rapports DSA</a> et <a href=\"/removals\">Retraits Google</a>."
     },
     "de": {
         "TITLE": "Methodik · Transparency Report",
@@ -5544,7 +5544,7 @@ _METH = {
         "P_SRC": "Vollständig aus öffentlicher Berichterstattung erstellt. Die gesamte Pipeline — Extraktion, Normalisierung, der Crosswalk und die Abfrageschicht — ist Open Source unter <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>. Beginnen Sie mit dem Erkunden: <a href=\"/reports\">DSA-Berichte</a> · <a href=\"/removals\">Google-Entfernungen</a> · <a href=\"/schema\">Schema</a>.",
         "TLEGEND": "Die neun Berichtstabellen entschlüsseln sich wie folgt: <code>t3</code> Anordnungen von Mitgliedstaaten · <code>t4</code> Meldungen (einschl. vertrauenswürdiger Hinweisgeber) · <code>t5</code> / <code>t6</code> Maßnahmen aus eigener Initiative (illegale Inhalte / Nutzungsbedingungen) · <code>t7</code> Beschwerden &amp; Rückfälligkeit · <code>t8</code> Einsatz automatisierter Mittel · <code>t9</code> Personalressourcen · <code>t10</code> durchschnittliche monatlich aktive Nutzer · <code>t11</code> qualitative Beschreibungen.",
         "CITE_RULE": "<strong>Quellenangabe:</strong> Schreiben Sie die Zahl der Plattform zu, die sie gemeldet hat; nennen Sie diese Website nur als Zugriffswerkzeug.",
-        "CITE_EX": "Beispiel: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> Die genaue Datensatzversion und der abgedeckte Zeitraum für die aktuelle Momentaufnahme erscheinen in der „Cite as“-Zeile auf den Dashboards <a href=\"/reports\">DSA-Berichte</a> und <a href=\"/removals\">Google-Entfernungen</a>."
+        "CITE_EX": "Beispiel: <code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> Die genaue Datensatzversion und der abgedeckte Zeitraum für die aktuelle Momentaufnahme erscheinen in der „Cite as“-Zeile auf den Dashboards <a href=\"/reports\">DSA-Berichte</a> und <a href=\"/removals\">Google-Entfernungen</a>."
     },
     "ja": {
         "TITLE": "方法論 · Transparency Report",
@@ -5585,7 +5585,7 @@ _METH = {
         "P_SRC": "完全に公開レポートから構築されています。抽出、正規化、クロスウォーク、クエリレイヤーを含むパイプライン全体は、<a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a> でオープンソースとして公開されています。さっそく探索してみましょう：<a href=\"/reports\">DSA レポート</a> · <a href=\"/removals\">Google の削除要請</a> · <a href=\"/schema\">スキーマ</a>。",
         "TLEGEND": "9つのレポートテーブルは次のように対応します。<code>t3</code> 加盟国による命令 · <code>t4</code> 通知（信頼できる通報者を含む） · <code>t5</code> / <code>t6</code> 自主的措置（違法コンテンツ / 利用規約） · <code>t7</code> 不服申立てと再犯 · <code>t8</code> 自動化手段の利用 · <code>t9</code> 人的リソース · <code>t10</code> 平均月間アクティブ利用者数 · <code>t11</code> 定性的な説明。",
         "CITE_RULE": "<strong>帰属表示：</strong>数値は、それを報告したプラットフォームに帰属させてください。本サイトはアクセスのためのツールとしてのみ引用してください。",
-        "CITE_EX": "例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> ライブスナップショットの正確なデータセットバージョンと対象期間は、<a href=\"/reports\">DSA レポート</a>および<a href=\"/removals\">Google の削除要請</a>ダッシュボードの「Cite as」の行に表示されます。"
+        "CITE_EX": "例：<code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> ライブスナップショットの正確なデータセットバージョンと対象期間は、<a href=\"/reports\">DSA レポート</a>および<a href=\"/removals\">Google の削除要請</a>ダッシュボードの「Cite as」の行に表示されます。"
     },
     "zh": {
         "TITLE": "方法说明 · Transparency Report",
@@ -5626,7 +5626,7 @@ _METH = {
         "P_SRC": "完全基于公开报告构建。整个流程——提取、规范化、对照表和查询层——已在 <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a> 开源。开始探索：<a href=\"/reports\">DSA 报告</a> · <a href=\"/removals\">Google 删除请求</a> · <a href=\"/schema\">模式</a>。",
         "TLEGEND": "这九张报告表的含义为：<code>t3</code> 成员国命令 · <code>t4</code> 通知（含可信举报者）· <code>t5</code> / <code>t6</code> 自主行动（非法内容 / 服务条款）· <code>t7</code> 申诉与累犯 · <code>t8</code> 自动化手段的使用 · <code>t9</code> 人力资源 · <code>t10</code> 平均月活跃接收者 · <code>t11</code> 定性描述。",
         "CITE_RULE": "<strong>署名：</strong>请将该数字归于报送它的平台；本站只应作为访问工具加以标注。",
-        "CITE_EX": "示例：<code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href=\"/reports\">DSA 报告</a> 和 <a href=\"/removals\">Google 删除请求</a> 仪表板的“Cite as”一行中。"
+        "CITE_EX": "示例：<code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 实时快照确切的数据集版本和涵盖期间显示在 <a href=\"/reports\">DSA 报告</a> 和 <a href=\"/removals\">Google 删除请求</a> 仪表板的“Cite as”一行中。"
     },
     "ko": {
         "TITLE": "방법론 · Transparency Report",
@@ -5667,7 +5667,7 @@ _METH = {
         "P_SRC": "전적으로 공개 보고 자료로 구축되었습니다. 추출, 정규화, 크로스워크, 쿼리 계층에 이르는 전체 파이프라인은 <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>에서 오픈 소스로 공개되어 있습니다. 탐색을 시작하세요: <a href=\"/reports\">DSA 보고서</a> · <a href=\"/removals\">Google 삭제 요청</a> · <a href=\"/schema\">스키마</a>.",
         "TLEGEND": "아홉 개의 보고서 표는 다음과 같이 해석됩니다: <code>t3</code> 회원국 명령 · <code>t4</code> 신고(신뢰할 수 있는 신고자 포함) · <code>t5</code> / <code>t6</code> 자체 발의 조치(불법 콘텐츠 / 서비스 약관) · <code>t7</code> 이의 제기 &amp; 재발 · <code>t8</code> 자동화 수단 사용 · <code>t9</code> 인적 자원 · <code>t10</code> 월평균 활성 수신자 · <code>t11</code> 정성적 설명.",
         "CITE_RULE": "<strong>출처 표기:</strong> 수치는 그것을 보고한 플랫폼에 귀속시키고, 이 사이트는 접근 도구로만 인용하십시오.",
-        "CITE_EX": "예: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 실시간 스냅샷의 정확한 데이터셋 버전과 대상 기간은 <a href=\"/reports\">DSA 보고서</a> 및 <a href=\"/removals\">Google 삭제 요청</a> 대시보드의 “Cite as” 줄에 표시됩니다."
+        "CITE_EX": "예: <code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> 실시간 스냅샷의 정확한 데이터셋 버전과 대상 기간은 <a href=\"/reports\">DSA 보고서</a> 및 <a href=\"/removals\">Google 삭제 요청</a> 대시보드의 “Cite as” 줄에 표시됩니다."
     },
     "it": {
         "TITLE": "Metodologia · Transparency Report",
@@ -5708,7 +5708,7 @@ _METH = {
         "P_SRC": "Costruito interamente a partire da informazioni pubbliche. L'intera pipeline — estrazione, normalizzazione, la tabella di corrispondenza e il livello di query — è open source su <a href=\"https://github.com/krMaynard/transparency-report-api\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/krMaynard/transparency-report-api</a>. Inizia a esplorare: <a href=\"/reports\">Report DSA</a> · <a href=\"/removals\">Rimozioni di Google</a> · <a href=\"/schema\">Schema</a>.",
         "TLEGEND": "Le nove tabelle di report si decodificano così: <code>t3</code> ordini degli Stati membri · <code>t4</code> notifiche (incl. segnalatori attendibili) · <code>t5</code> / <code>t6</code> azioni di propria iniziativa (contenuti illegali / condizioni del servizio) · <code>t7</code> ricorsi e recidiva · <code>t8</code> uso di strumenti automatizzati · <code>t9</code> risorse umane · <code>t10</code> destinatari attivi medi mensili · <code>t11</code> descrizioni qualitative.",
         "CITE_RULE": "<strong>Attribuzione:</strong> attribuisci la cifra alla piattaforma che l'ha dichiarata; cita questo sito solo come strumento di accesso.",
-        "CITE_EX": "Esempio: <code>YouTube, EU DSA transparency report (H2 2025), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> La versione esatta del set di dati e il periodo coperto dell'istantanea in tempo reale compaiono nella riga “Cite as” dei pannelli <a href=\"/reports\">Report DSA</a> e <a href=\"/removals\">Rimozioni di Google</a>."
+        "CITE_EX": "Esempio: <code>YouTube, EU DSA transparency report (H1 2026), accessed via the Transparency Report API — dataset version 7f3c1a2b9d04, report_id 42, retrieved 2026-06-26.</code> La versione esatta del set di dati e il periodo coperto dell'istantanea in tempo reale compaiono nella riga “Cite as” dei pannelli <a href=\"/reports\">Report DSA</a> e <a href=\"/removals\">Rimozioni di Google</a>."
     },
 }
 # --- 'What this is' refreshed for the full dataset (P_WHAT reworded; a

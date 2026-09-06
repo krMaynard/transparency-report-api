@@ -63,9 +63,9 @@ from typing import Any
 HERE = Path(__file__).parent.parent
 _DEFAULT_REGISTRY = HERE / "data" / "registry.json"
 
-# Periods for the first harmonized cycle (reports published February 2026).
-# VLOPs/VLOSEs cover H2 2025; all others cover the full calendar year 2025.
-_PERIOD_SEMI = ("2025-07-01", "2025-12-31")   # VLOPs/VLOSEs
+# Current discovery periods. VLOPs/VLOSEs report semi-annually; most other
+# harmonised-template services still have annual 2025 reports as their latest.
+_PERIOD_SEMI = ("2026-01-01", "2026-06-30")   # VLOPs/VLOSEs
 _PERIOD_ANNUAL = ("2025-01-01", "2025-12-31")  # everyone else
 
 _SEMI_ANNUAL_TIERS = {"vlop", "vlose"}

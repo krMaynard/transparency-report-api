@@ -1,6 +1,6 @@
 """Build demo.db from the aggregated EU DSA VLOP transparency dataset.
 
-Default source: ../krMaynard.github.io/data/vlop-dsa.json
+Default source: data/vlop-dsa.json
 Override with --source <path> or the SEED_SOURCE_JSON env var.
 Override output with --db <path> or the DB_PATH env var.
 
@@ -22,7 +22,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 _DEFAULT_SOURCE = os.getenv(
     "SEED_SOURCE_JSON",
-    os.path.normpath(os.path.join(HERE, "..", "krMaynard.github.io", "data", "vlop-dsa.json")),
+    os.path.join(HERE, "data", "vlop-dsa.json"),
 )
 _DEFAULT_GR_SOURCE = os.getenv(
     "SEED_GR_SOURCE_JSON",

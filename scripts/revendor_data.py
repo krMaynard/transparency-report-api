@@ -7,6 +7,7 @@ extracted CSVs, the report-locations catalogue). This script regenerates the
 vendored artifacts the Docker image is seeded from:
 
   * data/harmonised-reports.json  <- <data-repo>/harmonised-reports/extracted/<slug>/NN_*.csv
+  * data/vlop-dsa.json            <- <data-repo>/vlop-dsa.json
   * data/report-locations.csv     <- <data-repo>/dsa_reports.csv
   * data/ca-ab587-reports.csv     <- <data-repo>/ca-ab587/ca_ab587_reports.csv
   * data/ca-ab587-narratives.json <- <data-repo>/ca-ab587/ca-ab587-narratives.json
@@ -15,6 +16,9 @@ vendored artifacts the Docker image is seeded from:
   * data/ny-tos-narratives.json   <- <data-repo>/ny-tos-reports/ny_tos_narratives.json
   * data/state-tos-stats.csv      <- <data-repo>/state-tos-stats/state_tos_stats.csv
   * data/ai-training-transparency.json <- <data-repo>/ai-training-transparency/ai-training-transparency.json
+  * data/meta-cser.json           <- <data-repo>/meta-cser/meta-cser.json
+  * data/microsoft-lerr.json      <- <data-repo>/microsoft-lerr/microsoft-lerr.json
+  * data/android-security.json    <- <data-repo>/android-security/android-security.json
 
 and reports any **new extracted platforms that aren't yet curated in
 `seed_harmonised.SLUG_META`** (display name + tier). Those still seed — they fall
@@ -50,6 +54,8 @@ DEFAULT_DATA_REPO = os.getenv(
     "DATA_REPO", os.path.normpath(os.path.join(REPO, "..", "dsa-transparency-data"))
 )
 VENDORED_SNAPSHOT = os.path.join(REPO, "data", "harmonised-reports.json")
+VENDORED_VLOP = os.path.join(REPO, "data", "vlop-dsa.json")
+VLOP_SRC_REL = "vlop-dsa.json"
 VENDORED_RL_CSV = os.path.join(REPO, "data", "report-locations.csv")
 VENDORED_CA_AB587_CSV = os.path.join(REPO, "data", "ca-ab587-reports.csv")
 CA_AB587_CSV_REL = os.path.join("ca-ab587", "ca_ab587_reports.csv")
@@ -73,6 +79,12 @@ VENDORED_SNAP = os.path.join(REPO, "data", "snap-transparency.json")
 SNAP_SRC_REL = os.path.join("snap-transparency", "snap-transparency.json")
 VENDORED_INDIA = os.path.join(REPO, "data", "india-it-rules.json")
 INDIA_SRC_REL = os.path.join("india-it-rules", "india-it-rules.json")
+VENDORED_CSER = os.path.join(REPO, "data", "meta-cser.json")
+CSER_SRC_REL = os.path.join("meta-cser", "meta-cser.json")
+VENDORED_MICROSOFT = os.path.join(REPO, "data", "microsoft-lerr.json")
+MICROSOFT_SRC_REL = os.path.join("microsoft-lerr", "microsoft-lerr.json")
+VENDORED_ANDROID = os.path.join(REPO, "data", "android-security.json")
+ANDROID_SRC_REL = os.path.join("android-security", "android-security.json")
 VENDORED_KOREA = os.path.join(REPO, "data", "korea-transparency.json")
 KOREA_SRC_REL = os.path.join("korea-transparency", "korea-transparency.json")
 VENDORED_TAIWAN = os.path.join(REPO, "data", "taiwan-anti-fraud.json")
@@ -192,6 +204,8 @@ def main() -> int:
     uncurated = _uncurated(slugs)
     stale = _stale(slugs)
     unknown_surf = _unknown_surfaces(extracted_dir)
+    vlop_src = os.path.join(args.data_repo, VLOP_SRC_REL)
+    vlop_present = os.path.isfile(vlop_src)
     apple_src = os.path.join(args.data_repo, APPLE_SRC_REL)
     apple_present = os.path.isfile(apple_src)
     github_src = os.path.join(args.data_repo, GITHUB_SRC_REL)
@@ -200,6 +214,12 @@ def main() -> int:
     snap_present = os.path.isfile(snap_src)
     india_src = os.path.join(args.data_repo, INDIA_SRC_REL)
     india_present = os.path.isfile(india_src)
+    cser_src = os.path.join(args.data_repo, CSER_SRC_REL)
+    cser_present = os.path.isfile(cser_src)
+    microsoft_src = os.path.join(args.data_repo, MICROSOFT_SRC_REL)
+    microsoft_present = os.path.isfile(microsoft_src)
+    android_src = os.path.join(args.data_repo, ANDROID_SRC_REL)
+    android_present = os.path.isfile(android_src)
     korea_src = os.path.join(args.data_repo, KOREA_SRC_REL)
     korea_present = os.path.isfile(korea_src)
     taiwan_src = os.path.join(args.data_repo, TAIWAN_SRC_REL)
@@ -207,6 +227,8 @@ def main() -> int:
 
     if not args.check:
         sh.write_snapshot(extracted_dir=extracted_dir, json_path=VENDORED_SNAPSHOT)
+        if vlop_present:
+            shutil.copyfile(vlop_src, VENDORED_VLOP)
         shutil.copyfile(rl_src, VENDORED_RL_CSV)
         if ca_ab587_present:
             shutil.copyfile(ca_ab587_csv_src, VENDORED_CA_AB587_CSV)
@@ -230,6 +252,12 @@ def main() -> int:
             shutil.copyfile(snap_src, VENDORED_SNAP)
         if india_present:
             shutil.copyfile(india_src, VENDORED_INDIA)
+        if cser_present:
+            shutil.copyfile(cser_src, VENDORED_CSER)
+        if microsoft_present:
+            shutil.copyfile(microsoft_src, VENDORED_MICROSOFT)
+        if android_present:
+            shutil.copyfile(android_src, VENDORED_ANDROID)
         if korea_present:
             shutil.copyfile(korea_src, VENDORED_KOREA)
         if taiwan_present:
@@ -242,6 +270,7 @@ def main() -> int:
         f"{verb} from `{os.path.relpath(args.data_repo, REPO)}`:",
         "",
         f"- `data/harmonised-reports.json` — **{n_platforms}** extracted report files",
+        f"- `data/vlop-dsa.json` — {'present upstream' if vlop_present else '**missing upstream — skipped**'}",
         f"- `data/report-locations.csv` — **{n_rl_rows}** catalogue rows",
         (f"- `data/ca-ab587-reports.csv`: **{n_ca_ab587_rows}** filing rows"
          if ca_ab587_present else
@@ -268,6 +297,9 @@ def main() -> int:
         f"- `data/github-transparency.json` — {'present upstream' if github_present else '**missing upstream — skipped**'}",
         f"- `data/snap-transparency.json` — {'present upstream' if snap_present else '**missing upstream — skipped**'}",
         f"- `data/india-it-rules.json` — {'present upstream' if india_present else '**missing upstream — skipped**'}",
+        f"- `data/meta-cser.json` — {'present upstream' if cser_present else '**missing upstream — skipped**'}",
+        f"- `data/microsoft-lerr.json` — {'present upstream' if microsoft_present else '**missing upstream — skipped**'}",
+        f"- `data/android-security.json` — {'present upstream' if android_present else '**missing upstream — skipped**'}",
         f"- `data/korea-transparency.json` — {'present upstream' if korea_present else '**missing upstream — skipped**'}",
         f"- `data/taiwan-anti-fraud.json` — {'present upstream' if taiwan_present else '**missing upstream — skipped**'}",
         "",
