@@ -49,7 +49,9 @@ A query names one of the **report tables** (`GET /api/tables`) and then
 describes filters, group-bys, and aggregates over that table's fields. Every
 dataset also has a **public dashboard** (Chart.js trends + tables) with a
 per-chart **"Show data / Download CSV"** export, alongside the flagship
-interactive query builder and natural-language "Ask" box at `/reports`.
+interactive query builder and natural-language "Ask" box at `/reports`. The DSA
+dashboard automatically detects repeat harmonised filings and compares their
+reported totals, calendar-day-normalised rates, and category movement.
 
 ## Demo walkthrough
 

@@ -51,6 +51,16 @@ class TestInfra:
         assert r.status_code == 200
         assert "text/html" in r.headers["content-type"]
 
+    def test_dashboard_has_repeat_filing_trend_analysis(self):
+        r = client.get("/reports")
+        assert r.status_code == 200
+        assert 'id="trend-card"' in r.text
+        assert 'id="trend-chart"' in r.text
+        assert 'id="trend-category-chart"' in r.text
+        assert "Daily averages make unequal reporting windows comparable" in r.text
+        assert 'group_by: ["service_name", "report_period", "report_period_start", "report_period_end"]' in r.text
+        assert "setupTrends()" in r.text
+
     def test_healthz(self):
         assert client.get("/healthz").status_code == 200
 

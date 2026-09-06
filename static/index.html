@@ -266,7 +266,8 @@
   }
   /* Result tables can be wide (composite/Compare panels); let each result region
      scroll horizontally on narrow screens instead of overflowing the page. */
-  #tab-fallback, #tab-secondary, #ex-out, #cmp-out, #ask-out { overflow-x: auto; }
+  #tab-fallback, #tab-secondary, #trend-fallback, #trend-category-fallback,
+  #ex-out, #cmp-out, #ask-out { overflow-x: auto; }
   .restable { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 13.5px; }
   .restable th, .restable td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
   .restable th { color: var(--muted); font-weight: 600; }
@@ -343,6 +344,50 @@
   details.advanced .adv-intro { padding: 0 18px; }
   details.advanced > .card { box-shadow: none; }
   .qjson summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+
+  /* ── Repeat-filing trend analysis ──────────────────────────── */
+  .trend-card { border-top: 3px solid var(--accent); }
+  .trend-head { display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 18px; margin-bottom: 8px; }
+  .trend-head h2 { margin-bottom: 3px; }
+  .trend-head .sub { margin: 0; max-width: 62ch; }
+  .trend-controls { padding: 12px 14px; margin: 15px 0 18px; border: 1px solid var(--border);
+    border-radius: 10px; background: var(--panel2); }
+  .trend-controls select { background: var(--panel); }
+  .trend-periods { display: grid; grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+    align-items: stretch; margin: 4px 0 20px; }
+  .trend-period { min-width: 0; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; background: var(--panel2); }
+  .trend-period.latest { border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    background: color-mix(in srgb, var(--accent) 7%, var(--panel)); }
+  .trend-period .period-kicker { color: var(--muted); font-size: 10.5px; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase; }
+  .trend-period .period-date { display: block; margin-top: 2px; font-weight: 700; font-size: 14px; }
+  .trend-period .period-value { display: block; margin-top: 8px; color: var(--accent2);
+    font: 700 22px/1.2 var(--mono); }
+  .trend-period .period-meta { display: block; margin-top: 2px; color: var(--muted); font-size: 11.5px; }
+  .trend-arrow { align-self: center; display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-size: 20px; }
+  .trend-delta { display: inline-flex; align-items: center; width: fit-content; margin-top: 8px;
+    border-radius: 999px; padding: 2px 8px; font: 700 11.5px/1.5 var(--mono);
+    background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-dark); }
+  [data-theme="dark"] .trend-delta { color: var(--accent); }
+  .trend-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 22px; align-items: start; }
+  .trend-grid.single { grid-template-columns: minmax(0, 1fr); }
+  .trend-panel { min-width: 0; }
+  .trend-panel h3 { margin: 0; font-size: 15px; }
+  .trend-panel > .sub { margin: 2px 0 8px; font-size: 12px; }
+  .trend-chart-frame { position: relative; width: 100%; height: 260px; }
+  .trend-chart-frame canvas { width: 100% !important; height: 100% !important; }
+  .trend-empty { color: var(--muted); font-size: 13px; padding: 18px 0; }
+  .trend-actions { margin-top: 14px; }
+  @media (max-width: 720px) {
+    .trend-head { display: block; }
+    .trend-grid { grid-template-columns: 1fr; }
+    .trend-periods { grid-template-columns: 1fr; gap: 8px; }
+    .trend-arrow { transform: rotate(90deg); height: 20px; }
+  }
 
   /* ── Mobile ─────────────────────────────────────────────────── */
   @media (max-width: 720px) {
@@ -816,6 +861,47 @@
     </dl>
   </details>
 
+  <section class="card trend-card" id="trend-card" aria-labelledby="trend-title">
+    <div class="trend-head">
+      <div>
+        <p class="tabs-eyebrow">Repeat filings</p>
+        <h2 id="trend-title">Change over time</h2>
+        <p class="sub">Compare the latest two harmonised DSA filings for the same service. Daily averages make unequal reporting windows comparable; the reported totals remain visible.</p>
+      </div>
+    </div>
+    <div class="controls trend-controls">
+      <label>Service <select id="trend-service" aria-label="Service with repeat filings"></select></label>
+      <label>Measure <select id="trend-metric" aria-label="Trend measure"></select></label>
+    </div>
+    <div class="error" id="trend-error" role="alert"></div>
+    <div id="trend-content" hidden>
+      <div class="trend-periods" id="trend-periods" aria-live="polite"></div>
+      <div class="trend-grid">
+        <div class="trend-panel">
+          <h3>Comparable daily average</h3>
+          <p class="sub">Reported total divided by calendar days in each filing window.</p>
+          <div class="trend-chart-frame" id="trend-chart-frame">
+            <canvas id="trend-chart" height="180" aria-hidden="true"></canvas>
+          </div>
+          <div id="trend-fallback" aria-live="polite"></div>
+        </div>
+        <div class="trend-panel" id="trend-category-panel">
+          <h3>Category movement</h3>
+          <p class="sub">Daily average for the largest reported content categories.</p>
+          <div class="trend-chart-frame" id="trend-category-chart-frame">
+            <canvas id="trend-category-chart" height="180" aria-hidden="true"></canvas>
+          </div>
+          <div id="trend-category-fallback" aria-live="polite"></div>
+        </div>
+      </div>
+      <div class="resactions trend-actions">
+        <button class="ghost" id="trend-csv" type="button">Download comparison CSV</button>
+      </div>
+      <details class="qjson"><summary>Query JSON (run it via the API)</summary><pre id="trend-json"></pre></details>
+    </div>
+    <p class="loading" id="trend-loading">Finding services with repeat filings…</p>
+  </section>
+
   <section class="card" id="tabs-card" aria-label="Browse DSA report tables">
     <div class="tabs-head">
       <p class="tabs-eyebrow">Browse by DSA report table</p>
@@ -1178,6 +1264,274 @@ async function explore(q) {
   const d = await res.json();
   if (!res.ok) throw new Error(d.detail || `HTTP ${res.status}`);
   return d;
+}
+
+// ── Repeat-filing trend analysis ────────────────────────────────────────────
+// Flow metrics are compared as calendar-day averages because harmonised filings
+// do not all cover the same number of days. The raw reported totals stay in the
+// period rail, fallback table, and CSV export.
+const TREND_METRICS = [
+  { id: "notices", label: "Article 16 notices", table: "t4_notices", measure: "notices",
+    filters: [CAT_TOTAL], categories: true },
+  { id: "illegal-actions", label: "Illegal-content actions", table: "t5_own_initiative_illegal",
+    measure: "measures", filters: [CAT_TOTAL], categories: true },
+  { id: "tos-actions", label: "Terms-of-service actions", table: "t6_own_initiative_tos",
+    measure: "measures", filters: [CAT_TOTAL,
+      { operation: "EQ", field_name: "surface_is_total", field_values: ["1"] }], categories: true },
+  { id: "complaints", label: "Internal complaints", table: "t7_appeals_recidivism",
+    measure: "value", filters: [SCOPE_TOTAL, APPEALS_IND,
+      { operation: "EQ", field_name: "surface_is_total", field_values: ["1"] }], categories: false },
+];
+let trendChart = null, trendCategoryChart = null, trendCoverage = [];
+let trendRequestId = 0, trendExport = null;
+
+const trendDate = (value) => {
+  const d = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? null : d;
+};
+const periodDays = (start, end) => {
+  const a = trendDate(start), b = trendDate(end);
+  if (!a || !b || b < a) return null;
+  return Math.floor((b - a) / 86400000) + 1;
+};
+const trendPeriodLabel = (period) => {
+  const start = trendDate(period.start), end = trendDate(period.end);
+  if (!start || !end) return fmtPeriod(period.period);
+  const month = new Intl.DateTimeFormat(undefined, { month: "short", timeZone: "UTC" });
+  const day = new Intl.DateTimeFormat(undefined, { day: "numeric", timeZone: "UTC" });
+  const year = new Intl.DateTimeFormat(undefined, { year: "numeric", timeZone: "UTC" });
+  const sm = month.format(start), em = month.format(end);
+  const sd = day.format(start), ed = day.format(end);
+  const sy = year.format(start), ey = year.format(end);
+  if (sy === ey && sm === em) return `${sm} ${sd}–${ed}, ${sy}`;
+  if (sy === ey) return `${sm} ${sd}–${em} ${ed}, ${sy}`;
+  return `${sm} ${sd}, ${sy}–${em} ${ed}, ${ey}`;
+};
+const fmtRate = (value) => {
+  if (value == null || !Number.isFinite(value)) return "Not reported";
+  const digits = Math.abs(value) < 10 && value !== 0 ? 2 : 1;
+  return value.toLocaleString(undefined, { maximumFractionDigits: digits });
+};
+const trendDelta = (prior, latest) => {
+  if (prior == null || latest == null) return { label: "No comparable value", pct: null };
+  if (prior === 0) {
+    if (latest === 0) return { label: "No change", pct: 0 };
+    return { label: "New activity", pct: null };
+  }
+  const pct = ((latest - prior) / Math.abs(prior)) * 100;
+  return { label: `${pct > 0 ? "+" : ""}${pct.toLocaleString(undefined, { maximumFractionDigits: 1 })}%`, pct };
+};
+
+function trendQuery(metric, service, categoryBreakdown) {
+  const and = metric.filters.slice();
+  if (service) and.push({ operation: "EQ", field_name: "service_name", field_values: [service] });
+  if (categoryBreakdown) {
+    // Replace the total category with the canonical statement-level taxonomy.
+    const withoutTotal = and.filter(f => f.field_name !== "category_is_total");
+    withoutTotal.push(STATEMENT_CATS);
+    return { table: metric.table,
+      group_by: ["category_label", "report_period", "report_period_start", "report_period_end"],
+      aggregates: [{ function: "SUM", field_name: metric.measure, alias: "value" }],
+      sort: [{ field_name: "report_period_start", order: "asc" }], max_count: 500,
+      query: { and: withoutTotal, not: [VLOP_TIER] } };
+  }
+  return { table: metric.table,
+    group_by: ["report_period", "report_period_start", "report_period_end"],
+    aggregates: [{ function: "SUM", field_name: metric.measure, alias: "value" }],
+    sort: [{ field_name: "report_period_start", order: "asc" }], max_count: 50,
+    query: { and, not: [VLOP_TIER] } };
+}
+
+function coverageQuery() {
+  return { table: "t4_notices",
+    group_by: ["service_name", "report_period", "report_period_start", "report_period_end"],
+    aggregates: [{ function: "SUM", field_name: "notices", alias: "value" }],
+    sort: [{ field_name: "report_period_start", order: "asc" }], max_count: 500,
+    query: { and: [CAT_TOTAL], not: [VLOP_TIER] } };
+}
+
+function indexedRows(d) {
+  const idx = {};
+  (d.columns || []).forEach((name, i) => { idx[name] = i; });
+  return (d.rows || []).map(row => ({ row, idx }));
+}
+
+function drawTrendTotals(periods, metric) {
+  const labels = periods.map(trendPeriodLabel);
+  const daily = periods.map(p => p.daily);
+  const fallback = $("#trend-fallback"), frame = $("#trend-chart-frame");
+  const body = periods.map(p => `<tr><td>${esc(trendPeriodLabel(p))}</td>` +
+    `<td class="num">${fmt(p.total)}</td><td class="num">${fmt(p.days)}</td>` +
+    `<td class="num">${esc(fmtRate(p.daily))}</td></tr>`).join("");
+  fallback.innerHTML = `<table class="restable"><tr><th>Reporting period</th>` +
+    `<th class="num">Reported total</th><th class="num">Days</th>` +
+    `<th class="num">Daily average</th></tr>${body}</table>`;
+  if (trendChart) { trendChart.destroy(); trendChart = null; }
+  if (!chartReady() || !daily.some(v => v != null)) {
+    frame.style.display = "none"; fallback.classList.remove("sr-only"); return;
+  }
+  frame.style.display = ""; fallback.classList.add("sr-only");
+  trendChart = new Chart($("#trend-chart"), {
+    type: "bar",
+    data: { labels, datasets: [{ label: `${metric.label} per day`, data: daily,
+      backgroundColor: ["#8b949e", "#1e7268"], borderRadius: 5, maxBarThickness: 72 }] },
+    options: { maintainAspectRatio: false, plugins: { legend: { display: false },
+      tooltip: { callbacks: { label: ctx => `${fmtRate(ctx.raw)} per day` } } },
+      scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } },
+  });
+}
+
+function drawTrendCategories(d, periods, metric) {
+  const panel = $("#trend-category-panel"), fallback = $("#trend-category-fallback");
+  const frame = $("#trend-category-chart-frame");
+  panel.closest(".trend-grid").classList.toggle("single", !metric.categories);
+  if (trendCategoryChart) { trendCategoryChart.destroy(); trendCategoryChart = null; }
+  if (!metric.categories) {
+    panel.hidden = true; return [];
+  }
+  panel.hidden = false;
+  const wanted = new Map(periods.map((p, i) => [p.period, { i, days: p.days }]));
+  const cats = new Map();
+  indexedRows(d).forEach(({ row, idx }) => {
+    const period = row[idx.report_period], meta = wanted.get(period);
+    if (!meta) return;
+    const name = String(row[idx.category_label] || "Unspecified");
+    if (!cats.has(name)) cats.set(name, [null, null]);
+    const total = row[idx.value];
+    cats.get(name)[meta.i] = total == null || !meta.days ? null : Number(total) / meta.days;
+  });
+  const ranked = [...cats.entries()].filter(([, values]) => values.some(v => v != null))
+    .sort((a, b) => Math.max(...b[1].map(v => v || 0)) - Math.max(...a[1].map(v => v || 0)))
+    .slice(0, 8);
+  if (!ranked.length) {
+    frame.style.display = "none";
+    fallback.classList.remove("sr-only");
+    fallback.innerHTML = '<p class="trend-empty">No statement-category breakdown was reported for both periods.</p>';
+    return [];
+  }
+  const labels = ranked.map(r => r[0]);
+  const head = `<tr><th>Category</th>${periods.map(p => `<th class="num">${esc(trendPeriodLabel(p))}</th>`).join("")}</tr>`;
+  const body = ranked.map(([name, values]) => `<tr><td>${esc(name)}</td>` +
+    values.map(v => `<td class="num">${esc(fmtRate(v))}</td>`).join("") + `</tr>`).join("");
+  fallback.innerHTML = `<table class="restable">${head}${body}</table>`;
+  if (!chartReady()) {
+    frame.style.display = "none"; fallback.classList.remove("sr-only"); return ranked;
+  }
+  frame.style.display = ""; fallback.classList.add("sr-only");
+  trendCategoryChart = new Chart($("#trend-category-chart"), {
+    type: "bar",
+    data: { labels, datasets: periods.map((p, i) => ({ label: trendPeriodLabel(p),
+      data: ranked.map(r => r[1][i]), backgroundColor: i ? "#1e7268" : "#8b949e", borderRadius: 3 })) },
+    options: { indexAxis: "y", maintainAspectRatio: false,
+      plugins: { legend: { display: true, labels: { boxWidth: 11 } },
+        tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}: ${fmtRate(ctx.raw)} per day` } } },
+      scales: { x: { beginAtZero: true }, y: { grid: { display: false } } } },
+  });
+  return ranked;
+}
+
+function renderTrendPeriods(periods, metric) {
+  const delta = trendDelta(periods[0].daily, periods[1].daily);
+  const cards = periods.map((p, i) => `<div class="trend-period${i ? " latest" : ""}">` +
+    `<span class="period-kicker">${i ? "Latest filing" : "Previous filing"}</span>` +
+    `<span class="period-date">${esc(trendPeriodLabel(p))}</span>` +
+    `<span class="period-value">${esc(fmtRate(p.daily))}<small> / day</small></span>` +
+    `<span class="period-meta">${fmt(p.total)} reported across ${fmt(p.days)} days</span>` +
+    `${i ? `<span class="trend-delta">${esc(delta.label)} vs previous</span>` : ""}</div>`);
+  $("#trend-periods").innerHTML = cards[0] +
+    '<div class="trend-arrow" aria-hidden="true">→</div>' + cards[1];
+}
+
+async function loadTrend() {
+  const service = $("#trend-service").value;
+  const metric = TREND_METRICS.find(m => m.id === $("#trend-metric").value) || TREND_METRICS[0];
+  if (!service) return;
+  const requestId = ++trendRequestId;
+  $("#trend-error").textContent = "";
+  $("#trend-loading").textContent = "Loading comparison…";
+  $("#trend-loading").hidden = false; $("#trend-content").hidden = true;
+  const totalQuery = trendQuery(metric, service, false);
+  const categoryQuery = metric.categories ? trendQuery(metric, service, true) : null;
+  $("#trend-json").textContent = JSON.stringify(categoryQuery
+    ? { totals: totalQuery, by_category: categoryQuery } : { totals: totalQuery }, null, 2);
+  try {
+    const [totals, categories] = await Promise.all([
+      explore(totalQuery), categoryQuery ? explore(categoryQuery) : Promise.resolve(null),
+    ]);
+    if (requestId !== trendRequestId) return;
+    const coverage = trendCoverage.find(s => s.name === service);
+    const latestPeriods = coverage.periods.slice(-2);
+    const values = new Map();
+    indexedRows(totals).forEach(({ row, idx }) => values.set(row[idx.report_period], row[idx.value]));
+    const periods = latestPeriods.map(p => {
+      const total = values.has(p.period) && values.get(p.period) != null ? Number(values.get(p.period)) : null;
+      const days = periodDays(p.start, p.end);
+      return { ...p, days, total, daily: total == null || !days ? null : total / days };
+    });
+    renderTrendPeriods(periods, metric);
+    drawTrendTotals(periods, metric);
+    const categoryRows = categories ? drawTrendCategories(categories, periods, metric) : [];
+    if (!categories) drawTrendCategories({ columns: [], rows: [] }, periods, metric);
+    trendExport = { columns: ["service", "measure", "report_period", "period_start", "period_end", "days", "reported_total", "daily_average"],
+      rows: periods.map(p => [service, metric.label, p.period, p.start, p.end, p.days, p.total, p.daily]),
+      categories: categoryRows };
+    $("#trend-content").hidden = false; $("#trend-loading").hidden = true;
+  } catch (err) {
+    if (requestId !== trendRequestId) return;
+    $("#trend-loading").hidden = true;
+    $("#trend-error").textContent = "Could not load trend data: " + err.message;
+  }
+}
+
+async function setupTrends() {
+  const metricSelect = $("#trend-metric"), serviceSelect = $("#trend-service");
+  TREND_METRICS.forEach(metric => {
+    const option = document.createElement("option");
+    option.value = metric.id; option.textContent = metric.label; metricSelect.appendChild(option);
+  });
+  try {
+    const d = await explore(coverageQuery());
+    const services = new Map();
+    indexedRows(d).forEach(({ row, idx }) => {
+      const name = String(row[idx.service_name] || "");
+      const period = String(row[idx.report_period] || "");
+      const start = String(row[idx.report_period_start] || "");
+      const end = String(row[idx.report_period_end] || "");
+      if (!name || !period || !periodDays(start, end)) return;
+      if (!services.has(name)) services.set(name, { name, periods: new Map(), weight: 0 });
+      const service = services.get(name);
+      service.periods.set(period, { period, start, end });
+      service.weight += Number(row[idx.value]) || 0;
+    });
+    trendCoverage = [...services.values()].map(s => ({ ...s,
+      periods: [...s.periods.values()].sort((a, b) => a.start.localeCompare(b.start)) }))
+      .filter(s => s.periods.length >= 2).sort((a, b) => a.name.localeCompare(b.name));
+    if (!trendCoverage.length) {
+      $("#trend-loading").className = "trend-empty";
+      $("#trend-loading").textContent = "Trend analysis will appear when a service has two comparable harmonised filings.";
+      $(".trend-controls").hidden = true;
+      return;
+    }
+    trendCoverage.forEach(service => {
+      const option = document.createElement("option");
+      option.value = service.name;
+      option.textContent = `${service.name} (${service.periods.length} periods)`;
+      serviceSelect.appendChild(option);
+    });
+    // Start with the repeat filer that has the most reported notices, which is
+    // generally the most informative example rather than relying on alphabetic order.
+    const defaultService = trendCoverage.reduce((best, s) => s.weight > best.weight ? s : best);
+    serviceSelect.value = defaultService.name;
+    serviceSelect.addEventListener("change", loadTrend);
+    metricSelect.addEventListener("change", loadTrend);
+    $("#trend-csv").addEventListener("click", () => trendExport &&
+      downloadBlob(`dsa-trend-${serviceSelect.value.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.csv`,
+        toCSV(trendExport), "text/csv"));
+    loadTrend();
+  } catch (err) {
+    $("#trend-loading").hidden = true;
+    $("#trend-error").textContent = "Could not find repeat filings: " + err.message;
+  }
 }
 
 async function renderTab(tab) {
@@ -1941,7 +2295,7 @@ document.addEventListener("DOMContentLoaded", () => {
     Chart.defaults.animation = false;
   }
   // setupCompare needs the /api/explore/options payload setupExplore fetches.
-  load(); setupTabs(); setupExplore().then(setupCompare); setupAsk();
+  load(); setupTabs(); setupTrends(); setupExplore().then(setupCompare); setupAsk();
 });
 </script>
 <script>
