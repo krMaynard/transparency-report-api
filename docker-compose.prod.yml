@@ -1,13 +1,13 @@
-# Production self-hosting stack — the single-VPS replacement for Cloud Run + Upstash.
+# Production stack for the API host.
 #
-#   API server (self-seeding image) + local Redis + Caddy (automatic HTTPS).
+#   API server (self-seeding image) + local Redis + loopback-only Caddy.
 #
 # Quick start (see DEPLOY-SELFHOST.md for the full runbook):
 #   cp .env.example .env         # fill in real production values
 #   docker compose -f docker-compose.prod.yml up -d --build
 #
-# Caddy is the only ingress (ports 80/443); the app and Redis stay on the
-# internal network and are never published to the host.
+# The web and redirect origins are published only on loopback. Cloudflare Tunnel
+# is the public ingress; Redis stays entirely on the internal Docker network.
 services:
   web:
     build: .
@@ -38,11 +38,11 @@ services:
     image: caddy:2-alpine
     env_file: .env
     ports:
-      - "80:80"
-      - "443:443"
+      # Legacy-host redirect origin for Cloudflare Tunnel; never exposed to LAN.
+      - "127.0.0.1:18081:80"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy-data:/data       # ACME account + issued certificates (keep this!)
+      - caddy-data:/data       # Caddy runtime state
       - caddy-config:/config
     depends_on:
       - web

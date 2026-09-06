@@ -1,33 +1,41 @@
-# Self-hosting on a single VPS
+# Production deployment: Docker + Cloudflare Tunnel
 
-This is the lowest-cost way to run the API: one small VPS running the app,
-a local Redis, and Caddy for automatic HTTPS — replacing managed **Cloud Run +
-Upstash**. A ~$5/mo box (e.g. Hetzner CX22, 2 vCPU / 4 GB) comfortably runs the
-whole stack with no cold starts and no per-request billing.
+Production runs on this host as a Docker Compose stack and is published through
+a named Cloudflare Tunnel. Cloudflare terminates public TLS, so no application
+container listens on a public interface and inbound ports 80/443 are not
+required.
 
-The image is self-contained (the read-only SQLite DB is seeded at build time),
-so there is no external data dependency at runtime. The only mutable state is
-Redis (jobs / issued keys / Google sessions), persisted to a Docker volume.
+```text
+api.krm.fyi -> Cloudflare -> named tunnel -> 127.0.0.1:18080 -> web:8080
+legacy hosts -> Cloudflare -> named tunnel -> 127.0.0.1:18081 -> Caddy redirects
+web -> redis:6379 (private Docker network)
+```
 
-> The Cloud Run path (`service.yaml` + `.github/workflows/deploy.yml`) still
-> works and is untouched — this is a parallel, cheaper option. See
-> `PRODUCTIONIZE.md` for the hosting comparison.
+The image contains the read-only SQLite database built from the vendored data.
+Redis holds mutable jobs, sessions, registrations, and issued keys in the
+`redis-data` Docker volume.
 
-## Files
+## Files and host services
 
-| File | Role |
-|------|------|
-| `docker-compose.prod.yml` | web (this image) + redis (persistent) + caddy (TLS) |
-| `Caddyfile` | reverse proxy + automatic Let's Encrypt certificate |
-| `.env` | your production config (copy from `.env.example`) |
+| Component | Role |
+|---|---|
+| `docker-compose.prod.yml` | Runs `web`, persistent Redis, and the legacy redirect origin |
+| `Caddyfile` | Internal HTTP reverse proxy and legacy-host redirects; it does not terminate public TLS |
+| `.env` | Production configuration and secrets; never commit it |
+| `cloudflared-transparency.service` | User-level systemd service running the named tunnel |
+| `~/.cloudflared/config.yml` | Tunnel ingress rules and credentials path |
 
 ## 1. Prerequisites
 
-- A VPS with a public IPv4 (and ideally IPv6), Docker Engine + the Compose plugin
-  installed, and ports **80** and **443** open.
-- A domain whose **A** (and **AAAA**) records point at the VPS. Set
-  `SITE_ADDRESS` in `.env`; it defaults to `transparency.kieranmaynard.com`.
-- Clone this repo onto the box (the build context is the repo root).
+- Docker Engine and the Compose plugin.
+- A Cloudflare named tunnel with a DNS route for `api.krm.fyi`.
+- A tunnel ingress rule forwarding the canonical hostname to
+  `http://127.0.0.1:18080` and any legacy hostnames to
+  `http://127.0.0.1:18081`.
+- The tunnel credential file referenced by `~/.cloudflared/config.yml`.
+
+Keep both published Compose ports bound to `127.0.0.1`. They are origins for
+`cloudflared`, not public listeners.
 
 ## 2. Configure `.env`
 
@@ -35,68 +43,91 @@ Redis (jobs / issued keys / Google sessions), persisted to a Docker volume.
 cp .env.example .env
 ```
 
-Then edit `.env`. The settings that matter for a real deployment:
+Set these production values:
 
-| Variable | Set to | Why |
-|---|---|---|
-| `SITE_ADDRESS` | your public hostname | Hostname Caddy serves and provisions TLS for. |
-| `UPSTASH_REDIS_REST_URL` / `_TOKEN` | **empty** (delete the placeholder lines) | The app prefers Upstash when these are set — leave them blank so it uses the local `REDIS_URL` that `docker-compose.prod.yml` injects. **Easy to miss:** the sample values in `.env.example` are non-empty. |
-| `DOWNLOAD_URL_SECRET` | `openssl rand -hex 32` | Stable HMAC secret so signed download links survive restarts. |
-| `ALLOW_DEMO_KEYS` | `0` | Disable the hard-coded demo keys + open registration in production. |
-| `GOOGLE_CLIENT_ID` | your OAuth 2.0 **Web** client ID | Enables Google sign-in. Add the site origin to the client's Authorized JavaScript origins. |
-| `ADMIN_EMAILS` | your email(s), comma-separated | Admin kill-switch over registrations. |
-| `PUBLIC_BASE_URL` | `https://transparency.kieranmaynard.com` | Absolute links in webhook callbacks / signed downloads. |
-| `ANTHROPIC_API_KEY` | your key (optional) | Enables the NL "Ask" box. Leave empty to keep `/api/ask` off (503). |
-| `ANTHROPIC_MODEL` | `claude-sonnet-5` (default) | Model that translates questions → structured queries. Sonnet is the cost/quality middle tier; set `claude-haiku-4-5` to go cheaper or `claude-opus-4-8` for max quality. |
-| `ALLOWED_ORIGINS` | empty (same-origin) | The bundled dashboard is same-origin; only set this if a separate frontend calls the API cross-origin. |
+| Variable | Production value |
+|---|---|
+| `SITE_ADDRESS` | `api.krm.fyi` |
+| `DOWNLOAD_URL_SECRET` | Stable random secret, for example from `openssl rand -hex 32` |
+| `ALLOW_DEMO_KEYS` | `0` |
+| `GOOGLE_CLIENT_ID` | OAuth 2.0 Web client ID with `https://api.krm.fyi` as an authorized JavaScript origin |
+| `ADMIN_EMAILS` | Comma-separated administrator addresses |
+| `PUBLIC_BASE_URL` | `https://api.krm.fyi` |
+| `APP_VERSION` | Commit SHA being deployed |
+| `ANTHROPIC_API_KEY` | Optional; enables `/api/ask` |
+| `ALLOWED_ORIGINS` | Empty for the same-origin bundled UI |
 
-Do **not** set `REDIS_URL` in `.env` — the compose file provides it.
+Leave `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` empty. Do not set
+`REDIS_URL` in `.env`; Compose supplies `redis://redis:6379/0` to the web
+container.
 
-## 3. Launch
+## 3. Deploy
+
+Start the full stack the first time:
 
 ```bash
 docker compose -f docker-compose.prod.yml up -d --build
+systemctl --user enable --now cloudflared-transparency.service
 ```
 
-Caddy will obtain a certificate on first start (needs DNS pointing at the box and
-80/443 reachable). Watch it:
+For a routine application rollout, first make sure the working tree contains
+only the reviewed release. Build the image, set `APP_VERSION` in `.env` to the
+commit SHA, and recreate only the web container:
 
 ```bash
-docker compose -f docker-compose.prod.yml logs -f caddy
+docker compose -f docker-compose.prod.yml build web
+docker compose -f docker-compose.prod.yml up -d --no-deps --no-build --force-recreate web
 ```
+
+When unrelated work is present in the checkout, build the exact committed tree
+instead of the working directory:
+
+```bash
+git archive --format=tar HEAD | docker build --tag transparency-report-api-web:latest -
+docker compose -f docker-compose.prod.yml up -d --no-deps --no-build --force-recreate web
+```
+
+This keeps Redis and Caddy running while the application container is replaced.
 
 ## 4. Verify
 
+Check the containers and tunnel first:
+
 ```bash
-# Liveness/readiness (through Caddy, over HTTPS):
-curl -fsS https://transparency.kieranmaynard.com/healthz
-curl -fsS https://transparency.kieranmaynard.com/readyz
-# Build id + which Redis backend is active ("redis" expected, not "upstash"/"memory"):
-curl -fsS https://transparency.kieranmaynard.com/version
+docker compose -f docker-compose.prod.yml ps
+systemctl --user status cloudflared-transparency.service
 ```
 
-Open the dashboard at the domain root and confirm the "Ask" box works (if
-`ANTHROPIC_API_KEY` is set).
-
-## 5. Operations
+Then verify both the loopback origin and public route:
 
 ```bash
-# Logs
+curl -fsS http://127.0.0.1:18080/readyz
+curl -fsS http://127.0.0.1:18080/version
+curl -fsS https://api.krm.fyi/readyz
+curl -fsS https://api.krm.fyi/version
+```
+
+The public `/version` response and `X-Version` header should match the release
+SHA, and the reported state backend should be `redis`.
+
+## 5. Operations and rollback
+
+```bash
+# Application logs
 docker compose -f docker-compose.prod.yml logs -f web
 
-# Update after pulling new code (rebuilds the image + re-seeds the DB)
-git pull
-docker compose -f docker-compose.prod.yml up -d --build
+# Tunnel logs
+journalctl --user -u cloudflared-transparency.service -f
 
-# Back up the mutable state (issued keys / sessions / jobs)
+# Back up Redis state
 docker run --rm -v transparency-report-api_redis-data:/data -v "$PWD":/backup \
   alpine tar czf /backup/redis-backup.tar.gz -C /data .
 ```
 
-Notes:
-- **Keep the `caddy-data` volume** — it holds the ACME account and issued
-  certificates. Losing it forces re-issuance (subject to Let's Encrypt rate limits).
-- The dataset is baked into the image; refresh it with
-  `scripts/refresh-dataset.sh` (then rebuild) when the upstream data changes.
-- To scale beyond one app replica later, the local Redis already makes the job /
-  session / key stores shared — add replicas of `web` and let Caddy load-balance.
+To roll back, rebuild the last known-good commit, restore its SHA in
+`APP_VERSION`, recreate only `web`, and repeat the verification checks. The
+Redis volume is not replaced during an application rollback.
+
+Refresh the vendored dataset before building when upstream data changes. Use
+`scripts/refresh-dataset.sh` for the VLOP snapshot and
+`scripts/revendor_data.py` for the other snapshots.

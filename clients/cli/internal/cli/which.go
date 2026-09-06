@@ -38,7 +38,7 @@ var whichIndex = []whichEntry{
 	{Command: "dsa-vlop-transparency-jobs list", Description: "List Jobs", Group: "dsa-vlop-transparency-jobs"},
 	{Command: "dsa-vlop-transparency-jobs download job-result", Description: "Secure download via a signed, expiring URL — no API key needed.\n\nThe link is a capability: the HMAC signature authorises this exact job +\nformat + expiry, so possession of a valid, unexpired URL is sufficient.", Group: "dsa-vlop-transparency-jobs"},
 	{Command: "dsa-vlop-transparency-jobs result get-job", Description: "Get Job Result", Group: "dsa-vlop-transparency-jobs"},
-	{Command: "dsa-vlop-transparency-version version", Description: "The deployed build (commit SHA on Cloud Run, else \"dev\") + app version.", Group: "dsa-vlop-transparency-version"},
+	{Command: "dsa-vlop-transparency-version version", Description: "The deployed build identifier (normally a commit SHA) + app version.", Group: "dsa-vlop-transparency-version"},
 	{Command: "explore explore", Description: "Public, synchronous, bounded query for the interactive dashboard.\n\nSame validated structured-query model as POST /api/query (no SQL is ever\naccepted; every field/operation is checked against the table registry and all\nvalues are bound), but it runs inline and hard-caps the row count — no auth,\nno job, no webhook. IP-rate-limited so the open endpoint can't be hammered.", Group: "explore"},
 	{Command: "explore options", Description: "Public metadata for the dashboard's query builder: each table's queryable\ndimensions and measures, from the fixed registry (no DB, no secrets).", Group: "explore"},
 	{Command: "fields list", Description: "Fields for a report table (`?table=…`), or an overview of all tables.", Group: "fields"},

@@ -15,8 +15,8 @@ func newDsaVlopTransparencyVersionPromotedCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:         "dsa-vlop-transparency-version",
-		Short:       "The deployed build (commit SHA on Cloud Run, else 'dev') + app version.",
-		Long:        "The deployed build (commit SHA on Cloud Run, else 'dev') + app version.",
+		Short:       "The deployed build identifier (normally a commit SHA) + app version.",
+		Long:        "The deployed build identifier (normally a commit SHA) + app version.",
 		Example:     "  dsa-research-pp-cli dsa-vlop-transparency-version",
 		Annotations: map[string]string{"pp:endpoint": "dsa-vlop-transparency-version.version", "pp:method": "GET", "pp:path": "/version", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {

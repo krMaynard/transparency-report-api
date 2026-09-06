@@ -25,4 +25,3 @@ docs/
 .env
 .dockerignore
 Dockerfile
-service.yaml

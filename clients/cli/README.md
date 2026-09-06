@@ -188,7 +188,7 @@ Manage dsa vlop transparency jobs
 
 Manage dsa vlop transparency version
 
-- **`dsa-research-pp-cli dsa-vlop-transparency-version`** - The deployed build (commit SHA on Cloud Run, else "dev") + app version.
+- **`dsa-research-pp-cli dsa-vlop-transparency-version`** - The deployed build identifier (normally a commit SHA) + app version.
 
 ### explore
 

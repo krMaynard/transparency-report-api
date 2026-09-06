@@ -146,7 +146,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("dsa-vlop-transparency-version_version",
-			mcplib.WithDescription("The deployed build (commit SHA on Cloud Run, else 'dev') + app version. Returns the ResponseVersionVersionGet."),
+			mcplib.WithDescription("The deployed build identifier (normally a commit SHA) + app version. Returns the ResponseVersionVersionGet."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),

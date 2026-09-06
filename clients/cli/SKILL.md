@@ -59,7 +59,7 @@ Query the aggregated EU Digital Services Act VLOP transparency reports (tables 3
 
 **dsa-vlop-transparency-version** — Manage dsa vlop transparency version
 
-- `dsa-research-pp-cli dsa-vlop-transparency-version` — The deployed build (commit SHA on Cloud Run, else 'dev') + app version.
+- `dsa-research-pp-cli dsa-vlop-transparency-version` — The deployed build identifier (normally a commit SHA) + app version.
 
 **explore** — Manage explore
 

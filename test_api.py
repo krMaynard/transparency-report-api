@@ -1213,7 +1213,7 @@ class TestVersion:
         assert r.status_code == 200
         body = r.json()
         # Defaults to "dev" in tests (APP_VERSION unset); the CD workflow injects
-        # the commit SHA on Cloud Run.
+        # the deployed commit SHA in production.
         assert body["version"] == "dev"
         assert "app_version" in body
 

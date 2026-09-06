@@ -1,4 +1,4 @@
-# DSA VLOP Transparency Query API — container image for Cloud Run.
+# DSA VLOP Transparency Query API — production container image.
 #
 # The image is self-contained: the SQLite DB is seeded at build time from the
 # vendored dataset snapshot (data/vlop-dsa.json), so the running container has no
@@ -31,12 +31,12 @@ RUN python seed.py --source data/vlop-dsa.json --gr-source data/google-governmen
 RUN useradd --system --uid 10001 appuser
 USER appuser
 
-# Cloud Run sends traffic to $PORT (default 8080) and terminates TLS at its front
-# end, setting forwarded headers — trust them for correct client IP / scheme.
+# The local production stack publishes this port only on loopback. Cloudflare
+# terminates public TLS and forwards traffic through a named tunnel.
 EXPOSE 8080
 
-# Container-level health for docker-compose / non-Cloud-Run runtimes (Cloud Run
-# uses its own probes from service.yaml). Pure-Python so no extra packages.
+# Container-level health check used by Docker Compose. Pure Python, so it does
+# not add another package to the production image.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
   CMD ["python", "-c", "import os,urllib.request,sys; port=os.getenv('PORT') or '8080'; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:'+port+'/healthz', timeout=2).status==200 else 1)"]
 

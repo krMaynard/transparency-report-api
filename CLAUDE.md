@@ -147,9 +147,8 @@ Built to demonstrate two things:
 | `static/{es,fr,de,it,ja,zh,ko}/*.html` | Localized copies of the twenty-four pages, served under a locale prefix (`/es`, `/es/reports`, …). **Generated** — never hand-edit; see `scripts/localize_static.py` |
 | `scripts/localize_static.py` | Generates the localized pages from the English originals + per-locale translation tables (the single source of UI translations). Re-run after any English page change |
 | `Dockerfile` | Self-contained image: installs deps, seeds `demo.db` at build time, runs uvicorn on `$PORT` as non-root |
-| `service.yaml` | Cloud Run (Knative) manifest — prod env + startup/liveness probes |
-| `docker-compose.prod.yml` | Self-hosting stack (single VPS): the app image + local persistent Redis + Caddy (automatic HTTPS) — the low-cost alternative to Cloud Run + Upstash. See `DEPLOY-SELFHOST.md` |
-| `Caddyfile` | Caddy reverse-proxy config for the self-hosted stack — TLS termination + Let's Encrypt for `transparency.kieranmaynard.com` → `web:8080` |
+| `docker-compose.prod.yml` | Active production stack: the app image + persistent local Redis + loopback-only Caddy, published through Cloudflare Tunnel. See `DEPLOY-SELFHOST.md` |
+| `Caddyfile` | Caddy reverse-proxy config for the self-hosted stack and legacy-host redirects to `api.krm.fyi` |
 | `DEPLOY-SELFHOST.md` | Runbook for the single-VPS self-hosting path (prereqs, `.env`, launch, verify, ops) |
 | `scripts/refresh-dataset.sh` | Re-vendor `data/vlop-dsa.json` from the canonical sibling-repo dataset |
 | `scripts/revendor_data.py` | Re-vendor the **non-VLOP** snapshots (`data/harmonised-reports.json` + `data/report-locations.csv`) from the sibling `dsa-transparency-data` repo and report any extracted platform still missing a `seed_harmonised.SLUG_META` entry. Run by the `revendor-data.yml` workflow (nightly / on dispatch); also runnable locally (`--check` for a dry run) |
@@ -158,15 +157,13 @@ Built to demonstrate two things:
 | `scripts/make_portal_gifs.py` | Portal-workflow GIF generator (Playwright + Pillow) → `docs/gifs/portal-*.gif` |
 | `requirements.txt` | `fastapi` + `uvicorn[standard]` + `anthropic` (NL queries) |
 | `demo.db` | SQLite DB (git-ignored, produced by `seed.py`) |
-| `clients/cli/` | Generated Go CLI + MCP server for this API (CLI Printing Press, from `/openapi.json`) — own module; built on demand, excluded from the Docker/Cloud Build image |
+| `clients/cli/` | Generated Go CLI + MCP server for this API (CLI Printing Press, from `/openapi.json`) — own module; built on demand, excluded from the production Docker image |
 | `mcp_server.py` | Native Python MCP **stdio** server — a thin HTTP front end over the API (8 tools: `list_tables`/`describe_table`/`dataset_overview`/`run_query`/`ask`/`register`/`submit_query`/`poll_job`). Does **not** import `main`; talks to a running server over `httpx`, so its deps (`mcp`+`httpx`) stay out of the app image and clear of the `fastapi`/`starlette` pins. Configured via `TRANSPARENCY_API_URL`/`_API_KEY`/`_API_TIMEOUT`. See [`docs/MCP.md`](docs/MCP.md) |
 | `requirements-mcp.txt` | Deps for `mcp_server.py` only (`mcp`, `httpx`) — install into a separate venv (`make mcp`); kept out of `requirements.txt`/the Docker image |
 | `mcp-config.example.json` | Example MCP host config (Claude Desktop / Claude Code) for `mcp_server.py` |
 | `test_mcp_server.py` | Tests for `mcp_server.py` — drives the tool functions against the app via an in-process `TestClient` (no network, no `mcp` SDK needed; the `build_server()` test self-skips when the SDK is absent) |
 | `.github/workflows/ci.yml` | CI: `pyflakes` lint + `pytest` on every PR/push (Python 3.11 & 3.12) |
-| `.github/workflows/deploy.yml` | CD: build/push image + deploy to Cloud Run on push to `main` (WIF; skips until configured) |
 | `.github/workflows/revendor-data.yml` | Auto-vendoring: regenerate the non-VLOP snapshots from `dsa-transparency-data` and open/update a single `auto/revendor-data` PR when they change. Triggers: nightly schedule, `workflow_dispatch`, or a `data-updated` `repository_dispatch` from the data repo. Validates by reseeding + `pytest` before opening the PR |
-| `.gcloudignore` | Trims the Cloud Build upload context (keeps Dockerfile + `data/`) |
 
 ## Localization
 
@@ -203,12 +200,11 @@ SDK/`demo.db` needed; `conftest.py` builds a temp DB and `test_mcp_server.py`
 drives the API in-process via `TestClient`). Run them locally before pushing
 (`make lint typecheck test`).
 
-`deploy.yml` builds + pushes the image and rolls a Cloud Run revision on push to
-`main` via Workload Identity Federation, stamping the commit SHA as `APP_VERSION`.
-It deploys with `--no-traffic`, smoke-tests the new revision's `/readyz`, then
-promotes it with `update-traffic --to-latest`. Gated on the `GCP_PROJECT_ID` repo
-variable, so it **skips** (not fails) until GCP is configured — see README →
-"Continuous deployment". `.gcloudignore` keeps the Cloud Build upload lean.
+Production is not deployed by GitHub Actions. It runs from
+`docker-compose.prod.yml` on this host and is published through the
+`cloudflared-transparency.service` named tunnel. Follow `DEPLOY-SELFHOST.md` for
+build, rollout, verification, and rollback; set `APP_VERSION` to the deployed
+commit SHA.
 
 ## Data re-vendoring (automated)
 

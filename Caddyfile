@@ -1,16 +1,7 @@
-# Caddy reverse proxy for the self-hosted transparency API.
-#
-# Caddy terminates TLS and provisions/renews a Let's Encrypt certificate
-# automatically for the hostname below — point the domain's A (and AAAA) records
-# at this host first, and make sure ports 80 and 443 are open. The app sits on
-# the internal Docker network at web:8080 and is never exposed to the host.
-#
-# Optional: set a global ACME contact email for expiry notices by uncommenting:
-# {
-# 	email you@example.com
-# }
+# Internal HTTP proxy and legacy-host redirect for the self-hosted transparency
+# API. Cloudflare terminates public TLS; Caddy is bound to loopback only.
 
-{$SITE_ADDRESS:transparency.kieranmaynard.com} {
+http://{$SITE_ADDRESS:api.krm.fyi} {
 	encode zstd gzip
 
 	# App emits its own HSTS + security headers and runs uvicorn with
@@ -23,4 +14,15 @@
 		output stdout
 		format console
 	}
+}
+
+# Keep both former public hostnames working while making api.krm.fyi canonical.
+# {uri} preserves both the request path and query string.
+http://transparency.krm.fyi, http://transparency.kieranmaynard.com {
+	redir https://api.krm.fyi{uri} 308
+}
+
+# Preserve every legacy website path and query while moving the primary site.
+http://kieranmaynard.com, http://www.kieranmaynard.com {
+	redir https://krm.fyi{uri} 308
 }

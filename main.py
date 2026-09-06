@@ -112,9 +112,9 @@ GOOGLE_SESSION_TTL = int(os.getenv("GOOGLE_SESSION_TTL_SECONDS", str(7 * 24 * 36
 # Demo auth (hardcoded momo/honggildong keys + the open /portal/register flow). Handy for
 # local dev; set ALLOW_DEMO_KEYS=0 in production so only Google sign-in works.
 ALLOW_DEMO_KEYS = os.getenv("ALLOW_DEMO_KEYS", "1").lower() in ("1", "true", "yes")
-# Deployed build identifier — the CD workflow injects the commit SHA as APP_VERSION
-# on each Cloud Run revision; defaults to "dev" locally. Surfaced at GET /version
-# and in the X-Version response header so you can confirm what's actually live.
+# Deployed build identifier. Set APP_VERSION to the release commit SHA when the
+# production container is rolled out; it defaults to "dev" locally. Surfaced at
+# GET /version and in X-Version so you can confirm what is actually live.
 APP_VERSION = os.getenv("APP_VERSION") or "dev"
 # Combined-site layout: the home page is served at "/", the dashboard at "/reports", and the JSON API lives
 # under this prefix on the same origin (no CORS). Operational endpoints
@@ -5042,7 +5042,7 @@ def health() -> dict[str, str]:
 
 @app.get("/version")
 def version() -> dict[str, str]:
-    """The deployed build (commit SHA on Cloud Run, else "dev") + app version."""
+    """The deployed build identifier (normally a commit SHA) + app version."""
     return {"version": APP_VERSION, "app_version": app.version}
 
 
